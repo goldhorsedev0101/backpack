@@ -37,6 +37,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User preferences endpoints
+  app.get('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({
+        interests: user.interests || [],
+        travelStyles: user.travelStyles || [],
+        budgetRange: user.budgetRange,
+        experienceLevel: user.experienceLevel,
+        groupSize: user.groupSize,
+        preferredDuration: user.preferredDuration,
+        accommodationType: user.accommodationType || [],
+        activities: user.activities || [],
+        dietaryRestrictions: user.dietaryRestrictions || [],
+        languages: user.languages || [],
+        personalityTraits: user.personalityTraits || [],
+        bio: user.bio,
+        onboardingCompleted: user.onboardingCompleted || false
+      });
+    } catch (error) {
+      console.error("Error fetching user preferences:", error);
+      res.status(500).json({ message: "Failed to fetch user preferences" });
+    }
+  });
+
+  app.post('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const preferences = req.body;
+      
+      // Map travelStyle to travelStyles for database storage
+      if (preferences.travelStyle) {
+        preferences.travelStyles = preferences.travelStyle;
+        delete preferences.travelStyle;
+      }
+      
+      // Mark onboarding as completed
+      preferences.onboardingCompleted = true;
+      
+      const updatedUser = await storage.updateUserPreferences(userId, preferences);
+      
+      res.json({
+        message: "Preferences updated successfully",
+        user: updatedUser
+      });
+    } catch (error) {
+      console.error("Error updating user preferences:", error);
+      res.status(500).json({ message: "Failed to update user preferences" });
+    }
+  });
+
   // Trip routes
   app.get('/api/trips', async (req, res) => {
     try {

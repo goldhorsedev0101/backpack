@@ -32,6 +32,7 @@ export interface IStorage {
   // User operations (mandatory for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  updateUserPreferences(userId: string, preferences: Partial<User>): Promise<User>;
   
   // Trip operations
   createTrip(trip: InsertTrip): Promise<Trip>;
@@ -87,6 +88,23 @@ export class DatabaseStorage implements IStorage {
         },
       })
       .returning();
+    return user;
+  }
+
+  async updateUserPreferences(userId: string, preferences: Partial<User>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({
+        ...preferences,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (!user) {
+      throw new Error("User not found");
+    }
+    
     return user;
   }
 

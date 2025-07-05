@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import TripCard from "@/components/trip-card";
 import AiChat from "@/components/ai-chat";
+import PersonalizedRecommendations from "@/components/personalized-recommendations";
 import { Link } from "wouter";
 import { 
   Plus, 
@@ -113,6 +114,9 @@ export default function Home() {
                 </Card>
               )}
             </section>
+
+            {/* Personalized Recommendations */}
+            <PersonalizedRecommendations className="mb-12" />
 
             {/* Popular Routes */}
             <section>
