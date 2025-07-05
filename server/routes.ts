@@ -212,6 +212,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { destination, duration, budget, travelStyle, interests } = req.body;
       
+      console.log('Trip generation request:', { destination, duration, budget, travelStyle, interests });
+      
       const suggestions = await generateTravelSuggestions({
         travelStyle,
         budget,
@@ -219,6 +221,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         interests: interests || [],
         preferredCountries: destination ? [destination] : []
       });
+
+      console.log('Generated suggestions:', suggestions);
 
       if (suggestions.length > 0) {
         const trip = suggestions[0];
@@ -238,11 +242,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
         res.json(response);
       } else {
-        throw new Error("No suggestions generated");
+        // Fallback: create a basic trip structure when AI fails
+        const fallbackTrip = {
+          title: `${destination} Adventure`,
+          description: `Explore the amazing ${destination} with ${travelStyle.join(' and ')} experiences.`,
+          destinations: [
+            {
+              name: destination,
+              days: duration === "1-2 weeks" ? 10 : 21,
+              activities: ["Explore local culture", "Visit main attractions", "Try local cuisine"],
+              estimatedCost: budget || 1000
+            }
+          ],
+          totalEstimatedCost: (budget || 1000) * 1.2,
+          recommendations: ["Book accommodation in advance", "Learn basic local phrases", "Pack for local weather"]
+        };
+        
+        console.log('Using fallback trip generation');
+        res.json(fallbackTrip);
       }
     } catch (error) {
       console.error("Error generating trip:", error);
-      res.status(500).json({ message: "Failed to generate trip with AI" });
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      res.status(500).json({ 
+        message: "Failed to generate trip with AI",
+        error: errorMessage 
+      });
     }
   });
 

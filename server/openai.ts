@@ -44,7 +44,7 @@ export async function generateTravelSuggestions(
   }
 ): Promise<TripSuggestion[]> {
   try {
-    const prompt = `You are a South American travel expert. Generate 3-5 unique travel suggestions based on these preferences:
+    const prompt = `Generate travel suggestions for South America based on these preferences:
 
 Travel Style: ${preferences.travelStyle || 'Any'}
 Budget: $${preferences.budget || 'Flexible'}
@@ -52,7 +52,31 @@ Duration: ${preferences.duration || 'Flexible'}
 Interests: ${preferences.interests?.join(', ') || 'General sightseeing'}
 Preferred Countries: ${preferences.preferredCountries?.join(', ') || 'Any South American country'}
 
-Focus on authentic, lesser-known destinations alongside popular spots. Include practical budget estimates and highlight unique experiences. Respond with a JSON array of trip suggestions.`;
+Return a JSON object with a "suggestions" array containing 3 trip suggestions. Each suggestion must have:
+- destination (string): City or region name
+- country (string): South American country
+- description (string): Brief overview of the trip
+- bestTimeToVisit (string): Best months to visit
+- estimatedBudget (object): {low: number, high: number} in USD
+- highlights (array): List of 3-5 main activities/attractions
+- travelStyle (array): List of applicable travel styles
+- duration (string): Recommended trip length
+
+Example response format:
+{
+  "suggestions": [
+    {
+      "destination": "Cusco",
+      "country": "Peru", 
+      "description": "Ancient Inca capital with stunning architecture",
+      "bestTimeToVisit": "May to September",
+      "estimatedBudget": {"low": 800, "high": 1500},
+      "highlights": ["Machu Picchu", "Sacred Valley", "Local markets"],
+      "travelStyle": ["adventure", "cultural"],
+      "duration": "7-10 days"
+    }
+  ]
+}`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -70,11 +94,29 @@ Focus on authentic, lesser-known destinations alongside popular spots. Include p
       temperature: 0.7
     });
 
-    const result = JSON.parse(response.choices[0].message.content || '{"suggestions": []}');
-    return result.suggestions || result.trips || [];
+    const content = response.choices[0].message.content;
+    console.log('OpenAI response content:', content);
+    
+    if (!content) {
+      throw new Error('No content received from OpenAI');
+    }
+    
+    const result = JSON.parse(content);
+    console.log('Parsed OpenAI result:', result);
+    
+    // Handle different response formats
+    const suggestions = result.suggestions || result.trips || result;
+    if (Array.isArray(suggestions)) {
+      return suggestions;
+    } else if (Array.isArray(result)) {
+      return result;
+    } else {
+      throw new Error('Invalid response format from OpenAI');
+    }
   } catch (error) {
     console.error('Error generating travel suggestions:', error);
-    throw new Error('Failed to generate travel suggestions');
+    console.error('Error details:', error instanceof Error ? error.message : error);
+    throw new Error(`Failed to generate travel suggestions: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
