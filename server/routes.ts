@@ -3,6 +3,9 @@ import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import { db } from "./db";
+import { achievements } from "@shared/schema";
+import { eq } from "drizzle-orm";
 import {
   insertTripSchema,
   insertReviewSchema,
@@ -795,8 +798,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const preferences = {
         userId,
         travelStyle: user?.travelStyle || 'adventure',
-        budget: user?.budget || 'mid',
-        interests: user?.interests || ['culture', 'food', 'nature'],
+        budget: 'mid',
+        interests: ['culture', 'food', 'nature'],
         notifications: {
           email: true,
           push: true,
@@ -1263,13 +1266,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const achievement of defaultAchievements) {
         try {
           // Check if achievement already exists
-          const existing = await db
-            .select()
-            .from(achievements)
-            .where(eq(achievements.name, achievement.name))
-            .limit(1);
+          const existing = await storage.getAllAchievements();
+          const existingAchievement = existing.find(a => a.name === achievement.name);
 
-          if (existing.length === 0) {
+          if (!existingAchievement) {
             await db.insert(achievements).values(achievement);
             createdCount++;
           }
