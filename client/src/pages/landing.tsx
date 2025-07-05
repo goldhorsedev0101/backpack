@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   Compass, 
   MapPin, 
@@ -27,12 +28,15 @@ import {
   Facebook,
   Youtube,
   Home,
-  UserPlus
+  UserPlus,
+  LogIn,
+  LogOut
 } from "lucide-react";
 
 export default function Landing() {
   const [budget, setBudget] = useState([2500]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+  const { user } = useAuth();
 
   const toggleStyle = (style: string) => {
     setSelectedStyles(prev => 
@@ -44,6 +48,14 @@ export default function Landing() {
 
   const handleLogin = () => {
     window.location.href = "/api/login";
+  };
+
+  const handleRegister = () => {
+    window.location.href = "/api/login?signup=true";
+  };
+
+  const handleLogout = () => {
+    window.location.href = "/api/logout";
   };
 
   return (
@@ -67,10 +79,26 @@ export default function Landing() {
               </div>
             </div>
             <div className="hidden md:flex items-center space-x-4">
-              <Button onClick={handleLogin} className="bg-primary text-white hover:bg-orange-600">
-                <UserPlus className="w-4 h-4 mr-2" />
-                Sign In
-              </Button>
+              {user ? (
+                <>
+                  <span className="text-slate-600">Welcome, {user.firstName || user.email}</span>
+                  <Button onClick={handleLogout} variant="outline" className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button onClick={handleLogin} variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Login
+                  </Button>
+                  <Button onClick={handleRegister} className="bg-primary text-white hover:bg-orange-600">
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Register
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -97,6 +125,29 @@ export default function Landing() {
                 Watch Demo
               </Button>
             </div>
+            {!user && (
+              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-6">
+                <span className="text-white opacity-75">Already have an account?</span>
+                <Button onClick={handleLogin} variant="outline" className="border-white text-white px-6 py-2 rounded-lg hover:bg-white hover:text-primary">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Login
+                </Button>
+                <span className="text-white opacity-75">or</span>
+                <Button onClick={handleRegister} className="bg-accent text-white px-6 py-2 rounded-lg hover:bg-orange-600">
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Register
+                </Button>
+              </div>
+            )}
+            {user && (
+              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-6">
+                <span className="text-white opacity-90">Welcome back, {user.firstName || user.email}!</span>
+                <Button onClick={handleLogout} variant="outline" className="border-white text-white px-6 py-2 rounded-lg hover:bg-red-500 hover:text-white">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -175,11 +226,23 @@ export default function Landing() {
               </div>
               
               <div className="text-center">
-                <Button onClick={handleLogin} className="bg-primary text-white px-8 py-4 rounded-xl font-semibold hover:bg-orange-600">
-                  <Bot className="w-5 h-5 mr-2" />
-                  Generate My Trip
-                </Button>
-                <p className="text-sm text-gray-500 mt-2">Sign in to start planning your adventure</p>
+                {user ? (
+                  <>
+                    <Button onClick={() => window.location.href = "/trip-builder"} className="bg-primary text-white px-8 py-4 rounded-xl font-semibold hover:bg-orange-600">
+                      <Bot className="w-5 h-5 mr-2" />
+                      Generate My Trip
+                    </Button>
+                    <p className="text-sm text-gray-500 mt-2">Ready to plan your next adventure!</p>
+                  </>
+                ) : (
+                  <>
+                    <Button onClick={handleRegister} className="bg-primary text-white px-8 py-4 rounded-xl font-semibold hover:bg-orange-600">
+                      <Bot className="w-5 h-5 mr-2" />
+                      Generate My Trip
+                    </Button>
+                    <p className="text-sm text-gray-500 mt-2">Sign in to start planning your adventure</p>
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>

@@ -193,6 +193,7 @@ TripWise is a full-stack web application focused on South American travel planni
 - July 05, 2025. Fixed onboarding "Complete Setup" button navigation issue - now properly redirects to home page after completing setup
 - July 05, 2025. Restructured user flow - Landing page now appears first for all users, onboarding only starts after sign-in button is clicked
 - July 05, 2025. Modified authentication flow - Personalization (onboarding) now always happens immediately after login/register, regardless of previous completion status
+- July 05, 2025. Implemented conditional authentication UI on landing page - separate login/register buttons, welcome messages for authenticated users, and dynamic trip generation functionality
 
 ## User Preferences
 

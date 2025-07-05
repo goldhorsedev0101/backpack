@@ -1,7 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
 
+interface User {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  profileImageUrl?: string;
+  onboardingCompleted?: boolean;
+  interests?: string[];
+  travelStyles?: string[];
+  budgetRange?: string;
+  experienceLevel?: string;
+  groupSize?: string;
+  preferredDuration?: string;
+  accommodationType?: string[];
+  activities?: string[];
+  personalityTraits?: string[];
+}
+
 export function useAuth() {
-  const { data: user, isLoading, error } = useQuery({
+  const { data: user, isLoading, error } = useQuery<User | null>({
     queryKey: ["/api/auth/user"],
     retry: false,
   });
