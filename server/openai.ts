@@ -44,6 +44,13 @@ export async function generateTravelSuggestions(
   }
 ): Promise<TripSuggestion[]> {
   try {
+    // Add API key check
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OpenAI API key not configured');
+    }
+    
+    console.log('OpenAI API Key exists:', !!process.env.OPENAI_API_KEY);
+    console.log('Generating suggestions with preferences:', preferences);
     const prompt = `Generate travel suggestions for South America based on these preferences:
 
 Travel Style: ${preferences.travelStyle || 'Any'}

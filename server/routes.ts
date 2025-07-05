@@ -214,60 +214,121 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('Trip generation request:', { destination, duration, budget, travelStyle, interests });
       
-      const suggestions = await generateTravelSuggestions({
-        travelStyle,
-        budget,
-        duration,
-        interests: interests || [],
-        preferredCountries: destination ? [destination] : []
-      });
+      // Enhanced destination-specific trip data
+      const destinationData = {
+        'Peru': {
+          activities: ['Machu Picchu trek', 'Sacred Valley exploration', 'Cusco city tour', 'Amazon rainforest adventure', 'Lima food tour'],
+          description: 'Discover ancient Inca civilization, stunning mountain landscapes, and rich cultural heritage in Peru.',
+          highlights: ['Machu Picchu', 'Sacred Valley', 'Rainbow Mountain', 'Amazon jungle', 'Colonial architecture']
+        },
+        'Colombia': {
+          activities: ['Cartagena colonial tour', 'Coffee region exploration', 'Medellín city experience', 'Tayrona National Park', 'Salsa dancing lessons'],
+          description: 'Experience vibrant culture, stunning Caribbean coast, and world-renowned coffee regions in Colombia.',
+          highlights: ['Cartagena old city', 'Coffee plantations', 'Caribbean beaches', 'Pablo Escobar tour', 'Street art scene']
+        },
+        'Bolivia': {
+          activities: ['Salar de Uyuni tour', 'La Paz cable car ride', 'Death Road cycling', 'Lake Titicaca visit', 'Sucre colonial exploration'],
+          description: 'Explore otherworldly salt flats, high-altitude adventures, and indigenous culture in Bolivia.',
+          highlights: ['Salt flats mirror effect', 'Floating islands', 'World\'s most dangerous road', 'Witch markets', 'Colonial Sucre']
+        },
+        'Chile': {
+          activities: ['Atacama Desert stargazing', 'Patagonia hiking', 'Santiago wine tours', 'Easter Island exploration', 'Valparaíso street art tour'],
+          description: 'Journey through diverse landscapes from desert to glaciers, with world-class wine and unique culture.',
+          highlights: ['Atacama geysers', 'Torres del Paine', 'Moai statues', 'Wine valleys', 'Colorful port cities']
+        },
+        'Argentina': {
+          activities: ['Buenos Aires tango shows', 'Iguazu Falls visit', 'Patagonia glacier trekking', 'Mendoza wine tasting', 'Bariloche lake district'],
+          description: 'Experience passionate tango culture, incredible natural wonders, and world-famous beef and wine.',
+          highlights: ['Iguazu waterfalls', 'Perito Moreno glacier', 'Tango shows', 'Wine country', 'Lake district']
+        },
+        'Brazil': {
+          activities: ['Rio de Janeiro beaches', 'Amazon rainforest tour', 'Salvador cultural immersion', 'Iguazu Falls Brazilian side', 'São Paulo food scene'],
+          description: 'Immerse yourself in carnival culture, pristine beaches, and the world\'s largest rainforest.',
+          highlights: ['Christ the Redeemer', 'Copacabana beach', 'Amazon wildlife', 'Carnival festivals', 'Capoeira performances']
+        },
+        'Ecuador': {
+          activities: ['Galápagos wildlife tour', 'Quito colonial exploration', 'Amazon lodge stay', 'Cotopaxi volcano hike', 'Otavalo market visit'],
+          description: 'Discover unique wildlife, colonial architecture, and diverse ecosystems from coast to jungle.',
+          highlights: ['Galápagos islands', 'Equatorial monuments', 'Cloud forests', 'Indigenous markets', 'Active volcanoes']
+        }
+      };
 
-      console.log('Generated suggestions:', suggestions);
+      const selectedDestination = destinationData[destination] || {
+        activities: ['Explore local culture', 'Visit main attractions', 'Try local cuisine', 'Meet local people', 'Discover hidden gems'],
+        description: `Explore the amazing ${destination} with authentic ${travelStyle?.join(' and ') || 'adventure'} experiences.`,
+        highlights: ['Cultural sites', 'Local markets', 'Traditional food', 'Natural landscapes', 'Historical monuments']
+      };
 
-      if (suggestions.length > 0) {
-        const trip = suggestions[0];
-        const response = {
-          title: `${trip.destination} Adventure`,
-          description: trip.description,
-          destinations: [
-            {
-              name: trip.destination,
-              days: duration === "1-2 weeks" ? 10 : 21,
-              activities: trip.highlights,
-              estimatedCost: trip.estimatedBudget.low
-            }
-          ],
-          totalEstimatedCost: trip.estimatedBudget.high,
-          recommendations: trip.highlights
-        };
-        res.json(response);
-      } else {
-        // Fallback: create a basic trip structure when AI fails
-        const fallbackTrip = {
-          title: `${destination} Adventure`,
-          description: `Explore the amazing ${destination} with ${travelStyle.join(' and ')} experiences.`,
-          destinations: [
-            {
-              name: destination,
-              days: duration === "1-2 weeks" ? 10 : 21,
-              activities: ["Explore local culture", "Visit main attractions", "Try local cuisine"],
-              estimatedCost: budget || 1000
-            }
-          ],
-          totalEstimatedCost: (budget || 1000) * 1.2,
-          recommendations: ["Book accommodation in advance", "Learn basic local phrases", "Pack for local weather"]
-        };
+      // Try AI generation first, then fall back to enhanced destination data
+      let trip;
+      try {
+        const suggestions = await generateTravelSuggestions({
+          travelStyle,
+          budget,
+          duration,
+          interests: interests || [],
+          preferredCountries: destination ? [destination] : []
+        });
         
-        console.log('Using fallback trip generation');
-        res.json(fallbackTrip);
+        if (suggestions.length > 0) {
+          trip = suggestions[0];
+        } else {
+          throw new Error('No AI suggestions returned');
+        }
+      } catch (aiError) {
+        console.log('AI generation failed, using enhanced fallback:', aiError);
+        // Use enhanced destination-specific data
+        trip = {
+          destination: destination,
+          description: selectedDestination.description,
+          highlights: selectedDestination.activities.slice(0, 5),
+          estimatedBudget: {
+            low: Math.max(budget * 0.8, 500),
+            high: Math.max(budget * 1.2, 800)
+          }
+        };
       }
+
+      const response = {
+        title: `${destination} ${travelStyle?.includes('adventure') ? 'Adventure' : travelStyle?.includes('cultural') ? 'Cultural Journey' : 'Experience'}`,
+        description: trip.description,
+        destinations: [
+          {
+            name: destination,
+            days: duration === "1-2 weeks" ? 10 : duration === "2-4 weeks" ? 21 : 14,
+            activities: trip.highlights || selectedDestination.activities,
+            estimatedCost: trip.estimatedBudget?.low || budget * 0.8
+          }
+        ],
+        totalEstimatedCost: trip.estimatedBudget?.high || budget * 1.2,
+        recommendations: selectedDestination.highlights
+      };
+      
+      console.log('Sending trip response:', response);
+      res.json(response);
     } catch (error) {
       console.error("Error generating trip:", error);
+      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
+      
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      res.status(500).json({ 
-        message: "Failed to generate trip with AI",
-        error: errorMessage 
-      });
+      
+      // Provide more specific error information
+      if (errorMessage.includes("API key")) {
+        res.status(500).json({ 
+          message: "OpenAI API key issue. Please check configuration.",
+          error: errorMessage 
+        });
+      } else if (errorMessage.includes("rate limit")) {
+        res.status(500).json({ 
+          message: "OpenAI rate limit reached. Please try again later.",
+          error: errorMessage 
+        });
+      } else {
+        res.status(500).json({ 
+          message: "Failed to generate trip with AI",
+          error: errorMessage 
+        });
+      }
     }
   });
 
@@ -346,6 +407,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error generating recommendations:", error);
       res.status(500).json({ message: "Failed to generate recommendations" });
+    }
+  });
+
+  // Test OpenAI API endpoint
+  app.get('/api/ai/test', async (req, res) => {
+    try {
+      console.log('Testing OpenAI API...');
+      const testResponse = await generateTravelSuggestions({
+        travelStyle: 'adventure',
+        budget: 1000,
+        duration: '1-2 weeks',
+        interests: ['hiking'],
+        preferredCountries: ['Peru']
+      });
+      console.log('OpenAI test successful:', testResponse);
+      res.json({ status: 'success', suggestions: testResponse });
+    } catch (error) {
+      console.error('OpenAI test failed:', error);
+      res.status(500).json({ 
+        status: 'error', 
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      });
     }
   });
 
