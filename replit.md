@@ -191,6 +191,7 @@ TripWise is a full-stack web application focused on South American travel planni
 - July 05, 2025. Resolved OpenAI integration issues for trip generation and AI chat assistant functionality
 - July 05, 2025. Implemented comprehensive user onboarding and personalization system with multi-step preference collection, personalized destination recommendations, and enhanced trip planning
 - July 05, 2025. Fixed onboarding "Complete Setup" button navigation issue - now properly redirects to home page after completing setup
+- July 05, 2025. Restructured user flow - Landing page now appears first for all users, onboarding only starts after sign-in button is clicked
 
 ## User Preferences
 

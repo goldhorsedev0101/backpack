@@ -71,13 +71,9 @@ function Router() {
 
   return (
     <Switch>
-      {!isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : (
-        <Switch>
-          <Route path="/landing" component={Landing} />
-          <Route path="*" component={AuthenticatedApp} />
-        </Switch>
+      <Route path="/" component={Landing} />
+      {isAuthenticated && (
+        <Route path="*" component={AuthenticatedApp} />
       )}
       <Route component={NotFound} />
     </Switch>

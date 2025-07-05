@@ -101,26 +101,34 @@ export default function Onboarding() {
     setLocation('/');
   };
 
-  const handleCompleteSetup = () => {
+  const handleCompleteSetup = async () => {
     console.log('Complete Setup clicked with preferences:', preferences);
     
     try {
-      // Multiple navigation approaches to ensure it works
-      console.log('Attempting navigation to home page...');
+      // Save preferences to backend to mark onboarding as complete
+      console.log('Saving preferences...');
+      await apiRequest('/api/user/preferences', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...preferences,
+          onboardingCompleted: true
+        })
+      });
       
-      // Method 1: Use wouter navigation
+      // Invalidate cache to refetch user data
+      queryClient.invalidateQueries({ queryKey: ['/api/user/preferences'] });
+      
+      // Navigate to home page
+      console.log('Attempting navigation to home page...');
       setLocation('/');
       
-      // Method 2: Fallback with window navigation
-      setTimeout(() => {
-        console.log('Fallback navigation...');
-        window.location.href = '/';
-      }, 100);
-      
     } catch (error) {
-      console.error('Navigation error:', error);
-      // Force navigation as last resort
-      window.location.href = '/';
+      console.error('Error saving preferences:', error);
+      // Still navigate even if save fails
+      setLocation('/');
     }
   };
 
