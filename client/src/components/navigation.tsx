@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { queryClient } from "@/lib/queryClient";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -40,8 +41,19 @@ export default function Navigation() {
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
+  const handleLogout = async () => {
+    try {
+      // Clear the user query cache
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      queryClient.removeQueries({ queryKey: ["/api/auth/user"] });
+      
+      // Navigate to logout endpoint
+      window.location.href = "/api/logout";
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Fallback: just navigate to logout
+      window.location.href = "/api/logout";
+    }
   };
 
   const userInitials = user?.firstName && user?.lastName 

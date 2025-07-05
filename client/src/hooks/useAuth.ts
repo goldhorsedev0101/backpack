@@ -22,9 +22,11 @@ export function useAuth() {
   const { data: user, isLoading, error } = useQuery<User | null>({
     queryKey: ["/api/auth/user"],
     retry: false,
+    refetchOnWindowFocus: true,
+    staleTime: 0, // Always check for fresh auth status
   });
 
-  // If there's an error fetching user (server not running), assume not authenticated
+  // If there's an error fetching user (401 or server error), assume not authenticated
   if (error) {
     return {
       user: null,

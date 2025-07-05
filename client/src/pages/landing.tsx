@@ -7,6 +7,7 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { queryClient } from "@/lib/queryClient";
 import { 
   Compass, 
   MapPin, 
@@ -54,8 +55,19 @@ export default function Landing() {
     window.location.href = "/api/login?signup=true";
   };
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
+  const handleLogout = async () => {
+    try {
+      // Clear the user query cache
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      queryClient.removeQueries({ queryKey: ["/api/auth/user"] });
+      
+      // Navigate to logout endpoint
+      window.location.href = "/api/logout";
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Fallback: just navigate to logout
+      window.location.href = "/api/logout";
+    }
   };
 
   return (

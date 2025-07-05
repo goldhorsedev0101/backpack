@@ -154,6 +154,16 @@ export async function setupAuth(app: Express) {
 
   app.get("/api/logout", (req, res) => {
     req.logout(() => {
+      console.log('Logout request - hostname:', req.hostname, 'NODE_ENV:', process.env.NODE_ENV);
+      
+      // For localhost development, just redirect to home
+      if (req.hostname === 'localhost' || process.env.NODE_ENV === 'development') {
+        console.log('Redirecting to home for development');
+        return res.redirect('/');
+      }
+      
+      console.log('Using OIDC logout for production');
+      // For production, use proper OIDC logout
       res.redirect(
         client.buildEndSessionUrl(config, {
           client_id: process.env.REPL_ID!,
