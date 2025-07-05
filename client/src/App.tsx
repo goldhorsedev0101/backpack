@@ -14,6 +14,7 @@ import BudgetTracker from "@/pages/budget-tracker";
 import Achievements from "@/pages/achievements";
 import Onboarding from "@/pages/onboarding";
 import Navigation from "@/components/navigation";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 function AuthenticatedApp() {
   // Always show onboarding immediately after authentication
@@ -69,12 +70,14 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

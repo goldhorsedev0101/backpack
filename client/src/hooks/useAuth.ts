@@ -24,6 +24,26 @@ export function useAuth() {
     retry: false,
     refetchOnWindowFocus: true,
     staleTime: 0, // Always check for fresh auth status
+    queryFn: async () => {
+      try {
+        const res = await fetch("/api/auth/user", {
+          credentials: "include",
+        });
+        
+        if (res.status === 401) {
+          return null; // Not authenticated
+        }
+        
+        if (!res.ok) {
+          throw new Error(`${res.status}: ${res.statusText}`);
+        }
+        
+        return await res.json();
+      } catch (err) {
+        console.error("Auth error:", err);
+        return null; // Return null instead of throwing to prevent unhandled rejections
+      }
+    },
   });
 
   // If there's an error fetching user (401 or server error), assume not authenticated
