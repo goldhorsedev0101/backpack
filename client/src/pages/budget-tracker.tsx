@@ -211,9 +211,16 @@ export default function BudgetTracker() {
           <div className="lg:col-span-2 space-y-6">
             {selectedTrip && selectedTripData && (
               <BudgetOverview 
-                tripData={selectedTripData}
-                expenses={tripExpenses}
-                categoryTotals={categoryTotals}
+                totalBudget={budget}
+                totalSpent={totalSpent}
+                expenses={tripExpenses.map((expense: any) => ({
+                  id: expense.id,
+                  amount: parseFloat(expense.amount),
+                  category: expense.category,
+                  description: expense.description,
+                  date: expense.createdAt || expense.date
+                }))}
+                currency="USD"
               />
             )}
 
