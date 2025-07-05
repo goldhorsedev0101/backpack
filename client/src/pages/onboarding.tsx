@@ -104,9 +104,24 @@ export default function Onboarding() {
   const handleCompleteSetup = () => {
     console.log('Complete Setup clicked with preferences:', preferences);
     
-    // For now, just navigate immediately to ensure user can proceed
-    // TODO: Implement proper API integration for saving preferences
-    setLocation('/');
+    try {
+      // Multiple navigation approaches to ensure it works
+      console.log('Attempting navigation to home page...');
+      
+      // Method 1: Use wouter navigation
+      setLocation('/');
+      
+      // Method 2: Fallback with window navigation
+      setTimeout(() => {
+        console.log('Fallback navigation...');
+        window.location.href = '/';
+      }, 100);
+      
+    } catch (error) {
+      console.error('Navigation error:', error);
+      // Force navigation as last resort
+      window.location.href = '/';
+    }
   };
 
   const renderStep = () => {
