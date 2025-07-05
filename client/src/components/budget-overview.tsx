@@ -1,13 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
 import { 
   DollarSign, 
   TrendingUp, 
   TrendingDown,
   PieChart,
   Target,
-  AlertTriangle
+  AlertTriangle,
+  CheckCircle,
+  Bed,
+  Bus,
+  Utensils,
+  Ticket,
+  ShoppingBag
 } from "lucide-react";
 
 interface BudgetOverviewProps {
@@ -23,158 +29,217 @@ interface BudgetOverviewProps {
   currency?: string;
 }
 
+const EXPENSE_CATEGORIES = [
+  { id: 'accommodation', label: 'Accommodation', icon: Bed, color: 'bg-primary' },
+  { id: 'transportation', label: 'Transportation', icon: Bus, color: 'bg-secondary' },
+  { id: 'food', label: 'Food & Drinks', icon: Utensils, color: 'bg-accent' },
+  { id: 'activities', label: 'Activities', icon: Ticket, color: 'bg-mint' },
+  { id: 'other', label: 'Other', icon: ShoppingBag, color: 'bg-gray-500' },
+];
+
 export default function BudgetOverview({ 
   totalBudget = 0, 
   totalSpent = 0, 
-  expenses = [],
-  currency = "USD"
+  expenses = [], 
+  currency = "USD" 
 }: BudgetOverviewProps) {
+  const budgetUsed = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
   const remaining = totalBudget - totalSpent;
-  const spentPercentage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
-  
-  // Calculate category breakdown
-  const categoryTotals = expenses.reduce((acc, expense) => {
-    acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
-    return acc;
-  }, {} as Record<string, number>);
 
-  const getStatusColor = () => {
-    if (spentPercentage >= 90) return "text-red-600";
-    if (spentPercentage >= 75) return "text-yellow-600";
-    return "text-green-600";
+  // Calculate category totals
+  const categoryTotals = EXPENSE_CATEGORIES.map(category => ({
+    ...category,
+    total: expenses
+      .filter(expense => expense.category === category.id)
+      .reduce((sum, expense) => sum + expense.amount, 0)
+  })).filter(category => category.total > 0);
+
+  // Get recent expenses (last 5)
+  const recentExpenses = expenses
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5);
+
+  const getBudgetStatus = () => {
+    if (budgetUsed <= 80) return { color: 'text-green-600', icon: CheckCircle, text: 'On Track' };
+    if (budgetUsed <= 100) return { color: 'text-orange-600', icon: AlertTriangle, text: 'Close to Limit' };
+    return { color: 'text-red-600', icon: AlertTriangle, text: 'Over Budget' };
   };
 
-  const getProgressColor = () => {
-    if (spentPercentage >= 90) return "bg-red-500";
-    if (spentPercentage >= 75) return "bg-yellow-500";
-    return "bg-green-500";
-  };
+  const status = getBudgetStatus();
+  const StatusIcon = status.icon;
 
   return (
-    <div className="grid gap-6">
-      {/* Budget Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Budget</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              ${totalBudget.toFixed(2)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {currency} allocated for trip
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              ${totalSpent.toFixed(2)}
-            </div>
-            <p className={`text-xs ${getStatusColor()}`}>
-              {spentPercentage.toFixed(1)}% of budget used
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Remaining</CardTitle>
-            {remaining >= 0 ? (
-              <TrendingUp className="h-4 w-4 text-green-600" />
-            ) : (
-              <TrendingDown className="h-4 w-4 text-red-600" />
-            )}
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${remaining >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              ${Math.abs(remaining).toFixed(2)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {remaining >= 0 ? 'Under budget' : 'Over budget'}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Expenses</CardTitle>
-            <PieChart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {expenses.length}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Total transactions
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Budget Progress */}
+    <div className="space-y-6">
+      {/* Budget Summary Card */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            Budget Progress
-            {spentPercentage >= 90 && (
-              <Badge variant="destructive" className="flex items-center gap-1">
-                <AlertTriangle className="h-3 w-3" />
-                Over Budget
-              </Badge>
-            )}
+          <CardTitle className="flex items-center justify-between">
+            <span className="flex items-center">
+              <Target className="w-5 h-5 mr-2 text-primary" />
+              Budget Overview
+            </span>
+            <Badge variant={budgetUsed <= 80 ? "default" : budgetUsed <= 100 ? "secondary" : "destructive"}>
+              <StatusIcon className="w-3 h-3 mr-1" />
+              {status.text}
+            </Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Spent: ${totalSpent.toFixed(2)}</span>
-              <span>Budget: ${totalBudget.toFixed(2)}</span>
+        <CardContent className="space-y-6">
+          {/* Budget Progress */}
+          {totalBudget > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Budget Progress</span>
+                <span className="text-sm font-medium">{budgetUsed.toFixed(1)}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className={`h-3 rounded-full transition-all duration-300 ${
+                    budgetUsed <= 80 ? 'bg-green-500' : budgetUsed <= 100 ? 'bg-orange-500' : 'bg-red-500'
+                  }`}
+                  style={{ width: `${Math.min(budgetUsed, 100)}%` }}
+                />
+              </div>
             </div>
-            <Progress value={Math.min(spentPercentage, 100)} className="h-2" />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>0%</span>
-              <span>{spentPercentage.toFixed(1)}%</span>
-              <span>100%</span>
+          )}
+
+          {/* Financial Summary */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="text-center p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-center mb-2">
+                <DollarSign className="w-5 h-5 text-gray-600" />
+              </div>
+              <div className="text-2xl font-bold text-gray-800">
+                ${totalSpent.toFixed(2)}
+              </div>
+              <div className="text-sm text-gray-600">Total Spent</div>
             </div>
+
+            {totalBudget > 0 && (
+              <>
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-center mb-2">
+                    <Target className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-800">
+                    ${totalBudget.toFixed(2)}
+                  </div>
+                  <div className="text-sm text-gray-600">Budget</div>
+                </div>
+
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-center mb-2">
+                    {remaining >= 0 ? (
+                      <TrendingUp className="w-5 h-5 text-green-600" />
+                    ) : (
+                      <TrendingDown className="w-5 h-5 text-red-600" />
+                    )}
+                  </div>
+                  <div className={`text-2xl font-bold ${remaining >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    ${Math.abs(remaining).toFixed(2)}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {remaining >= 0 ? 'Remaining' : 'Over Budget'}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
 
       {/* Category Breakdown */}
-      {Object.keys(categoryTotals).length > 0 && (
+      {categoryTotals.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Spending by Category</CardTitle>
+            <CardTitle className="flex items-center">
+              <PieChart className="w-5 h-5 mr-2 text-primary" />
+              Spending by Category
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {categoryTotals.map((category) => {
+                const CategoryIcon = category.icon;
+                const percentage = totalSpent > 0 ? (category.total / totalSpent) * 100 : 0;
+                
+                return (
+                  <div key={category.id} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className={`p-2 rounded-lg ${category.color} mr-3`}>
+                          <CategoryIcon className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="font-medium">{category.label}</span>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-semibold">${category.total.toFixed(2)}</div>
+                        <div className="text-sm text-gray-600">{percentage.toFixed(1)}%</div>
+                      </div>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full ${category.color} opacity-70`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Recent Expenses */}
+      {recentExpenses.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <TrendingUp className="w-5 h-5 mr-2 text-primary" />
+              Recent Expenses
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {Object.entries(categoryTotals)
-                .sort(([, a], [, b]) => b - a)
-                .map(([category, amount]) => {
-                  const percentage = totalSpent > 0 ? (amount / totalSpent) * 100 : 0;
-                  return (
-                    <div key={category} className="space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span className="capitalize">{category}</span>
-                        <span className="font-medium">${amount.toFixed(2)}</span>
+              {recentExpenses.map((expense, index) => {
+                const category = EXPENSE_CATEGORIES.find(c => c.id === expense.category);
+                const CategoryIcon = category?.icon || ShoppingBag;
+                
+                return (
+                  <div key={expense.id}>
+                    <div className="flex items-center justify-between py-2">
+                      <div className="flex items-center">
+                        <div className={`p-2 rounded-lg ${category?.color || 'bg-gray-500'} mr-3`}>
+                          <CategoryIcon className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                          <div className="font-medium">{expense.description}</div>
+                          <div className="text-sm text-gray-600">
+                            {category?.label || 'Other'} • {new Date(expense.date).toLocaleDateString()}
+                          </div>
+                        </div>
                       </div>
-                      <Progress value={percentage} className="h-1" />
-                      <div className="text-xs text-muted-foreground text-right">
-                        {percentage.toFixed(1)}% of total spending
+                      <div className="font-semibold text-gray-800">
+                        ${expense.amount.toFixed(2)}
                       </div>
                     </div>
-                  );
-                })
-              }
+                    {index < recentExpenses.length - 1 && <Separator className="mt-2" />}
+                  </div>
+                );
+              })}
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Empty State */}
+      {expenses.length === 0 && (
+        <Card>
+          <CardContent className="text-center py-8">
+            <PieChart className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-600 mb-2">No Expenses Yet</h3>
+            <p className="text-gray-500">Start adding expenses to see your budget overview.</p>
           </CardContent>
         </Card>
       )}
