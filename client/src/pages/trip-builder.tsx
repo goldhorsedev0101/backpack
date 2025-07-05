@@ -9,12 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import BudgetEstimator from "@/components/budget-estimator";
 import { 
   Bot, 
   MapPin, 
@@ -62,6 +62,8 @@ const TRAVEL_STYLES = [
 export default function TripBuilder() {
   const [budget, setBudget] = useState([2500]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+  const [currentDestination, setCurrentDestination] = useState("");
+  const [currentDuration, setCurrentDuration] = useState("");
   const [aiSuggestion, setAiSuggestion] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
@@ -199,7 +201,7 @@ export default function TripBuilder() {
           <p className="text-lg text-gray-600">Tell us your preferences and let our AI create the perfect itinerary</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-2 gap-8">
           {/* Trip Preferences Form */}
           <Card className="shadow-lg">
             <CardHeader>
@@ -214,7 +216,10 @@ export default function TripBuilder() {
                 <Label htmlFor="destination" className="text-sm font-medium text-slate-700 mb-2 block">
                   Where do you want to go?
                 </Label>
-                <Select onValueChange={(value) => form.setValue('destination', value)}>
+                <Select onValueChange={(value) => {
+                  form.setValue('destination', value);
+                  setCurrentDestination(value);
+                }}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a destination" />
                   </SelectTrigger>
@@ -231,7 +236,10 @@ export default function TripBuilder() {
                 <Label htmlFor="duration" className="text-sm font-medium text-slate-700 mb-2 block">
                   Trip Duration
                 </Label>
-                <Select onValueChange={(value) => form.setValue('duration', value)}>
+                <Select onValueChange={(value) => {
+                  form.setValue('duration', value);
+                  setCurrentDuration(value);
+                }}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select duration" />
                   </SelectTrigger>
@@ -243,31 +251,6 @@ export default function TripBuilder() {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-
-              {/* Budget */}
-              <div>
-                <Label className="text-sm font-medium text-slate-700 mb-2 block">
-                  Budget Range
-                </Label>
-                <div className="px-4">
-                  <Slider
-                    value={budget}
-                    onValueChange={(value) => {
-                      setBudget(value);
-                      form.setValue('budget', value[0]);
-                    }}
-                    max={5000}
-                    min={500}
-                    step={100}
-                    className="mb-4"
-                  />
-                  <div className="flex justify-between text-sm text-gray-600">
-                    <span>$500</span>
-                    <span className="text-lg font-semibold text-primary">${budget[0]}</span>
-                    <span>$5000</span>
-                  </div>
-                </div>
               </div>
 
               {/* Travel Style */}
@@ -446,6 +429,21 @@ export default function TripBuilder() {
               )}
             </CardContent>
           </Card>
+
+          {/* Budget Estimator */}
+          <div className="xl:col-span-1 lg:col-span-2">
+            <BudgetEstimator
+              budget={budget}
+              onBudgetChange={(value) => {
+                setBudget(value);
+                form.setValue('budget', value[0]);
+              }}
+              destination={currentDestination}
+              duration={currentDuration}
+              travelStyle={selectedStyles}
+              className="shadow-lg"
+            />
+          </div>
         </div>
       </div>
     </div>
