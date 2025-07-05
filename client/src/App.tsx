@@ -32,14 +32,16 @@ function Router() {
       {!isAuthenticated ? (
         <Route path="/" component={Landing} />
       ) : (
-        <>
+        <div className="min-h-screen">
           <Navigation />
-          <Route path="/" component={Home} />
-          <Route path="/trip-builder" component={TripBuilder} />
-          <Route path="/community" component={Community} />
-          <Route path="/budget-tracker" component={BudgetTracker} />
-          <Route path="/achievements" component={Achievements} />
-        </>
+          <main>
+            <Route path="/" component={Home} />
+            <Route path="/trip-builder" component={TripBuilder} />
+            <Route path="/community" component={Community} />
+            <Route path="/budget-tracker" component={BudgetTracker} />
+            <Route path="/achievements" component={Achievements} />
+          </main>
+        </div>
       )}
       <Route component={NotFound} />
     </Switch>
