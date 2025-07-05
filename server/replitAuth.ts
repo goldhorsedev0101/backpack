@@ -84,14 +84,20 @@ export async function setupAuth(app: Express) {
     verified(null, user);
   };
 
-  for (const domain of process.env
-    .REPLIT_DOMAINS!.split(",")) {
+  const domains = process.env.REPLIT_DOMAINS!.split(",");
+  
+  // Add localhost support for development
+  if (process.env.NODE_ENV !== 'production') {
+    domains.push('localhost:5000');
+  }
+  
+  for (const domain of domains) {
     const strategy = new Strategy(
       {
         name: `replitauth:${domain}`,
         config,
         scope: "openid email profile offline_access",
-        callbackURL: `https://${domain}/api/callback`,
+        callbackURL: `${domain.includes('localhost') ? 'http' : 'https'}://${domain}/api/callback`,
       },
       verify,
     );
@@ -101,7 +107,35 @@ export async function setupAuth(app: Express) {
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
-  app.get("/api/login", (req, res, next) => {
+  app.get("/api/login", async (req, res, next) => {
+    // For localhost development, create a test user session
+    if (req.hostname === 'localhost') {
+      try {
+        // Create a test user for development
+        const testUserData = {
+          id: 'test-user-123',
+          email: 'test@tripwise.dev',
+          firstName: 'Test',
+          lastName: 'User'
+        };
+        
+        // Ensure the test user exists in the database
+        await upsertUser(testUserData);
+        
+        req.login(testUserData, (err) => {
+          if (err) {
+            return next(err);
+          }
+          return res.redirect('/');
+        });
+        return;
+      } catch (error) {
+        console.error('Error creating test user:', error);
+        return next(error);
+      }
+    }
+    
+    // For production/Replit domain, use proper authentication
     passport.authenticate(`replitauth:${req.hostname}`, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
@@ -109,7 +143,10 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/callback", (req, res, next) => {
-    passport.authenticate(`replitauth:${req.hostname}`, {
+    // Map localhost to localhost:5000 for development
+    const hostname = req.hostname === 'localhost' ? 'localhost:5000' : req.hostname;
+    
+    passport.authenticate(`replitauth:${hostname}`, {
       successReturnToOrRedirect: "/",
       failureRedirect: "/api/login",
     })(req, res, next);
