@@ -7,6 +7,7 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
 import { 
   Compass, 
@@ -38,6 +39,7 @@ export default function Landing() {
   const [budget, setBudget] = useState([2500]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
 
   // Handle logout cleanup on page load
   useEffect(() => {
@@ -68,6 +70,16 @@ export default function Landing() {
 
   const handleRegister = () => {
     window.location.href = "/api/login?signup=true";
+  };
+
+  const handleStartPlanning = () => {
+    if (user) {
+      // User is authenticated, go directly to trip builder
+      setLocation("/trip-builder");
+    } else {
+      // User not authenticated, redirect to login first
+      window.location.href = "/api/login";
+    }
   };
 
   const handleLogout = async () => {
@@ -151,7 +163,7 @@ export default function Landing() {
               AI-powered trip planning for backpackers. Get personalized itineraries, connect with fellow travelers, and explore South America like never before.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button onClick={handleLogin} className="bg-white text-primary px-8 py-4 rounded-xl font-semibold hover:bg-gray-100">
+              <Button onClick={handleStartPlanning} className="bg-white text-primary px-8 py-4 rounded-xl font-semibold hover:bg-gray-100">
                 <Bot className="w-5 h-5 mr-2" />
                 Start Planning
               </Button>
@@ -261,23 +273,13 @@ export default function Landing() {
               </div>
               
               <div className="text-center">
-                {user ? (
-                  <>
-                    <Button onClick={() => window.location.href = "/trip-builder"} className="bg-primary text-white px-8 py-4 rounded-xl font-semibold hover:bg-orange-600">
-                      <Bot className="w-5 h-5 mr-2" />
-                      Generate My Trip
-                    </Button>
-                    <p className="text-sm text-gray-500 mt-2">Ready to plan your next adventure!</p>
-                  </>
-                ) : (
-                  <>
-                    <Button onClick={handleRegister} className="bg-primary text-white px-8 py-4 rounded-xl font-semibold hover:bg-orange-600">
-                      <Bot className="w-5 h-5 mr-2" />
-                      Generate My Trip
-                    </Button>
-                    <p className="text-sm text-gray-500 mt-2">Sign in to start planning your adventure</p>
-                  </>
-                )}
+                <Button onClick={handleStartPlanning} className="bg-primary text-white px-8 py-4 rounded-xl font-semibold hover:bg-orange-600">
+                  <Bot className="w-5 h-5 mr-2" />
+                  {user ? "Generate My Trip" : "Start Planning"}
+                </Button>
+                <p className="text-sm text-gray-500 mt-2">
+                  {user ? "Ready to plan your next adventure!" : "Sign in to start planning your adventure"}
+                </p>
               </div>
             </CardContent>
           </Card>

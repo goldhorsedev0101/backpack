@@ -199,6 +199,7 @@ TripWise is a full-stack web application focused on South American travel planni
 - July 06, 2025. Implemented comprehensive TripAdvisor-style database integration with complete schema, API endpoints, and sample South American travel data including destinations, accommodations, attractions, restaurants, reviews, and ratings
 - July 06, 2025. Added user registry page that appears after registration - collects basic profile information (bio, location, travel style, budget) before proceeding to full onboarding
 - July 06, 2025. Enhanced logout system with complete session clearing - removes all authentication data, clears cache, destroys server sessions, and prevents authentication persistence
+- July 06, 2025. Updated landing page "Start Planning" buttons to navigate directly to AI Trip Builder for authenticated users, or redirect to login for new users
 
 ## User Preferences
 
