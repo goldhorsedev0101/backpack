@@ -684,15 +684,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Travel timing endpoints
-  app.get("/api/travel-timing/:destination", async (req, res) => {
+  // Test endpoint to verify routing works
+  app.get("/api/test-timing", (req, res) => {
+    res.json({ message: "Travel timing routes are working" });
+  });
+
+  // Travel timing endpoints - moved higher in the route order to prevent conflicts
+  app.get("/api/travel-timing/:destination", (req, res) => {
     try {
       const { destination } = req.params;
       const { country } = req.query;
       
+      console.log('Travel timing request for:', destination, 'country:', country);
+      
+      // Direct access to travel timing database for debugging
+      const destinationKey = destination.toLowerCase().replace(/[^a-z]/g, '');
+      console.log('Looking for destination key:', destinationKey);
+      
       const timingInfo = travelTimingService.getBestTimeInfo(destination, country as string);
+      console.log('Travel timing result:', timingInfo ? 'Found' : 'Not found');
+      
       if (!timingInfo) {
-        return res.status(404).json({ error: 'Travel timing information not available for this destination' });
+        console.log('Available destinations:', ['lima', 'cusco', 'bogota', 'buenosaires', 'riodejaneiro', 'santiago']);
+        return res.status(404).json({ 
+          error: 'Travel timing information not available for this destination',
+          availableDestinations: ['lima', 'cusco', 'bogota', 'buenosaires', 'riodejaneiro', 'santiago']
+        });
       }
       
       res.json(timingInfo);

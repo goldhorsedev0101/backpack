@@ -1,35 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
 import { Calendar, Clock, TrendingUp, AlertTriangle, CheckCircle, Sun, Cloud, Snowflake } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-interface TravelTimingInfo {
-  destination: string;
-  country: string;
-  bestMonths: string[];
-  peakSeason: string[];
-  shoulderSeason: string[];
-  lowSeason: string[];
-  avoidMonths: string[];
-  reasons: {
-    weather: string;
-    crowds: string;
-    prices: string;
-    activities: string;
-  };
-  monthlyBreakdown: {
-    [month: string]: {
-      rating: 'excellent' | 'very-good' | 'good' | 'fair' | 'poor';
-      temperature: string;
-      rainfall: string;
-      crowds: 'low' | 'moderate' | 'high' | 'very-high';
-      prices: 'low' | 'moderate' | 'high' | 'very-high';
-      highlights: string[];
-      considerations: string[];
-    };
-  };
-}
+import { travelTimingService, type TravelTimingInfo } from '@/services/travelTimingService';
 
 interface BestTimeInfoProps {
   destination: string;
@@ -70,32 +43,10 @@ const getRatingIcon = (rating: string) => {
 };
 
 export function BestTimeInfo({ destination, country, compact = false }: BestTimeInfoProps) {
-  const { data: timingInfo, isLoading, error } = useQuery({
-    queryKey: ['travel-timing', destination, country],
-    queryFn: async (): Promise<TravelTimingInfo> => {
-      const params = new URLSearchParams();
-      if (country) params.append('country', country);
-      
-      const response = await fetch(`/api/travel-timing/${encodeURIComponent(destination)}?${params}`);
-      if (!response.ok) {
-        throw new Error('Travel timing information not available');
-      }
-      return response.json();
-    },
-    staleTime: 1000 * 60 * 60, // 1 hour
-    retry: false
-  });
+  // Use client-side travel timing service directly
+  const timingInfo = travelTimingService.getBestTimeInfo(destination, country);
 
-  if (isLoading) {
-    return (
-      <div className="animate-pulse">
-        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-      </div>
-    );
-  }
-
-  if (error || !timingInfo) {
+  if (!timingInfo) {
     return (
       <div className="text-sm text-gray-500">
         <Clock className="w-4 h-4 inline mr-1" />
