@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
+import logo from "@/assets/tripwise-logo.svg";
 import { 
   Compass, 
   MapPin, 
@@ -113,8 +114,7 @@ export default function Landing() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <Compass className="text-primary text-2xl mr-2" />
-                <span className="text-xl font-bold text-slate-700">TripWise</span>
+                <img src={logo} alt="TripWise" className="h-10" />
               </div>
               <div className="hidden md:block ml-10">
                 <div className="flex items-baseline space-x-4">
@@ -437,8 +437,7 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center mb-6">
-                <Compass className="text-primary text-2xl mr-2" />
-                <span className="text-xl font-bold">TripWise</span>
+                <img src={logo} alt="TripWise" className="h-8 brightness-0 invert" />
               </div>
               <p className="text-gray-300 mb-4">Smart, social, and personalized trip planning for the modern backpacker.</p>
               <div className="flex space-x-4">

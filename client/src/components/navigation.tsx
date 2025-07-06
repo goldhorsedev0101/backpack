@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
+import logoCompact from "@/assets/tripwise-logo-compact.svg";
 import { 
   Compass, 
   Home, 
@@ -84,8 +85,7 @@ export default function Navigation() {
           <div className="px-4">
             <div className="flex justify-between items-center h-16">
               <Link href="/" className="flex items-center">
-                <Compass className="text-primary text-2xl mr-2" />
-                <span className="text-xl font-bold text-slate-700">TripWise</span>
+                <img src={logoCompact} alt="TripWise" className="h-8" />
               </Link>
               
               <div className="flex items-center space-x-4">
@@ -174,8 +174,7 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
-              <Compass className="text-primary text-2xl mr-2" />
-              <span className="text-xl font-bold text-slate-700">TripWise</span>
+              <img src={logoCompact} alt="TripWise" className="h-8" />
             </Link>
             
             <div className="hidden md:block ml-10">
