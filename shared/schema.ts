@@ -149,6 +149,179 @@ export const userAchievements = pgTable("user_achievements", {
   isCompleted: boolean("is_completed").notNull().default(false),
 });
 
+// TripAdvisor-like data tables
+export const destinations = pgTable("destinations", {
+  id: serial("id").primaryKey(),
+  locationId: varchar("location_id").unique().notNull(), // TripAdvisor location ID
+  name: varchar("name").notNull(),
+  latitude: decimal("latitude", { precision: 10, scale: 8 }),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+  addressStreet1: varchar("address_street1"),
+  addressStreet2: varchar("address_street2"),
+  city: varchar("city"),
+  state: varchar("state"),
+  country: varchar("country").notNull(),
+  postalCode: varchar("postal_code"),
+  addressString: text("address_string"),
+  webUrl: text("web_url"),
+  photoCount: integer("photo_count").default(0),
+  timezone: varchar("timezone"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const accommodations = pgTable("accommodations", {
+  id: serial("id").primaryKey(),
+  locationId: varchar("location_id").unique().notNull(), // TripAdvisor location ID
+  destinationId: integer("destination_id").references(() => destinations.id),
+  name: varchar("name").notNull(),
+  rating: decimal("rating", { precision: 2, scale: 1 }), // Overall rating (1-5)
+  numReviews: integer("num_reviews").default(0),
+  priceLevel: varchar("price_level"), // $, $$, $$$, $$$$
+  category: varchar("category").notNull().default("hotel"), // hotel, bed_and_breakfast, etc.
+  latitude: decimal("latitude", { precision: 10, scale: 8 }),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+  addressStreet1: varchar("address_street1"),
+  addressStreet2: varchar("address_street2"),
+  city: varchar("city"),
+  state: varchar("state"),
+  country: varchar("country").notNull(),
+  postalCode: varchar("postal_code"),
+  addressString: text("address_string"),
+  webUrl: text("web_url"),
+  writeReviewUrl: text("write_review_url"),
+  bookingUrl: text("booking_url"),
+  isBookable: boolean("is_bookable").default(false),
+  photoCount: integer("photo_count").default(0),
+  ranking: integer("ranking"),
+  rankingOutOf: integer("ranking_out_of"),
+  rankingString: varchar("ranking_string"),
+  geoLocationId: varchar("geo_location_id"),
+  geoLocationName: varchar("geo_location_name"),
+  amenities: text("amenities").array(),
+  awards: jsonb("awards"), // Store award information as JSON
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const attractions = pgTable("attractions", {
+  id: serial("id").primaryKey(),
+  locationId: varchar("location_id").unique().notNull(), // TripAdvisor location ID
+  destinationId: integer("destination_id").references(() => destinations.id),
+  name: varchar("name").notNull(),
+  rating: decimal("rating", { precision: 2, scale: 1 }), // Overall rating (1-5)
+  numReviews: integer("num_reviews").default(0),
+  priceLevel: varchar("price_level"), // $, $$, $$$, $$$$
+  category: varchar("category").notNull(), // attraction
+  subcategory: varchar("subcategory"),
+  attractionTypes: text("attraction_types").array(),
+  latitude: decimal("latitude", { precision: 10, scale: 8 }),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+  addressStreet1: varchar("address_street1"),
+  addressStreet2: varchar("address_street2"),
+  city: varchar("city"),
+  state: varchar("state"),
+  country: varchar("country").notNull(),
+  postalCode: varchar("postal_code"),
+  addressString: text("address_string"),
+  webUrl: text("web_url"),
+  writeReviewUrl: text("write_review_url"),
+  photoCount: integer("photo_count").default(0),
+  ranking: integer("ranking"),
+  rankingOutOf: integer("ranking_out_of"),
+  rankingString: varchar("ranking_string"),
+  geoLocationId: varchar("geo_location_id"),
+  geoLocationName: varchar("geo_location_name"),
+  hours: jsonb("hours"), // Store operating hours as JSON
+  awards: jsonb("awards"), // Store award information as JSON
+  groups: jsonb("groups"), // Attraction groups and categories
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const restaurants = pgTable("restaurants", {
+  id: serial("id").primaryKey(),
+  locationId: varchar("location_id").unique().notNull(), // TripAdvisor location ID
+  destinationId: integer("destination_id").references(() => destinations.id),
+  name: varchar("name").notNull(),
+  rating: decimal("rating", { precision: 2, scale: 1 }), // Overall rating (1-5)
+  numReviews: integer("num_reviews").default(0),
+  priceLevel: varchar("price_level"), // $, $$, $$$, $$$$
+  category: varchar("category").notNull().default("restaurant"),
+  cuisine: text("cuisine").array(), // Array of cuisine types
+  latitude: decimal("latitude", { precision: 10, scale: 8 }),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+  addressStreet1: varchar("address_street1"),
+  addressStreet2: varchar("address_street2"),
+  city: varchar("city"),
+  state: varchar("state"),
+  country: varchar("country").notNull(),
+  postalCode: varchar("postal_code"),
+  addressString: text("address_string"),
+  webUrl: text("web_url"),
+  writeReviewUrl: text("write_review_url"),
+  photoCount: integer("photo_count").default(0),
+  ranking: integer("ranking"),
+  rankingOutOf: integer("ranking_out_of"),
+  rankingString: varchar("ranking_string"),
+  geoLocationId: varchar("geo_location_id"),
+  geoLocationName: varchar("geo_location_name"),
+  hours: jsonb("hours"), // Store operating hours as JSON
+  awards: jsonb("awards"), // Store award information as JSON
+  dietaryRestrictions: text("dietary_restrictions").array(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const locationReviews = pgTable("location_reviews", {
+  id: serial("id").primaryKey(),
+  locationId: varchar("location_id").notNull(), // References TripAdvisor location ID
+  locationCategory: varchar("location_category").notNull(), // "accommodation", "attraction", "restaurant"
+  userId: varchar("user_id").references(() => users.id),
+  rating: integer("rating").notNull(), // 1-5 rating
+  title: varchar("title"),
+  text: text("text"),
+  travelDate: timestamp("travel_date"),
+  tripType: varchar("trip_type"), // business, couples, solo, family, friends
+  helpful: integer("helpful").default(0),
+  language: varchar("language").default("en"),
+  source: varchar("source").default("tripadvisor"), // tripadvisor, internal, etc.
+  externalReviewId: varchar("external_review_id"), // Original review ID from source
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const locationSubratings = pgTable("location_subratings", {
+  id: serial("id").primaryKey(),
+  locationId: varchar("location_id").notNull(), // References TripAdvisor location ID
+  locationCategory: varchar("location_category").notNull(), // "accommodation", "restaurant"
+  ratingType: varchar("rating_type").notNull(), // location, sleep, room, service, value, cleanliness, food, atmosphere
+  rating: decimal("rating", { precision: 2, scale: 1 }), // 1-5 rating
+  localizedName: varchar("localized_name"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const locationPhotos = pgTable("location_photos", {
+  id: serial("id").primaryKey(),
+  locationId: varchar("location_id").notNull(), // References TripAdvisor location ID
+  locationCategory: varchar("location_category").notNull(), // "accommodation", "attraction", "restaurant"
+  photoUrl: text("photo_url").notNull(),
+  thumbnailUrl: text("thumbnail_url"),
+  caption: text("caption"),
+  uploadedBy: varchar("uploaded_by"), // user or business
+  width: integer("width"),
+  height: integer("height"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const locationAncestors = pgTable("location_ancestors", {
+  id: serial("id").primaryKey(),
+  locationId: varchar("location_id").notNull(), // References TripAdvisor location ID
+  ancestorLocationId: varchar("ancestor_location_id").notNull(),
+  level: varchar("level").notNull(), // City, State, Country
+  name: varchar("name").notNull(),
+  abbreviation: varchar("abbreviation"),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   trips: many(trips),
@@ -233,6 +406,93 @@ export const userAchievementsRelations = relations(userAchievements, ({ one }) =
   }),
 }));
 
+// TripAdvisor data relations
+export const destinationsRelations = relations(destinations, ({ many }) => ({
+  accommodations: many(accommodations),
+  attractions: many(attractions),
+  restaurants: many(restaurants),
+}));
+
+export const accommodationsRelations = relations(accommodations, ({ one, many }) => ({
+  destination: one(destinations, {
+    fields: [accommodations.destinationId],
+    references: [destinations.id],
+  }),
+  reviews: many(locationReviews),
+  subratings: many(locationSubratings),
+  photos: many(locationPhotos),
+  ancestors: many(locationAncestors),
+}));
+
+export const attractionsRelations = relations(attractions, ({ one, many }) => ({
+  destination: one(destinations, {
+    fields: [attractions.destinationId],
+    references: [destinations.id],
+  }),
+  reviews: many(locationReviews),
+  photos: many(locationPhotos),
+  ancestors: many(locationAncestors),
+}));
+
+export const restaurantsRelations = relations(restaurants, ({ one, many }) => ({
+  destination: one(destinations, {
+    fields: [restaurants.destinationId],
+    references: [destinations.id],
+  }),
+  reviews: many(locationReviews),
+  subratings: many(locationSubratings),
+  photos: many(locationPhotos),
+  ancestors: many(locationAncestors),
+}));
+
+export const locationReviewsRelations = relations(locationReviews, ({ one }) => ({
+  user: one(users, {
+    fields: [locationReviews.userId],
+    references: [users.id],
+  }),
+}));
+
+export const locationSubratingsRelations = relations(locationSubratings, ({ one }) => ({
+  accommodation: one(accommodations, {
+    fields: [locationSubratings.locationId],
+    references: [accommodations.locationId],
+  }),
+  restaurant: one(restaurants, {
+    fields: [locationSubratings.locationId],
+    references: [restaurants.locationId],
+  }),
+}));
+
+export const locationPhotosRelations = relations(locationPhotos, ({ one }) => ({
+  accommodation: one(accommodations, {
+    fields: [locationPhotos.locationId],
+    references: [accommodations.locationId],
+  }),
+  attraction: one(attractions, {
+    fields: [locationPhotos.locationId],
+    references: [attractions.locationId],
+  }),
+  restaurant: one(restaurants, {
+    fields: [locationPhotos.locationId],
+    references: [restaurants.locationId],
+  }),
+}));
+
+export const locationAncestorsRelations = relations(locationAncestors, ({ one }) => ({
+  accommodation: one(accommodations, {
+    fields: [locationAncestors.locationId],
+    references: [accommodations.locationId],
+  }),
+  attraction: one(attractions, {
+    fields: [locationAncestors.locationId],
+    references: [attractions.locationId],
+  }),
+  restaurant: one(restaurants, {
+    fields: [locationAncestors.locationId],
+    references: [restaurants.locationId],
+  }),
+}));
+
 // Insert schemas
 export const insertTripSchema = createInsertSchema(trips).omit({
   id: true,
@@ -272,6 +532,50 @@ export const insertUserAchievementSchema = createInsertSchema(userAchievements).
   unlockedAt: true,
 });
 
+// TripAdvisor insert schemas
+export const insertDestinationSchema = createInsertSchema(destinations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertAccommodationSchema = createInsertSchema(accommodations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertAttractionSchema = createInsertSchema(attractions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertRestaurantSchema = createInsertSchema(restaurants).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertLocationReviewSchema = createInsertSchema(locationReviews).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertLocationSubratingSchema = createInsertSchema(locationSubratings).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const insertLocationPhotoSchema = createInsertSchema(locationPhotos).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertLocationAncestorSchema = createInsertSchema(locationAncestors).omit({
+  id: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -290,3 +594,21 @@ export type Achievement = typeof achievements.$inferSelect;
 export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
 export type UserAchievement = typeof userAchievements.$inferSelect;
 export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
+
+// TripAdvisor types
+export type Destination = typeof destinations.$inferSelect;
+export type InsertDestination = z.infer<typeof insertDestinationSchema>;
+export type Accommodation = typeof accommodations.$inferSelect;
+export type InsertAccommodation = z.infer<typeof insertAccommodationSchema>;
+export type Attraction = typeof attractions.$inferSelect;
+export type InsertAttraction = z.infer<typeof insertAttractionSchema>;
+export type Restaurant = typeof restaurants.$inferSelect;
+export type InsertRestaurant = z.infer<typeof insertRestaurantSchema>;
+export type LocationReview = typeof locationReviews.$inferSelect;
+export type InsertLocationReview = z.infer<typeof insertLocationReviewSchema>;
+export type LocationSubrating = typeof locationSubratings.$inferSelect;
+export type InsertLocationSubrating = z.infer<typeof insertLocationSubratingSchema>;
+export type LocationPhoto = typeof locationPhotos.$inferSelect;
+export type InsertLocationPhoto = z.infer<typeof insertLocationPhotoSchema>;
+export type LocationAncestor = typeof locationAncestors.$inferSelect;
+export type InsertLocationAncestor = z.infer<typeof insertLocationAncestorSchema>;

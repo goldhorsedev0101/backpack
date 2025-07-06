@@ -12,6 +12,7 @@ import TripBuilder from "@/pages/trip-builder";
 import Community from "@/pages/community";
 import BudgetTracker from "@/pages/budget-tracker";
 import Achievements from "@/pages/achievements";
+import TripAdvisorData from "@/pages/tripadvisor-data";
 import Onboarding from "@/pages/onboarding";
 import Navigation from "@/components/navigation";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -35,6 +36,7 @@ function AuthenticatedApp() {
           <Route path="/community" component={Community} />
           <Route path="/budget-tracker" component={BudgetTracker} />
           <Route path="/achievements" component={Achievements} />
+          <Route path="/tripadvisor-data" component={TripAdvisorData} />
           <Route path="/onboarding" component={Onboarding} />
           <Route component={NotFound} />
         </Switch>

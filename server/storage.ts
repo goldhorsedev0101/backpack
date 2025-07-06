@@ -8,6 +8,14 @@ import {
   connections,
   achievements,
   userAchievements,
+  destinations,
+  accommodations,
+  attractions,
+  restaurants,
+  locationReviews,
+  locationSubratings,
+  locationPhotos,
+  locationAncestors,
   type User,
   type UpsertUser,
   type Trip,
@@ -24,6 +32,22 @@ import {
   type Achievement,
   type UserAchievement,
   type InsertUserAchievement,
+  type Destination,
+  type InsertDestination,
+  type Accommodation,
+  type InsertAccommodation,
+  type Attraction,
+  type InsertAttraction,
+  type Restaurant,
+  type InsertRestaurant,
+  type LocationReview,
+  type InsertLocationReview,
+  type LocationSubrating,
+  type InsertLocationSubrating,
+  type LocationPhoto,
+  type InsertLocationPhoto,
+  type LocationAncestor,
+  type InsertLocationAncestor,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, sql } from "drizzle-orm";
@@ -67,6 +91,52 @@ export interface IStorage {
   createUserAchievement(userAchievement: InsertUserAchievement): Promise<UserAchievement>;
   updateAchievementProgress(userId: string, achievementId: number, progress: number): Promise<UserAchievement>;
   checkAndUnlockAchievements(userId: string): Promise<UserAchievement[]>;
+  
+  // TripAdvisor data operations
+  // Destination operations
+  createDestination(destination: InsertDestination): Promise<Destination>;
+  getDestinations(): Promise<Destination[]>;
+  getDestinationByLocationId(locationId: string): Promise<Destination | undefined>;
+  updateDestination(locationId: string, destination: Partial<InsertDestination>): Promise<Destination>;
+  searchDestinations(query: string): Promise<Destination[]>;
+  
+  // Accommodation operations
+  createAccommodation(accommodation: InsertAccommodation): Promise<Accommodation>;
+  getAccommodations(destinationId?: number): Promise<Accommodation[]>;
+  getAccommodationByLocationId(locationId: string): Promise<Accommodation | undefined>;
+  updateAccommodation(locationId: string, accommodation: Partial<InsertAccommodation>): Promise<Accommodation>;
+  searchAccommodations(query: string, filters?: { destinationId?: number; priceLevel?: string; rating?: number }): Promise<Accommodation[]>;
+  
+  // Attraction operations
+  createAttraction(attraction: InsertAttraction): Promise<Attraction>;
+  getAttractions(destinationId?: number): Promise<Attraction[]>;
+  getAttractionByLocationId(locationId: string): Promise<Attraction | undefined>;
+  updateAttraction(locationId: string, attraction: Partial<InsertAttraction>): Promise<Attraction>;
+  searchAttractions(query: string, filters?: { destinationId?: number; category?: string }): Promise<Attraction[]>;
+  
+  // Restaurant operations
+  createRestaurant(restaurant: InsertRestaurant): Promise<Restaurant>;
+  getRestaurants(destinationId?: number): Promise<Restaurant[]>;
+  getRestaurantByLocationId(locationId: string): Promise<Restaurant | undefined>;
+  updateRestaurant(locationId: string, restaurant: Partial<InsertRestaurant>): Promise<Restaurant>;
+  searchRestaurants(query: string, filters?: { destinationId?: number; cuisine?: string; priceLevel?: string }): Promise<Restaurant[]>;
+  
+  // Location review operations
+  createLocationReview(review: InsertLocationReview): Promise<LocationReview>;
+  getLocationReviews(locationId: string, category: string): Promise<LocationReview[]>;
+  getRecentLocationReviews(): Promise<LocationReview[]>;
+  
+  // Location subrating operations
+  upsertLocationSubratings(locationId: string, category: string, subratings: InsertLocationSubrating[]): Promise<LocationSubrating[]>;
+  getLocationSubratings(locationId: string, category: string): Promise<LocationSubrating[]>;
+  
+  // Location photo operations
+  createLocationPhoto(photo: InsertLocationPhoto): Promise<LocationPhoto>;
+  getLocationPhotos(locationId: string, category: string): Promise<LocationPhoto[]>;
+  
+  // Location ancestor operations
+  upsertLocationAncestors(locationId: string, ancestors: InsertLocationAncestor[]): Promise<LocationAncestor[]>;
+  getLocationAncestors(locationId: string): Promise<LocationAncestor[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -423,6 +493,349 @@ export class DatabaseStorage implements IStorage {
     }
 
     return newAchievements;
+  }
+
+  // TripAdvisor data operations implementation
+  
+  // Destination operations
+  async createDestination(destination: InsertDestination): Promise<Destination> {
+    const [newDestination] = await db.insert(destinations).values(destination).returning();
+    return newDestination;
+  }
+
+  async getDestinations(): Promise<Destination[]> {
+    return await db.select().from(destinations).orderBy(destinations.name);
+  }
+
+  async getDestinationByLocationId(locationId: string): Promise<Destination | undefined> {
+    const [destination] = await db
+      .select()
+      .from(destinations)
+      .where(eq(destinations.locationId, locationId));
+    return destination || undefined;
+  }
+
+  async updateDestination(locationId: string, destinationData: Partial<InsertDestination>): Promise<Destination> {
+    const [updated] = await db
+      .update(destinations)
+      .set({ ...destinationData, updatedAt: new Date() })
+      .where(eq(destinations.locationId, locationId))
+      .returning();
+    return updated;
+  }
+
+  async searchDestinations(query: string): Promise<Destination[]> {
+    return await db
+      .select()
+      .from(destinations)
+      .where(or(
+        sql`${destinations.name} ILIKE ${`%${query}%`}`,
+        sql`${destinations.city} ILIKE ${`%${query}%`}`,
+        sql`${destinations.country} ILIKE ${`%${query}%`}`
+      ))
+      .orderBy(destinations.name);
+  }
+
+  // Accommodation operations
+  async createAccommodation(accommodation: InsertAccommodation): Promise<Accommodation> {
+    const [newAccommodation] = await db.insert(accommodations).values(accommodation).returning();
+    return newAccommodation;
+  }
+
+  async getAccommodations(destinationId?: number): Promise<Accommodation[]> {
+    if (destinationId) {
+      return await db
+        .select()
+        .from(accommodations)
+        .where(eq(accommodations.destinationId, destinationId))
+        .orderBy(desc(accommodations.rating));
+    }
+    return await db
+      .select()
+      .from(accommodations)
+      .orderBy(desc(accommodations.rating));
+  }
+
+  async getAccommodationByLocationId(locationId: string): Promise<Accommodation | undefined> {
+    const [accommodation] = await db
+      .select()
+      .from(accommodations)
+      .where(eq(accommodations.locationId, locationId));
+    return accommodation || undefined;
+  }
+
+  async updateAccommodation(locationId: string, accommodationData: Partial<InsertAccommodation>): Promise<Accommodation> {
+    const [updated] = await db
+      .update(accommodations)
+      .set({ ...accommodationData, updatedAt: new Date() })
+      .where(eq(accommodations.locationId, locationId))
+      .returning();
+    return updated;
+  }
+
+  async searchAccommodations(query: string, filters?: { destinationId?: number; priceLevel?: string; rating?: number }): Promise<Accommodation[]> {
+    let conditions = [sql`${accommodations.name} ILIKE ${`%${query}%`}`];
+
+    if (filters?.destinationId) {
+      conditions.push(eq(accommodations.destinationId, filters.destinationId));
+    }
+    if (filters?.priceLevel) {
+      conditions.push(eq(accommodations.priceLevel, filters.priceLevel));
+    }
+    if (filters?.rating) {
+      conditions.push(sql`${accommodations.rating} >= ${filters.rating}`);
+    }
+
+    return await db
+      .select()
+      .from(accommodations)
+      .where(and(...conditions))
+      .orderBy(desc(accommodations.rating));
+  }
+
+  // Attraction operations
+  async createAttraction(attraction: InsertAttraction): Promise<Attraction> {
+    const [newAttraction] = await db.insert(attractions).values(attraction).returning();
+    return newAttraction;
+  }
+
+  async getAttractions(destinationId?: number): Promise<Attraction[]> {
+    if (destinationId) {
+      return await db
+        .select()
+        .from(attractions)
+        .where(eq(attractions.destinationId, destinationId))
+        .orderBy(desc(attractions.rating));
+    }
+    return await db
+      .select()
+      .from(attractions)
+      .orderBy(desc(attractions.rating));
+  }
+
+  async getAttractionByLocationId(locationId: string): Promise<Attraction | undefined> {
+    const [attraction] = await db
+      .select()
+      .from(attractions)
+      .where(eq(attractions.locationId, locationId));
+    return attraction || undefined;
+  }
+
+  async updateAttraction(locationId: string, attractionData: Partial<InsertAttraction>): Promise<Attraction> {
+    const [updated] = await db
+      .update(attractions)
+      .set({ ...attractionData, updatedAt: new Date() })
+      .where(eq(attractions.locationId, locationId))
+      .returning();
+    return updated;
+  }
+
+  async searchAttractions(query: string, filters?: { destinationId?: number; category?: string }): Promise<Attraction[]> {
+    let conditions = [sql`${attractions.name} ILIKE ${`%${query}%`}`];
+
+    if (filters?.destinationId) {
+      conditions.push(eq(attractions.destinationId, filters.destinationId));
+    }
+    if (filters?.category) {
+      conditions.push(eq(attractions.category, filters.category));
+    }
+
+    return await db
+      .select()
+      .from(attractions)
+      .where(and(...conditions))
+      .orderBy(desc(attractions.rating));
+  }
+
+  // Restaurant operations
+  async createRestaurant(restaurant: InsertRestaurant): Promise<Restaurant> {
+    const [newRestaurant] = await db.insert(restaurants).values(restaurant).returning();
+    return newRestaurant;
+  }
+
+  async getRestaurants(destinationId?: number): Promise<Restaurant[]> {
+    if (destinationId) {
+      return await db
+        .select()
+        .from(restaurants)
+        .where(eq(restaurants.destinationId, destinationId))
+        .orderBy(desc(restaurants.rating));
+    }
+    return await db
+      .select()
+      .from(restaurants)
+      .orderBy(desc(restaurants.rating));
+  }
+
+  async getRestaurantByLocationId(locationId: string): Promise<Restaurant | undefined> {
+    const [restaurant] = await db
+      .select()
+      .from(restaurants)
+      .where(eq(restaurants.locationId, locationId));
+    return restaurant || undefined;
+  }
+
+  async updateRestaurant(locationId: string, restaurantData: Partial<InsertRestaurant>): Promise<Restaurant> {
+    const [updated] = await db
+      .update(restaurants)
+      .set({ ...restaurantData, updatedAt: new Date() })
+      .where(eq(restaurants.locationId, locationId))
+      .returning();
+    return updated;
+  }
+
+  async searchRestaurants(query: string, filters?: { destinationId?: number; cuisine?: string; priceLevel?: string }): Promise<Restaurant[]> {
+    let conditions = [sql`${restaurants.name} ILIKE ${`%${query}%`}`];
+
+    if (filters?.destinationId) {
+      conditions.push(eq(restaurants.destinationId, filters.destinationId));
+    }
+    if (filters?.cuisine) {
+      conditions.push(sql`${filters.cuisine} = ANY(${restaurants.cuisine})`);
+    }
+    if (filters?.priceLevel) {
+      conditions.push(eq(restaurants.priceLevel, filters.priceLevel));
+    }
+
+    return await db
+      .select()
+      .from(restaurants)
+      .where(and(...conditions))
+      .orderBy(desc(restaurants.rating));
+  }
+
+  // Location review operations
+  async createLocationReview(review: InsertLocationReview): Promise<LocationReview> {
+    const [newReview] = await db.insert(locationReviews).values(review).returning();
+    return newReview;
+  }
+
+  async getLocationReviews(locationId: string, category: string): Promise<LocationReview[]> {
+    return await db
+      .select({
+        id: locationReviews.id,
+        locationId: locationReviews.locationId,
+        locationCategory: locationReviews.locationCategory,
+        userId: locationReviews.userId,
+        rating: locationReviews.rating,
+        title: locationReviews.title,
+        text: locationReviews.text,
+        travelDate: locationReviews.travelDate,
+        tripType: locationReviews.tripType,
+        helpful: locationReviews.helpful,
+        language: locationReviews.language,
+        source: locationReviews.source,
+        externalReviewId: locationReviews.externalReviewId,
+        createdAt: locationReviews.createdAt,
+        user: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+        },
+      })
+      .from(locationReviews)
+      .leftJoin(users, eq(locationReviews.userId, users.id))
+      .where(and(
+        eq(locationReviews.locationId, locationId),
+        eq(locationReviews.locationCategory, category)
+      ))
+      .orderBy(desc(locationReviews.createdAt));
+  }
+
+  async getRecentLocationReviews(): Promise<LocationReview[]> {
+    return await db
+      .select({
+        id: locationReviews.id,
+        locationId: locationReviews.locationId,
+        locationCategory: locationReviews.locationCategory,
+        userId: locationReviews.userId,
+        rating: locationReviews.rating,
+        title: locationReviews.title,
+        text: locationReviews.text,
+        travelDate: locationReviews.travelDate,
+        tripType: locationReviews.tripType,
+        helpful: locationReviews.helpful,
+        language: locationReviews.language,
+        source: locationReviews.source,
+        externalReviewId: locationReviews.externalReviewId,
+        createdAt: locationReviews.createdAt,
+        user: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+        },
+      })
+      .from(locationReviews)
+      .leftJoin(users, eq(locationReviews.userId, users.id))
+      .orderBy(desc(locationReviews.createdAt))
+      .limit(20);
+  }
+
+  // Location subrating operations
+  async upsertLocationSubratings(locationId: string, category: string, subratings: InsertLocationSubrating[]): Promise<LocationSubrating[]> {
+    // Delete existing subratings for this location
+    await db
+      .delete(locationSubratings)
+      .where(and(
+        eq(locationSubratings.locationId, locationId),
+        eq(locationSubratings.locationCategory, category)
+      ));
+
+    // Insert new subratings
+    if (subratings.length > 0) {
+      return await db.insert(locationSubratings).values(subratings).returning();
+    }
+    return [];
+  }
+
+  async getLocationSubratings(locationId: string, category: string): Promise<LocationSubrating[]> {
+    return await db
+      .select()
+      .from(locationSubratings)
+      .where(and(
+        eq(locationSubratings.locationId, locationId),
+        eq(locationSubratings.locationCategory, category)
+      ));
+  }
+
+  // Location photo operations
+  async createLocationPhoto(photo: InsertLocationPhoto): Promise<LocationPhoto> {
+    const [newPhoto] = await db.insert(locationPhotos).values(photo).returning();
+    return newPhoto;
+  }
+
+  async getLocationPhotos(locationId: string, category: string): Promise<LocationPhoto[]> {
+    return await db
+      .select()
+      .from(locationPhotos)
+      .where(and(
+        eq(locationPhotos.locationId, locationId),
+        eq(locationPhotos.locationCategory, category)
+      ))
+      .orderBy(desc(locationPhotos.createdAt));
+  }
+
+  // Location ancestor operations
+  async upsertLocationAncestors(locationId: string, ancestors: InsertLocationAncestor[]): Promise<LocationAncestor[]> {
+    // Delete existing ancestors for this location
+    await db
+      .delete(locationAncestors)
+      .where(eq(locationAncestors.locationId, locationId));
+
+    // Insert new ancestors
+    if (ancestors.length > 0) {
+      return await db.insert(locationAncestors).values(ancestors).returning();
+    }
+    return [];
+  }
+
+  async getLocationAncestors(locationId: string): Promise<LocationAncestor[]> {
+    return await db
+      .select()
+      .from(locationAncestors)
+      .where(eq(locationAncestors.locationId, locationId));
   }
 }
 

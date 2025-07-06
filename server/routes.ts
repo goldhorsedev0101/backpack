@@ -1585,5 +1585,262 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // TripAdvisor-style data API routes
+  
+  // Destinations API
+  app.get('/api/destinations', async (req, res) => {
+    try {
+      const destinations = await storage.getDestinations();
+      res.json(destinations);
+    } catch (error) {
+      console.error("Error fetching destinations:", error);
+      res.status(500).json({ message: "Failed to fetch destinations" });
+    }
+  });
+
+  app.get('/api/destinations/search', async (req, res) => {
+    try {
+      const { q } = req.query;
+      if (!q || typeof q !== 'string') {
+        return res.status(400).json({ message: "Search query is required" });
+      }
+      const destinations = await storage.searchDestinations(q);
+      res.json(destinations);
+    } catch (error) {
+      console.error("Error searching destinations:", error);
+      res.status(500).json({ message: "Failed to search destinations" });
+    }
+  });
+
+  app.get('/api/destinations/:locationId', async (req, res) => {
+    try {
+      const { locationId } = req.params;
+      const destination = await storage.getDestinationByLocationId(locationId);
+      if (!destination) {
+        return res.status(404).json({ message: "Destination not found" });
+      }
+      res.json(destination);
+    } catch (error) {
+      console.error("Error fetching destination:", error);
+      res.status(500).json({ message: "Failed to fetch destination" });
+    }
+  });
+
+  // Accommodations API
+  app.get('/api/accommodations', async (req, res) => {
+    try {
+      const { destinationId } = req.query;
+      const accommodations = await storage.getAccommodations(
+        destinationId ? parseInt(destinationId as string) : undefined
+      );
+      res.json(accommodations);
+    } catch (error) {
+      console.error("Error fetching accommodations:", error);
+      res.status(500).json({ message: "Failed to fetch accommodations" });
+    }
+  });
+
+  app.get('/api/accommodations/search', async (req, res) => {
+    try {
+      const { q, destinationId, priceLevel, rating } = req.query;
+      if (!q || typeof q !== 'string') {
+        return res.status(400).json({ message: "Search query is required" });
+      }
+      
+      const filters = {
+        destinationId: destinationId ? parseInt(destinationId as string) : undefined,
+        priceLevel: priceLevel as string,
+        rating: rating ? parseFloat(rating as string) : undefined,
+      };
+      
+      const accommodations = await storage.searchAccommodations(q, filters);
+      res.json(accommodations);
+    } catch (error) {
+      console.error("Error searching accommodations:", error);
+      res.status(500).json({ message: "Failed to search accommodations" });
+    }
+  });
+
+  app.get('/api/accommodations/:locationId', async (req, res) => {
+    try {
+      const { locationId } = req.params;
+      const accommodation = await storage.getAccommodationByLocationId(locationId);
+      if (!accommodation) {
+        return res.status(404).json({ message: "Accommodation not found" });
+      }
+      res.json(accommodation);
+    } catch (error) {
+      console.error("Error fetching accommodation:", error);
+      res.status(500).json({ message: "Failed to fetch accommodation" });
+    }
+  });
+
+  // Attractions API
+  app.get('/api/attractions', async (req, res) => {
+    try {
+      const { destinationId } = req.query;
+      const attractions = await storage.getAttractions(
+        destinationId ? parseInt(destinationId as string) : undefined
+      );
+      res.json(attractions);
+    } catch (error) {
+      console.error("Error fetching attractions:", error);
+      res.status(500).json({ message: "Failed to fetch attractions" });
+    }
+  });
+
+  app.get('/api/attractions/search', async (req, res) => {
+    try {
+      const { q, destinationId, category } = req.query;
+      if (!q || typeof q !== 'string') {
+        return res.status(400).json({ message: "Search query is required" });
+      }
+      
+      const filters = {
+        destinationId: destinationId ? parseInt(destinationId as string) : undefined,
+        category: category as string,
+      };
+      
+      const attractions = await storage.searchAttractions(q, filters);
+      res.json(attractions);
+    } catch (error) {
+      console.error("Error searching attractions:", error);
+      res.status(500).json({ message: "Failed to search attractions" });
+    }
+  });
+
+  app.get('/api/attractions/:locationId', async (req, res) => {
+    try {
+      const { locationId } = req.params;
+      const attraction = await storage.getAttractionByLocationId(locationId);
+      if (!attraction) {
+        return res.status(404).json({ message: "Attraction not found" });
+      }
+      res.json(attraction);
+    } catch (error) {
+      console.error("Error fetching attraction:", error);
+      res.status(500).json({ message: "Failed to fetch attraction" });
+    }
+  });
+
+  // Restaurants API
+  app.get('/api/ta-restaurants', async (req, res) => {
+    try {
+      const { destinationId } = req.query;
+      const restaurants = await storage.getRestaurants(
+        destinationId ? parseInt(destinationId as string) : undefined
+      );
+      res.json(restaurants);
+    } catch (error) {
+      console.error("Error fetching restaurants:", error);
+      res.status(500).json({ message: "Failed to fetch restaurants" });
+    }
+  });
+
+  app.get('/api/ta-restaurants/search', async (req, res) => {
+    try {
+      const { q, destinationId, cuisine, priceLevel } = req.query;
+      if (!q || typeof q !== 'string') {
+        return res.status(400).json({ message: "Search query is required" });
+      }
+      
+      const filters = {
+        destinationId: destinationId ? parseInt(destinationId as string) : undefined,
+        cuisine: cuisine as string,
+        priceLevel: priceLevel as string,
+      };
+      
+      const restaurants = await storage.searchRestaurants(q, filters);
+      res.json(restaurants);
+    } catch (error) {
+      console.error("Error searching restaurants:", error);
+      res.status(500).json({ message: "Failed to search restaurants" });
+    }
+  });
+
+  app.get('/api/ta-restaurants/:locationId', async (req, res) => {
+    try {
+      const { locationId } = req.params;
+      const restaurant = await storage.getRestaurantByLocationId(locationId);
+      if (!restaurant) {
+        return res.status(404).json({ message: "Restaurant not found" });
+      }
+      res.json(restaurant);
+    } catch (error) {
+      console.error("Error fetching restaurant:", error);
+      res.status(500).json({ message: "Failed to fetch restaurant" });
+    }
+  });
+
+  // Location Reviews API
+  app.get('/api/location-reviews/:locationId/:category', async (req, res) => {
+    try {
+      const { locationId, category } = req.params;
+      const reviews = await storage.getLocationReviews(locationId, category);
+      res.json(reviews);
+    } catch (error) {
+      console.error("Error fetching location reviews:", error);
+      res.status(500).json({ message: "Failed to fetch location reviews" });
+    }
+  });
+
+  app.get('/api/location-reviews/recent', async (req, res) => {
+    try {
+      const reviews = await storage.getRecentLocationReviews();
+      res.json(reviews);
+    } catch (error) {
+      console.error("Error fetching recent location reviews:", error);
+      res.status(500).json({ message: "Failed to fetch recent location reviews" });
+    }
+  });
+
+  app.post('/api/location-reviews', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const reviewData = insertLocationReviewSchema.parse({ ...req.body, userId });
+      const review = await storage.createLocationReview(reviewData);
+      res.status(201).json(review);
+    } catch (error) {
+      console.error("Error creating location review:", error);
+      res.status(400).json({ message: "Failed to create location review" });
+    }
+  });
+
+  // Location Photos API
+  app.get('/api/location-photos/:locationId/:category', async (req, res) => {
+    try {
+      const { locationId, category } = req.params;
+      const photos = await storage.getLocationPhotos(locationId, category);
+      res.json(photos);
+    } catch (error) {
+      console.error("Error fetching location photos:", error);
+      res.status(500).json({ message: "Failed to fetch location photos" });
+    }
+  });
+
+  // Location Subratings API
+  app.get('/api/location-subratings/:locationId/:category', async (req, res) => {
+    try {
+      const { locationId, category } = req.params;
+      const subratings = await storage.getLocationSubratings(locationId, category);
+      res.json(subratings);
+    } catch (error) {
+      console.error("Error fetching location subratings:", error);
+      res.status(500).json({ message: "Failed to fetch location subratings" });
+    }
+  });
+
+  // Location Ancestors API
+  app.get('/api/location-ancestors/:locationId', async (req, res) => {
+    try {
+      const { locationId } = req.params;
+      const ancestors = await storage.getLocationAncestors(locationId);
+      res.json(ancestors);
+    } catch (error) {
+      console.error("Error fetching location ancestors:", error);
+      res.status(500).json({ message: "Failed to fetch location ancestors" });
+    }
+  });
+
   return httpServer;
 }

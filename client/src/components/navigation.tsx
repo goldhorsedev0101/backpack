@@ -24,7 +24,8 @@ import {
   User,
   LogOut,
   Menu,
-  X
+  X,
+  Database
 } from "lucide-react";
 
 const navigationItems = [
@@ -33,6 +34,7 @@ const navigationItems = [
   { href: "/community", label: "Community", icon: Users },
   { href: "/budget-tracker", label: "Budget", icon: DollarSign },
   { href: "/achievements", label: "Achievements", icon: Trophy },
+  { href: "/tripadvisor-data", label: "Travel Data", icon: Database },
 ];
 
 export default function Navigation() {
