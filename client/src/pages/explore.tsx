@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { MapPin, Star, Phone, Globe, Clock, DollarSign, Users, Camera, CloudSun } from "lucide-react";
 import DestinationWeather from "@/components/DestinationWeather";
+import { BestTimeInfo } from "@/components/BestTimeInfo";
 
 interface Destination {
   id: number;
@@ -262,9 +263,13 @@ export default function ExplorePage() {
                     </div>
                     
                     <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Clock className="w-4 h-4" />
-                        Best time: {destination.bestTimeToVisit}
+                      {/* Best Time to Travel Information */}
+                      <div className="border-t pt-3">
+                        <BestTimeInfo 
+                          destination={destination.name}
+                          country={destination.country}
+                          compact={true}
+                        />
                       </div>
                       
                       <div className="flex flex-wrap gap-1">

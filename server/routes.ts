@@ -7,6 +7,7 @@ import { db } from "./db";
 import { googlePlaces } from "./googlePlaces";
 import { seedSouthAmericanData } from "./dataSeeder";
 import { weatherService } from "./weatherService";
+import { travelTimingService } from "./travelTimingService";
 import { achievements } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import {
@@ -680,6 +681,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error generating travel recommendations:", error);
       res.status(500).json({ message: "Failed to generate travel recommendations" });
+    }
+  });
+
+  // Travel timing endpoints
+  app.get("/api/travel-timing/:destination", async (req, res) => {
+    try {
+      const { destination } = req.params;
+      const { country } = req.query;
+      
+      const timingInfo = travelTimingService.getBestTimeInfo(destination, country as string);
+      if (!timingInfo) {
+        return res.status(404).json({ error: 'Travel timing information not available for this destination' });
+      }
+      
+      res.json(timingInfo);
+    } catch (error) {
+      console.error('Travel timing error:', error);
+      res.status(500).json({ error: 'Failed to fetch travel timing information' });
+    }
+  });
+
+  app.get("/api/travel-timing/:destination/summary", async (req, res) => {
+    try {
+      const { destination } = req.params;
+      
+      const summary = travelTimingService.getSeasonalSummary(destination);
+      const currentRating = travelTimingService.getCurrentMonthRating(destination);
+      
+      res.json({
+        summary,
+        currentRating,
+        destination
+      });
+    } catch (error) {
+      console.error('Travel timing summary error:', error);
+      res.status(500).json({ error: 'Failed to fetch travel timing summary' });
     }
   });
 
