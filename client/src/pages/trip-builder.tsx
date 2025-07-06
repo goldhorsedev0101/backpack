@@ -80,7 +80,10 @@ export default function TripBuilder() {
 
   const generateTripMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("POST", "/api/ai/generate-trip", data);
+      return await apiRequest("/api/ai/generate-trip", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
     },
     onSuccess: async (response) => {
       const suggestion = await response.json();
@@ -91,8 +94,10 @@ export default function TripBuilder() {
         description: "Your personalized itinerary is ready.",
       });
     },
-    onError: (error) => {
+    onError: async (error) => {
       setIsGenerating(false);
+      console.error("Trip generation error:", error);
+      
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
@@ -104,9 +109,22 @@ export default function TripBuilder() {
         }, 500);
         return;
       }
+      
+      // Try to get more specific error message
+      let errorMessage = "Could not generate trip. Please try again.";
+      try {
+        const errorResponse = await error.response?.text();
+        if (errorResponse) {
+          const errorData = JSON.parse(errorResponse);
+          errorMessage = errorData.message || errorMessage;
+        }
+      } catch (e) {
+        // Fall back to default message
+      }
+      
       toast({
         title: "Generation Failed",
-        description: "Could not generate trip. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     },
@@ -114,7 +132,10 @@ export default function TripBuilder() {
 
   const createTripMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("POST", "/api/trips", data);
+      return await apiRequest("/api/trips", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/trips/user"] });

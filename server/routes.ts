@@ -287,12 +287,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Debug endpoint for authentication testing
+  app.get('/api/debug/auth', isAuthenticated, async (req: any, res) => {
+    res.json({ 
+      authenticated: true, 
+      user: req.user?.claims?.sub || req.user?.id,
+      timestamp: new Date().toISOString() 
+    });
+  });
+
   // AI-powered trip generation
   app.post('/api/ai/generate-trip', isAuthenticated, async (req: any, res) => {
     try {
       const { destination, duration, budget, travelStyle, interests } = req.body;
       
       console.log('Trip generation request:', { destination, duration, budget, travelStyle, interests });
+      
+      // Validate required fields
+      if (!destination || !duration || !budget || !travelStyle) {
+        return res.status(400).json({ 
+          message: "Missing required fields: destination, duration, budget, and travelStyle are required" 
+        });
+      }
       
       // Enhanced destination-specific trip data
       const destinationData = {
@@ -339,35 +355,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         highlights: ['Cultural sites', 'Local markets', 'Traditional food', 'Natural landscapes', 'Historical monuments']
       };
 
-      // Try AI generation first, then fall back to enhanced destination data
-      let trip;
-      try {
-        const suggestions = await generateTravelSuggestions({
-          travelStyle,
-          budget,
-          duration,
-          interests: interests || [],
-          preferredCountries: destination ? [destination] : []
-        });
-        
-        if (suggestions.length > 0) {
-          trip = suggestions[0];
-        } else {
-          throw new Error('No AI suggestions returned');
+      // Use enhanced destination-specific data for reliable trip generation
+      const trip = {
+        destination: destination,
+        description: selectedDestination.description,
+        highlights: selectedDestination.activities.slice(0, 5),
+        estimatedBudget: {
+          low: Math.max(budget * 0.8, 500),
+          high: Math.max(budget * 1.2, 800)
         }
-      } catch (aiError) {
-        console.log('AI generation failed, using enhanced fallback:', aiError);
-        // Use enhanced destination-specific data
-        trip = {
-          destination: destination,
-          description: selectedDestination.description,
-          highlights: selectedDestination.activities.slice(0, 5),
-          estimatedBudget: {
-            low: Math.max(budget * 0.8, 500),
-            high: Math.max(budget * 1.2, 800)
-          }
-        };
-      }
+      };
 
       const response = {
         title: `${destination} ${travelStyle?.includes('adventure') ? 'Adventure' : travelStyle?.includes('cultural') ? 'Cultural Journey' : 'Experience'}`,
