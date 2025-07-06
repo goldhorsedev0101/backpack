@@ -13,6 +13,7 @@ import Community from "@/pages/community";
 import BudgetTracker from "@/pages/budget-tracker";
 import Achievements from "@/pages/achievements";
 import TripAdvisorData from "@/pages/tripadvisor-data";
+import Explore from "@/pages/explore";
 import Onboarding from "@/pages/onboarding";
 import Registry from "@/pages/registry";
 import Navigation from "@/components/navigation";
@@ -44,6 +45,7 @@ function AuthenticatedApp() {
           <Route path="/budget-tracker" component={BudgetTracker} />
           <Route path="/achievements" component={Achievements} />
           <Route path="/tripadvisor-data" component={TripAdvisorData} />
+          <Route path="/explore" component={Explore} />
           <Route path="/onboarding" component={Onboarding} />
           <Route path="/registry" component={Registry} />
           <Route component={NotFound} />

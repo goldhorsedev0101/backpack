@@ -4,6 +4,8 @@ import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { db } from "./db";
+import { googlePlaces } from "./googlePlaces";
+import { seedSouthAmericanData } from "./dataSeeder";
 import { achievements } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import {
@@ -294,6 +296,114 @@ export async function registerRoutes(app: Express): Promise<Server> {
       user: req.user?.claims?.sub || req.user?.id,
       timestamp: new Date().toISOString() 
     });
+  });
+
+  // ===== ENHANCED SOUTH AMERICAN DATA ENDPOINTS =====
+  
+  // Seed database with comprehensive South American data
+  app.post('/api/data/seed', isAuthenticated, async (req: any, res) => {
+    try {
+      const result = await seedSouthAmericanData();
+      res.json(result);
+    } catch (error) {
+      console.error('Seeding error:', error);
+      res.status(500).json({ error: 'Failed to seed data' });
+    }
+  });
+
+  // ===== GOOGLE PLACES API INTEGRATION =====
+  
+  // Search places using Google Places API
+  app.get('/api/places/search', isAuthenticated, async (req: any, res) => {
+    try {
+      const { query, type, location } = req.query;
+      if (!query) {
+        return res.status(400).json({ error: 'Query parameter is required' });
+      }
+      
+      const results = await googlePlaces.searchPlaces(query, type, location);
+      res.json({ results });
+    } catch (error) {
+      console.error('Places search error:', error);
+      res.status(500).json({ error: 'Failed to search places' });
+    }
+  });
+
+  // Import Google Places data to our database
+  app.post('/api/places/import', isAuthenticated, async (req: any, res) => {
+    try {
+      const { placeId, category, destinationId } = req.body;
+      if (!placeId || !category || !destinationId) {
+        return res.status(400).json({ error: 'placeId, category, and destinationId are required' });
+      }
+
+      let imported = null;
+      switch (category) {
+        case 'accommodation':
+          const placeResult = { place_id: placeId, name: '', formatted_address: '', geometry: { location: { lat: 0, lng: 0 } }, types: [] };
+          imported = await googlePlaces.importAccommodation(placeResult, destinationId);
+          break;
+        case 'restaurant':
+          const restaurantResult = { place_id: placeId, name: '', formatted_address: '', geometry: { location: { lat: 0, lng: 0 } }, types: [] };
+          imported = await googlePlaces.importRestaurant(restaurantResult, destinationId);
+          break;
+        case 'attraction':
+          const attractionResult = { place_id: placeId, name: '', formatted_address: '', geometry: { location: { lat: 0, lng: 0 } }, types: [] };
+          imported = await googlePlaces.importAttraction(attractionResult, destinationId);
+          break;
+        default:
+          return res.status(400).json({ error: 'Invalid category. Must be accommodation, restaurant, or attraction' });
+      }
+
+      if (imported) {
+        // Import reviews as well
+        await googlePlaces.importReviews(placeId, category);
+      }
+
+      res.json({ imported, message: 'Place imported successfully' });
+    } catch (error) {
+      console.error('Places import error:', error);
+      res.status(500).json({ error: 'Failed to import place' });
+    }
+  });
+
+  // ===== TRIPADVISOR-READY STRUCTURE =====
+  
+  // TripAdvisor API placeholder endpoints (ready for future integration)
+  app.get('/api/tripadvisor/search', isAuthenticated, async (req: any, res) => {
+    // TODO: Integrate TripAdvisor API when access is granted
+    res.json({ 
+      message: 'TripAdvisor API integration pending approval',
+      fallback: 'Using enhanced database and Google Places data',
+      docs: 'https://www.tripadvisor.com/APIAccessSupport'
+    });
+  });
+
+  app.get('/api/tripadvisor/location/:locationId', isAuthenticated, async (req: any, res) => {
+    // TODO: TripAdvisor location details endpoint
+    const { locationId } = req.params;
+    
+    // Fallback to our database
+    const accommodation = await storage.getAccommodationByLocationId(locationId);
+    const restaurant = await storage.getRestaurantByLocationId(locationId);
+    const attraction = await storage.getAttractionByLocationId(locationId);
+    
+    const location = accommodation || restaurant || attraction;
+    if (location) {
+      res.json({ location, source: 'database' });
+    } else {
+      res.status(404).json({ error: 'Location not found' });
+    }
+  });
+
+  app.get('/api/tripadvisor/reviews/:locationId', isAuthenticated, async (req: any, res) => {
+    // TODO: TripAdvisor reviews endpoint
+    const { locationId } = req.params;
+    const { category } = req.query;
+    
+    // Fallback to our database
+    const reviews = await storage.getLocationReviews(locationId, category as string);
+    res.json({ reviews, source: 'database' });
   });
 
   // AI-powered trip generation
