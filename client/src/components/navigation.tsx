@@ -27,13 +27,15 @@ import {
   Menu,
   X,
   Database,
-  MapPin
+  MapPin,
+  Cloud
 } from "lucide-react";
 
 const navigationItems = [
   { href: "/", label: "Home", icon: Home },
   { href: "/trip-builder", label: "Plan Trip", icon: Calendar },
   { href: "/explore", label: "Explore", icon: MapPin },
+  { href: "/weather", label: "Weather", icon: Cloud },
   { href: "/community", label: "Community", icon: Users },
   { href: "/budget-tracker", label: "Budget", icon: DollarSign },
   { href: "/achievements", label: "Achievements", icon: Trophy },

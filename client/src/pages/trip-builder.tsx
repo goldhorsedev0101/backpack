@@ -15,6 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { WeatherWidget } from "@/components/WeatherWidget";
 import { 
   Bot, 
   MapPin, 
@@ -427,6 +428,20 @@ export default function TripBuilder() {
                       ))}
                     </ul>
                   </div>
+
+                  <Separator />
+
+                  {/* Weather Information */}
+                  {aiSuggestion.destinations?.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold text-slate-700 mb-3">Weather & Travel Conditions</h4>
+                      <WeatherWidget 
+                        destination={aiSuggestion.destinations[0].name}
+                        country={form.getValues('destination')}
+                        showRecommendations={true}
+                      />
+                    </div>
+                  )}
 
                   <Separator />
 

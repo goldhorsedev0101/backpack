@@ -201,6 +201,7 @@ TripWise is a full-stack web application focused on South American travel planni
 - July 06, 2025. Enhanced logout system with complete session clearing - removes all authentication data, clears cache, destroys server sessions, and prevents authentication persistence
 - July 06, 2025. Updated landing page "Start Planning" buttons to navigate directly to AI Trip Builder for authenticated users, or redirect to login for new users
 - July 06, 2025. Implemented comprehensive travel data integration: Google Places API service for real-time data import, enhanced South American database with 10 destinations and authentic locations, TripAdvisor-ready service structure for future API access, new Explore page for browsing destinations/accommodations/attractions/restaurants with search functionality
+- July 06, 2025. Implemented comprehensive weather integration with real-time weather data, climate analysis, and travel timing recommendations for optimal South American travel planning
 
 ## User Preferences
 
@@ -438,3 +439,117 @@ Comprehensive travel data system combining multiple data sources for rich, authe
 - **Multiple Sources**: Google Places + curated database + TripAdvisor-ready
 - **Scalable Architecture**: Ready for millions of locations
 - **User-Friendly Interface**: Comprehensive explore and search functionality
+
+## Weather Integration & Travel Timing System
+
+### Overview
+Comprehensive weather integration connecting TripWise to real-time weather data and climate analysis for optimal South American travel planning.
+
+### Weather Service (`server/weatherService.ts`)
+
+**Features**:
+- **Real-time Weather**: OpenWeather API integration for current conditions
+- **5-Day Forecasts**: Detailed weather predictions with temperature, precipitation, and wind
+- **Climate Database**: Historical climate data for major South American destinations
+- **Travel Recommendations**: AI-powered analysis of best travel times based on weather patterns
+- **Destination-Specific Advice**: Customized recommendations for altitude, tropical, coastal, and desert climates
+
+**API Endpoints**:
+- `GET /api/weather/:destination?country=Peru` - Real-time weather data
+- `GET /api/weather/:destination/recommendations?country=Peru` - Travel timing recommendations
+
+### Climate Data Coverage
+
+**Major Destinations with Climate Profiles**:
+- **Lima**: Coastal desert, mild year-round (17-26°C)
+- **Cusco**: High altitude, dry winters/wet summers (9-14°C)
+- **Bogotá**: Highland tropical, stable temperatures (14-15°C)
+- **Buenos Aires**: Temperate, opposite seasons (11-25°C)
+- **Rio de Janeiro**: Tropical coastal, warm and humid (20-26°C)
+- **Santiago**: Mediterranean, dry summers (8-21°C)
+
+### Travel Recommendation Engine
+
+**Analysis Factors**:
+- **Temperature Comfort**: Optimal 18-25°C range scoring
+- **Precipitation Patterns**: Dry season preferences
+- **Seasonal Activities**: Weather-appropriate recommendations
+- **Health Considerations**: Altitude sickness, tropical disease warnings
+- **Packing Advice**: Weather-specific gear recommendations
+
+**Recommendation Categories**:
+- **Excellent**: Perfect travel conditions (18-25°C, <30mm rain, >20 sunny days)
+- **Good**: Favorable conditions with minor considerations
+- **Fair**: Acceptable with weather precautions needed
+- **Poor**: Challenging conditions requiring preparation
+
+### Frontend Components
+
+**WeatherWidget Component** (`client/src/components/WeatherWidget.tsx`):
+- **Current Weather**: Real-time temperature, conditions, humidity, wind
+- **5-Day Forecast**: Visual forecast cards with precipitation chances
+- **Travel Recommendations**: Best/worst months, activities, packing tips, health warnings
+- **Interactive Tabs**: Current, forecast, and recommendations views
+- **Error Handling**: Graceful fallbacks when weather data unavailable
+
+**Weather Page** (`client/src/pages/weather.tsx`):
+- **Destination Selection**: Quick-select popular destinations or custom search
+- **Climate Information**: South American climate zones and seasonal patterns
+- **Travel Seasons Guide**: Best times for different activities and destinations
+- **Country Filtering**: Weather data organized by South American countries
+
+### Integration Points
+
+**Trip Builder Enhancement**:
+- Weather widget automatically displays for planned destinations
+- Real-time conditions inform travel timing decisions
+- Climate recommendations integrated with AI trip suggestions
+
+**Navigation Integration**:
+- Weather page accessible via main navigation with cloud icon
+- Seamless integration with existing explore and trip planning features
+
+### Technical Architecture
+
+**Weather Service Class**:
+```typescript
+class WeatherService {
+  getCurrentWeather(city: string, country: string): Promise<WeatherData>
+  generateTravelRecommendation(destination: string, weather?: WeatherData): TravelRecommendation
+  private findBestMonths(climateData: MonthlyData[]): string[]
+  private addDestinationSpecificAdvice(): void
+}
+```
+
+**Data Structures**:
+- **WeatherData**: Current conditions with 5-day forecast
+- **TravelRecommendation**: Best months, activities, packing, health warnings
+- **ClimateData**: Historical monthly averages for temperature, rainfall, humidity
+
+### Usage Examples
+
+**Planning a Peru Trip**:
+1. Select Cusco as destination
+2. View current weather (temperature, conditions)
+3. See 5-day forecast for trip planning
+4. Get recommendations: "Best months: May-September (dry season)"
+5. Receive altitude-specific advice and packing recommendations
+
+**Weather-Based Decision Making**:
+- **Dry Season (May-Sept)**: Perfect for Machu Picchu hiking
+- **Wet Season (Dec-Mar)**: Better for coastal areas like Lima
+- **Year-Round**: Stable equatorial destinations like Quito
+
+### API Requirements
+
+**OpenWeather API Key**:
+- Environment variable: `OPENWEATHER_API_KEY`
+- Free tier: 100,000 requests/month
+- Paid tiers available for higher usage
+
+### Error Handling
+
+**Graceful Degradation**:
+- Weather API failures fall back to climate database recommendations
+- Clear error messages guide users to alternative data sources
+- Offline capability with cached climate patterns

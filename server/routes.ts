@@ -6,6 +6,7 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { db } from "./db";
 import { googlePlaces } from "./googlePlaces";
 import { seedSouthAmericanData } from "./dataSeeder";
+import { weatherService } from "./weatherService";
 import { achievements } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import {
@@ -643,25 +644,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Weather & Travel Conditions API
+  // Weather API with real weather data and travel recommendations
   app.get('/api/weather/:destination', async (req, res) => {
     try {
       const { destination } = req.params;
-      // This would integrate with a weather API like OpenWeatherMap
-      const mockWeather = {
-        destination,
-        temperature: Math.floor(Math.random() * 20) + 15, // 15-35°C
-        condition: ['sunny', 'cloudy', 'rainy', 'partly-cloudy'][Math.floor(Math.random() * 4)],
-        humidity: Math.floor(Math.random() * 40) + 40, // 40-80%
-        forecast: Array.from({ length: 7 }, (_, i) => ({
-          date: new Date(Date.now() + i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          temp: Math.floor(Math.random() * 20) + 15,
-          condition: ['sunny', 'cloudy', 'rainy'][Math.floor(Math.random() * 3)]
-        }))
-      };
-      res.json(mockWeather);
+      const { country = 'Peru' } = req.query;
+      
+      // Get current weather from OpenWeather API
+      const weatherData = await weatherService.getCurrentWeather(destination, country as string);
+      
+      if (!weatherData) {
+        return res.status(404).json({ message: "Weather data not available for this destination" });
+      }
+
+      res.json(weatherData);
     } catch (error) {
       console.error("Error fetching weather:", error);
       res.status(500).json({ message: "Failed to fetch weather data" });
+    }
+  });
+
+  // Travel recommendations based on weather and climate data
+  app.get('/api/weather/:destination/recommendations', async (req, res) => {
+    try {
+      const { destination } = req.params;
+      const { country = 'Peru' } = req.query;
+      
+      // Get current weather for better recommendations
+      const weatherData = await weatherService.getCurrentWeather(destination, country as string);
+      
+      // Generate travel recommendations
+      const recommendations = weatherService.generateTravelRecommendation(destination, weatherData || undefined);
+      
+      res.json(recommendations);
+    } catch (error) {
+      console.error("Error generating travel recommendations:", error);
+      res.status(500).json({ message: "Failed to generate travel recommendations" });
     }
   });
 
