@@ -28,6 +28,17 @@ import {
 } from "./openai";
 import { generateItinerary as generateDetailedItinerary } from "./generateItinerary";
 
+// In-memory storage for user itineraries
+interface UserItineraryDay {
+  day: number;
+  location: string;
+  activities: string[];
+  estimatedCost: number;
+  tips: string[];
+}
+
+const userItineraries: Record<string, UserItineraryDay[]> = {};
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
@@ -791,6 +802,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Generate itinerary error:", error);
       res.status(500).json({ 
         message: "Failed to generate itinerary",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Add place to user's custom itinerary
+  app.post('/api/itinerary/:userId/add', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { day, location, activity, estimatedCost, tip } = req.body;
+      
+      // Validate required fields
+      if (!userId || !day || !location || !activity) {
+        return res.status(400).json({ 
+          message: "Missing required fields: day, location, activity are required" 
+        });
+      }
+
+      // Initialize user itinerary if it doesn't exist
+      if (!userItineraries[userId]) {
+        userItineraries[userId] = [];
+      }
+
+      // Find if day already exists in itinerary
+      let dayEntry = userItineraries[userId].find(d => d.day === parseInt(day));
+      
+      if (dayEntry) {
+        // Add activity to existing day
+        dayEntry.activities.push(activity);
+        dayEntry.estimatedCost += parseInt(estimatedCost) || 0;
+        if (tip) {
+          dayEntry.tips.push(tip);
+        }
+      } else {
+        // Create new day entry
+        const newDay: UserItineraryDay = {
+          day: parseInt(day),
+          location: location,
+          activities: [activity],
+          estimatedCost: parseInt(estimatedCost) || 0,
+          tips: tip ? [tip] : []
+        };
+        userItineraries[userId].push(newDay);
+        
+        // Sort by day number
+        userItineraries[userId].sort((a, b) => a.day - b.day);
+      }
+
+      res.json({
+        message: "Activity added to itinerary successfully",
+        itinerary: userItineraries[userId],
+        addedActivity: {
+          day: parseInt(day),
+          location,
+          activity,
+          estimatedCost: parseInt(estimatedCost) || 0,
+          tip: tip || null
+        }
+      });
+    } catch (error) {
+      console.error("Error adding to itinerary:", error);
+      res.status(500).json({ 
+        message: "Failed to add activity to itinerary",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Get user's custom itinerary
+  app.get('/api/itinerary/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      
+      const itinerary = userItineraries[userId] || [];
+      res.json({ 
+        userId,
+        itinerary,
+        totalDays: itinerary.length,
+        totalCost: itinerary.reduce((sum, day) => sum + day.estimatedCost, 0)
+      });
+    } catch (error) {
+      console.error("Error fetching user itinerary:", error);
+      res.status(500).json({ 
+        message: "Failed to fetch user itinerary",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Clear user's custom itinerary
+  app.delete('/api/itinerary/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      
+      delete userItineraries[userId];
+      
+      res.json({ 
+        message: "User itinerary cleared successfully",
+        userId
+      });
+    } catch (error) {
+      console.error("Error clearing user itinerary:", error);
+      res.status(500).json({ 
+        message: "Failed to clear user itinerary",
         error: error instanceof Error ? error.message : "Unknown error"
       });
     }
