@@ -61,6 +61,7 @@ export default {
           border: "var(--sidebar-border)",
           ring: "var(--sidebar-ring)",
         },
+        mint: "var(--mint)",
       },
       keyframes: {
         "accordion-down": {
