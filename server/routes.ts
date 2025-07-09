@@ -575,10 +575,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI-powered travel suggestions
-  app.post('/api/ai/travel-suggestions', isAuthenticated, async (req, res) => {
+  // AI-powered travel suggestions (guest-friendly)
+  app.post('/api/ai/travel-suggestions', async (req, res) => {
     try {
       const { travelStyle, budget, duration, interests, preferredCountries } = req.body;
+      
+      // Validate required inputs
+      if (!travelStyle || !budget || !duration || !interests) {
+        return res.status(400).json({ 
+          message: "Missing required fields: travelStyle, budget, duration, and interests are required" 
+        });
+      }
+
+      console.log("Generating travel suggestions with data:", {
+        travelStyle, budget, duration, interests, preferredCountries
+      });
+
       const suggestions = await generateTravelSuggestions({
         travelStyle,
         budget,
@@ -586,10 +598,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         interests,
         preferredCountries
       });
+      
       res.json({ suggestions });
     } catch (error) {
       console.error("Error generating travel suggestions:", error);
-      res.status(500).json({ error: "Failed to generate travel suggestions" });
+      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
+      
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      
+      // Provide more specific error information
+      if (errorMessage.includes("API key")) {
+        res.status(500).json({ 
+          message: "OpenAI API key issue. Please check configuration.",
+          error: errorMessage 
+        });
+      } else if (errorMessage.includes("rate limit")) {
+        res.status(500).json({ 
+          message: "OpenAI rate limit reached. Please try again later.",
+          error: errorMessage 
+        });
+      } else {
+        res.status(500).json({ 
+          message: "Failed to generate trip suggestions. Please try again.",
+          error: errorMessage 
+        });
+      }
     }
   });
 

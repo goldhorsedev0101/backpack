@@ -302,6 +302,43 @@ export default function TripBuilder() {
   });
 
   const handleGenerateAITrips = () => {
+    console.log("Generate AI Trips clicked");
+    console.log("Current form state:", {
+      selectedStyles,
+      budget: budget[0],
+      duration: form.getValues("duration"),
+      selectedInterests,
+      selectedCountries
+    });
+
+    // Validation checks
+    if (selectedStyles.length === 0) {
+      toast({
+        title: "Missing Travel Style",
+        description: "Please select at least one travel style.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (selectedInterests.length === 0) {
+      toast({
+        title: "Missing Interests", 
+        description: "Please select at least one interest.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!form.getValues("duration")) {
+      toast({
+        title: "Missing Duration",
+        description: "Please select trip duration.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsGenerating(true);
     const preferences = {
       travelStyle: selectedStyles,
@@ -311,6 +348,7 @@ export default function TripBuilder() {
       preferredCountries: selectedCountries.length > 0 ? selectedCountries : undefined,
     };
     
+    console.log("Sending preferences to API:", preferences);
     generateTripMutation.mutate(preferences);
   };
 
@@ -543,7 +581,7 @@ export default function TripBuilder() {
               {/* Generate AI Trip Button */}
               <Button 
                 onClick={handleGenerateAITrips}
-                disabled={isGenerating || selectedStyles.length === 0 || selectedInterests.length === 0 || !form.getValues("duration")}
+                disabled={isGenerating}
                 className="w-full h-12 text-lg font-semibold"
               >
                 {isGenerating ? (
