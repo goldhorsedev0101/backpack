@@ -372,6 +372,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get tourist attractions for a specific location using Google Places
+  app.get('/api/places/attractions/:location', async (req, res) => {
+    try {
+      const { location } = req.params;
+      
+      if (!location) {
+        return res.status(400).json({ error: 'Location parameter is required' });
+      }
+
+      // Search for tourist attractions using Google Places API
+      const results = await googlePlaces.searchPlaces(
+        location, 
+        'tourist_attraction',
+        location
+      );
+
+      // Limit to 10 most popular results and format response
+      const formattedResults = results.slice(0, 10).map(place => ({
+        name: place.name,
+        formatted_address: place.formatted_address,
+        rating: place.rating,
+        place_id: place.place_id,
+        types: place.types,
+        photo_reference: place.photos && place.photos.length > 0 ? place.photos[0].photo_reference : null,
+        user_ratings_total: place.user_ratings_total,
+        price_level: place.price_level,
+        opening_hours: place.opening_hours,
+        business_status: place.business_status
+      }));
+
+      res.json(formattedResults);
+    } catch (error) {
+      console.error('Error fetching tourist attractions:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch tourist attractions',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // ===== TRIPADVISOR-READY STRUCTURE =====
   
   // TripAdvisor API placeholder endpoints (ready for future integration)
