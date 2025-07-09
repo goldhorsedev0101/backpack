@@ -13,6 +13,7 @@ import logo from "@/assets/tripwise-logo.svg";
 import { 
   Compass, 
   MapPin, 
+  Map,
   Users, 
   Star, 
   Clock, 
@@ -401,7 +402,7 @@ export default function Landing() {
                 color: "bg-accent"
               },
               {
-                icon: MapPin,
+                icon: Map,
                 title: "Interactive Maps",
                 description: "Visualize your route, find nearby attractions, and navigate with confidence.",
                 color: "bg-mint"
