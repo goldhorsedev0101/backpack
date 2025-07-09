@@ -908,6 +908,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Save trip suggestion to user's trips  
+  app.post('/api/my-trips/:userId/save', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const trip = req.body;
+
+      console.log("Saving trip for user:", userId, "Trip data:", trip);
+
+      if (!trip || !trip.destination) {
+        return res.status(400).json({ message: "Missing trip data - destination is required" });
+      }
+
+      await storage.saveUserTrip(userId, trip);
+      res.status(200).json({ success: true, message: "Trip saved successfully" });
+    } catch (error) {
+      console.error("Failed to save trip:", error);
+      res.status(500).json({ 
+        message: "Failed to save trip",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // Get user's custom itinerary
   app.get('/api/itinerary/:userId', async (req, res) => {
     try {

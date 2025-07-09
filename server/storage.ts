@@ -64,6 +64,7 @@ export interface IStorage {
   getPublicTrips(): Promise<Trip[]>;
   getTripById(id: number): Promise<Trip | undefined>;
   updateTrip(id: number, trip: Partial<InsertTrip>): Promise<Trip>;
+  saveUserTrip(userId: string, trip: any): Promise<void>;
   
   // Review operations
   createReview(review: InsertReview): Promise<Review>;
@@ -213,6 +214,27 @@ export class DatabaseStorage implements IStorage {
       .where(eq(trips.id, id))
       .returning();
     return updatedTrip;
+  }
+
+  // Simple trip saving for suggestions (creates a new trip)
+  async saveUserTrip(userId: string, trip: any): Promise<void> {
+    try {
+      const tripData: InsertTrip = {
+        userId: userId,
+        title: trip.destination || trip.title || 'Saved Trip',
+        description: trip.description || `Trip to ${trip.destination}`,
+        destinations: trip.destination || trip.destinations || '',
+        duration: trip.duration || '7 days',
+        budget: trip.budget || trip.estimatedBudget?.high?.toString() || '1000',
+        travelStyle: Array.isArray(trip.travelStyle) ? trip.travelStyle.join(', ') : (trip.travelStyle || 'Adventure'),
+        isPublic: false
+      };
+
+      await db.insert(trips).values(tripData);
+    } catch (error) {
+      console.error('Error saving user trip:', error);
+      throw new Error('Failed to save trip to database');
+    }
   }
 
   // Review operations

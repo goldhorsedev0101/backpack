@@ -102,20 +102,20 @@ export default function MyTripsScreen() {
     }
   });
 
-  // Save trip mutation
+  // Save trip mutation using the new endpoint
   const saveTrip = useMutation({
     mutationFn: async (suggestion: TripSuggestion) => {
       const tripData = {
-        title: `${suggestion.destination}, ${suggestion.country}`,
+        destination: `${suggestion.destination}, ${suggestion.country}`,
         description: suggestion.description,
-        destinations: suggestion.destination,
-        budget: suggestion.estimatedBudget.high.toString(),
         duration: suggestion.duration,
-        isPublic: false,
-        travelStyle: suggestion.travelStyle.join(', ')
+        estimatedBudget: suggestion.estimatedBudget,
+        travelStyle: suggestion.travelStyle,
+        highlights: suggestion.highlights,
+        bestTimeToVisit: suggestion.bestTimeToVisit
       };
       
-      const response = await apiRequest('/api/trips', {
+      const response = await apiRequest('/api/my-trips/guest/save', {
         method: 'POST',
         body: JSON.stringify(tripData)
       });
