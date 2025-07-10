@@ -11,7 +11,17 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Loader2, MapPin, DollarSign, Calendar, Star, Users } from "lucide-react";
+import { Loader2, MapPin, DollarSign, Calendar, Star, Users, ExternalLink, Camera } from "lucide-react";
+
+interface RealPlace {
+  title: string;
+  link?: string;
+  source?: "Google" | "GetYourGuide" | "TripAdvisor";
+  placeId?: string;
+  rating?: number;
+  address?: string;
+  photoUrl?: string;
+}
 
 interface TripSuggestion {
   destination: string;
@@ -25,6 +35,7 @@ interface TripSuggestion {
   highlights: string[];
   travelStyle: string[];
   duration: string;
+  realPlaces?: RealPlace[];
 }
 
 interface SavedTrip {
@@ -352,6 +363,62 @@ export default function MyTripsScreen() {
                           ))}
                         </div>
                       </div>
+
+                      {/* Real Places Section */}
+                      {suggestion.realPlaces && suggestion.realPlaces.length > 0 && (
+                        <div>
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <MapPin className="w-4 h-4" />
+                            Real Places to Visit
+                          </Label>
+                          <div className="space-y-2 mt-2">
+                            {suggestion.realPlaces.slice(0, 4).map((place, idx) => (
+                              <div key={idx} className="p-2 border rounded-lg bg-muted/50">
+                                <div className="flex justify-between items-start">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <h4 className="text-sm font-medium">{place.title}</h4>
+                                      {place.rating && (
+                                        <div className="flex items-center gap-1">
+                                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                                          <span className="text-xs">{place.rating}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                    {place.address && (
+                                      <p className="text-xs text-muted-foreground">{place.address}</p>
+                                    )}
+                                    <div className="flex items-center gap-2 mt-1">
+                                      {place.source && (
+                                        <Badge variant="secondary" className="text-xs">
+                                          {place.source}
+                                        </Badge>
+                                      )}
+                                      {place.link && (
+                                        <a 
+                                          href={place.link} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+                                        >
+                                          View on Google Maps <ExternalLink className="w-3 h-3" />
+                                        </a>
+                                      )}
+                                    </div>
+                                  </div>
+                                  {place.photoUrl && (
+                                    <img 
+                                      src={place.photoUrl} 
+                                      alt={place.title}
+                                      className="w-12 h-12 rounded object-cover ml-2"
+                                    />
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       <Button 
                         onClick={() => saveTrip.mutate(suggestion)}

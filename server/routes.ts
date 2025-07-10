@@ -24,7 +24,8 @@ import {
   generateRecommendations,
   chatAssistant,
   conversationalTripAssistant,
-  generateConversationalSuggestions
+  generateConversationalSuggestions,
+  enrichSuggestionsWithRealPlaces
 } from "./openai";
 import { generateItinerary as generateDetailedItinerary } from "./generateItinerary";
 
@@ -683,6 +684,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error generating recommendations:", error);
       res.status(500).json({ message: "Failed to generate recommendations" });
+    }
+  });
+
+  // Test real places enrichment endpoint
+  app.post('/api/ai/enrich-places', async (req, res) => {
+    try {
+      const { suggestions } = req.body;
+      
+      if (!suggestions || !Array.isArray(suggestions)) {
+        return res.status(400).json({ 
+          message: "Invalid input: suggestions array required" 
+        });
+      }
+      
+      console.log('Enriching suggestions with real places...');
+      const enrichedSuggestions = await enrichSuggestionsWithRealPlaces(suggestions);
+      
+      res.json({ 
+        enrichedSuggestions,
+        message: 'Successfully enriched suggestions with real places from Google Places API'
+      });
+    } catch (error) {
+      console.error("Error enriching places:", error);
+      res.status(500).json({ 
+        message: "Failed to enrich suggestions with real places",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 

@@ -1,7 +1,18 @@
 import OpenAI from "openai";
+import { googlePlaces } from './googlePlaces';
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+export interface RealPlace {
+  title: string;
+  link?: string;
+  source?: "Google" | "GetYourGuide" | "TripAdvisor";
+  placeId?: string;
+  rating?: number;
+  address?: string;
+  photoUrl?: string;
+}
 
 export interface TripSuggestion {
   destination: string;
@@ -15,6 +26,7 @@ export interface TripSuggestion {
   highlights: string[];
   travelStyle: string[];
   duration: string;
+  realPlaces?: RealPlace[];
 }
 
 export interface TripItinerary {
@@ -147,13 +159,21 @@ Return ONLY a JSON object with this exact structure:
     
     // Handle different response formats
     const suggestions = result.suggestions || result.trips || result;
+    let baseSuggestions: TripSuggestion[];
+    
     if (Array.isArray(suggestions)) {
-      return suggestions;
+      baseSuggestions = suggestions;
     } else if (Array.isArray(result)) {
-      return result;
+      baseSuggestions = result;
     } else {
       throw new Error('Invalid response format from OpenAI');
     }
+    
+    // Enrich suggestions with real places from Google Places API
+    console.log('Enriching suggestions with real places...');
+    const enrichedSuggestions = await enrichSuggestionsWithRealPlaces(baseSuggestions);
+    
+    return enrichedSuggestions;
   } catch (error) {
     console.error('Error generating travel suggestions:', error);
     console.error('Error details:', error instanceof Error ? error.message : error);
@@ -448,7 +468,16 @@ Return ONLY a JSON object with this exact structure:
     }
     
     const result = JSON.parse(content);
-    return result.suggestions || [];
+    const baseSuggestions = result.suggestions || [];
+    
+    // Enrich suggestions with real places
+    if (baseSuggestions.length > 0) {
+      console.log('Enriching conversational suggestions with real places...');
+      const enrichedSuggestions = await enrichSuggestionsWithRealPlaces(baseSuggestions);
+      return enrichedSuggestions;
+    }
+    
+    return baseSuggestions;
     
   } catch (error) {
     console.error('Error generating conversational suggestions:', error);
@@ -477,5 +506,69 @@ export async function chatAssistant(
   } catch (error) {
     console.error('Error in chat assistant:', error);
     throw new Error('Failed to get response from travel assistant');
+  }
+}
+
+// Enrich trip suggestions with real places from Google Places API
+export async function enrichSuggestionsWithRealPlaces(suggestions: TripSuggestion[]): Promise<TripSuggestion[]> {
+  try {
+    console.log('Enriching suggestions with real places...');
+    
+    const enrichedSuggestions = await Promise.all(
+      suggestions.map(async (suggestion) => {
+        const realPlaces: RealPlace[] = [];
+        
+        // Search for real places for each highlight
+        for (const highlight of suggestion.highlights) {
+          try {
+            console.log(`Searching for: ${highlight} in ${suggestion.destination}, ${suggestion.country}`);
+            
+            // Search for places using Google Places API
+            const searchQuery = `${highlight} ${suggestion.destination} ${suggestion.country}`;
+            const places = await googlePlaces.searchPlaces(searchQuery, 'tourist_attraction', `${suggestion.destination}, ${suggestion.country}`);
+            
+            // Get the top 2-3 most relevant places for this highlight
+            const topPlaces = places.slice(0, 3);
+            
+            for (const place of topPlaces) {
+              // Generate Google Maps link
+              const googleMapsLink = `https://www.google.com/maps/place/?q=place_id:${place.place_id}`;
+              
+              // Get photo URL if available
+              let photoUrl: string | undefined;
+              if (place.photos && place.photos.length > 0) {
+                photoUrl = await googlePlaces.getPhotoUrl(place.photos[0].photo_reference, 400);
+              }
+              
+              realPlaces.push({
+                title: place.name,
+                link: googleMapsLink,
+                source: "Google",
+                placeId: place.place_id,
+                rating: place.rating,
+                address: place.formatted_address,
+                photoUrl
+              });
+            }
+          } catch (error) {
+            console.error(`Error searching for ${highlight}:`, error);
+            // Continue with other highlights even if one fails
+          }
+        }
+        
+        return {
+          ...suggestion,
+          realPlaces
+        };
+      })
+    );
+    
+    console.log('Successfully enriched suggestions with real places');
+    return enrichedSuggestions;
+    
+  } catch (error) {
+    console.error('Error enriching suggestions with real places:', error);
+    // Return original suggestions if enrichment fails
+    return suggestions;
   }
 }
