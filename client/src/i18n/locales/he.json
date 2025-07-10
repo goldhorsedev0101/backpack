@@ -1,0 +1,170 @@
+{
+  "navigation": {
+    "home": "בית",
+    "explore": "גלה",
+    "myTrips": "הטיולים שלי",
+    "budget": "תקציב",
+    "weather": "מזג אוויר",
+    "chat": "צ'אט AI",
+    "achievements": "הישגים",
+    "community": "קהילה",
+    "profile": "פרופיל",
+    "logout": "התנתק"
+  },
+  "landing": {
+    "title": "TripWise - מתכנן הטיולים החכם שלך לדרום אמריקה",
+    "subtitle": "מתכנן הטיולים החכם שלך לדרום אמריקה",
+    "description": "גלה יעדים מדהימים, קבל המלצות אישיות ותכנן את הטיול המושלם שלך עם עוזר הבינה המלאכותית שלנו.",
+    "startPlanning": "התחל לתכנן",
+    "signIn": "התחבר",
+    "register": "הרשם",
+    "welcomeBack": "ברוך שובך",
+    "createTrip": "צור טיול חדש",
+    "continueTrip": "המשך לתכנן"
+  },
+  "auth": {
+    "signInTitle": "התחבר לחשבון שלך",
+    "registerTitle": "צור חשבון חדש",
+    "email": "אימייל",
+    "password": "סיסמה",
+    "confirmPassword": "אשר סיסמה",
+    "signIn": "התחבר",
+    "register": "הרשם",
+    "forgotPassword": "שכחת סיסמה?",
+    "alreadyHaveAccount": "כבר יש לך חשבון?",
+    "dontHaveAccount": "אין לך חשבון?",
+    "signInHere": "התחבר כאן",
+    "registerHere": "הרשם כאן"
+  },
+  "myTrips": {
+    "title": "הטיולים שלי",
+    "generateTrip": "צור טיול",
+    "suggestions": "הצעות",
+    "savedTrips": "טיולים שמורים",
+    "noTrips": "אין לך טיולים שמורים עדיין",
+    "createFirst": "צור את הטיול הראשון שלך",
+    "loading": "טוען הצעות...",
+    "error": "שגיאה בטעינת הטיולים",
+    "retry": "נסה שוב"
+  },
+  "tripBuilder": {
+    "title": "בונה הטיולים",
+    "destination": "יעד",
+    "selectDestination": "בחר יעד",
+    "duration": "משך זמן",
+    "budget": "תקציב",
+    "interests": "תחומי עניין",
+    "travelStyle": "סגנון נסיעה",
+    "generate": "צור הצעות",
+    "save": "שמור טיול",
+    "saved": "נשמר!",
+    "saving": "שומר...",
+    "generateItinerary": "צור מסלול מפורט"
+  },
+  "chat": {
+    "title": "עוזר הטיולים החכם",
+    "placeholder": "שאל אותי כל שאלה על טיולים בדרום אמריקה...",
+    "send": "שלח",
+    "thinking": "חושב...",
+    "error": "שגיאה בקבלת תשובה",
+    "retry": "נסה שוב",
+    "quickPrompts": {
+      "bestTime": "מתי הזמן הטוב ביותר לבקר ב...",
+      "budget": "כמה עולה טיול ל...",
+      "activities": "מה אפשר לעשות ב...",
+      "safety": "האם זה בטוח לטייל ב..."
+    }
+  },
+  "explore": {
+    "title": "גלה יעדים",
+    "destinations": "יעדים",
+    "hotels": "מלונות",
+    "attractions": "אטרקציות",
+    "restaurants": "מסעדות",
+    "search": "חפש...",
+    "filter": "סנן",
+    "loadSampleData": "טען נתונים לדוגמה",
+    "loading": "טוען...",
+    "noResults": "לא נמצאו תוצאות",
+    "viewDetails": "צפה בפרטים"
+  },
+  "weather": {
+    "title": "מזג אוויר",
+    "current": "נוכחי",
+    "forecast": "תחזית",
+    "recommendations": "המלצות",
+    "selectDestination": "בחר יעד",
+    "temperature": "טמפרטורה",
+    "humidity": "לחות",
+    "wind": "רוח",
+    "precipitation": "משקעים",
+    "bestTime": "הזמן הטוב ביותר לביקור",
+    "avoid": "זמנים להימנע מהם"
+  },
+  "budget": {
+    "title": "מעקב תקציב",
+    "totalBudget": "תקציב כולל",
+    "spent": "הוצא",
+    "remaining": "נותר",
+    "addExpense": "הוסף הוצאה",
+    "category": "קטגוריה",
+    "amount": "סכום",
+    "description": "תיאור",
+    "date": "תאריך",
+    "save": "שמור",
+    "expenses": "הוצאות",
+    "categories": {
+      "accommodation": "לינה",
+      "transport": "תחבורה",
+      "food": "אוכל",
+      "activities": "פעילויות",
+      "shopping": "קניות",
+      "other": "אחר"
+    }
+  },
+  "achievements": {
+    "title": "הישגים",
+    "progress": "התקדמות",
+    "unlocked": "נפתח",
+    "locked": "נעול",
+    "points": "נקודות",
+    "level": "רמה",
+    "badges": "תגים",
+    "recent": "הישגים אחרונים"
+  },
+  "common": {
+    "loading": "טוען...",
+    "error": "שגיאה",
+    "success": "הצלחה",
+    "save": "שמור",
+    "cancel": "בטל",
+    "delete": "מחק",
+    "edit": "ערוך",
+    "close": "סגור",
+    "back": "חזור",
+    "next": "הבא",
+    "previous": "קודם",
+    "search": "חפש",
+    "filter": "סנן",
+    "sort": "מיין",
+    "viewMore": "צפה בעוד",
+    "showLess": "הראה פחות",
+    "or": "או"
+  },
+  "realPlaces": {
+    "title": "המלצות להזמנה לפי הטיול שלך",
+    "subtitle": "מקומות אמיתיים שאפשר להזמין עכשיו",
+    "viewOnMaps": "צפה במפות גוגל",
+    "noPlaces": "לא נמצאו מקומות להצגה",
+    "loading": "טוען מקומות...",
+    "error": "שגיאה בטעינת המקומות"
+  },
+  "validation": {
+    "required": "שדה חובה",
+    "email": "כתובת אימייל לא חוקית",
+    "minLength": "חייב להכיל לפחות {{count}} תווים",
+    "maxLength": "לא יכול להכיל יותר מ-{{count}} תווים",
+    "numeric": "חייב להיות מספר",
+    "positive": "חייב להיות מספר חיובי"
+  }
+}

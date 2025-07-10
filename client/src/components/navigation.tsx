@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
 import logoCompact from "@/assets/tripwise-logo-compact.svg";
-import { t } from "@/lib/hebrew";
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { 
   Compass, 
   Home, 
@@ -32,23 +33,29 @@ import {
   Cloud
 } from "lucide-react";
 
-const navigationItems = [
-  { href: "/", label: t("nav.home"), icon: Home },
-  { href: "/trip-builder", label: t("tripBuilder.title"), icon: Calendar },
-  { href: "/my-trips", label: t("myTrips.title"), icon: Compass },
-  { href: "/explore", label: t("nav.explore"), icon: MapPin },
-  { href: "/weather", label: t("weather.title"), icon: Cloud },
-  { href: "/community", label: t("nav.community"), icon: Users },
-  { href: "/budget-tracker", label: t("nav.budgetTracker"), icon: DollarSign },
-  { href: "/achievements", label: t("nav.achievements"), icon: Trophy },
-  { href: "/tripadvisor-data", label: "מידע נסיעות", icon: Database },
-];
+function useNavigationItems() {
+  const { t } = useTranslation();
+  
+  return [
+    { href: "/", label: t("navigation.home"), icon: Home },
+    { href: "/trip-builder", label: t("tripBuilder.title"), icon: Calendar },
+    { href: "/my-trips", label: t("myTrips.title"), icon: Compass },
+    { href: "/explore", label: t("explore.title"), icon: MapPin },
+    { href: "/weather", label: t("weather.title"), icon: Cloud },
+    { href: "/community", label: t("navigation.community"), icon: Users },
+    { href: "/budget-tracker", label: t("budget.title"), icon: DollarSign },
+    { href: "/achievements", label: t("achievements.title"), icon: Trophy },
+    { href: "/tripadvisor-data", label: t("explore.destinations"), icon: Database },
+  ];
+}
 
 export default function Navigation() {
   const [location] = useLocation();
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useTranslation();
+  const navigationItems = useNavigationItems();
 
   const handleLogout = async () => {
     try {
@@ -141,7 +148,7 @@ export default function Navigation() {
                     className="w-full flex items-center px-3 py-2 text-slate-600 hover:bg-gray-100 rounded-lg"
                   >
                     <LogOut className="w-5 h-5 ml-3" />
-                    {t("nav.logout")}
+                    {t("navigation.logout")}
                   </button>
                 </div>
               </div>
@@ -201,6 +208,7 @@ export default function Navigation() {
           </div>
 
           <div className="flex items-center space-x-4">
+            <LanguageSwitcher />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -223,13 +231,13 @@ export default function Navigation() {
                 <DropdownMenuItem asChild>
                   <Link href="/profile" className="w-full">
                     <User className="ml-2 h-4 w-4" />
-                    <span>{t("nav.profile")}</span>
+                    <span>{t("navigation.profile")}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="ml-2 h-4 w-4" />
-                  <span>{t("nav.logout")}</span>
+                  <span>{t("navigation.logout")}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
