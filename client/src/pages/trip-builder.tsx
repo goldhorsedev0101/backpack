@@ -496,13 +496,32 @@ export default function TripBuilder() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Destination */}
+              <div>
+                <Label htmlFor="destination" className="text-sm font-medium text-slate-700 mb-2 block">
+                  Destination
+                </Label>
+                <Select onValueChange={(value) => form.setValue('destination', value)}>
+                  <SelectTrigger className="w-full p-3">
+                    <SelectValue placeholder="Select destination" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SOUTH_AMERICAN_COUNTRIES.map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Duration */}
               <div>
                 <Label htmlFor="duration" className="text-sm font-medium text-slate-700 mb-2 block">
                   Trip Duration
                 </Label>
                 <Select onValueChange={(value) => form.setValue('duration', value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full p-3">
                     <SelectValue placeholder="How long do you want to travel?" />
                   </SelectTrigger>
                   <SelectContent>
@@ -534,7 +553,7 @@ export default function TripBuilder() {
                   />
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>$500</span>
-                    <span className="text-lg font-semibold text-primary">${budget[0]}</span>
+                    <span className="text-orange-500 font-bold text-xl">${budget[0]}</span>
                     <span>$5000</span>
                   </div>
                 </div>
@@ -545,21 +564,25 @@ export default function TripBuilder() {
                 <Label className="text-sm font-medium text-slate-700 mb-2 block">
                   Travel Style <span className="text-xs text-gray-500">(select multiple)</span>
                 </Label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-4">
                   {TRAVEL_STYLES.map((style) => (
-                    <Button
+                    <div
                       key={style.id}
-                      type="button"
-                      variant={selectedStyles.includes(style.id) ? "default" : "outline"}
                       onClick={() => toggleStyle(style.id)}
-                      className="justify-start h-24 min-h-[6rem] w-full p-3 text-left"
+                      className={`p-4 rounded-lg border hover:bg-accent transition cursor-pointer ${
+                        selectedStyles.includes(style.id)
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
                     >
-                      <style.icon className="w-5 h-5 mr-3 flex-shrink-0" />
-                      <div className="text-left flex-1">
-                        <div className="font-medium break-words whitespace-normal text-sm leading-tight text-balance">{style.label}</div>
-                        <div className="text-xs opacity-70 break-words whitespace-normal leading-tight text-balance">{style.description}</div>
+                      <div className="flex items-start space-x-3">
+                        <style.icon className="w-5 h-5 flex-shrink-0 mt-1" />
+                        <div>
+                          <h4 className="font-medium">{style.label}</h4>
+                          <p className="text-sm text-muted-foreground">{style.description}</p>
+                        </div>
                       </div>
-                    </Button>
+                    </div>
                   ))}
                 </div>
               </div>

@@ -212,11 +212,11 @@ export default function Landing() {
           
           <Card className="shadow-lg">
             <CardContent className="p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 <div>
                   <Label className="block text-sm font-medium text-slate-700 mb-2">Where do you want to go?</Label>
                   <Select onValueChange={(value) => setDestination(value)}>
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full p-3">
                       <SelectValue placeholder="Select a country" />
                     </SelectTrigger>
                     <SelectContent>
@@ -231,7 +231,7 @@ export default function Landing() {
                 <div>
                   <Label className="block text-sm font-medium text-slate-700 mb-2">Trip Duration</Label>
                   <Select>
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full p-3">
                       <SelectValue placeholder="Select duration" />
                     </SelectTrigger>
                     <SelectContent>
@@ -255,29 +255,37 @@ export default function Landing() {
                     />
                     <div className="flex justify-between text-sm text-gray-600">
                       <span>$500</span>
-                      <span className="text-lg font-semibold text-primary">${budget[0]}</span>
+                      <span className="text-orange-500 font-bold text-xl">${budget[0]}</span>
                       <span>$5000</span>
                     </div>
                   </div>
                 </div>
                 <div>
                   <Label className="block text-sm font-medium text-slate-700 mb-2">Travel Style</Label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-4">
                     {[
-                      { id: 'adventure', icon: Mountain, label: 'Adventure' },
-                      { id: 'culture', icon: Camera, label: 'Culture' },
-                      { id: 'food', icon: Utensils, label: 'Food' },
-                      { id: 'nightlife', icon: GlassWater, label: 'Nightlife' }
+                      { id: 'adventure', icon: Mountain, label: 'Adventure', description: 'Hiking, trekking, extreme sports' },
+                      { id: 'culture', icon: Camera, label: 'Culture', description: 'Museums, local traditions, history' },
+                      { id: 'food', icon: Utensils, label: 'Food', description: 'Local restaurants, cooking classes' },
+                      { id: 'nightlife', icon: GlassWater, label: 'Nightlife', description: 'Bars, clubs, social experiences' }
                     ].map(style => (
-                      <Button
+                      <div
                         key={style.id}
-                        variant={selectedStyles.includes(style.id) ? "default" : "outline"}
                         onClick={() => toggleStyle(style.id)}
-                        className="justify-start h-12 min-h-[3rem] w-full"
+                        className={`p-4 rounded-lg border hover:bg-accent transition cursor-pointer ${
+                          selectedStyles.includes(style.id)
+                            ? 'border-primary bg-primary/10 text-primary'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
                       >
-                        <style.icon className="w-4 h-4 mr-2 flex-shrink-0" />
-                        <span className="break-words whitespace-normal text-sm leading-tight text-balance">{style.label}</span>
-                      </Button>
+                        <div className="flex items-start space-x-3">
+                          <style.icon className="w-5 h-5 flex-shrink-0 mt-1" />
+                          <div>
+                            <h4 className="font-medium">{style.label}</h4>
+                            <p className="text-sm text-muted-foreground">{style.description}</p>
+                          </div>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>

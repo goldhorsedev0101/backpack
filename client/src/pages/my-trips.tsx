@@ -214,13 +214,13 @@ export default function MyTripsScreen() {
               <Card className="shadow-lg">
                 <CardContent className="p-8">
                   <form onSubmit={handleGenerateTrip} className="space-y-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="destination" className="text-sm font-medium text-slate-700">
                           Where do you want to go?
                         </Label>
                         <Select value={formData.destination} onValueChange={(value) => setFormData(prev => ({ ...prev, destination: value }))}>
-                          <SelectTrigger className="h-12">
+                          <SelectTrigger className="w-full p-3 h-12">
                             <SelectValue placeholder="Select destination" />
                           </SelectTrigger>
                           <SelectContent>
@@ -238,7 +238,7 @@ export default function MyTripsScreen() {
                           Trip Duration
                         </Label>
                         <Select value={formData.duration} onValueChange={(value) => setFormData(prev => ({ ...prev, duration: value }))}>
-                          <SelectTrigger className="h-12">
+                          <SelectTrigger className="w-full p-3 h-12">
                             <SelectValue placeholder="Select duration" />
                           </SelectTrigger>
                           <SelectContent>
@@ -272,7 +272,7 @@ export default function MyTripsScreen() {
                           <span className="text-sm text-gray-600">$5000</span>
                         </div>
                         <div className="text-center">
-                          <span className="text-xl font-bold text-orange-500">${formData.dailyBudget * 10}</span>
+                          <span className="text-orange-500 font-bold text-xl">${formData.dailyBudget * 10}</span>
                         </div>
                       </div>
                     </div>
@@ -282,25 +282,29 @@ export default function MyTripsScreen() {
                         Travel Style
                       </Label>
                       <div className="grid grid-cols-2 gap-4">
-                        {travelStyles.slice(0, 4).map((style) => (
-                          <button
-                            key={style}
-                            type="button"
-                            onClick={() => handleStyleChange(style, !formData.travelStyle.includes(style))}
-                            className={`p-4 rounded-lg border-2 text-left transition-all w-full h-20 min-h-[5rem] ${
-                              formData.travelStyle.includes(style)
+                        {[
+                          { name: 'Adventure', icon: Mountain, description: 'Hiking, trekking, extreme sports' },
+                          { name: 'Cultural', icon: Camera, description: 'Museums, local traditions, history' },
+                          { name: 'Food & Cuisine', icon: Utensils, description: 'Local restaurants, cooking classes' },
+                          { name: 'Nightlife', icon: Users, description: 'Bars, clubs, social experiences' }
+                        ].map((style) => (
+                          <div
+                            key={style.name}
+                            onClick={() => handleStyleChange(style.name, !formData.travelStyle.includes(style.name))}
+                            className={`p-4 rounded-lg border hover:bg-accent transition cursor-pointer ${
+                              formData.travelStyle.includes(style.name)
                                 ? 'border-primary bg-primary/10 text-primary'
                                 : 'border-gray-200 hover:border-gray-300'
                             }`}
                           >
-                            <div className="flex items-center space-x-2 h-full">
-                              {style === 'Adventure' && <Mountain className="w-5 h-5 flex-shrink-0" />}
-                              {style === 'Cultural' && <Camera className="w-5 h-5 flex-shrink-0" />}
-                              {style === 'Food & Cuisine' && <Utensils className="w-5 h-5 flex-shrink-0" />}
-                              {style === 'Nightlife' && <Users className="w-5 h-5 flex-shrink-0" />}
-                              <span className="font-medium break-words whitespace-normal text-sm leading-tight text-balance">{style}</span>
+                            <div className="flex items-start space-x-3">
+                              <style.icon className="w-5 h-5 flex-shrink-0 mt-1" />
+                              <div>
+                                <h4 className="font-medium">{style.name}</h4>
+                                <p className="text-sm text-muted-foreground">{style.description}</p>
+                              </div>
                             </div>
-                          </button>
+                          </div>
                         ))}
                       </div>
                     </div>
