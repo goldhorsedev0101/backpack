@@ -291,8 +291,14 @@ export default function MyTripsNew() {
       console.log('Sending data to API:', data);
       setIsGenerating(true);
       
-      // Use the mutation but handle the result manually
-      generateAISuggestionsMutation.mutate(data);
+      // Use mutateAsync and wrap in try-catch to prevent unhandled rejection
+      try {
+        const result = await generateAISuggestionsMutation.mutateAsync(data);
+        console.log('Mutation completed successfully:', result);
+      } catch (mutationError) {
+        console.error('Mutation failed:', mutationError);
+        // Error is already handled in onError callback, no need to rethrow
+      }
       
     } catch (error) {
       console.error('Error in handleGenerateAITrips:', error);
@@ -308,9 +314,15 @@ export default function MyTripsNew() {
   const handleGenerateItinerary = async () => {
     try {
       setIsGeneratingItinerary(true);
-      await generateItineraryMutation.mutateAsync();
+      try {
+        const result = await generateItineraryMutation.mutateAsync();
+        console.log('Itinerary generation completed:', result);
+      } catch (mutationError) {
+        console.error('Itinerary mutation failed:', mutationError);
+        // Error is handled in onError callback
+      }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error in handleGenerateItinerary:', error);
     } finally {
       setIsGeneratingItinerary(false);
     }
