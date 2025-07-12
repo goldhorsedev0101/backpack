@@ -69,6 +69,11 @@ const interests = [
   "Spiritual & Wellness", "Architecture", "Festivals & Events", "Beaches"
 ];
 
+const southAmericanDestinations = [
+  "Colombia", "Peru", "Bolivia", "Chile", "Argentina", "Brazil", 
+  "Ecuador", "Venezuela", "Uruguay", "Paraguay", "Guyana", "Suriname", "French Guiana"
+];
+
 export default function MyTripsScreen() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("generate");
@@ -218,13 +223,18 @@ export default function MyTripsScreen() {
                         <Label htmlFor="destination" className="text-sm font-medium text-slate-700">
                           Where do you want to go?
                         </Label>
-                        <Input
-                          id="destination"
-                          placeholder="e.g., Colombia, Peru, Bolivia"
-                          value={formData.destination}
-                          onChange={(e) => setFormData(prev => ({ ...prev, destination: e.target.value }))}
-                          className="h-12"
-                        />
+                        <Select value={formData.destination} onValueChange={(value) => setFormData(prev => ({ ...prev, destination: value }))}>
+                          <SelectTrigger className="h-12">
+                            <SelectValue placeholder="Select destination" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {southAmericanDestinations.map((destination) => (
+                              <SelectItem key={destination} value={destination}>
+                                {destination}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
 
                       <div className="space-y-2">
