@@ -264,10 +264,14 @@ export default function MyTripsNew() {
         method: 'POST',
         body: JSON.stringify({
           title: `${suggestion.destination}, ${suggestion.country}`,
-          destinations: [suggestion.destination],
+          destinations: JSON.stringify([{
+            name: suggestion.destination,
+            country: suggestion.country,
+            description: suggestion.description,
+            highlights: suggestion.highlights
+          }]),
           description: suggestion.description,
-          budget: `$${suggestion.estimatedBudget.low}-${suggestion.estimatedBudget.high}`,
-          duration: suggestion.duration,
+          budget: suggestion.estimatedBudget.low.toString(),
           travelStyle: suggestion.travelStyle.join(', '),
         }),
       });
