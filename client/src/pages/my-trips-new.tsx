@@ -170,7 +170,7 @@ export default function MyTripsNew() {
   const generateAISuggestionsMutation = useMutation({
     mutationFn: async (data: TripFormData) => {
       try {
-        const response = await apiRequest<TripSuggestion[]>('/api/ai/travel-suggestions', {
+        const response = await apiRequest('/api/ai/travel-suggestions', {
           method: 'POST',
           body: JSON.stringify({
             destination: data.destination,
@@ -180,8 +180,9 @@ export default function MyTripsNew() {
             interests: data.interests,
           }),
         });
-        console.log('API response received:', response);
-        return response;
+        const jsonData = await response.json();
+        console.log('API response received:', jsonData);
+        return jsonData as TripSuggestion[];
       } catch (error) {
         console.error('API request failed:', error);
         throw error;
@@ -223,7 +224,7 @@ export default function MyTripsNew() {
   const generateItineraryMutation = useMutation({
     mutationFn: async () => {
       const formData = form.getValues();
-      const response = await apiRequest<ItineraryDay[]>('/api/ai/itinerary', {
+      const response = await apiRequest('/api/ai/itinerary', {
         method: 'POST',
         body: JSON.stringify({
           destination: formData.destination,
@@ -233,7 +234,8 @@ export default function MyTripsNew() {
           budget: formData.budget,
         }),
       });
-      return response;
+      const jsonData = await response.json();
+      return jsonData as ItineraryDay[];
     },
     onSuccess: (data) => {
       setItinerary(data);
@@ -256,7 +258,10 @@ export default function MyTripsNew() {
   // Fetch saved trips
   const { data: savedTrips = [], isLoading: isLoadingSavedTrips } = useQuery({
     queryKey: ['/api/trips/user'],
-    queryFn: () => apiRequest<SavedTrip[]>('/api/trips/user'),
+    queryFn: async () => {
+      const response = await apiRequest('/api/trips/user');
+      return response.json() as Promise<SavedTrip[]>;
+    },
   });
 
   const handleGenerateAITrips = async () => {
