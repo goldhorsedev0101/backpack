@@ -37,7 +37,9 @@ import {
   Star,
   ExternalLink,
   FolderOpen,
-  BookOpen
+  BookOpen,
+  Heart,
+  Save
 } from "lucide-react";
 
 // Form schema
