@@ -15,7 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { RealPlaceLinks } from "@/components/RealPlaceLinks";
+// import { RealPlaceLinks } from "@/components/RealPlaceLinks";
 import { SOUTH_AMERICAN_COUNTRIES } from "@/lib/constants";
 import { 
   Bot, 
@@ -241,7 +241,17 @@ export default function MyTripsNew() {
   const handleGenerateAITrips = async () => {
     try {
       const formData = form.getValues();
+      console.log('Form data:', formData);
+      console.log('Selected styles:', selectedStyles);
+      console.log('Selected interests:', selectedInterests);
+      console.log('Budget:', budget[0]);
+      
       if (!formData.destination || selectedStyles.length === 0 || selectedInterests.length === 0) {
+        console.log('Missing information check failed:', {
+          destination: formData.destination,
+          stylesLength: selectedStyles.length,
+          interestsLength: selectedInterests.length
+        });
         toast({
           title: "Missing Information",
           description: "Please fill in destination, travel styles, and interests",
@@ -257,10 +267,17 @@ export default function MyTripsNew() {
         budget: budget[0],
       };
 
+      console.log('Sending data to API:', data);
       setIsGenerating(true);
-      await generateAISuggestionsMutation.mutateAsync(data);
+      const result = await generateAISuggestionsMutation.mutateAsync(data);
+      console.log('API result:', result);
     } catch (error) {
       console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate trip suggestions. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsGenerating(false);
     }
@@ -323,7 +340,10 @@ export default function MyTripsNew() {
                   <Label htmlFor="destination" className="text-sm font-medium text-slate-700 mb-2 block">
                     Destination
                   </Label>
-                  <Select onValueChange={(value) => form.setValue('destination', value)}>
+                  <Select onValueChange={(value) => {
+                    form.setValue('destination', value);
+                    console.log('Destination set to:', value);
+                  }}>
                     <SelectTrigger className="w-full p-3">
                       <SelectValue placeholder="Select destination" />
                     </SelectTrigger>
@@ -342,7 +362,10 @@ export default function MyTripsNew() {
                   <Label htmlFor="duration" className="text-sm font-medium text-slate-700 mb-2 block">
                     Trip Duration
                   </Label>
-                  <Select onValueChange={(value) => form.setValue('duration', value)}>
+                  <Select onValueChange={(value) => {
+                    form.setValue('duration', value);
+                    console.log('Duration set to:', value);
+                  }}>
                     <SelectTrigger className="w-full p-3">
                       <SelectValue placeholder="How long do you want to travel?" />
                     </SelectTrigger>
@@ -561,12 +584,13 @@ export default function MyTripsNew() {
                           </div>
                         </div>
 
+{/* Temporarily disabled RealPlaceLinks to debug
                         {suggestion.realPlaces && suggestion.realPlaces.length > 0 && (
                           <RealPlaceLinks 
-                            realPlaces={suggestion.realPlaces} 
-                            highlights={suggestion.highlights}
+                            suggestion={suggestion}
                           />
                         )}
+                        */}
 
                         <div className="flex flex-wrap gap-2">
                           {suggestion.travelStyle.map((style) => (
