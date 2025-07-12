@@ -7,7 +7,6 @@ import TripCard from "@/components/trip-card";
 import AiChat from "@/components/ai-chat";
 import PersonalizedRecommendations from "@/components/personalized-recommendations";
 import { Link } from "wouter";
-import { useTranslation } from 'react-i18next';
 import { 
   Plus, 
   MapPin, 
@@ -22,7 +21,6 @@ import {
 
 export default function Home() {
   const { user } = useAuth();
-  const { t } = useTranslation();
 
   const { data: trips = [], isLoading: tripsLoading } = useQuery({
     queryKey: ["/api/trips"]
@@ -37,8 +35,8 @@ export default function Home() {
   });
 
   const welcomeMessage = user?.firstName 
-    ? t('home.welcomeBack', { name: user.firstName })
-    : t('home.welcomeDefault');
+    ? `Welcome back, ${user.firstName}!` 
+    : "Welcome to TripWise!";
 
   return (
     <div className="bg-gray-50 pb-20 md:pb-0">
@@ -47,18 +45,18 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center md:text-left">
             <h1 className="text-3xl md:text-4xl font-bold mb-4">{welcomeMessage}</h1>
-            <p className="text-xl opacity-90 mb-6">{t('home.heroSubtitle')}</p>
+            <p className="text-xl opacity-90 mb-6">Ready for your next South American adventure?</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
               <Link href="/trip-builder">
                 <Button className="bg-white text-primary hover:bg-gray-100 px-6 py-3">
                   <Plus className="w-5 h-5 mr-2" />
-                  {t('home.planNewTrip')}
+                  Plan New Trip
                 </Button>
               </Link>
               <Link href="/community">
                 <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary px-6 py-3">
                   <Users className="w-5 h-5 mr-2" />
-                  {t('home.joinCommunity')}
+                  Join Community
                 </Button>
               </Link>
             </div>
@@ -73,11 +71,11 @@ export default function Home() {
             {/* My Trips */}
             <section>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-slate-700">{t('home.myTrips')}</h2>
+                <h2 className="text-2xl font-bold text-slate-700">My Trips</h2>
                 <Link href="/trip-builder">
                   <Button className="bg-primary hover:bg-orange-600">
                     <Plus className="w-4 h-4 mr-2" />
-                    {t('home.newTrip')}
+                    New Trip
                   </Button>
                 </Link>
               </div>
@@ -104,12 +102,12 @@ export default function Home() {
                 <Card className="border-dashed border-2 border-gray-300">
                   <CardContent className="p-8 text-center">
                     <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-600 mb-2">{t('home.noTripsYet')}</h3>
-                    <p className="text-gray-500 mb-4">{t('home.createFirstTrip')}</p>
+                    <h3 className="text-lg font-semibold text-gray-600 mb-2">No trips yet</h3>
+                    <p className="text-gray-500 mb-4">Start planning your first South American adventure!</p>
                     <Link href="/trip-builder">
                       <Button className="bg-primary hover:bg-orange-600">
                         <Plus className="w-4 h-4 mr-2" />
-                        {t('home.createFirstTrip')}
+                        Create Your First Trip
                       </Button>
                     </Link>
                   </CardContent>
@@ -123,8 +121,8 @@ export default function Home() {
             {/* Popular Routes */}
             <section>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-slate-700">{t('home.featuredDestinations')}</h2>
-                <Button variant="outline">{t('explore.viewAll')}</Button>
+                <h2 className="text-2xl font-bold text-slate-700">Popular Routes</h2>
+                <Button variant="outline">View All</Button>
               </div>
               
               {tripsLoading ? (
@@ -156,16 +154,16 @@ export default function Home() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <TrendingUp className="w-5 h-5 mr-2 text-primary" />
-                  {t('home.yourStats')}
+                  Your Stats
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">{t('home.tripsPlanned')}</span>
+                  <span className="text-gray-600">Trips Planned</span>
                   <Badge variant="secondary">{userTrips.length}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">{t('home.countriesVisited')}</span>
+                  <span className="text-gray-600">Countries Visited</span>
                   <Badge variant="secondary">
                     {new Set(userTrips.flatMap((trip: any) => 
                       trip.destinations?.map((d: any) => d.country) || []
@@ -173,7 +171,7 @@ export default function Home() {
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">{t('home.reviewsWritten')}</span>
+                  <span className="text-gray-600">Reviews Written</span>
                   <Badge variant="secondary">
                     {reviews.filter((r: any) => r.userId === user?.id).length}
                   </Badge>
@@ -186,7 +184,7 @@ export default function Home() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <MessageCircle className="w-5 h-5 mr-2 text-secondary" />
-                  {t('home.communityActivity')}
+                  Community Activity
                 </CardTitle>
               </CardHeader>
               <CardContent>

@@ -90,32 +90,30 @@ export async function generateTravelSuggestions(
     const interestsStr = preferences.interests?.join(', ') || 'General exploration';
     const countriesStr = preferences.preferredCountries?.join(', ') || 'Any South American country';
 
-    const prompt = `ענה תמיד בעברית ברמה גבוהה, בצורה ברורה, מקצועית אך נגישה למטיילים.
+    const prompt = `You are TripWise – a smart, friendly, and social travel planner built for Gen Z and solo travelers.  
+Your mission is to help travelers discover personalized, exciting, and budget-conscious trips across South America.
 
-אתה TripWise – מתכנן טיולים חכם, ידידותי וחברתי שנבנה למטיילים צעירים ונוסעים סולו.  
-המשימה שלך היא לעזור למטיילים לגלות טיולים מותאמים אישית, מרגשים וחסכוניים ברחבי דרום אמריקה.
+Using the following preferences:
+- Travel Style: ${travelStylesStr}
+- Budget: ${budgetStr}
+- Duration: ${durationStr}
+- Interests: ${interestsStr}
+- Preferred Countries: ${countriesStr}
 
-בהתבסס על ההעדפות הבאות:
-- סגנון נסיעה: ${travelStylesStr}
-- תקציב: ${budgetStr}
-- משך זמן: ${durationStr}
-- תחומי עניין: ${interestsStr}
-- מדינות מועדפות: ${countriesStr}
+Provide 3 trip suggestions in a JSON format.  
+Each suggestion should feel exciting and tailored, not generic.
 
-ספק 3 הצעות טיול בפורמט JSON.  
-כל הצעה צריכה להרגיש מרגשת ומותאמת אישית, לא גנרית.
+For each suggestion, include:
+- destination (city or region name)
+- country
+- description: 2–3 sentence overview (inspiring and clear)
+- bestTimeToVisit: e.g., "April to June"
+- estimatedBudget: {low, high} in USD
+- highlights: 3–5 key attractions or activities
+- travelStyle: relevant styles (e.g., adventure, culture, relax)
+- duration: how long to stay (e.g., "7–10 days")
 
-עבור כל הצעה, כלול:
-- destination (שם עיר או אזור בעברית)
-- country (שם המדינה בעברית)
-- description: סקירה של 2-3 משפטים (מעוררת השראה וברורה בעברית)
-- bestTimeToVisit: למשל "אפריל עד יוני"
-- estimatedBudget: {low, high} בדולר אמריקאי
-- highlights: 3-5 אטרקציות או פעילויות מרכזיות בעברית
-- travelStyle: סגנונות רלוונטיים בעברית (למשל הרפתקה, תרבות, הרפיה)
-- duration: כמה זמן לשהות (למשל "7-10 ימים")
-
-וודא שההצעות מגוונות - אווירות, מקומות וחוויות שונות. דבר כמו חבר מקומי לטיולים, לא מדריך פורמלי.
+Make sure the suggestions are diverse — different vibes, locations and experiences. Speak like a local travel buddy, not a formal guide.
 
 Return ONLY a JSON object with this exact structure:
 {
@@ -138,7 +136,7 @@ Return ONLY a JSON object with this exact structure:
       messages: [
         {
           role: "system",
-          content: "ענה תמיד בעברית ברמה גבוהה, בצורה ברורה, מקצועית אך נגישה למטיילים. אתה TripWise, מתכנן טיולים חכם וידידותי למטיילים צעירים ונוסעים סולו החוקרים את דרום אמריקה. ספק הצעות טיול מרגשות ומותאמות אישית בפורמט JSON. היה אותנטי, מעורר השראה ודבר כמו חבר לטיולים, לא מדריך פורמלי."
+          content: "You are TripWise, a smart and friendly travel planner for Gen Z and solo travelers exploring South America. Provide exciting, personalized trip suggestions in JSON format. Be authentic, inspiring, and speak like a travel buddy, not a formal guide."
         },
         {
           role: "user",
@@ -191,20 +189,18 @@ export async function generateItinerary(
   preferences: string[]
 ): Promise<TripItinerary[]> {
   try {
-    const prompt = `ענה תמיד בעברית ברמה גבוהה, בצורה ברורה, מקצועית אך נגישה למטיילים.
-
-צור מסלול מפורט ל-${duration} ימים ב${destination} עם תקציב של $${budget}. 
+    const prompt = `Create a detailed ${duration}-day itinerary for ${destination} with a budget of $${budget}. 
     
-העדפות: ${preferences.join(', ')}
+Preferences: ${preferences.join(', ')}
 
-כלול פעילויות יומיות, עלויות מוערכות וטיפים מעשיים. התמקד בחוויות מקומיות אותנטיות ואפשרויות חסכוניות.`;
+Include daily activities, estimated costs, and practical tips. Focus on authentic local experiences and budget-friendly options.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "ענה תמיד בעברית ברמה גבוהה, בצורה ברורה, מקצועית אך נגישה למטיילים. אתה מדריך טיולים מקומי בדרום אמריקה. צור מסלולי טיול מפורטים יום אחר יום בפורמט JSON: [{day, location, activities: [], estimatedCost, tips: []}]. כל התוכן צריך להיות בעברית."
+          content: "You are a local South American travel guide. Create detailed day-by-day itineraries in JSON format: [{day, location, activities: [], estimatedCost, tips: []}]"
         },
         {
           role: "user",
@@ -241,27 +237,25 @@ export async function analyzeBudget(
 
     const totalSpent = expenses.reduce((sum, expense) => sum + expense.amount, 0);
 
-    const prompt = `ענה תמיד בעברית ברמה גבוהה, בצורה ברורה, מקצועית אך נגישה למטיילים.
+    const prompt = `Analyze this travel budget and provide optimization suggestions:
 
-נתח את תקציב הנסיעה הזה וספק הצעות אופטימיזציה:
+Total Budget: $${totalBudget}
+Total Spent: $${totalSpent}
 
-תקציב כולל: $${totalBudget}
-סה"כ הוצאה: $${totalSpent}
-
-פירוט הוצאות:
+Expense Breakdown:
 ${Object.entries(expenseBreakdown).map(([category, amount]) => `${category}: $${amount}`).join('\n')}
 
-הוצאות אחרונות:
+Recent Expenses:
 ${expenses.slice(-10).map(e => `${e.category}: $${e.amount} - ${e.description}`).join('\n')}
 
-ספק המלצות אופטימיזציה תקציבית לנסיעות בדרום אמריקה, תוך התמקדות בהזדמנויות חיסכון מעשיות.`;
+Provide budget optimization recommendations for South American travel, focusing on practical savings opportunities.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "ענה תמיד בעברית ברמה גבוהה, בצורה ברורה, מקצועית אך נגישה למטיילים. אתה מומחה לנסיעות חסכוניות בדרום אמריקה. נתח דפוסי הוצאות וספק הצעות אופטימיזציה מעשיות בפורמט JSON: [{category, currentSpending, recommendedBudget, tips: [], potentialSavings}]. כל התוכן צריך להיות בעברית."
+          content: "You are a budget travel expert for South America. Analyze spending patterns and provide practical optimization suggestions in JSON format: [{category, currentSpending, recommendedBudget, tips: [], potentialSavings}]"
         },
         {
           role: "user",
@@ -292,20 +286,18 @@ export async function generateRecommendations(
   try {
     const reviewSummary = reviews.map(r => `Rating: ${r.rating}/5 - ${r.comment}`).join('\n');
 
-    const prompt = `ענה תמיד בעברית ברמה גבוהה, בצורה ברורה, מקצועית אך נגישה למטיילים.
-
-בהתבסס על הביקורות הקהילתיות האלה עבור ${destination}, צור 5-7 המלצות טיול מותאמות אישית:
+    const prompt = `Based on these community reviews for ${destination}, generate 5-7 personalized travel recommendations:
 
 ${reviewSummary}
 
-התמקד בטיפים מעשיים, אוצרות נסתרים ועצות שמתייחסות לדאגות נפוצות שמוזכרות בביקורות.`;
+Focus on practical tips, hidden gems, and advice that addresses common concerns mentioned in the reviews.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "ענה תמיד בעברית ברמה גבוהה, בצורה ברורה, מקצועית אך נגישה למטיילים. אתה מומחה טיולים מקומי. צור המלצות טיול מעשיות בהתבסס על משובי קהילה. השב עם אובייקט JSON המכיל מערך של מחרוזות המלצה בעברית."
+          content: "You are a local travel expert. Generate practical travel recommendations based on community feedback. Respond with a JSON object containing an array of recommendation strings."
         },
         {
           role: "user",
@@ -352,30 +344,28 @@ ${chatText}
       messages: [
         {
           role: "system",
-          content: `ענה תמיד בעברית ברמה גבוהה, בצורה ברורה, מקצועית אך נגישה למטיילים.
+          content: `You are TripWise – a smart, friendly, and social travel planner built for Gen Z and solo travelers.
 
-אתה TripWise – מתכנן טיולים חכם, ידידותי וחברתי שנבנה למטיילים צעירים ונוסעים סולו.
+Your role is to:
+1. Provide personalized travel suggestions based on the user's preferences.
+2. Maintain conversation continuity and remember what has been discussed.
+3. Generate trip suggestions when you have enough information.
 
-התפקיד שלך הוא:
-1. לספק הצעות טיול מותאמות אישית בהתבסס על העדפות המשתמש.
-2. לשמור על המשכיות השיחה ולזכור מה נדון.
-3. לייצר הצעות טיול כשיש מספיק מידע.
+When receiving new input, do the following:
+- Check if the user has provided a destination, interests, duration, travel style, and daily budget.
+- If anything is missing, ask follow-up questions in a casual, helpful tone (use emojis if you want).
+- Once you have all the info, indicate that you're ready to generate suggestions.
+- Do not repeat destinations from previous suggestions: ${previousDestinations}
 
-כאשר אתה מקבל קלט חדש, עשה את הדברים הבאים:
-- בדוק אם המשתמש סיפק יעד, תחומי עניין, משך זמן, סגנון נסיעה ותקציב יומי.
-- אם משהו חסר, שאל שאלות המשך בטון נינוח ומועיל.
-- ברגע שיש לך את כל המידע, ציין שאתה מוכן לייצר הצעות.
-- אל תחזור על יעדים מהצעות קודמות: ${previousDestinations}
+If you have enough information to generate suggestions, respond with:
+"GENERATE_SUGGESTIONS" followed by your response.
 
-אם יש לך מספיק מידע לייצר הצעות, השב עם:
-"GENERATE_SUGGESTIONS" ואחריו התגובה שלך.
+Style:
+- Write like a friendly, adventurous local friend – not like a travel agent.
+- Be energetic, positive, and clear.
+- Ask one question at a time to avoid overwhelming the user.
 
-סגנון:
-- כתב כמו חבר מקומי ידידותי והרפתקני - לא כמו סוכן נסיעות.
-- היה אנרגטי, חיובי וברור.
-- שאל שאלה אחת בכל פעם כדי לא להציף את המשתמש.
-
-התמקד בחוויות נסיעה בדרום אמריקה.${contextInfo}`
+Focus on South American travel experiences.${contextInfo}`
         },
         {
           role: "user",
@@ -419,28 +409,26 @@ export async function generateConversationalSuggestions(
     const conversationText = chatHistory.map(h => `${h.role}: ${h.content}`).join('\n');
     const previousDestinations = previousSuggestions.map(s => `${s.destination}, ${s.country}`).join('; ');
     
-    const prompt = `ענה תמיד בעברית ברמה גבוהה, בצורה ברורה, מקצועית אך נגישה למטיילים.
+    const prompt = `You are TripWise – a smart, friendly, and social travel planner built for Gen Z and solo travelers.
 
-אתה TripWise – מתכנן טיולים חכם, ידידותי וחברתי שנבנה למטיילים צעירים ונוסעים סולו.
+Based on this conversation, generate 3 exciting, personalized trip suggestions for South America:
 
-בהתבסס על השיחה הזו, צור 3 הצעות טיול מרגשות ומותאמות אישית לדרום אמריקה:
-
-שיחה:
+Conversation:
 ${conversationText}
 
-חשוב: אל תציע את היעדים שהוזכרו קודם: ${previousDestinations}
+IMPORTANT: Do not suggest these previously mentioned destinations: ${previousDestinations}
 
-צור 3 הצעות טיול בפורמט JSON. כל הצעה צריכה לכלול:
-- destination: עיר או אזור בעברית
-- country: מדינה דרום אמריקאית בעברית
-- description: 2-3 משפטים מעניינים בעברית
-- bestTimeToVisit: למשל "אפריל עד יוני"
-- estimatedBudget: {low, high} בדולר אמריקאי
-- highlights: 3-5 מקומות או חוויות מרכזיות בעברית
-- travelStyle: ["הרפתקה", "רגוע", וכו'] בעברית
-- duration: כמה זמן לשהות (למשל "7-10 ימים")
+Generate 3 trip suggestions in JSON format. Each suggestion should include:
+- destination: city or region
+- country: South American country  
+- description: 2–3 engaging sentences
+- bestTimeToVisit: e.g., "April to June"
+- estimatedBudget: {low, high} in USD
+- highlights: 3–5 key places or experiences
+- travelStyle: ["adventure", "chill", etc.]
+- duration: how long to stay (e.g., "7–10 days")
 
-וודא שההצעות מגוונות - אווירות, מקומות וחוויות שונות. דבר כמו חבר מקומי לטיולים, לא מדריך פורמלי.
+Make sure the suggestions are diverse — different vibes, locations and experiences. Speak like a local travel buddy, not a formal guide.
 
 Return ONLY a JSON object with this exact structure:
 {
@@ -463,7 +451,7 @@ Return ONLY a JSON object with this exact structure:
       messages: [
         {
           role: "system",
-          content: "ענה תמיד בעברית ברמה גבוהה, בצורה ברורה, מקצועית אך נגישה למטיילים. אתה TripWise, מתכנן טיולים חכם וידידותי למטיילים צעירים ונוסעים סולו החוקרים את דרום אמריקה. צור הצעות טיול מרגשות ומותאמות אישית בפורמט JSON. היה אותנטי, מעורר השראה ודבר כמו חבר לטיולים."
+          content: "You are TripWise, a smart and friendly travel planner for Gen Z and solo travelers exploring South America. Generate exciting, personalized trip suggestions in JSON format. Be authentic, inspiring, and speak like a travel buddy."
         },
         {
           role: "user",

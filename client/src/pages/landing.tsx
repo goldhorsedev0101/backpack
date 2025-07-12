@@ -9,8 +9,6 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
-import { useTranslation } from 'react-i18next';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import logo from "@/assets/tripwise-logo.svg";
 import { 
   Compass, 
@@ -44,7 +42,6 @@ export default function Landing() {
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const { user } = useAuth();
   const [, setLocation] = useLocation();
-  const { t } = useTranslation();
 
   // Handle logout cleanup on page load
   useEffect(() => {
@@ -130,24 +127,23 @@ export default function Landing() {
               </div>
             </div>
             <div className="hidden md:flex items-center space-x-4">
-              <LanguageSwitcher />
               {user ? (
                 <>
-                  <span className="text-slate-600">{t("landing.welcomeBack")}, {user.firstName || user.email}</span>
+                  <span className="text-slate-600">Welcome, {user.firstName || user.email}</span>
                   <Button onClick={handleLogout} variant="outline" className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white">
                     <LogOut className="w-4 h-4 mr-2" />
-                    {t("navigation.logout")}
+                    Logout
                   </Button>
                 </>
               ) : (
                 <>
                   <Button onClick={handleLogin} variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
                     <LogIn className="w-4 h-4 mr-2" />
-                    {t("landing.signIn")}
+                    Login
                   </Button>
                   <Button onClick={handleRegister} className="bg-primary text-white hover:bg-orange-600">
                     <UserPlus className="w-4 h-4 mr-2" />
-                    {t("landing.register")}
+                    Register
                   </Button>
                 </>
               )}
@@ -161,41 +157,42 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
-              {t("landing.title")}
+              Plan Your Perfect<br />
+              <span className="text-accent">Adventure</span>
             </h1>
             <p className="text-xl text-white opacity-90 mb-8 max-w-3xl mx-auto">
-              {t("landing.description")}
+              AI-powered trip planning for backpackers. Get personalized itineraries, connect with fellow travelers, and explore South America like never before.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button onClick={handleStartPlanning} className="bg-white text-primary px-8 py-4 rounded-xl font-semibold hover:bg-gray-100">
                 <Bot className="w-5 h-5 mr-2" />
-                {t("landing.startPlanning")}
+                Start Planning
               </Button>
               <Button variant="outline" className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-primary">
                 <Play className="w-5 h-5 mr-2" />
-                {t("common.viewMore")}
+                Watch Demo
               </Button>
             </div>
             {!user && (
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-6">
-                <span className="text-white opacity-75">{t("auth.alreadyHaveAccount")}</span>
+                <span className="text-white opacity-75">Already have an account?</span>
                 <Button onClick={handleLogin} variant="outline" className="border-white text-white px-6 py-2 rounded-lg hover:bg-white hover:text-primary">
                   <LogIn className="w-4 h-4 mr-2" />
-                  {t("landing.signIn")}
+                  Login
                 </Button>
-                <span className="text-white opacity-75">{t("common.or")}</span>
+                <span className="text-white opacity-75">or</span>
                 <Button onClick={handleRegister} className="bg-accent text-white px-6 py-2 rounded-lg hover:bg-orange-600">
                   <UserPlus className="w-4 h-4 mr-2" />
-                  {t("landing.register")}
+                  Register
                 </Button>
               </div>
             )}
             {user && (
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-6">
-                <span className="text-white opacity-90">{t("landing.welcomeBack")}, {user.firstName || user.email}!</span>
+                <span className="text-white opacity-90">Welcome back, {user.firstName || user.email}!</span>
                 <Button onClick={handleLogout} variant="outline" className="border-white text-white px-6 py-2 rounded-lg hover:bg-red-500 hover:text-white">
                   <LogOut className="w-4 h-4 mr-2" />
-                  {t("navigation.logout")}
+                  Logout
                 </Button>
               </div>
             )}

@@ -13,8 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
 import logoCompact from "@/assets/tripwise-logo-compact.svg";
-import { useTranslation } from 'react-i18next';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { 
   Compass, 
   Home, 
@@ -33,29 +31,23 @@ import {
   Cloud
 } from "lucide-react";
 
-function useNavigationItems() {
-  const { t } = useTranslation();
-  
-  return [
-    { href: "/", label: t("navigation.home"), icon: Home },
-    { href: "/trip-builder", label: t("tripBuilder.title"), icon: Calendar },
-    { href: "/my-trips", label: t("myTrips.title"), icon: Compass },
-    { href: "/explore", label: t("explore.title"), icon: MapPin },
-    { href: "/weather", label: t("weather.title"), icon: Cloud },
-    { href: "/community", label: t("navigation.community"), icon: Users },
-    { href: "/budget-tracker", label: t("budget.title"), icon: DollarSign },
-    { href: "/achievements", label: t("achievements.title"), icon: Trophy },
-    { href: "/tripadvisor-data", label: t("explore.destinations"), icon: Database },
-  ];
-}
+const navigationItems = [
+  { href: "/", label: "Home", icon: Home },
+  { href: "/trip-builder", label: "Plan Trip", icon: Calendar },
+  { href: "/my-trips", label: "My Trips", icon: Compass },
+  { href: "/explore", label: "Explore", icon: MapPin },
+  { href: "/weather", label: "Weather", icon: Cloud },
+  { href: "/community", label: "Community", icon: Users },
+  { href: "/budget-tracker", label: "Budget", icon: DollarSign },
+  { href: "/achievements", label: "Achievements", icon: Trophy },
+  { href: "/tripadvisor-data", label: "Travel Data", icon: Database },
+];
 
 export default function Navigation() {
   const [location] = useLocation();
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { t } = useTranslation();
-  const navigationItems = useNavigationItems();
 
   const handleLogout = async () => {
     try {
@@ -92,7 +84,7 @@ export default function Navigation() {
     return (
       <>
         {/* Mobile Top Navigation */}
-        <nav className="bg-white shadow-lg sticky top-0 z-50 md:hidden" dir="rtl">
+        <nav className="bg-white shadow-lg sticky top-0 z-50 md:hidden">
           <div className="px-4">
             <div className="flex justify-between items-center h-16">
               <Link href="/" className="flex items-center">
@@ -147,8 +139,8 @@ export default function Navigation() {
                     onClick={handleLogout}
                     className="w-full flex items-center px-3 py-2 text-slate-600 hover:bg-gray-100 rounded-lg"
                   >
-                    <LogOut className="w-5 h-5 ml-3" />
-                    {t("navigation.logout")}
+                    <LogOut className="w-5 h-5 mr-3" />
+                    Sign Out
                   </button>
                 </div>
               </div>
@@ -180,7 +172,7 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-50 hidden md:block" dir="rtl">
+    <nav className="bg-white shadow-lg sticky top-0 z-50 hidden md:block">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -208,7 +200,6 @@ export default function Navigation() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <LanguageSwitcher />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -230,14 +221,14 @@ export default function Navigation() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/profile" className="w-full">
-                    <User className="ml-2 h-4 w-4" />
-                    <span>{t("navigation.profile")}</span>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="ml-2 h-4 w-4" />
-                  <span>{t("navigation.logout")}</span>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sign out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
