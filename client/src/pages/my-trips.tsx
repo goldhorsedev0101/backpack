@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Loader2, MapPin, DollarSign, Calendar, Star, Users, ExternalLink, Camera } from "lucide-react";
+import { Loader2, MapPin, DollarSign, Calendar, Star, Users, ExternalLink, Camera, Mountain, Utensils } from "lucide-react";
 import { RealPlaceLinks } from "@/components/RealPlaceLinks";
 
 interface RealPlace {
@@ -184,290 +184,350 @@ export default function MyTripsScreen() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-8">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">My Trips</h1>
-          <p className="text-muted-foreground mt-2">Plan, discover, and manage your South American adventures</p>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-700 mb-4">AI Trip Builder</h1>
+          <p className="text-lg text-gray-600">Tell us your preferences and let our AI create the perfect itinerary</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="generate">Generate Trip</TabsTrigger>
-            <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
-            <TabsTrigger value="saved">My Trips</TabsTrigger>
+            <TabsTrigger value="generate">
+              <Users className="w-4 h-4 mr-2" />
+              Preferences
+            </TabsTrigger>
+            <TabsTrigger value="suggestions">
+              <Star className="w-4 h-4 mr-2" />
+              Suggestions
+            </TabsTrigger>
+            <TabsTrigger value="saved">
+              <MapPin className="w-4 h-4 mr-2" />
+              My Trips
+            </TabsTrigger>
           </TabsList>
 
           {/* Tab 1: Trip Generation Form */}
-          <TabsContent value="generate" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Plan Your Next Adventure</CardTitle>
-                <CardDescription>
-                  Tell us about your dream trip and we'll create personalized suggestions for you
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleGenerateTrip} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="destination">Destination</Label>
-                      <Input
-                        id="destination"
-                        placeholder="e.g., Peru, Colombia, Argentina"
-                        value={formData.destination}
-                        onChange={(e) => setFormData(prev => ({ ...prev, destination: e.target.value }))}
-                      />
+          <TabsContent value="generate" className="mt-6">
+            <div className="max-w-2xl mx-auto">
+              <Card className="shadow-lg">
+                <CardContent className="p-8">
+                  <form onSubmit={handleGenerateTrip} className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="destination" className="text-sm font-medium text-slate-700">
+                          Where do you want to go?
+                        </Label>
+                        <Input
+                          id="destination"
+                          placeholder="e.g., Colombia, Peru, Bolivia"
+                          value={formData.destination}
+                          onChange={(e) => setFormData(prev => ({ ...prev, destination: e.target.value }))}
+                          className="h-12"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="duration" className="text-sm font-medium text-slate-700">
+                          Trip Duration
+                        </Label>
+                        <Select value={formData.duration} onValueChange={(value) => setFormData(prev => ({ ...prev, duration: value }))}>
+                          <SelectTrigger className="h-12">
+                            <SelectValue placeholder="Select duration" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1-2 weeks">1-2 weeks</SelectItem>
+                            <SelectItem value="2-4 weeks">2-4 weeks</SelectItem>
+                            <SelectItem value="1-2 months">1-2 months</SelectItem>
+                            <SelectItem value="3+ months">3+ months</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="duration">Trip Duration</Label>
-                      <Select value={formData.duration} onValueChange={(value) => setFormData(prev => ({ ...prev, duration: value }))}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select duration" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1-3 days">1-3 days</SelectItem>
-                          <SelectItem value="4-7 days">4-7 days</SelectItem>
-                          <SelectItem value="1-2 weeks">1-2 weeks</SelectItem>
-                          <SelectItem value="2-3 weeks">2-3 weeks</SelectItem>
-                          <SelectItem value="1 month">1 month</SelectItem>
-                          <SelectItem value="2+ months">2+ months</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="dailyBudget">Daily Budget (USD)</Label>
-                      <Input
-                        id="dailyBudget"
-                        type="number"
-                        min="10"
-                        max="500"
-                        value={formData.dailyBudget}
-                        onChange={(e) => setFormData(prev => ({ ...prev, dailyBudget: parseInt(e.target.value) || 50 }))}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label>Travel Style (Select all that apply)</Label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {travelStyles.map((style) => (
-                        <div key={style} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={style}
-                            checked={formData.travelStyle.includes(style)}
-                            onCheckedChange={(checked) => handleStyleChange(style, !!checked)}
-                          />
-                          <Label htmlFor={style} className="text-sm">{style}</Label>
+                    <div className="space-y-4">
+                      <Label className="text-sm font-medium text-slate-700">
+                        Budget Range
+                      </Label>
+                      <div className="px-4">
+                        <div className="flex items-center space-x-4 mb-4">
+                          <span className="text-sm text-gray-600">$500</span>
+                          <div className="flex-1 relative">
+                            <input
+                              type="range"
+                              min="500"
+                              max="5000"
+                              step="100"
+                              value={formData.dailyBudget * 10}
+                              onChange={(e) => setFormData(prev => ({ ...prev, dailyBudget: parseInt(e.target.value) / 10 }))}
+                              className="w-full h-2 bg-gradient-to-r from-orange-400 to-teal-400 rounded-lg appearance-none cursor-pointer"
+                            />
+                          </div>
+                          <span className="text-sm text-gray-600">$5000</span>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label>Interests (Optional)</Label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {interests.map((interest) => (
-                        <div key={interest} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={interest}
-                            checked={formData.interests.includes(interest)}
-                            onCheckedChange={(checked) => handleInterestChange(interest, !!checked)}
-                          />
-                          <Label htmlFor={interest} className="text-sm">{interest}</Label>
+                        <div className="text-center">
+                          <span className="text-xl font-bold text-orange-500">${formData.dailyBudget * 10}</span>
                         </div>
-                      ))}
+                      </div>
                     </div>
-                  </div>
 
-                  <Button type="submit" disabled={generateTripMutation.isPending} className="w-full">
-                    {generateTripMutation.isPending ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Generating Suggestions...
-                      </>
-                    ) : (
-                      "Generate Trip Suggestions"
-                    )}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+                    <div className="space-y-4">
+                      <Label className="text-sm font-medium text-slate-700">
+                        Travel Style
+                      </Label>
+                      <div className="grid grid-cols-2 gap-4">
+                        {travelStyles.slice(0, 4).map((style) => (
+                          <button
+                            key={style}
+                            type="button"
+                            onClick={() => handleStyleChange(style, !formData.travelStyle.includes(style))}
+                            className={`p-4 rounded-lg border-2 text-left transition-all ${
+                              formData.travelStyle.includes(style)
+                                ? 'border-primary bg-primary/10 text-primary'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="flex items-center space-x-2">
+                              {style === 'Adventure' && <Mountain className="w-5 h-5" />}
+                              {style === 'Cultural' && <Camera className="w-5 h-5" />}
+                              {style === 'Food & Cuisine' && <Utensils className="w-5 h-5" />}
+                              {style === 'Nightlife' && <Users className="w-5 h-5" />}
+                              <span className="font-medium">{style}</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Button 
+                      type="submit" 
+                      disabled={generateTripMutation.isPending} 
+                      className="w-full h-14 text-lg bg-orange-500 hover:bg-orange-600"
+                    >
+                      {generateTripMutation.isPending ? (
+                        <>
+                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Calendar className="w-5 h-5 mr-2" />
+                          Generate My Trip
+                        </>
+                      )}
+                    </Button>
+
+                    <p className="text-center text-sm text-gray-500">
+                      Ready to plan your next adventure!
+                    </p>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           {/* Tab 2: Trip Suggestions */}
-          <TabsContent value="suggestions" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-semibold">Trip Suggestions</h2>
-              {suggestions.length > 0 && (
-                <Badge variant="secondary">{suggestions.length} suggestions</Badge>
-              )}
-            </div>
+          <TabsContent value="suggestions" className="mt-6">
+            <Card className="shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Star className="w-6 h-6 mr-2 text-primary" />
+                  AI Trip Suggestions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
 
-            {suggestions.length === 0 ? (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <MapPin className="w-12 h-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No Suggestions Yet</h3>
-                  <p className="text-muted-foreground text-center">
-                    Generate your first trip suggestion using the form in the "Generate Trip" tab
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {suggestions.map((suggestion, index) => (
-                  <Card key={index} className="h-fit">
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
+                {suggestions.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                    <p className="text-lg font-medium text-gray-700 mb-2">Ready to plan your South American adventure?</p>
+                    <p className="text-sm text-gray-500">
+                      Fill in your preferences and click "Generate My Trip" to get personalized recommendations
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {suggestions.map((suggestion, index) => (
+                      <div key={index} className="border rounded-lg p-4 space-y-4">
                         <div>
-                          <CardTitle className="text-lg">{suggestion.destination}</CardTitle>
-                          <CardDescription>{suggestion.country}</CardDescription>
+                          <h3 className="text-xl font-bold text-slate-700 mb-1">
+                            {suggestion.destination}, {suggestion.country}
+                          </h3>
+                          <p className="text-gray-600 leading-relaxed">
+                            {suggestion.description}
+                          </p>
                         </div>
-                        <Badge variant="outline">{suggestion.duration}</Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-sm">{suggestion.description}</p>
 
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="w-4 h-4 text-green-600" />
-                          <span>${suggestion.estimatedBudget.low}-${suggestion.estimatedBudget.high}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-blue-600" />
-                          <span className="text-xs">{suggestion.bestTimeToVisit}</span>
-                        </div>
-                      </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="bg-blue-50 p-3 rounded-lg">
+                            <div className="flex items-center mb-1">
+                              <Calendar className="w-4 h-4 mr-2 text-blue-600" />
+                              <span className="font-semibold text-blue-800 text-sm">Duration</span>
+                            </div>
+                            <p className="text-blue-700 text-sm">{suggestion.duration}</p>
+                          </div>
 
-                      <div>
-                        <Label className="text-sm font-medium">Highlights</Label>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {suggestion.highlights.slice(0, 3).map((highlight, idx) => (
-                            <Badge key={idx} variant="secondary" className="text-xs">
-                              {highlight}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <Label className="text-sm font-medium">Travel Style</Label>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {suggestion.travelStyle.map((style, idx) => (
-                            <Badge key={idx} variant="outline" className="text-xs">
-                              {style}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Real Places Links Component */}
-                      <RealPlaceLinks suggestion={suggestion} />
-
-                      <Button 
-                        onClick={() => saveTrip.mutate(suggestion)}
-                        disabled={saveTrip.isPending}
-                        className="w-full"
-                        size="sm"
-                      >
-                        {saveTrip.isPending ? (
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        ) : (
-                          <Star className="w-4 h-4 mr-2" />
-                        )}
-                        Save Trip
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Tab 3: Saved Trips */}
-          <TabsContent value="saved" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-semibold">My Saved Trips</h2>
-              {savedTrips && (
-                <Badge variant="secondary">{savedTrips.length} saved trips</Badge>
-              )}
-            </div>
-
-            {tripsLoading ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin" />
-              </div>
-            ) : !savedTrips || savedTrips.length === 0 ? (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <Users className="w-12 h-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No Saved Trips</h3>
-                  <p className="text-muted-foreground text-center">
-                    Save trip suggestions to build your personal travel collection
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {savedTrips.map((trip: SavedTrip) => (
-                  <Card key={trip.id} className="h-fit">
-                    <CardHeader>
-                      <CardTitle className="text-lg">{trip.title || trip.destinations}</CardTitle>
-                      <CardDescription>
-                        Saved on {new Date(trip.createdAt).toLocaleDateString()}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-sm">{trip.description}</p>
-
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="w-4 h-4 text-green-600" />
-                          <span>${trip.budget}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-blue-600" />
-                          <span>{trip.duration}</span>
-                        </div>
-                      </div>
-
-                      {trip.destinations && (
-                        <div>
-                          <Label className="text-sm font-medium">Destination</Label>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            <Badge variant="secondary" className="text-xs">
-                              <MapPin className="w-3 h-3 mr-1" />
-                              {Array.isArray(trip.destinations) 
-                                ? trip.destinations.join(', ') 
-                                : typeof trip.destinations === 'string'
-                                  ? trip.destinations
-                                  : 'Unknown destination'}
-                            </Badge>
+                          <div className="bg-green-50 p-3 rounded-lg">
+                            <div className="flex items-center mb-1">
+                              <DollarSign className="w-4 h-4 mr-2 text-green-600" />
+                              <span className="font-semibold text-green-800 text-sm">Budget</span>
+                            </div>
+                            <p className="text-green-700 text-sm font-bold">
+                              ${suggestion.estimatedBudget.low} - ${suggestion.estimatedBudget.high}
+                            </p>
                           </div>
                         </div>
-                      )}
 
-                      {trip.travelStyle && (
                         <div>
-                          <Label className="text-sm font-medium">Travel Style</Label>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {trip.travelStyle.split(', ').map((style, idx) => (
-                              <Badge key={idx} variant="outline" className="text-xs">
-                                {style.trim()}
+                          <h4 className="font-semibold text-slate-700 mb-2 text-sm">Best Time to Visit</h4>
+                          <p className="text-sm text-gray-600">{suggestion.bestTimeToVisit}</p>
+                        </div>
+
+                        <div>
+                          <h4 className="font-semibold text-slate-700 mb-2 text-sm">Highlights</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {suggestion.highlights?.map((highlight, idx) => (
+                              <Badge key={idx} variant="secondary" className="text-xs">
+                                {highlight}
                               </Badge>
                             ))}
                           </div>
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+
+                        <div>
+                          <h4 className="font-semibold text-slate-700 mb-2 text-sm">Travel Style</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {suggestion.travelStyle?.map((style, idx) => (
+                              <Badge key={idx} variant="outline" className="text-xs">
+                                {style}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Real Places Links Component */}
+                        <RealPlaceLinks suggestion={suggestion} />
+
+                        <div className="pt-2 space-y-2">
+                          <Button 
+                            onClick={() => saveTrip.mutate(suggestion)}
+                            disabled={saveTrip.isPending}
+                            className="w-full"
+                          >
+                            {saveTrip.isPending ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Saving...
+                              </>
+                            ) : (
+                              <>
+                                <Star className="w-4 h-4 mr-2" />
+                                Save This Trip
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+          </TabsContent>
+
+          {/* Tab 3: Saved Trips */}
+          <TabsContent value="saved" className="mt-6">
+            <Card className="shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <MapPin className="w-6 h-6 mr-2 text-primary" />
+                  My Saved Trips
+                  {savedTrips && savedTrips.length > 0 && (
+                    <Badge variant="secondary" className="ml-auto">{savedTrips.length} trips</Badge>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+
+                {tripsLoading ? (
+                  <div className="text-center py-8">
+                    <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-primary" />
+                    <p className="text-lg font-medium text-gray-700">Loading your trips...</p>
+                  </div>
+                ) : !savedTrips || savedTrips.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                    <p className="text-lg font-medium text-gray-700 mb-2">No Saved Trips</p>
+                    <p className="text-sm text-gray-500">
+                      Save trip suggestions to build your personal travel collection
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {savedTrips.map((trip: SavedTrip) => (
+                      <div key={trip.id} className="border rounded-lg p-4 space-y-4">
+                        <div>
+                          <h3 className="text-xl font-bold text-slate-700 mb-1">
+                            {trip.title || trip.destinations}
+                          </h3>
+                          <p className="text-gray-600 text-sm">
+                            Saved on {new Date(trip.createdAt).toLocaleDateString()}
+                          </p>
+                          <p className="text-gray-600 leading-relaxed mt-2">
+                            {trip.description}
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="bg-green-50 p-3 rounded-lg">
+                            <div className="flex items-center mb-1">
+                              <DollarSign className="w-4 h-4 mr-2 text-green-600" />
+                              <span className="font-semibold text-green-800 text-sm">Budget</span>
+                            </div>
+                            <p className="text-green-700 text-sm font-bold">${trip.budget}</p>
+                          </div>
+
+                          <div className="bg-blue-50 p-3 rounded-lg">
+                            <div className="flex items-center mb-1">
+                              <Calendar className="w-4 h-4 mr-2 text-blue-600" />
+                              <span className="font-semibold text-blue-800 text-sm">Duration</span>
+                            </div>
+                            <p className="text-blue-700 text-sm">{trip.duration}</p>
+                          </div>
+                        </div>
+
+                        {trip.destinations && (
+                          <div>
+                            <h4 className="font-semibold text-slate-700 mb-2 text-sm">Destination</h4>
+                            <div className="flex flex-wrap gap-2">
+                              <Badge variant="secondary" className="text-xs">
+                                <MapPin className="w-3 h-3 mr-1" />
+                                {Array.isArray(trip.destinations) 
+                                  ? trip.destinations.join(', ') 
+                                  : typeof trip.destinations === 'string'
+                                    ? trip.destinations
+                                    : 'Unknown destination'}
+                              </Badge>
+                            </div>
+                          </div>
+                        )}
+
+                        {trip.travelStyle && (
+                          <div>
+                            <h4 className="font-semibold text-slate-700 mb-2 text-sm">Travel Style</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {trip.travelStyle.split(', ').map((style, idx) => (
+                                <Badge key={idx} variant="outline" className="text-xs">
+                                  {style.trim()}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
