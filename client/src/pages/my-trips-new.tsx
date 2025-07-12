@@ -169,31 +169,52 @@ export default function MyTripsNew() {
   // API calls
   const generateAISuggestionsMutation = useMutation({
     mutationFn: async (data: TripFormData) => {
-      const response = await apiRequest<TripSuggestion[]>('/api/ai/travel-suggestions', {
-        method: 'POST',
-        body: JSON.stringify({
-          destination: data.destination,
-          travelStyle: data.travelStyle,
-          budget: data.budget,
-          duration: data.duration,
-          interests: data.interests,
-        }),
-      });
-      return response;
+      try {
+        const response = await apiRequest<TripSuggestion[]>('/api/ai/travel-suggestions', {
+          method: 'POST',
+          body: JSON.stringify({
+            destination: data.destination,
+            travelStyle: data.travelStyle,
+            budget: data.budget,
+            duration: data.duration,
+            interests: data.interests,
+          }),
+        });
+        console.log('API response received:', response);
+        return response;
+      } catch (error) {
+        console.error('API request failed:', error);
+        throw error;
+      }
     },
     onSuccess: (data) => {
-      setAiSuggestions(data);
-      setActiveTab("suggestions");
-      toast({
-        title: "AI Suggestions Generated!",
-        description: `Generated ${data.length} personalized trip suggestions`,
-      });
+      console.log('Success callback called with data:', data);
+      setIsGenerating(false);
+      if (data && Array.isArray(data)) {
+        console.log('Setting AI suggestions state:', data);
+        setAiSuggestions(data);
+        setTimeout(() => {
+          setActiveTab("suggestions");
+        }, 100);
+        toast({
+          title: "AI Suggestions Generated!",
+          description: `Generated ${data.length} personalized trip suggestions`,
+        });
+      } else {
+        console.error('Invalid data received:', data);
+        toast({
+          title: "Error",
+          description: "Invalid response format from server",
+          variant: "destructive",
+        });
+      }
     },
     onError: (error) => {
       console.error('Error generating AI suggestions:', error);
+      setIsGenerating(false);
       toast({
-        title: "Error",
-        description: "Failed to generate trip suggestions. Please try again.",
+        title: "Error", 
+        description: error?.message || "Failed to generate trip suggestions. Please try again.",
         variant: "destructive",
       });
     },
@@ -269,17 +290,18 @@ export default function MyTripsNew() {
 
       console.log('Sending data to API:', data);
       setIsGenerating(true);
-      const result = await generateAISuggestionsMutation.mutateAsync(data);
-      console.log('API result:', result);
+      
+      // Use the mutation but handle the result manually
+      generateAISuggestionsMutation.mutate(data);
+      
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error in handleGenerateAITrips:', error);
+      setIsGenerating(false);
       toast({
         title: "Error",
         description: "Failed to generate trip suggestions. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsGenerating(false);
     }
   };
 
@@ -501,6 +523,9 @@ export default function MyTripsNew() {
                     <p className="text-lg font-medium text-gray-700 mb-2">No suggestions generated yet</p>
                     <p className="text-sm text-gray-500 mb-4">
                       Set your preferences and click "Generate AI Trip Suggestions" to get started
+                    </p>
+                    <p className="text-xs text-gray-400 mb-4">
+                      Debug: isGenerating={String(isGenerating)}, suggestions length={aiSuggestions.length}
                     </p>
                     <Button onClick={() => setActiveTab("preferences")} variant="outline">
                       <Bot className="w-4 h-4 mr-2" />

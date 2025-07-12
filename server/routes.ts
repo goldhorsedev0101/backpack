@@ -579,7 +579,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI-powered travel suggestions (guest-friendly)
   app.post('/api/ai/travel-suggestions', async (req, res) => {
     try {
-      const { travelStyle, budget, duration, interests, preferredCountries } = req.body;
+      const { destination, travelStyle, budget, duration, interests, preferredCountries } = req.body;
       
       // Validate required inputs
       if (!travelStyle || !budget || !duration || !interests) {
@@ -589,7 +589,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       console.log("Generating travel suggestions with data:", {
-        travelStyle, budget, duration, interests, preferredCountries
+        destination, travelStyle, budget, duration, interests, preferredCountries
       });
 
       const suggestions = await generateTravelSuggestions({
@@ -597,10 +597,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         budget,
         duration,
         interests,
-        preferredCountries
+        preferredCountries: destination ? [destination] : preferredCountries
       });
       
-      res.json({ suggestions });
+      console.log("Generated suggestions:", suggestions);
+      res.json(suggestions);
     } catch (error) {
       console.error("Error generating travel suggestions:", error);
       console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
