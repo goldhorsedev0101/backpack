@@ -321,51 +321,6 @@ export default function MyTripsNew() {
     },
   });
 
-  // Save itinerary mutation
-  const saveItineraryMutation = useMutation({
-    mutationFn: async () => {
-      if (itinerary.length === 0) {
-        throw new Error("No itinerary to save");
-      }
-      
-      const mainDestination = itinerary[0]?.location || "Unknown";
-      const totalCost = itinerary.reduce((sum, day) => sum + day.estimatedCost, 0);
-      
-      const response = await apiRequest('/api/trips', {
-        method: 'POST',
-        body: JSON.stringify({
-          title: `${mainDestination} - Daily Itinerary`,
-          destinations: JSON.stringify([{
-            name: mainDestination,
-            country: "South America",
-            description: `Detailed ${itinerary.length}-day itinerary`,
-            highlights: itinerary.map(day => day.activities[0]).filter(Boolean)
-          }]),
-          description: `Detailed ${itinerary.length}-day itinerary for ${mainDestination}`,
-          budget: totalCost.toString(),
-          travelStyle: "detailed planning",
-          itinerary: JSON.stringify(itinerary), // Save the full itinerary as JSON
-        }),
-      });
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Itinerary Saved!",
-        description: "Daily itinerary saved to My Trips",
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/trips/user'] });
-    },
-    onError: (error) => {
-      console.error('Error saving itinerary:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save itinerary. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
-
   // Fetch saved trips
   const { data: savedTrips = [], isLoading: isLoadingSavedTrips } = useQuery({
     queryKey: ['/api/trips/user'],
@@ -441,74 +396,6 @@ export default function MyTripsNew() {
       console.error('Error in handleGenerateItinerary:', error);
     } finally {
       setIsGeneratingItinerary(false);
-    }
-  };
-
-  const handleGenerateItineraryForSuggestion = async (suggestion: TripSuggestion) => {
-    try {
-      setIsGeneratingItinerary(true);
-      
-      // Parse duration to get number of days
-      const durationText = suggestion.duration.toLowerCase();
-      let durationDays = 7; // default
-      
-      if (durationText.includes('week')) {
-        const weeks = parseInt(durationText) || 1;
-        durationDays = weeks * 7;
-      } else if (durationText.includes('day')) {
-        durationDays = parseInt(durationText) || 7;
-      }
-      
-      console.log('Generating itinerary for suggestion:', {
-        destination: suggestion.destination,
-        duration: durationDays,
-        travelStyle: suggestion.travelStyle
-      });
-      
-      const response = await apiRequest('/api/ai/itinerary', {
-        method: 'POST',
-        body: JSON.stringify({
-          destination: suggestion.destination,
-          duration: durationDays,
-          interests: suggestion.highlights || [], // Use highlights as interests
-          travelStyle: suggestion.travelStyle,
-          budget: suggestion.estimatedBudget.low || 1000,
-        }),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Itinerary API error:', errorData);
-        throw new Error(errorData.message || `API Error: ${response.status}`);
-      }
-      
-      const jsonData = await response.json();
-      console.log('Received itinerary response:', jsonData);
-      setItinerary(jsonData);
-      setActiveTab('itinerary'); // Switch to itinerary tab
-      
-      toast({
-        title: "Success!",
-        description: `Generated ${durationDays}-day itinerary for ${suggestion.destination}`,
-      });
-      
-    } catch (error) {
-      console.error('Error generating itinerary for suggestion:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to generate itinerary",
-        variant: "destructive",
-      });
-    } finally {
-      setIsGeneratingItinerary(false);
-    }
-  };
-
-  const handleSaveItinerary = async () => {
-    try {
-      await saveItineraryMutation.mutateAsync();
-    } catch (error) {
-      console.error('Error saving itinerary:', error);
     }
   };
 
@@ -821,22 +708,7 @@ export default function MyTripsNew() {
                           ))}
                         </div>
 
-                        <div className="flex justify-between items-center pt-4 border-t">
-                          <Button 
-                            onClick={() => handleGenerateItineraryForSuggestion(suggestion)}
-                            disabled={isGeneratingItinerary}
-                            variant="outline"
-                            size="sm"
-                            className="mr-2"
-                          >
-                            {isGeneratingItinerary ? (
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            ) : (
-                              <Route className="w-4 h-4 mr-2" />
-                            )}
-                            Generate Daily Itinerary
-                          </Button>
-                          
+                        <div className="flex justify-end pt-4 border-t">
                           <Button 
                             onClick={() => saveTripMutation.mutate(suggestion)}
                             disabled={saveTripMutation.isPending}
@@ -898,25 +770,10 @@ export default function MyTripsNew() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-xl font-bold text-slate-700">Your Day-by-Day Itinerary</h3>
-                      <div className="flex gap-2">
-                        <Button 
-                          onClick={handleSaveItinerary}
-                          disabled={saveItineraryMutation.isPending}
-                          variant="default"
-                          size="sm"
-                        >
-                          {saveItineraryMutation.isPending ? (
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          ) : (
-                            <Heart className="w-4 h-4 mr-2" />
-                          )}
-                          Save Itinerary
-                        </Button>
-                        <Button onClick={handleGenerateItinerary} variant="outline" size="sm">
-                          <Route className="w-4 h-4 mr-2" />
-                          Generate New
-                        </Button>
-                      </div>
+                      <Button onClick={handleGenerateItinerary} variant="outline" size="sm">
+                        <Route className="w-4 h-4 mr-2" />
+                        Generate New
+                      </Button>
                     </div>
                     
                     {itinerary.map((day) => (
