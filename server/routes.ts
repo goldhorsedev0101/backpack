@@ -1753,16 +1753,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error('Database error:', err);
           res.status(500).json({ error: err.message });
         } else {
-          const places = rows.map(row => ({
-            ...row,
-            types: JSON.parse(row.types || '[]'),
-            reviews_count: row.reviews_count || 0
-          }));
-          res.json({ places, total: places.length });
+          try {
+            const places = rows.map((row: any) => ({
+              ...row,
+              types: JSON.parse(row.types || '[]'),
+              reviews_count: row.reviews_count || 0
+            }));
+            res.json({ places, total: places.length });
+          } catch (parseError) {
+            console.error('JSON parse error:', parseError);
+            res.json({ places: rows, total: rows.length });
+          }
         }
         db.close();
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Collector places error:', error);
       res.status(500).json({ error: 'Failed to fetch places' });
     }
@@ -1784,7 +1789,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         db.close();
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Collector reviews error:', error);
       res.status(500).json({ error: 'Failed to fetch reviews' });
     }
@@ -1824,7 +1829,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         });
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Collector stats error:', error);
       res.status(500).json({ error: 'Failed to fetch stats' });
     }
