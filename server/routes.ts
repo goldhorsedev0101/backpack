@@ -1724,6 +1724,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Collector Data API Endpoints
+  app.get('/api/collector/places', async (req, res) => {
+    try {
+      const sqlite3 = require('sqlite3').verbose();
+      const db = new sqlite3.Database('collected_places.db');
+      
+      const { search, country, limit = 50, offset = 0 } = req.query;
+      
+      let query = 'SELECT * FROM places WHERE 1=1';
+      const params: any[] = [];
+      
+      if (search) {
+        query += ' AND (name LIKE ? OR address LIKE ?)';
+        params.push(`%${search}%`, `%${search}%`);
+      }
+      
+      if (country) {
+        query += ' AND address LIKE ?';
+        params.push(`%${country}%`);
+      }
+      
+      query += ' ORDER BY rating DESC LIMIT ? OFFSET ?';
+      params.push(parseInt(limit as string), parseInt(offset as string));
+      
+      db.all(query, params, (err: any, rows: any[]) => {
+        if (err) {
+          console.error('Database error:', err);
+          res.status(500).json({ error: err.message });
+        } else {
+          const places = rows.map(row => ({
+            ...row,
+            types: JSON.parse(row.types || '[]'),
+            reviews_count: row.reviews_count || 0
+          }));
+          res.json({ places, total: places.length });
+        }
+        db.close();
+      });
+    } catch (error) {
+      console.error('Collector places error:', error);
+      res.status(500).json({ error: 'Failed to fetch places' });
+    }
+  });
+
+  app.get('/api/collector/places/:placeId/reviews', async (req, res) => {
+    try {
+      const sqlite3 = require('sqlite3').verbose();
+      const db = new sqlite3.Database('collected_places.db');
+      
+      const { placeId } = req.params;
+      
+      db.all('SELECT * FROM reviews WHERE place_id = ? ORDER BY rating DESC', [placeId], (err: any, rows: any[]) => {
+        if (err) {
+          console.error('Database error:', err);
+          res.status(500).json({ error: err.message });
+        } else {
+          res.json({ reviews: rows });
+        }
+        db.close();
+      });
+    } catch (error) {
+      console.error('Collector reviews error:', error);
+      res.status(500).json({ error: 'Failed to fetch reviews' });
+    }
+  });
+
+  app.get('/api/collector/stats', async (req, res) => {
+    try {
+      const sqlite3 = require('sqlite3').verbose();
+      const db = new sqlite3.Database('collected_places.db');
+      
+      db.serialize(() => {
+        let stats: any = {};
+        
+        db.get('SELECT COUNT(*) as places FROM places', (err: any, placesRow: any) => {
+          if (!err) stats.places = placesRow.places;
+          
+          db.get('SELECT COUNT(*) as reviews FROM reviews', (err: any, reviewsRow: any) => {
+            if (!err) stats.reviews = reviewsRow.reviews;
+            
+            db.all(`
+              SELECT SUBSTR(address, -20) as country, COUNT(*) as count 
+              FROM places 
+              WHERE address IS NOT NULL 
+              GROUP BY SUBSTR(address, -20) 
+              ORDER BY count DESC 
+              LIMIT 10
+            `, (err: any, countryRows: any[]) => {
+              if (!err) stats.countries = countryRows;
+              
+              db.get('SELECT AVG(rating) as avgRating FROM places WHERE rating > 0', (err: any, avgRow: any) => {
+                if (!err) stats.averageRating = avgRow.avgRating;
+                
+                res.json(stats);
+                db.close();
+              });
+            });
+          });
+        });
+      });
+    } catch (error) {
+      console.error('Collector stats error:', error);
+      res.status(500).json({ error: 'Failed to fetch stats' });
+    }
+  });
+
   // Offline Maps & Navigation API
   app.get('/api/maps/:destination/download', async (req, res) => {
     try {
