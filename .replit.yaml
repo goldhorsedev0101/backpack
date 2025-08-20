@@ -1,3 +1,5 @@
 workflows:
   "Start application":
     script: npm run dev
+  "TripWise Collector":
+    script: cd tripwise && python3 run.py
