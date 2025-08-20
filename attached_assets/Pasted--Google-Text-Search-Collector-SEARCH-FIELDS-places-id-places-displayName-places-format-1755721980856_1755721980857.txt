@@ -1,0 +1,135 @@
+# ==== Google Text Search Collector ====
+SEARCH_FIELDS = "places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.types"
+
+def _google_text_search(text_query: str, location_bias: dict | None = None, max_results: int = 20):
+    """
+    קריאת places:searchText — מחזירה רשימת מקומות בסיסית.
+    location_bias: dict כמו {"circle": {"center": {"latitude": ..., "longitude": ...}, "radius": 5000}}
+    """
+    url = "https://places.googleapis.com/v1/places:searchText"
+    headers = {
+        "X-Goog-Api-Key": GOOGLE_PLACES_KEY,
+        "X-Goog-FieldMask": SEARCH_FIELDS,
+        "Content-Type": "application/json"
+    }
+    body = {"textQuery": text_query}
+    if location_bias:
+        body["locationBias"] = location_bias
+    # אפשר גם body["maxResultCount"] = min(max_results, 20)  # מגבלת API
+    r = requests.post(url, headers=headers, json=body, timeout=20)
+    if r.status_code != 200:
+        raise HTTPException(r.status_code, r.text)
+    return r.json().get("places", [])
+
+@app.get("/api/collect/google")
+def collect_google(
+    q: str,
+    lat: float | None = None,
+    lng: float | None = None,
+    radius_m: int = 5000,
+    limit: int = 20
+):
+    """
+    מפעיל חיפוש Places לפי טקסט (q), מושך פרטים+ביקורות לכל תוצאה, ושומר ל-DB.
+    דוגמאות:
+    /api/collect/google?q=hostel%20cusco
+    /api/collect/google?q=best%20coffee%20medellin&lat=6.2476&lng=-75.5658&radius_m=8000
+    """
+    loc_bias = None
+    if lat is not None and lng is not None:
+        loc_bias = {"circle": {"center": {"latitude": lat, "longitude": lng}, "radius": radius_m}}
+
+    # 1) חיפוש טקסטואלי
+    places = _google_text_search(q, loc_bias, limit)
+    if not places:
+        return {"found": 0, "saved": 0}
+
+    ses = SessionLocal()
+    saved = 0
+    details_payload = []
+
+    try:
+        for p in places[:limit]:
+            pid = p.get("id")
+            if not pid:
+                continue
+
+            # 2) פרטים מלאים + ביקורות
+            try:
+                detail = place_details(pid)  # משתמש בפונקציה הקיימת שמחזירה JSONResponse
+                if isinstance(detail, JSONResponse):
+                    detail = detail.body
+                    if isinstance(detail, (bytes, bytearray)):
+                        detail = json.loads(detail.decode("utf-8"))
+                    elif isinstance(detail, str):
+                        detail = json.loads(detail)
+                details_payload.append(detail)
+            except Exception:
+                # אם נכשל, לפחות נשמור את המידע הבסיסי
+                details_payload.append({
+                    "place_id": pid,
+                    "name": (p.get("displayName") or {}).get("text"),
+                    "address": p.get("formattedAddress"),
+                    "lat": (p.get("location") or {}).get("latitude"),
+                    "lng": (p.get("location") or {}).get("longitude"),
+                    "rating": p.get("rating"),
+                    "reviews_count": p.get("userRatingCount"),
+                    "types": [t for t in (p.get("types") or [])],
+                    "reviews": []
+                })
+
+        # 3) שמירה ל-DB בעזרת אותו מסלול של /api/save-places
+        #    (אפשר לשחזר את הלוגיקה פה כדי לא לקרוא HTTP פנימי)
+        for item in details_payload:
+            place_id = item.get("place_id")
+            if not place_id:
+                continue
+
+            place = ses.get(Place, place_id)
+            if not place:
+                place = Place(place_id=place_id, created_at=datetime.utcnow())
+                ses.add(place)
+
+            place.name = item.get("name") or place.name
+            place.address = item.get("address") or place.address
+            place.lat = item.get("lat") or place.lat
+            place.lng = item.get("lng") or place.lng
+            place.rating = item.get("rating") if item.get("rating") is not None else place.rating
+            place.reviews_count = item.get("reviews_count") or place.reviews_count
+            place.website = item.get("website") or place.website
+            place.phone = item.get("phone") or place.phone
+            types_val = item.get("types")
+            if isinstance(types_val, list):
+                place.types = json.dumps(types_val, ensure_ascii=False)
+            elif isinstance(types_val, str):
+                place.types = types_val
+            place.summary = item.get("summary") or place.summary
+            place.updated_at = datetime.utcnow()
+
+            for rv in item.get("reviews", []) or []:
+                rid = rv.get("id")
+                if not rid:
+                    continue
+                if ses.get(Review, rid):
+                    continue
+                ses.add(Review(
+                    id=rid,
+                    place_id=place_id,
+                    source=rv.get("source") or "google",
+                    rating=rv.get("rating"),
+                    text=rv.get("text"),
+                    lang=rv.get("lang"),
+                    published_at=_maybe_datetime(rv.get("published_at")),
+                    author=rv.get("author"),
+                    url=rv.get("url"),
+                ))
+            saved += 1
+
+        ses.commit()
+    except Exception as e:
+        ses.rollback()
+        raise HTTPException(500, f"Collector error: {e}")
+    finally:
+        ses.close()
+
+    return {"query": q, "found": len(places), "saved": saved}
