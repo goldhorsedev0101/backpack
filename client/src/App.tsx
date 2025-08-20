@@ -19,6 +19,7 @@ import MyTripsNew from "@/pages/my-trips-new";
 import Onboarding from "@/pages/onboarding";
 import Registry from "@/pages/registry";
 import DemoRealPlaces from "@/pages/demo-real-places";
+import CollectorData from "@/pages/CollectorData";
 import Navigation from "@/components/navigation";
 import { ErrorBoundary } from "@/components/error-boundary";
 
@@ -54,6 +55,7 @@ function AuthenticatedApp() {
           <Route path="/onboarding" component={Onboarding} />
           <Route path="/registry" component={Registry} />
           <Route path="/demo-real-places" component={DemoRealPlaces} />
+          <Route path="/collector-data" component={CollectorData} />
           <Route component={NotFound} />
         </Switch>
       </main>

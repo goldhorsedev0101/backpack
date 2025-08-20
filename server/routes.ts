@@ -315,6 +315,157 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // ===== COLLECTOR DATA API ENDPOINTS =====
+  
+  // Search places from collected data
+  app.get('/api/collector/places', async (req, res) => {
+    const sqlite3 = require('sqlite3').verbose();
+    const db = new sqlite3.Database('collected_places.db');
+    
+    const { search, country, limit = 50, offset = 0 } = req.query;
+    
+    let query = 'SELECT * FROM places WHERE 1=1';
+    const params = [];
+    
+    if (search) {
+      query += ' AND (name LIKE ? OR address LIKE ?)';
+      params.push(`%${search}%`, `%${search}%`);
+    }
+    
+    if (country) {
+      query += ' AND address LIKE ?';
+      params.push(`%${country}%`);
+    }
+    
+    query += ' ORDER BY rating DESC LIMIT ? OFFSET ?';
+    params.push(parseInt(limit as string), parseInt(offset as string));
+    
+    db.all(query, params, (err, rows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else {
+        const places = rows.map((row: any) => ({
+          ...row,
+          types: JSON.parse(row.types || '[]'),
+          reviews_count: row.reviews_count || 0
+        }));
+        res.json({ places, total: places.length });
+      }
+      db.close();
+    });
+  });
+
+  // Get reviews for a specific place
+  app.get('/api/collector/places/:placeId/reviews', async (req, res) => {
+    const sqlite3 = require('sqlite3').verbose();
+    const db = new sqlite3.Database('collected_places.db');
+    
+    const { placeId } = req.params;
+    
+    db.all('SELECT * FROM reviews WHERE place_id = ? ORDER BY rating DESC', [placeId], (err, rows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else {
+        res.json({ reviews: rows });
+      }
+      db.close();
+    });
+  });
+
+  // Get collector data statistics
+  app.get('/api/collector/stats', async (req, res) => {
+    const sqlite3 = require('sqlite3').verbose();
+    const db = new sqlite3.Database('collected_places.db');
+    
+    db.serialize(() => {
+      let stats: any = {};
+      
+      db.get('SELECT COUNT(*) as places FROM places', (err, placesRow: any) => {
+        if (!err) stats.places = placesRow.places;
+        
+        db.get('SELECT COUNT(*) as reviews FROM reviews', (err, reviewsRow: any) => {
+          if (!err) stats.reviews = reviewsRow.reviews;
+          
+          db.all(`
+            SELECT SUBSTR(address, -20) as country, COUNT(*) as count 
+            FROM places 
+            WHERE address IS NOT NULL 
+            GROUP BY SUBSTR(address, -20) 
+            ORDER BY count DESC 
+            LIMIT 10
+          `, (err, countryRows: any) => {
+            if (!err) stats.countries = countryRows;
+            
+            db.get('SELECT AVG(rating) as avgRating FROM places WHERE rating > 0', (err, avgRow: any) => {
+              if (!err) stats.averageRating = avgRow.avgRating;
+              
+              res.json(stats);
+              db.close();
+            });
+          });
+        });
+      });
+    });
+  });
+
+  // Get places by specific country
+  app.get('/api/collector/countries/:country/places', async (req, res) => {
+    const sqlite3 = require('sqlite3').verbose();
+    const db = new sqlite3.Database('collected_places.db');
+    
+    const { country } = req.params;
+    const { limit = 20, offset = 0 } = req.query;
+    
+    db.all(
+      'SELECT * FROM places WHERE address LIKE ? ORDER BY rating DESC LIMIT ? OFFSET ?',
+      [`%${country}%`, parseInt(limit as string), parseInt(offset as string)],
+      (err, rows) => {
+        if (err) {
+          res.status(500).json({ error: err.message });
+        } else {
+          const places = rows.map((row: any) => ({
+            ...row,
+            types: JSON.parse(row.types || '[]'),
+            reviews_count: row.reviews_count || 0
+          }));
+          res.json({ places, country, total: places.length });
+        }
+        db.close();
+      }
+    );
+  });
+
+  // Get detailed place information
+  app.get('/api/collector/places/:placeId', async (req, res) => {
+    const sqlite3 = require('sqlite3').verbose();
+    const db = new sqlite3.Database('collected_places.db');
+    
+    const { placeId } = req.params;
+    
+    db.get('SELECT * FROM places WHERE place_id = ?', [placeId], (err, row: any) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else if (!row) {
+        res.status(404).json({ error: 'Place not found' });
+      } else {
+        // Get reviews for this place
+        db.all('SELECT * FROM reviews WHERE place_id = ? ORDER BY rating DESC', [placeId], (err, reviews) => {
+          if (!err) {
+            row.reviews = reviews;
+          }
+          
+          const place = {
+            ...row,
+            types: JSON.parse(row.types || '[]'),
+            reviews_count: row.reviews_count || 0
+          };
+          res.json({ place });
+          db.close();
+        });
+      }
+    });
+  });
+
   // ===== ENHANCED SOUTH AMERICAN DATA ENDPOINTS =====
   
   // Seed database with comprehensive South American data

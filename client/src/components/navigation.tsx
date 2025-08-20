@@ -40,6 +40,7 @@ const navigationItems = [
   { href: "/budget-tracker", label: "Budget", icon: DollarSign },
   { href: "/achievements", label: "Achievements", icon: Trophy },
   { href: "/tripadvisor-data", label: "Travel Data", icon: Database },
+  { href: "/collector-data", label: "South America Data", icon: Compass },
 ];
 
 export default function Navigation() {
