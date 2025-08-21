@@ -22,6 +22,7 @@ import {
   insertChatRoomSchema,
   insertTravelBuddyPostSchema,
   insertTravelBuddyApplicationSchema,
+  insertLocationReviewSchema,
 } from "@shared/schema";
 import {
   generateTravelSuggestions,
