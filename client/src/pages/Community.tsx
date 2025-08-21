@@ -36,10 +36,11 @@ export default function Community() {
     enabled: true
   });
 
-  // Handle API response - check if it's database initialization message
-  const placeReviews = Array.isArray(reviewsData) ? reviewsData : [];
+  // Handle new API response format { items: [], total: 0 }
+  const placeReviews = (reviewsData as any)?.items || [];
+  const totalReviews = (reviewsData as any)?.total || 0;
   const isDatabaseInitializing = reviewsData && typeof reviewsData === 'object' && 'message' in reviewsData && 
-    typeof (reviewsData as any).message === 'string' && (reviewsData as any).message.includes('tables are being initialized');
+    typeof (reviewsData as any).message === 'string' && (reviewsData as any).message.includes('being loaded');
   
   // Show error message if API fails but continue with empty array
   if (reviewsError && !reviewsLoading) {
