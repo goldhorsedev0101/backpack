@@ -30,13 +30,22 @@ export default function Community() {
   const [selectedLocation, setSelectedLocation] = useState('all');
 
   // Fetch place reviews (simplified version without authentication requirement)
-  const { data: reviewsData, isLoading: reviewsLoading } = useQuery({
+  const { data: reviewsData, isLoading: reviewsLoading, error: reviewsError } = useQuery({
     queryKey: ['/api/place-reviews', selectedLocation, searchTerm],
     retry: false,
     enabled: true
   });
 
+  // Ensure placeReviews is always an array, even if API fails
   const placeReviews = Array.isArray(reviewsData) ? reviewsData : [];
+  
+  // Show error message if API fails but continue with empty array
+  if (reviewsError && !reviewsLoading) {
+    console.warn('Reviews API error:', reviewsError);
+  }
+
+  // Use only authentic API data
+  const displayReviews = placeReviews;
 
   return (
     <div className="container mx-auto py-6 px-4">
@@ -111,7 +120,7 @@ export default function Community() {
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {placeReviews.length > 0 ? placeReviews.map((review: any) => (
+              {displayReviews && displayReviews.length > 0 ? displayReviews.map((review: any) => (
                 <Card key={review.id} className="w-full">
                   <CardHeader>
                     <div className="flex items-start justify-between">

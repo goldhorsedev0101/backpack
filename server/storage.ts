@@ -963,16 +963,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async searchPlaceReviews(location: string, placeType?: string): Promise<PlaceReview[]> {
-    let query = db
-      .select()
-      .from(placeReviews)
-      .where(sql`LOWER(${placeReviews.location}) LIKE LOWER(${'%' + location + '%'})`);
-
     if (placeType) {
-      query = query.where(eq(placeReviews.placeType, placeType));
+      return await db
+        .select()
+        .from(placeReviews)
+        .where(
+          and(
+            sql`LOWER(${placeReviews.location}) LIKE LOWER(${'%' + location + '%'})`,
+            eq(placeReviews.placeType, placeType)
+          )
+        )
+        .orderBy(desc(placeReviews.createdAt));
     }
 
-    return await query.orderBy(desc(placeReviews.createdAt));
+    return await db
+      .select()
+      .from(placeReviews)
+      .where(sql`LOWER(${placeReviews.location}) LIKE LOWER(${'%' + location + '%'})`)
+      .orderBy(desc(placeReviews.createdAt));
   }
 
   async updatePlaceReview(id: number, review: Partial<InsertPlaceReview>): Promise<PlaceReview> {
@@ -988,7 +996,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(placeReviews)
       .where(and(eq(placeReviews.id, id), eq(placeReviews.userId, userId)));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   // Review voting operations
@@ -1066,7 +1074,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(chatRooms)
       .where(and(eq(chatRooms.id, id), eq(chatRooms.createdBy, userId)));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async joinChatRoom(roomId: number, userId: string): Promise<ChatRoomMember> {
@@ -1097,7 +1105,7 @@ export class DatabaseStorage implements IStorage {
       .delete(chatRoomMembers)
       .where(and(eq(chatRoomMembers.roomId, roomId), eq(chatRoomMembers.userId, userId)));
 
-    if (result.rowCount > 0) {
+    if ((result.rowCount ?? 0) > 0) {
       // Update member count
       await db
         .update(chatRooms)
@@ -1108,7 +1116,7 @@ export class DatabaseStorage implements IStorage {
         .where(eq(chatRooms.id, roomId));
     }
 
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async getChatRoomMembers(roomId: number): Promise<ChatRoomMember[]> {
@@ -1202,7 +1210,7 @@ export class DatabaseStorage implements IStorage {
       .update(travelBuddyPosts)
       .set({ isActive: false })
       .where(and(eq(travelBuddyPosts.id, id), eq(travelBuddyPosts.userId, userId)));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   // Travel buddy application operations
