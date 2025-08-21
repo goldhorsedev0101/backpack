@@ -814,7 +814,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('Testing OpenAI API...');
       const testResponse = await generateTravelSuggestions({
-        travelStyle: 'adventure',
+        travelStyle: ['adventure'],
         budget: 1000,
         duration: '1-2 weeks',
         interests: ['hiking'],
@@ -893,9 +893,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Build message for AI based on form inputs
       const interestsText = interests && interests.length > 0 ? ` I enjoy ${interests.join(', ')}.` : '';
-      const message = `I want to visit ${destination} for ${duration}. My daily budget is $${dailyBudget}. I'm interested in ${travelStyle.join(', ')} travel style.${interestsText} Please suggest 3 different trip options for me.`;
+      const travelStyleText = Array.isArray(travelStyle) ? travelStyle.join(', ') : travelStyle;
+      const message = `I want to visit ${destination} for ${duration}. My daily budget is $${dailyBudget}. I'm interested in ${travelStyleText} travel style.${interestsText} Please suggest 3 different trip options for me.`;
 
-      const chatHistory = [{ role: 'user', content: message }];
+      const chatHistory = [{ role: 'user' as const, content: message }];
       const suggestions = await generateConversationalSuggestions(chatHistory, []);
 
       console.log("Generated suggestions:", suggestions);
@@ -1802,7 +1803,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           total: userTrips.length,
           completed: userTrips.filter((trip: any) => new Date(trip.endDate) < new Date()).length,
           upcoming: userTrips.filter((trip: any) => new Date(trip.startDate) > new Date()).length,
-          countries: [...new Set(userTrips.map((trip: any) => trip.destinations?.[0]?.country).filter(Boolean))].length
+          countries: Array.from(new Set(userTrips.map((trip: any) => trip.destinations?.[0]?.country).filter(Boolean))).length
         },
         expenses: {
           total: userExpenses.reduce((sum: number, expense: any) => sum + parseFloat(expense.amount), 0),
@@ -1820,7 +1821,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           avgPerTrip: userTrips.length > 0 ? userExpenses.reduce((sum: number, expense: any) => sum + parseFloat(expense.amount), 0) / userTrips.length : 0
         },
         destinations: {
-          visited: [...new Set(userTrips.map((trip: any) => trip.destinations?.[0]?.name).filter(Boolean))],
+          visited: Array.from(new Set(userTrips.map((trip: any) => trip.destinations?.[0]?.name).filter(Boolean))),
           wishlist: ['Patagonia', 'Amazon Rainforest', 'Atacama Desert', 'Salar de Uyuni']
         }
       };
@@ -1926,7 +1927,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(health);
     } catch (error) {
       console.error("Health check failed:", error);
-      res.status(500).json({ status: 'unhealthy', error: error.message });
+      res.status(500).json({ 
+        status: 'unhealthy', 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
     }
   });
 
