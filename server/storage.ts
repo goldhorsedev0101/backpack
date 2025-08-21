@@ -5,6 +5,7 @@ import {
   expenses,
   chatRooms,
   chatMessages,
+  chatRoomMembers,
   connections,
   achievements,
   userAchievements,
@@ -16,6 +17,10 @@ import {
   locationSubratings,
   locationPhotos,
   locationAncestors,
+  placeReviews,
+  reviewVotes,
+  travelBuddyPosts,
+  travelBuddyApplications,
   type User,
   type UpsertUser,
   type Trip,
@@ -27,6 +32,8 @@ import {
   type ChatRoom,
   type ChatMessage,
   type InsertChatMessage,
+  type ChatRoomMember,
+  type InsertChatRoomMember,
   type Connection,
   type InsertConnection,
   type Achievement,
@@ -48,6 +55,14 @@ import {
   type InsertLocationPhoto,
   type LocationAncestor,
   type InsertLocationAncestor,
+  type PlaceReview,
+  type InsertPlaceReview,
+  type ReviewVote,
+  type InsertReviewVote,
+  type TravelBuddyPost,
+  type InsertTravelBuddyPost,
+  type TravelBuddyApplication,
+  type InsertTravelBuddyApplication,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, sql } from "drizzle-orm";
@@ -138,6 +153,46 @@ export interface IStorage {
   // Location ancestor operations
   upsertLocationAncestors(locationId: string, ancestors: InsertLocationAncestor[]): Promise<LocationAncestor[]>;
   getLocationAncestors(locationId: string): Promise<LocationAncestor[]>;
+  
+  // Enhanced community features
+  // Place review operations (for real places with Google Places API)
+  createPlaceReview(review: InsertPlaceReview): Promise<PlaceReview>;
+  getPlaceReviews(placeId: string): Promise<PlaceReview[]>;
+  getRecentPlaceReviews(limit?: number): Promise<PlaceReview[]>;
+  getUserPlaceReviews(userId: string): Promise<PlaceReview[]>;
+  searchPlaceReviews(location: string, placeType?: string): Promise<PlaceReview[]>;
+  updatePlaceReview(id: number, review: Partial<InsertPlaceReview>): Promise<PlaceReview>;
+  deletePlaceReview(id: number, userId: string): Promise<boolean>;
+  
+  // Review voting operations
+  voteOnReview(vote: InsertReviewVote): Promise<ReviewVote>;
+  getReviewVotes(reviewId: number): Promise<ReviewVote[]>;
+  getUserVoteOnReview(reviewId: number, userId: string): Promise<ReviewVote | undefined>;
+  updateReviewHelpfulness(reviewId: number): Promise<void>;
+  
+  // Enhanced chat room operations
+  createChatRoom(room: any): Promise<ChatRoom>;
+  getChatRoomById(id: number): Promise<ChatRoom | undefined>;
+  updateChatRoom(id: number, room: Partial<any>): Promise<ChatRoom>;
+  deleteChatRoom(id: number, userId: string): Promise<boolean>;
+  joinChatRoom(roomId: number, userId: string): Promise<ChatRoomMember>;
+  leaveChatRoom(roomId: number, userId: string): Promise<boolean>;
+  getChatRoomMembers(roomId: number): Promise<ChatRoomMember[]>;
+  searchChatRooms(query: string, filters?: { type?: string; destination?: string }): Promise<ChatRoom[]>;
+  updateChatRoomActivity(roomId: number): Promise<void>;
+  
+  // Travel buddy system operations
+  createTravelBuddyPost(post: InsertTravelBuddyPost): Promise<TravelBuddyPost>;
+  getTravelBuddyPosts(filters?: { destination?: string; startDate?: Date; endDate?: Date }): Promise<TravelBuddyPost[]>;
+  getUserTravelBuddyPosts(userId: string): Promise<TravelBuddyPost[]>;
+  updateTravelBuddyPost(id: number, post: Partial<InsertTravelBuddyPost>): Promise<TravelBuddyPost>;
+  deleteTravelBuddyPost(id: number, userId: string): Promise<boolean>;
+  
+  // Travel buddy application operations
+  applyForTravelBuddy(application: InsertTravelBuddyApplication): Promise<TravelBuddyApplication>;
+  getTravelBuddyApplications(postId: number): Promise<TravelBuddyApplication[]>;
+  getUserTravelBuddyApplications(userId: string): Promise<TravelBuddyApplication[]>;
+  updateTravelBuddyApplication(id: number, status: string): Promise<TravelBuddyApplication>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -874,6 +929,311 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(locationAncestors)
       .where(eq(locationAncestors.locationId, locationId));
+  }
+  // Enhanced community features implementation
+  
+  // Place review operations
+  async createPlaceReview(review: InsertPlaceReview): Promise<PlaceReview> {
+    const [placeReview] = await db.insert(placeReviews).values(review).returning();
+    return placeReview;
+  }
+
+  async getPlaceReviews(placeId: string): Promise<PlaceReview[]> {
+    return await db
+      .select()
+      .from(placeReviews)
+      .where(eq(placeReviews.placeId, placeId))
+      .orderBy(desc(placeReviews.createdAt));
+  }
+
+  async getRecentPlaceReviews(limit: number = 10): Promise<PlaceReview[]> {
+    return await db
+      .select()
+      .from(placeReviews)
+      .orderBy(desc(placeReviews.createdAt))
+      .limit(limit);
+  }
+
+  async getUserPlaceReviews(userId: string): Promise<PlaceReview[]> {
+    return await db
+      .select()
+      .from(placeReviews)
+      .where(eq(placeReviews.userId, userId))
+      .orderBy(desc(placeReviews.createdAt));
+  }
+
+  async searchPlaceReviews(location: string, placeType?: string): Promise<PlaceReview[]> {
+    let query = db
+      .select()
+      .from(placeReviews)
+      .where(sql`LOWER(${placeReviews.location}) LIKE LOWER(${'%' + location + '%'})`);
+
+    if (placeType) {
+      query = query.where(eq(placeReviews.placeType, placeType));
+    }
+
+    return await query.orderBy(desc(placeReviews.createdAt));
+  }
+
+  async updatePlaceReview(id: number, review: Partial<InsertPlaceReview>): Promise<PlaceReview> {
+    const [updatedReview] = await db
+      .update(placeReviews)
+      .set({ ...review, updatedAt: new Date() })
+      .where(eq(placeReviews.id, id))
+      .returning();
+    return updatedReview;
+  }
+
+  async deletePlaceReview(id: number, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(placeReviews)
+      .where(and(eq(placeReviews.id, id), eq(placeReviews.userId, userId)));
+    return result.rowCount > 0;
+  }
+
+  // Review voting operations
+  async voteOnReview(vote: InsertReviewVote): Promise<ReviewVote> {
+    const [reviewVote] = await db
+      .insert(reviewVotes)
+      .values(vote)
+      .onConflictDoUpdate({
+        target: [reviewVotes.reviewId, reviewVotes.userId],
+        set: { voteType: vote.voteType, createdAt: new Date() },
+      })
+      .returning();
+    
+    await this.updateReviewHelpfulness(vote.reviewId);
+    return reviewVote;
+  }
+
+  async getReviewVotes(reviewId: number): Promise<ReviewVote[]> {
+    return await db
+      .select()
+      .from(reviewVotes)
+      .where(eq(reviewVotes.reviewId, reviewId));
+  }
+
+  async getUserVoteOnReview(reviewId: number, userId: string): Promise<ReviewVote | undefined> {
+    const [vote] = await db
+      .select()
+      .from(reviewVotes)
+      .where(and(eq(reviewVotes.reviewId, reviewId), eq(reviewVotes.userId, userId)));
+    return vote;
+  }
+
+  async updateReviewHelpfulness(reviewId: number): Promise<void> {
+    const helpfulCount = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(reviewVotes)
+      .where(and(eq(reviewVotes.reviewId, reviewId), eq(reviewVotes.voteType, 'helpful')))
+      .then(result => result[0]?.count || 0);
+
+    await db
+      .update(placeReviews)
+      .set({ helpfulCount })
+      .where(eq(placeReviews.id, reviewId));
+  }
+
+  // Enhanced chat room operations
+  async createChatRoom(room: any): Promise<ChatRoom> {
+    const [chatRoom] = await db.insert(chatRooms).values(room).returning();
+    
+    // Add creator as first member with admin role
+    await db.insert(chatRoomMembers).values({
+      roomId: chatRoom.id,
+      userId: room.createdBy,
+      role: 'admin',
+    });
+
+    return chatRoom;
+  }
+
+  async getChatRoomById(id: number): Promise<ChatRoom | undefined> {
+    const [room] = await db.select().from(chatRooms).where(eq(chatRooms.id, id));
+    return room;
+  }
+
+  async updateChatRoom(id: number, room: Partial<any>): Promise<ChatRoom> {
+    const [updatedRoom] = await db
+      .update(chatRooms)
+      .set({ ...room, updatedAt: new Date() })
+      .where(eq(chatRooms.id, id))
+      .returning();
+    return updatedRoom;
+  }
+
+  async deleteChatRoom(id: number, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(chatRooms)
+      .where(and(eq(chatRooms.id, id), eq(chatRooms.createdBy, userId)));
+    return result.rowCount > 0;
+  }
+
+  async joinChatRoom(roomId: number, userId: string): Promise<ChatRoomMember> {
+    const [member] = await db
+      .insert(chatRoomMembers)
+      .values({
+        roomId,
+        userId,
+        role: 'member',
+      })
+      .onConflictDoNothing()
+      .returning();
+
+    // Update member count
+    await db
+      .update(chatRooms)
+      .set({
+        memberCount: sql`${chatRooms.memberCount} + 1`,
+        updatedAt: new Date(),
+      })
+      .where(eq(chatRooms.id, roomId));
+
+    return member;
+  }
+
+  async leaveChatRoom(roomId: number, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(chatRoomMembers)
+      .where(and(eq(chatRoomMembers.roomId, roomId), eq(chatRoomMembers.userId, userId)));
+
+    if (result.rowCount > 0) {
+      // Update member count
+      await db
+        .update(chatRooms)
+        .set({
+          memberCount: sql`${chatRooms.memberCount} - 1`,
+          updatedAt: new Date(),
+        })
+        .where(eq(chatRooms.id, roomId));
+    }
+
+    return result.rowCount > 0;
+  }
+
+  async getChatRoomMembers(roomId: number): Promise<ChatRoomMember[]> {
+    return await db
+      .select()
+      .from(chatRoomMembers)
+      .where(eq(chatRoomMembers.roomId, roomId))
+      .orderBy(chatRoomMembers.joinedAt);
+  }
+
+  async searchChatRooms(query: string, filters?: { type?: string; destination?: string }): Promise<ChatRoom[]> {
+    let queryBuilder = db
+      .select()
+      .from(chatRooms)
+      .where(
+        and(
+          eq(chatRooms.isActive, true),
+          or(
+            sql`LOWER(${chatRooms.name}) LIKE LOWER(${'%' + query + '%'})`,
+            sql`LOWER(${chatRooms.description}) LIKE LOWER(${'%' + query + '%'})`
+          )
+        )
+      );
+
+    if (filters?.type) {
+      queryBuilder = queryBuilder.where(eq(chatRooms.type, filters.type));
+    }
+
+    if (filters?.destination) {
+      queryBuilder = queryBuilder.where(eq(chatRooms.destination, filters.destination));
+    }
+
+    return await queryBuilder
+      .orderBy(desc(chatRooms.lastActivity))
+      .limit(50);
+  }
+
+  async updateChatRoomActivity(roomId: number): Promise<void> {
+    await db
+      .update(chatRooms)
+      .set({ lastActivity: new Date() })
+      .where(eq(chatRooms.id, roomId));
+  }
+
+  // Travel buddy system operations
+  async createTravelBuddyPost(post: InsertTravelBuddyPost): Promise<TravelBuddyPost> {
+    const [buddyPost] = await db.insert(travelBuddyPosts).values(post).returning();
+    return buddyPost;
+  }
+
+  async getTravelBuddyPosts(filters?: { destination?: string; startDate?: Date; endDate?: Date }): Promise<TravelBuddyPost[]> {
+    let query = db
+      .select()
+      .from(travelBuddyPosts)
+      .where(and(eq(travelBuddyPosts.isActive, true), sql`${travelBuddyPosts.expiresAt} > NOW()`));
+
+    if (filters?.destination) {
+      query = query.where(sql`LOWER(${travelBuddyPosts.destination}) LIKE LOWER(${'%' + filters.destination + '%'})`);
+    }
+
+    if (filters?.startDate) {
+      query = query.where(sql`${travelBuddyPosts.startDate} >= ${filters.startDate}`);
+    }
+
+    if (filters?.endDate) {
+      query = query.where(sql`${travelBuddyPosts.endDate} <= ${filters.endDate}`);
+    }
+
+    return await query.orderBy(desc(travelBuddyPosts.createdAt));
+  }
+
+  async getUserTravelBuddyPosts(userId: string): Promise<TravelBuddyPost[]> {
+    return await db
+      .select()
+      .from(travelBuddyPosts)
+      .where(eq(travelBuddyPosts.userId, userId))
+      .orderBy(desc(travelBuddyPosts.createdAt));
+  }
+
+  async updateTravelBuddyPost(id: number, post: Partial<InsertTravelBuddyPost>): Promise<TravelBuddyPost> {
+    const [updatedPost] = await db
+      .update(travelBuddyPosts)
+      .set({ ...post, updatedAt: new Date() })
+      .where(eq(travelBuddyPosts.id, id))
+      .returning();
+    return updatedPost;
+  }
+
+  async deleteTravelBuddyPost(id: number, userId: string): Promise<boolean> {
+    const result = await db
+      .update(travelBuddyPosts)
+      .set({ isActive: false })
+      .where(and(eq(travelBuddyPosts.id, id), eq(travelBuddyPosts.userId, userId)));
+    return result.rowCount > 0;
+  }
+
+  // Travel buddy application operations
+  async applyForTravelBuddy(application: InsertTravelBuddyApplication): Promise<TravelBuddyApplication> {
+    const [app] = await db.insert(travelBuddyApplications).values(application).returning();
+    return app;
+  }
+
+  async getTravelBuddyApplications(postId: number): Promise<TravelBuddyApplication[]> {
+    return await db
+      .select()
+      .from(travelBuddyApplications)
+      .where(eq(travelBuddyApplications.postId, postId))
+      .orderBy(travelBuddyApplications.createdAt);
+  }
+
+  async getUserTravelBuddyApplications(userId: string): Promise<TravelBuddyApplication[]> {
+    return await db
+      .select()
+      .from(travelBuddyApplications)
+      .where(eq(travelBuddyApplications.applicantId, userId))
+      .orderBy(desc(travelBuddyApplications.createdAt));
+  }
+
+  async updateTravelBuddyApplication(id: number, status: string): Promise<TravelBuddyApplication> {
+    const [updatedApp] = await db
+      .update(travelBuddyApplications)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(travelBuddyApplications.id, id))
+      .returning();
+    return updatedApp;
   }
 }
 

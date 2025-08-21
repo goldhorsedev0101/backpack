@@ -70,14 +70,48 @@ export const trips = pgTable("trips", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Reviews table
+// Enhanced Reviews table for real places
+export const placeReviews = pgTable("place_reviews", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  placeId: varchar("place_id").notNull(), // Google Places ID or TripAdvisor ID
+  placeName: varchar("place_name").notNull(),
+  placeType: varchar("place_type").notNull(), // "accommodation", "restaurant", "attraction", "activity"
+  location: varchar("location").notNull(), // City, Country
+  coordinates: jsonb("coordinates"), // {lat, lng}
+  overallRating: integer("overall_rating").notNull(), // 1-5
+  ratings: jsonb("ratings").notNull(), // {cleanliness: 5, location: 4, value: 3, service: 5}
+  title: varchar("title").notNull(),
+  comment: text("comment").notNull(),
+  photos: text("photos").array(), // URLs to user photos
+  tags: text("tags").array(), // ["solo-friendly", "budget", "party", "romantic"]
+  visitedDate: timestamp("visited_date"),
+  tripDuration: varchar("trip_duration"), // "1-2 days", "3-7 days", etc
+  travelStyle: varchar("travel_style"), // "backpacker", "luxury", "family"
+  helpfulCount: integer("helpful_count").default(0),
+  isVerified: boolean("is_verified").default(false), // Verified by mods
+  language: varchar("language").default("en"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Review helpfulness votes
+export const reviewVotes = pgTable("review_votes", {
+  id: serial("id").primaryKey(),
+  reviewId: integer("review_id").references(() => placeReviews.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  voteType: varchar("vote_type").notNull(), // "helpful", "not_helpful"
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Legacy reviews table (keep for compatibility)
 export const reviews = pgTable("reviews", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").references(() => users.id).notNull(),
   destination: varchar("destination").notNull(),
   rating: integer("rating").notNull(),
   comment: text("comment").notNull(),
-  tags: jsonb("tags"), // Array of tags like ["food", "accommodation", "activities"]
+  tags: jsonb("tags"),
   helpfulCount: integer("helpful_count").default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -94,25 +128,86 @@ export const expenses = pgTable("expenses", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Chat rooms table
+// Enhanced Chat rooms with advanced features
 export const chatRooms = pgTable("chat_rooms", {
   id: serial("id").primaryKey(),
   name: varchar("name").notNull(),
-  type: varchar("type").notNull(), // "destination", "general", "private"
+  description: text("description"),
+  type: varchar("type").notNull(), // "destination", "travel_style", "activity", "general", "private", "trip_buddy"
   destination: varchar("destination"), // For destination-specific chats
+  travelDates: jsonb("travel_dates"), // {start: "2024-03-15", end: "2024-03-22"}
+  maxMembers: integer("max_members").default(50),
+  memberCount: integer("member_count").default(1),
+  isPrivate: boolean("is_private").default(false),
+  requiresApproval: boolean("requires_approval").default(false),
+  tags: text("tags").array(), // ["backpacking", "budget", "solo-travel", "women-only"]
+  languages: text("languages").array(), // ["en", "es", "pt"]
   createdBy: varchar("created_by").references(() => users.id).notNull(),
   isActive: boolean("is_active").default(true),
+  lastActivity: timestamp("last_activity").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Chat messages table
+// Chat room members
+export const chatRoomMembers = pgTable("chat_room_members", {
+  id: serial("id").primaryKey(),
+  roomId: integer("room_id").references(() => chatRooms.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  role: varchar("role").default("member"), // "admin", "moderator", "member"
+  joinedAt: timestamp("joined_at").defaultNow(),
+  lastSeen: timestamp("last_seen").defaultNow(),
+  notificationsEnabled: boolean("notifications_enabled").default(true),
+});
+
+// Enhanced Chat messages with rich content
 export const chatMessages = pgTable("chat_messages", {
   id: serial("id").primaryKey(),
   roomId: integer("room_id").references(() => chatRooms.id).notNull(),
   userId: varchar("user_id").references(() => users.id).notNull(),
   message: text("message").notNull(),
-  messageType: varchar("message_type").default("text"), // "text", "image", "location"
+  messageType: varchar("message_type").default("text"), // "text", "image", "location", "place_share", "trip_share"
+  metadata: jsonb("metadata"), // Store URLs, coordinates, place info, etc.
+  replyTo: integer("reply_to"), // Reference to another message
+  reactions: jsonb("reactions").default('{}'), // {👍: ["user1", "user2"], ❤️: ["user3"]}
+  isEdited: boolean("is_edited").default(false),
+  editedAt: timestamp("edited_at"),
+  isDeleted: boolean("is_deleted").default(false),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Travel buddy matching system
+export const travelBuddyPosts = pgTable("travel_buddy_posts", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  title: varchar("title").notNull(),
+  description: text("description").notNull(),
+  destination: varchar("destination").notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  groupSize: integer("group_size").notNull(),
+  currentMembers: integer("current_members").default(1),
+  budget: varchar("budget"), // "low", "mid", "high"
+  travelStyle: text("travel_style").array(),
+  activities: text("activities").array(),
+  requirements: text("requirements"), // Age range, gender preferences, etc.
+  contactInfo: jsonb("contact_info"), // How to get in touch
+  isActive: boolean("is_active").default(true),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Travel buddy applications
+export const travelBuddyApplications = pgTable("travel_buddy_applications", {
+  id: serial("id").primaryKey(),
+  postId: integer("post_id").references(() => travelBuddyPosts.id).notNull(),
+  applicantId: varchar("applicant_id").references(() => users.id).notNull(),
+  message: text("message").notNull(),
+  status: varchar("status").default("pending"), // "pending", "accepted", "rejected"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Travel companions/connections table
@@ -366,6 +461,7 @@ export const chatRoomsRelations = relations(chatRooms, ({ one, many }) => ({
     fields: [chatRooms.createdBy],
     references: [users.id],
   }),
+  members: many(chatRoomMembers),
   messages: many(chatMessages),
 }));
 
@@ -405,6 +501,56 @@ export const userAchievementsRelations = relations(userAchievements, ({ one }) =
   achievement: one(achievements, {
     fields: [userAchievements.achievementId],
     references: [achievements.id],
+  }),
+}));
+
+// New community feature relations
+export const placeReviewsRelations = relations(placeReviews, ({ one, many }) => ({
+  user: one(users, {
+    fields: [placeReviews.userId],
+    references: [users.id],
+  }),
+  votes: many(reviewVotes),
+}));
+
+export const reviewVotesRelations = relations(reviewVotes, ({ one }) => ({
+  review: one(placeReviews, {
+    fields: [reviewVotes.reviewId],
+    references: [placeReviews.id],
+  }),
+  user: one(users, {
+    fields: [reviewVotes.userId],
+    references: [users.id],
+  }),
+}));
+
+export const chatRoomMembersRelations = relations(chatRoomMembers, ({ one }) => ({
+  room: one(chatRooms, {
+    fields: [chatRoomMembers.roomId],
+    references: [chatRooms.id],
+  }),
+  user: one(users, {
+    fields: [chatRoomMembers.userId],
+    references: [users.id],
+  }),
+}));
+
+export const travelBuddyPostsRelations = relations(travelBuddyPosts, ({ one, many }) => ({
+  user: one(users, {
+    fields: [travelBuddyPosts.userId],
+    references: [users.id],
+  }),
+  applications: many(travelBuddyApplications),
+}));
+
+export const travelBuddyApplicationsRelations = relations(travelBuddyApplications, ({ one }) => ({
+  post: one(travelBuddyPosts, {
+    fields: [travelBuddyApplications.postId],
+    references: [travelBuddyPosts.id],
+  }),
+  applicant: one(users, {
+    fields: [travelBuddyApplications.applicantId],
+    references: [users.id],
   }),
 }));
 
@@ -528,6 +674,86 @@ export const insertAchievementSchema = createInsertSchema(achievements).omit({
   id: true,
   createdAt: true,
 });
+
+// New Zod schemas for enhanced community features
+export const insertPlaceReviewSchema = createInsertSchema(placeReviews).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  helpfulCount: true,
+  isVerified: true,
+}).extend({
+  overallRating: z.number().min(1).max(5),
+  ratings: z.object({
+    cleanliness: z.number().min(1).max(5).optional(),
+    location: z.number().min(1).max(5).optional(), 
+    value: z.number().min(1).max(5).optional(),
+    service: z.number().min(1).max(5).optional(),
+    facilities: z.number().min(1).max(5).optional(),
+  }),
+  title: z.string().min(5).max(100),
+  comment: z.string().min(20).max(2000),
+  tags: z.array(z.string()).max(10),
+});
+
+export const insertReviewVoteSchema = createInsertSchema(reviewVotes).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertChatRoomSchema = createInsertSchema(chatRooms).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  memberCount: true,
+  lastActivity: true,
+}).extend({
+  name: z.string().min(3).max(50),
+  description: z.string().max(200).optional(),
+  tags: z.array(z.string()).max(10),
+  maxMembers: z.number().min(2).max(100),
+});
+
+export const insertChatRoomMemberSchema = createInsertSchema(chatRoomMembers).omit({
+  id: true,
+  joinedAt: true,
+  lastSeen: true,
+});
+
+export const insertTravelBuddyPostSchema = createInsertSchema(travelBuddyPosts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  currentMembers: true,
+  isActive: true,
+}).extend({
+  title: z.string().min(10).max(100),
+  description: z.string().min(20).max(1000),
+  groupSize: z.number().min(1).max(20),
+  travelStyle: z.array(z.string()).max(5),
+  activities: z.array(z.string()).max(10),
+});
+
+export const insertTravelBuddyApplicationSchema = createInsertSchema(travelBuddyApplications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  status: true,
+});
+
+// Type exports for the new schemas
+export type PlaceReview = typeof placeReviews.$inferSelect;
+export type InsertPlaceReview = z.infer<typeof insertPlaceReviewSchema>;
+export type ReviewVote = typeof reviewVotes.$inferSelect;
+export type InsertReviewVote = z.infer<typeof insertReviewVoteSchema>;
+export type ChatRoom = typeof chatRooms.$inferSelect;
+export type InsertChatRoom = z.infer<typeof insertChatRoomSchema>;
+export type ChatRoomMember = typeof chatRoomMembers.$inferSelect;
+export type InsertChatRoomMember = z.infer<typeof insertChatRoomMemberSchema>;
+export type TravelBuddyPost = typeof travelBuddyPosts.$inferSelect;
+export type InsertTravelBuddyPost = z.infer<typeof insertTravelBuddyPostSchema>;
+export type TravelBuddyApplication = typeof travelBuddyApplications.$inferSelect;
+export type InsertTravelBuddyApplication = z.infer<typeof insertTravelBuddyApplicationSchema>;
 
 export const insertUserAchievementSchema = createInsertSchema(userAchievements).omit({
   id: true,

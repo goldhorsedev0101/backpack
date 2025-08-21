@@ -17,6 +17,11 @@ import {
   insertExpenseSchema,
   insertChatMessageSchema,
   insertConnectionSchema,
+  insertPlaceReviewSchema,
+  insertReviewVoteSchema,
+  insertChatRoomSchema,
+  insertTravelBuddyPostSchema,
+  insertTravelBuddyApplicationSchema,
 } from "@shared/schema";
 import {
   generateTravelSuggestions,
@@ -2483,6 +2488,262 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching location ancestors:", error);
       res.status(500).json({ message: "Failed to fetch location ancestors" });
+    }
+  });
+
+  // ===== ENHANCED COMMUNITY FEATURES API =====
+  
+  // Place Reviews API (for real places with Google Places integration)
+  app.get('/api/place-reviews', async (req, res) => {
+    try {
+      const { placeId, location, placeType, limit = '10' } = req.query;
+      
+      if (placeId) {
+        const reviews = await storage.getPlaceReviews(placeId as string);
+        return res.json(reviews);
+      }
+      
+      if (location) {
+        const reviews = await storage.searchPlaceReviews(location as string, placeType as string);
+        return res.json(reviews.slice(0, parseInt(limit as string)));
+      }
+      
+      const recentReviews = await storage.getRecentPlaceReviews(parseInt(limit as string));
+      res.json(recentReviews);
+    } catch (error) {
+      console.error("Error fetching place reviews:", error);
+      res.status(500).json({ message: "Failed to fetch place reviews" });
+    }
+  });
+
+  app.post('/api/place-reviews', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
+      const reviewData = insertPlaceReviewSchema.parse({ ...req.body, userId });
+      const review = await storage.createPlaceReview(reviewData);
+      res.status(201).json(review);
+    } catch (error) {
+      console.error("Error creating place review:", error);
+      res.status(400).json({ message: "Failed to create place review" });
+    }
+  });
+
+  app.get('/api/place-reviews/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
+      const reviews = await storage.getUserPlaceReviews(userId);
+      res.json(reviews);
+    } catch (error) {
+      console.error("Error fetching user place reviews:", error);
+      res.status(500).json({ message: "Failed to fetch user reviews" });
+    }
+  });
+
+  app.patch('/api/place-reviews/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
+      const reviewData = req.body;
+      const updatedReview = await storage.updatePlaceReview(id, reviewData);
+      res.json(updatedReview);
+    } catch (error) {
+      console.error("Error updating place review:", error);
+      res.status(400).json({ message: "Failed to update place review" });
+    }
+  });
+
+  app.delete('/api/place-reviews/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
+      const deleted = await storage.deletePlaceReview(id, userId);
+      if (deleted) {
+        res.json({ message: "Review deleted successfully" });
+      } else {
+        res.status(404).json({ message: "Review not found or unauthorized" });
+      }
+    } catch (error) {
+      console.error("Error deleting place review:", error);
+      res.status(500).json({ message: "Failed to delete place review" });
+    }
+  });
+
+  // Review voting endpoints
+  app.post('/api/review-votes', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
+      const voteData = insertReviewVoteSchema.parse({ ...req.body, userId });
+      const vote = await storage.voteOnReview(voteData);
+      res.status(201).json(vote);
+    } catch (error) {
+      console.error("Error voting on review:", error);
+      res.status(400).json({ message: "Failed to vote on review" });
+    }
+  });
+
+  // Enhanced Chat Rooms API
+  app.get('/api/chat-rooms', async (req, res) => {
+    try {
+      const { search, type, destination } = req.query;
+      
+      if (search) {
+        const rooms = await storage.searchChatRooms(search as string, {
+          type: type as string,
+          destination: destination as string
+        });
+        return res.json(rooms);
+      }
+      
+      const rooms = await storage.getChatRooms();
+      res.json(rooms);
+    } catch (error) {
+      console.error("Error fetching chat rooms:", error);
+      res.status(500).json({ message: "Failed to fetch chat rooms" });
+    }
+  });
+
+  app.post('/api/chat-rooms', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
+      const roomData = insertChatRoomSchema.parse({ ...req.body, createdBy: userId });
+      const room = await storage.createChatRoom(roomData);
+      res.status(201).json(room);
+    } catch (error) {
+      console.error("Error creating chat room:", error);
+      res.status(400).json({ message: "Failed to create chat room" });
+    }
+  });
+
+  app.get('/api/chat-rooms/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const room = await storage.getChatRoomById(id);
+      if (room) {
+        res.json(room);
+      } else {
+        res.status(404).json({ message: "Chat room not found" });
+      }
+    } catch (error) {
+      console.error("Error fetching chat room:", error);
+      res.status(500).json({ message: "Failed to fetch chat room" });
+    }
+  });
+
+  app.post('/api/chat-rooms/:id/join', isAuthenticated, async (req: any, res) => {
+    try {
+      const roomId = parseInt(req.params.id);
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
+      const member = await storage.joinChatRoom(roomId, userId);
+      res.status(201).json(member);
+    } catch (error) {
+      console.error("Error joining chat room:", error);
+      res.status(400).json({ message: "Failed to join chat room" });
+    }
+  });
+
+  app.post('/api/chat-rooms/:id/leave', isAuthenticated, async (req: any, res) => {
+    try {
+      const roomId = parseInt(req.params.id);
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
+      const left = await storage.leaveChatRoom(roomId, userId);
+      if (left) {
+        res.json({ message: "Left chat room successfully" });
+      } else {
+        res.status(404).json({ message: "Not a member of this room" });
+      }
+    } catch (error) {
+      console.error("Error leaving chat room:", error);
+      res.status(500).json({ message: "Failed to leave chat room" });
+    }
+  });
+
+  app.get('/api/chat-rooms/:id/members', async (req, res) => {
+    try {
+      const roomId = parseInt(req.params.id);
+      const members = await storage.getChatRoomMembers(roomId);
+      res.json(members);
+    } catch (error) {
+      console.error("Error fetching chat room members:", error);
+      res.status(500).json({ message: "Failed to fetch members" });
+    }
+  });
+
+  // Travel Buddy System API
+  app.get('/api/travel-buddy-posts', async (req, res) => {
+    try {
+      const { destination, startDate, endDate } = req.query;
+      const filters: any = {};
+      
+      if (destination) filters.destination = destination as string;
+      if (startDate) filters.startDate = new Date(startDate as string);
+      if (endDate) filters.endDate = new Date(endDate as string);
+      
+      const posts = await storage.getTravelBuddyPosts(filters);
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching travel buddy posts:", error);
+      res.status(500).json({ message: "Failed to fetch travel buddy posts" });
+    }
+  });
+
+  app.post('/api/travel-buddy-posts', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
+      const postData = insertTravelBuddyPostSchema.parse({ ...req.body, userId });
+      const post = await storage.createTravelBuddyPost(postData);
+      res.status(201).json(post);
+    } catch (error) {
+      console.error("Error creating travel buddy post:", error);
+      res.status(400).json({ message: "Failed to create travel buddy post" });
+    }
+  });
+
+  app.get('/api/travel-buddy-posts/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
+      const posts = await storage.getUserTravelBuddyPosts(userId);
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching user travel buddy posts:", error);
+      res.status(500).json({ message: "Failed to fetch user posts" });
+    }
+  });
+
+  app.post('/api/travel-buddy-applications', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
+      const applicationData = insertTravelBuddyApplicationSchema.parse({ 
+        ...req.body, 
+        applicantId: userId 
+      });
+      const application = await storage.applyForTravelBuddy(applicationData);
+      res.status(201).json(application);
+    } catch (error) {
+      console.error("Error creating travel buddy application:", error);
+      res.status(400).json({ message: "Failed to apply for travel buddy" });
+    }
+  });
+
+  app.get('/api/travel-buddy-posts/:id/applications', isAuthenticated, async (req: any, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      const applications = await storage.getTravelBuddyApplications(postId);
+      res.json(applications);
+    } catch (error) {
+      console.error("Error fetching travel buddy applications:", error);
+      res.status(500).json({ message: "Failed to fetch applications" });
+    }
+  });
+
+  app.patch('/api/travel-buddy-applications/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { status } = req.body;
+      const application = await storage.updateTravelBuddyApplication(id, status);
+      res.json(application);
+    } catch (error) {
+      console.error("Error updating travel buddy application:", error);
+      res.status(400).json({ message: "Failed to update application" });
     }
   });
 

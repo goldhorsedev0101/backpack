@@ -17,3 +17,6 @@ externalPort = 80
 [[ports]]
 localPort = 8000
 externalPort = 8000
+
+[agent]
+integrations = ["javascript_websocket==1.0.0", "javascript_database==1.0.0", "javascript_log_in_with_replit==1.0.0"]
