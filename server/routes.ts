@@ -525,7 +525,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       };
 
-      const selectedDestination = destinationData[destination] || {
+      const selectedDestination = destinationData[destination as keyof typeof destinationData] || {
         activities: ['Explore local culture', 'Visit main attractions', 'Try local cuisine', 'Meet local people', 'Discover hidden gems'],
         description: `Explore the amazing ${destination} with authentic ${travelStyle?.join(' and ') || 'adventure'} experiences.`,
         highlights: ['Cultural sites', 'Local markets', 'Traditional food', 'Natural landscapes', 'Historical monuments']
@@ -671,7 +671,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Use the generateDetailedItinerary function for better results
       const itinerary = await generateDetailedItinerary({
-        userId: req.user.claims?.sub || req.user.id || 'guest',
+        userId: (req.user as any)?.claims?.sub || (req.user as any)?.id || 'guest',
         destination: destination,
         duration: durationDays,
         interests: cleanInterests,

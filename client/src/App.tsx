@@ -9,7 +9,7 @@ import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
 
-import Community from "@/pages/community";
+import Community from "@/pages/Community";
 import BudgetTracker from "@/pages/budget-tracker";
 import Achievements from "@/pages/achievements";
 import TripAdvisorData from "@/pages/tripadvisor-data";
