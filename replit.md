@@ -18,7 +18,7 @@ Preferred communication style: Simple, everyday language.
 ### Backend Architecture
 - **Runtime**: Node.js with TypeScript
 - **Framework**: Express.js (REST API)
-- **Database**: PostgreSQL with Drizzle ORM
+- **Database**: Supabase (PostgreSQL) with Drizzle ORM
 - **Authentication**: Replit Auth with OpenID Connect
 - **Session Management**: Express sessions with PostgreSQL store
 - **Real-time Communication**: WebSocket support
@@ -73,11 +73,12 @@ Preferred communication style: Simple, everyday language.
 - **Google Places API**: For detailed place information and automated collection
 - **Facebook Graph API**: For social media content extraction
 
-## Recent Data Collection & Community Features (Aug 2025)
-- **Migrated to PostgreSQL**: Successfully migrated from SQLite with all 392 places and 1,943 reviews
+## Recent Migration to Supabase (Aug 2025)
+- **Migrated to Supabase**: Updated database connection from Neon to Supabase PostgreSQL
+- **Connection Setup**: Updated server/db.ts to use standard PostgreSQL driver instead of Neon serverless
+- **Database Configuration**: Ready for Supabase with proper SSL and connection pooling
+- **Migration Scripts**: Created comprehensive SQL scripts and migration guides for Supabase setup
 - **Community Platform**: Full social platform with place reviews, chat rooms, and travel buddy matching
-- **Sample Data Added**: Live demonstration data including authentic place reviews, active chat rooms, and travel buddy posts
-- **Database Schema**: Enhanced with social features - place_reviews, chat_rooms, chat_room_members, travel_buddy_posts, travel_buddy_applications
-- **Real-time Features**: WebSocket-ready chat system with room management and member tracking
-- **Geographic Coverage**: Peru, Colombia, Ecuador, Bolivia, Chile, Argentina, Brazil, Uruguay, Paraguay
-- **Data Quality**: Authentic reviews with detailed ratings (cleanliness, location, value, service, facilities)
+- **Data Preservation**: All 392 places and 1,943 reviews prepared for Supabase migration
+- **Hybrid Approach**: App configured to work with Supabase when network allows, fallback-ready
+- **Schema Compatibility**: Maintained all existing table structures and relationships for seamless migration
