@@ -51,6 +51,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
+  // Basic health endpoint
+  app.get('/api/health', (_req, res) => res.json({ ok: true, time: new Date().toISOString() }));
+
   // --- Debug cookie endpoints (temporary for diagnosis) ---
   app.get('/api/debug/set-cookie', (req, res) => {
     res.cookie('bb_debug', 'ok', {
