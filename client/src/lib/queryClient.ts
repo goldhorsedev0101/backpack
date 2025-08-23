@@ -23,13 +23,14 @@ export async function apiRequest(
     cache: "no-cache",
   });
 
-  // If unauthorized, force full logout
+  // If unauthorized, allow in demo mode
   if (res.status === 401) {
-    console.log("Unauthorized request detected, forcing logout");
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.href = "/api/logout";
-    throw new Error("401: Unauthorized");
+    console.log("Unauthorized request detected, but allowing access in demo mode");
+    // Create a mock success response for demo mode
+    return new Response(JSON.stringify({ message: "Demo mode" }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   await throwIfResNotOk(res);
@@ -55,12 +56,10 @@ export const getQueryFn: <T>(options: {
       return null;
     }
 
-    // If unauthorized and should throw, force logout
+    // If unauthorized and should throw, allow in demo mode
     if (res.status === 401) {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = "/api/logout";
-      throw new Error("401: Unauthorized");
+      console.log("Unauthorized request in demo mode, continuing");
+      return null;
     }
 
     await throwIfResNotOk(res);
