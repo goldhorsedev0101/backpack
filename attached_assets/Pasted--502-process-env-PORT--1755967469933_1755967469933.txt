@@ -1,0 +1,138 @@
+🔧 משימה: עצבו את הפרויקט כך שירוץ בפרודקשן יציב בריפליט ללא שגיאות 502, יאזין ל‑process.env.PORT, ויספק דוח סופי. בצעו את כל השלבים **בדיוק** כמפורט.
+
+========================================
+שלב 1 — עדכון .replit להרצת Production
+========================================
+1) בקובץ `.replit`:
+   - החליפו את שורת ההרצה כך:
+     run = "npm start"
+   - מחקו כל בלוקי [[ports]] וכל הגדרות localPort/externalPort אם קיימים.
+   - אל תשנו הגדרות אחרות.
+
+2) בקובץ `.replit.yaml` — אל תשנו דבר.
+
+====================================================
+שלב 2 — עדכון package.json לבילד יציב (ללא esbuild)
+====================================================
+ב-`package.json` עדכנו את אובייקט scripts כך (השאירו כל מפתח אחר בקובץ ללא שינוי):
+{
+  "scripts": {
+    "dev": "NODE_ENV=development tsx server/index.ts",
+    "build": "vite build && tsc -p tsconfig.json",
+    "start": "NODE_ENV=production node build/server/index.js",
+    "check": "tsc",
+    "db:push": "drizzle-kit push"
+  }
+}
+הסבר: הלקוח (client) נשאר עם `vite build`. השרת נבנה ע"י TypeScript (`tsc`) כדי לשמור שימוש דינמי ב‑process.env.PORT ולא לקבע 5000 בבילד.
+
+========================================
+שלב 3 — יצירת/עדכון tsconfig.json
+========================================
+צרו/עדכנו קובץ `tsconfig.json` בשורש עם התוכן הבא (אל תוסיפו/תגרעו שדות אחרים):
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "build",
+    "rootDir": ".",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  },
+  "include": ["server/**/*.ts", "shared/**/*.ts"],
+  "exclude": ["node_modules", "dist", "build"]
+}
+
+=============================================================
+שלב 4 — וידוא האזנה ל‑process.env.PORT והוספת בריאות בשורש
+=============================================================
+ב-`server/index.ts` ודאו שקיים (או הוסיפו) הקוד הבא, מבלי ליצור מאזינים נוספים בשום קובץ אחר:
+-----------------------------------------------------
+[BEGIN PATCH server/index.ts]
+/* ודאו שיש בריאות בשורש (בנוסף ל-/api/health) */
+app.get('/', (_req, res) => res.send('OK'));
+
+/* האזנה דינמית לפורט */
+const PORT = Number(process.env.PORT) || 3000;
+const HOST = '0.0.0.0';
+const server = createServer(app);
+
+server.keepAliveTimeout = 61_000;
+server.headersTimeout = 65_000;
+server.requestTimeout = 60_000;
+
+server.listen(PORT, HOST, () => {
+  console.log(`[server] listening on http://${HOST}:${PORT}`);
+  console.log(`[server] PORT env = ${process.env.PORT ?? "(undefined)"}`);
+});
+[END PATCH server/index.ts]
+-----------------------------------------------------
+אין להוסיף/להשאיר app.listen או createServer בקבצים אחרים (למשל ב-routes). אם קיימים — להסיר.
+
+========================================================
+שלב 5 — ניקוי פורטים קשיחים בקוד השרת בלבד
+========================================================
+- עברו על קוד השרת והסירו כל שימוש קשיח ב-:3000 או :5000 או app.listen(3000/5000).
+- יוצא מן הכלל: לוגיקה הממפה `req.hostname === "localhost"` ל-`localhost:5000` בתוך קבצי auth לפיתוח מקומי — להשאיר כפי שהיא. אין לגעת בצד ה-client.
+
+========================================
+שלב 6 — בנייה והרצה
+========================================
+בצעו:
+- npm install
+- npm run build
+- npm start
+
+========================================
+שלב 7 — בדיקות בריאות מהטרמינל
+========================================
+הריצו ואספו פלט:
+- echo "PORT is: $PORT"
+- curl -s -i http://localhost:$PORT/
+- curl -s -i http://localhost:$PORT/api/health
+
+================================================
+פלט נדרש — דוח מסכם אחד (החזירו בדיוק כך)
+================================================
+החזירו דוח במבנה הבא:
+
+1) 📄 קבצים ששונו:
+   - <נתיב מלא לקובץ 1>
+   - <נתיב מלא לקובץ 2>
+   - ...
+
+2) 🔀 Diff תמציתי (לפחות השורות שהשתנו) לכל קובץ:
+   - .replit (לפני ← אחרי):
+     - run: "npm run dev" ← "npm start"
+     - הסרת [[ports]] ...
+   - package.json (scripts לפני ← אחרי):
+     - build: "vite build && esbuild ..." ← "vite build && tsc -p tsconfig.json"
+     - start: "NODE_ENV=production node dist/index.js" ← "NODE_ENV=production node build/server/index.js"
+   - tsconfig.json: (חדש/עודכן) הוספת outDir=build, module=NodeNext, וכו'.
+   - server/index.ts: הוספת app.get('/') ובלוק ההאזנה עם process.env.PORT.
+
+3) 🧪 תוצאות בנייה והרצה:
+   - פלט npm run build: (3–5 שורות רלוונטיות)
+   - פלט npm start (10–15 שורות ראשונות), כולל:
+     - `[server] listening on http://0.0.0.0:<PORT>`
+     - `[server] PORT env = <מספר או (undefined)>`
+
+4) ❤️ בדיקות בריאות:
+   - תוצאת `echo "PORT is: $PORT"` (שורה אחת)
+   - שורת הסטטוס של `curl /` (לדוג': `HTTP/1.1 200 OK`) + 20 התווים הראשונים של הגוף ("OK...")
+   - שורת הסטטוס של `curl /api/health` + 60 התווים הראשונים של הגוף (JSON המתחיל ב-{"ok":true,...})
+
+5) 🔎 אימות שאין מאזינים כפולים/פורטים קשיחים:
+   - סיכום חיפוש קצר (כמה ממצאים הוסרו/תוקנו, ואישור שלא נותרו מופעים בקוד השרת).
+
+⚠️ חשוב:
+- לא לשנות צד client מעבר ל-vite build.
+- לא להשאיר createServer או app.listen מחוץ ל-server/index.ts.
+- כל ההרצה חייבת להישען על process.env.PORT.
+- אם התגלו חסרים (תלויות/tsconfig) — להשלים ולהציג ב"דוח" מה נוסף.
+
+סיום המשימה: הציגו את "הדוח המסכם" בלבד בהתאם למבנה שבסעיף הדוח.

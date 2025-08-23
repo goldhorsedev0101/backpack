@@ -16,6 +16,9 @@ async function startServer() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
+  /* ודאו שיש בריאות בשורש (בנוסף ל-/api/health) */
+  app.get('/', (_req, res) => res.send('OK'));
+
   await registerRoutes(app);
 
   const publicDir = path.join(__dirname, '../dist/public');
@@ -35,6 +38,7 @@ async function startServer() {
 
   server.listen(PORT, HOST, () => {
     console.log(`[server] listening on http://${HOST}:${PORT}`);
+    console.log(`[server] PORT env = ${process.env.PORT ?? "(undefined)"}`);
   });
 }
 
