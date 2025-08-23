@@ -42,6 +42,7 @@ export function getSession() {
       sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
       // אם בעתיד הלקוח והשרת יהיו על דומיינים שונים:
       // השתמשו: sameSite: 'none' ו‑secure: true (חובה HTTPS)
+      path: '/',
       maxAge: sessionTtl,
     },
   });

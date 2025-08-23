@@ -1,0 +1,113 @@
+בצעו את תיקוני האימות/קוקיות הבאים בפרויקט BackpackBuddy, כולל אבחון ידני:
+
+========================================
+1) Express חייב "trust proxy" (חשוב ברפליט/פרוקסי)
+========================================
+בקובץ השרת הראשי (server/index.ts או היכן שנוצר app):
+- מיד אחרי יצירת `const app = express();` הוסיפו:
+  app.set('trust proxy', 1);
+
+דוגמה:
+----------------------------------------
+import express from 'express';
+const app = express();
+app.set('trust proxy', 1); // <<< חובה ברפליט מאחורי פרוקסי
+----------------------------------------
+
+========================================
+2) הגדרת Cookie של הסשן – מאוזנת לפי סביבה
+========================================
+בקובץ שמגדיר את הסשן/קוקי (למשל server/replitAuth.ts או המקום בו מוגדר cookie/session):
+- ודאו שה־cookie מוגדר כך:
+
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',  // ב-dev: false
+    sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+    // אם בעתיד תעבדו Cross-Site (דומיין לקוח שונה מדומיין שרת):
+    // sameSite: 'none', secure: true  (חובה HTTPS), והשאירו trust proxy
+    path: '/',
+    maxAge: sessionTtl,
+  }
+
+הערות חשובות:
+- בלי trust proxy, secure cookies לא יוגדרו מאחורי פרוקסי גם אם הדומיין https.
+- אם כרגע הלקוח והשרת על אותו דומיין/סב‑דומיין של replit.dev – השאירו sameSite:'lax' ו-secure:false ב-development.
+
+========================================
+3) עטיפת fetch בצד הלקוח – עם credentials: 'include'
+========================================
+ב-client/src/lib/api.ts או client/src/lib/queryClient.ts (או ה-wrapper המרכזי לפניות ל-API):
+ודאו שכל קריאה כוללת שליחת עוגיות:
+
+export async function apiRequest(url: string, options: RequestInit = {}) {
+  const res = await fetch(url, {
+    credentials: 'include',                        // <<< חובה
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    ...options,
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`${res.status} ${res.statusText}: ${text}`);
+  }
+  return res;
+}
+
+========================================
+4) מסלול DEBUG להצבת קוקי ידנית (אבחון מיידי)
+========================================
+הוסיפו זמנית ב-server/index.ts (אחרי ה-middlewares ולפני ה-routes המוגנים):
+
+app.get('/api/debug/set-cookie', (req, res) => {
+  // נציב קוקי בדיקה כדי לראות אם הדפדפן שומר אותו
+  res.cookie('bb_debug', 'ok', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',  // ב-dev false
+    sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+    path: '/',
+    maxAge: 1000 * 60 * 10,
+  });
+  res.json({ ok: true });
+});
+
+app.get('/api/debug/echo-cookie', (req, res) => {
+  res.json({ cookiesSeen: req.headers.cookie || null });
+});
+
+========================================
+5) הפעלה מחדש + בדיקות ידניות (בדפדפן → DevTools)
+========================================
+לאחר הריסטארט:
+
+A. פתחו את:
+   /api/debug/set-cookie
+   - צפו בכרטיסיית Network של הבקשה
+   - בתגובה חייב להופיע Header בשם **Set-Cookie** עם bb_debug=ok
+
+B. בצעו:
+   await fetch('/api/debug/echo-cookie', { credentials: 'include' }).then(r => r.json())
+   - התוצאה חייבת להראות שהשרת רואה את הקוקי: "bb_debug=ok"
+
+C. בדקו אימות:
+   await fetch('/api/auth/user', { credentials: 'include' }).then(r => r.status)
+   - אם 200 → הסשן עובד.
+   - אם 401/302 → ודאו שב‑login נוצרת באמת עוגייה של סשן (Set-Cookie) ושאותה קונפיגורציית cookie כמו בסעיף 2.
+
+========================================
+6) אם אין Set-Cookie או שהוא לא נשמר
+========================================
+- ודאו שהדפדפן נטען ב-https:// (לא http://).
+- ודאו שיש app.set('trust proxy', 1).
+- ודאו שב-dev secure=false (כמו בסעיף 2).
+- בדקו בקונסולת השרת שהבקשות מגיעות, והדפדפן לא חוסם 3rd-party cookies.
+- אם אתם מריצים לקוח ושרת על דומיינים שונים: עברו ל-sameSite:'none' ו-secure:true (חובה https), והשאירו trust proxy.
+
+========================================
+7) (אופציונלי) בריאות API
+========================================
+אם אין קיים עדיין, הוסיפו:
+app.get('/api/health', (_req, res) => res.json({ ok: true, time: new Date().toISOString() }));
+
+בדקו:
+fetch('/api/health', { credentials: 'include' }).then(r => r.json())
+צריך להחזיר 200 עם JSON.

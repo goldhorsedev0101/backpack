@@ -10,6 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.set('trust proxy', 1); // חובה ברפליט מאחורי פרוקסי
 const PORT = Number(process.env.PORT) || 5000;
 
 // CORS configuration for credentials
@@ -51,6 +52,23 @@ app.get('/api/health', (req, res) => {
     },
     version: '1.0.0'
   });
+});
+
+// DEBUG endpoints for cookie testing
+app.get('/api/debug/set-cookie', (req, res) => {
+  // נציב קוקי בדיקה כדי לראות אם הדפדפן שומר אותו
+  res.cookie('bb_debug', 'ok', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',  // ב-dev false
+    sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+    path: '/',
+    maxAge: 1000 * 60 * 10,
+  });
+  res.json({ ok: true });
+});
+
+app.get('/api/debug/echo-cookie', (req, res) => {
+  res.json({ cookiesSeen: req.headers.cookie || null });
 });
 
 // Places endpoint - serves real Supabase data
