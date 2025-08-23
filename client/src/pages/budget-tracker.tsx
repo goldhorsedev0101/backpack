@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import BudgetOverview from "@/components/budget-overview";
+import { EXPENSE_CATEGORIES } from "@/lib/expense-categories";
 import { 
   DollarSign, 
   Plus, 
@@ -25,11 +26,6 @@ import {
   PieChart,
   Calendar,
   MapPin,
-  Bed,
-  Bus,
-  Utensils,
-  Ticket,
-  ShoppingBag,
   Lightbulb,
   Target,
   AlertTriangle,
@@ -49,13 +45,6 @@ const expenseSchema = z.object({
   location: z.string().optional(),
 });
 
-const EXPENSE_CATEGORIES = [
-  { id: 'accommodation', label: 'Accommodation', icon: Bed, color: 'bg-blue-500' },
-  { id: 'transportation', label: 'Transportation', icon: Bus, color: 'bg-green-500' },
-  { id: 'food', label: 'Food & Drinks', icon: Utensils, color: 'bg-orange-500' },
-  { id: 'activities', label: 'Activities', icon: Ticket, color: 'bg-purple-500' },
-  { id: 'other', label: 'Other', icon: ShoppingBag, color: 'bg-gray-500' },
-];
 
 type ExpenseFormData = z.infer<typeof expenseSchema>;
 

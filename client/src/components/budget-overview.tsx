@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { EXPENSE_CATEGORIES } from "@/lib/expense-categories";
 import { 
   DollarSign, 
   TrendingUp, 
@@ -9,10 +10,6 @@ import {
   Target,
   AlertTriangle,
   CheckCircle,
-  Bed,
-  Bus,
-  Utensils,
-  Ticket,
   ShoppingBag
 } from "lucide-react";
 
@@ -29,13 +26,6 @@ interface BudgetOverviewProps {
   currency?: string;
 }
 
-const EXPENSE_CATEGORIES = [
-  { id: 'accommodation', label: 'Accommodation', icon: Bed, color: 'bg-primary' },
-  { id: 'transportation', label: 'Transportation', icon: Bus, color: 'bg-secondary' },
-  { id: 'food', label: 'Food & Drinks', icon: Utensils, color: 'bg-accent' },
-  { id: 'activities', label: 'Activities', icon: Ticket, color: 'bg-mint' },
-  { id: 'other', label: 'Other', icon: ShoppingBag, color: 'bg-gray-500' },
-];
 
 export default function BudgetOverview({ 
   totalBudget = 0, 
