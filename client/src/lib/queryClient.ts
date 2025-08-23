@@ -74,7 +74,7 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       staleTime: Infinity,
       retry: false,
-      cacheTime: 5 * 60 * 1000, // 5 minutes default cache
+      gcTime: 5 * 60 * 1000, // 5 minutes default cache
     },
     mutations: {
       retry: false,
