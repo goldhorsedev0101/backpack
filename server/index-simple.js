@@ -187,6 +187,8 @@ app.get('/api/destinations', async (req, res) => {
 
 // Serve React app for all non-API routes
 app.get('*', (req, res) => {
+  console.log(`Request for: ${req.path}`);
+  
   // If it's an API route, let it pass through to API handlers
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API endpoint not found' });
@@ -194,6 +196,7 @@ app.get('*', (req, res) => {
   
   // Otherwise serve the React app
   const indexPath = path.resolve(process.cwd(), 'dist/public/index.html');
+  console.log(`Serving index.html from: ${indexPath}`);
   res.sendFile(indexPath);
 });
 
