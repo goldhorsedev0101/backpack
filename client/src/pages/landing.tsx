@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
+// import { useAuth } from "@/hooks/useAuth"; // Demo mode
 import { useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
 import { SOUTH_AMERICAN_COUNTRIES } from "@/lib/constants";
@@ -42,7 +42,8 @@ export default function Landing() {
   const [budget, setBudget] = useState([2500]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [destination, setDestination] = useState<string>("");
-  const { user } = useAuth();
+  // const { user } = useAuth(); // Demo mode - no auth needed
+  const user = null;
   const [, setLocation] = useLocation();
 
   // Handle logout cleanup on page load

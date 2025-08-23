@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useAuth } from "@/hooks/useAuth";
+// import { useAuth } from "@/hooks/useAuth"; // Disabled for demo mode
 import { Button } from "@/components/ui/button";
 import { queryClient } from "@/lib/queryClient";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -46,7 +46,7 @@ const navigationItems = [
 
 export default function Navigation() {
   const [location] = useLocation();
-  const { user } = useAuth();
+  const user = null; // Demo mode - no auth
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isVisible } = useScrollDirection();
@@ -74,13 +74,8 @@ export default function Navigation() {
     }
   };
 
-  const userInitials = (user as any)?.firstName && (user as any)?.lastName 
-    ? `${(user as any).firstName[0]}${(user as any).lastName[0]}`
-    : (user as any)?.email?.[0]?.toUpperCase() || "U";
-
-  const userName = (user as any)?.firstName && (user as any)?.lastName
-    ? `${(user as any).firstName} ${(user as any).lastName}`
-    : (user as any)?.email || "User";
+  const userInitials = "U"; // Demo mode
+  const userName = "Demo User"; // Demo mode
 
   if (isMobile) {
     return (
