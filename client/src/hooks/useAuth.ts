@@ -21,60 +21,10 @@ interface User {
 }
 
 export function useAuth() {
-  // Check for logout parameter in URL
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('logout') === 'true') {
-      // Clear URL parameter
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, []);
-
-  const { data: user, isLoading, error } = useQuery<User | null>({
-    queryKey: ["/api/auth/user"],
-    retry: false,
-    refetchOnWindowFocus: true,
-    staleTime: 0, // Always check for fresh auth status
-    gcTime: 0, // Don't cache authentication data
-    queryFn: async () => {
-      try {
-        const res = await fetch("/api/auth/user", {
-          credentials: "include",
-          cache: "no-cache", // Force fresh request
-          headers: {
-            "Cache-Control": "no-cache",
-            "Pragma": "no-cache"
-          }
-        });
-        
-        if (res.status === 401) {
-          return null; // Not authenticated
-        }
-        
-        if (!res.ok) {
-          throw new Error(`${res.status}: ${res.statusText}`);
-        }
-        
-        return await res.json();
-      } catch (err) {
-        console.error("Auth error:", err);
-        return null; // Return null instead of throwing to prevent unhandled rejections
-      }
-    },
-  });
-
-  // If there's an error fetching user (401 or server error), assume not authenticated
-  if (error) {
-    return {
-      user: null,
-      isLoading: false,
-      isAuthenticated: false,
-    };
-  }
-
+  // DEMO MODE - return static demo user data without any API calls
   return {
-    user,
-    isLoading,
-    isAuthenticated: !!user,
+    user: null, // No user in demo mode
+    isLoading: false, // Never loading in demo mode
+    isAuthenticated: false, // Not authenticated in demo mode
   };
 }
