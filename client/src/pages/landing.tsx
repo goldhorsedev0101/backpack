@@ -78,8 +78,21 @@ export default function Landing() {
   };
 
   const handleStartPlanning = () => {
-    // Go directly to trip planner (works for both authenticated and non-authenticated users)
-    setLocation("/my-trips");
+    console.log("Start Planning button clicked!");
+    console.log("Current location:", window.location.pathname);
+    console.log("Attempting to navigate to /my-trips");
+    
+    try {
+      setLocation("/my-trips");
+      console.log("setLocation called successfully");
+      
+      // Also add a timeout to check if navigation worked
+      setTimeout(() => {
+        console.log("Location after navigation:", window.location.pathname);
+      }, 100);
+    } catch (error) {
+      console.error("Navigation error:", error);
+    }
   };
 
   const handleLogout = async () => {

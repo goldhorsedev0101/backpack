@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/hooks/useAuth";
+// import { useAuth } from "@/hooks/useAuth"; // Demo mode
 import TripCard from "@/components/trip-card";
 import AiChat from "@/components/ai-chat";
 import PersonalizedRecommendations from "@/components/personalized-recommendations";
@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 export default function Home() {
-  const { user } = useAuth();
+  const user = null; // Demo mode - no auth
 
   const { data: trips = [], isLoading: tripsLoading } = useQuery({
     queryKey: ["/api/trips"]
@@ -34,9 +34,7 @@ export default function Home() {
     queryKey: ["/api/reviews"]
   });
 
-  const welcomeMessage = user?.firstName 
-    ? `Welcome back, ${user.firstName}!` 
-    : "Welcome to TripWise!";
+  const welcomeMessage = "Welcome to TripWise!";
 
   return (
     <div className="bg-gray-50 pb-20 md:pb-0">

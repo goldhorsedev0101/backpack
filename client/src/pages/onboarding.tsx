@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Heart, DollarSign, Calendar, Compass, Users } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { useAuth } from "@/hooks/useAuth";
+// import { useAuth } from "@/hooks/useAuth"; // Demo mode
 
 interface UserPreferences {
   interests: string[];
@@ -70,7 +70,7 @@ export default function Onboarding() {
     bio: ""
   });
 
-  const { user } = useAuth();
+  const user = null; // Demo mode - no auth
   const queryClient = useQueryClient();
 
   // TODO: Implement proper API integration for saving preferences
