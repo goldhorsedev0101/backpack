@@ -1,0 +1,63 @@
+אני רוצה שתתקן את הפרויקט BackpackBuddy לפי ההוראות הבאות:
+
+1. **client/src/components/navigation.tsx**
+   - תייבא את `Button` מ־`@/components/ui/button`.
+   - בכל מקום שיש `<Link>...<button>...</button></Link>` תחליף ל:
+     ```tsx
+     <Button asChild variant="ghost" className="...">
+       <Link href="/route">טקסט/אייקון</Link>
+     </Button>
+     ```
+   - זה כולל:
+     - תפריט מובייל (navigationItems)
+     - פס תחתון במובייל
+     - ניווט דסקטופ
+
+2. **client/src/pages/landing.tsx**
+   - תייבא גם כאן `Link` ו־`Button`.
+   - תחליף את כל `<a href="#discover">`, `<a href="#plan">`, `<a href="#community">`, `<a href="#budget">` ללינקים אמיתיים:
+     - Discover → `/explore`
+     - Plan Trip → `/my-trips`
+     - Community → `/community`
+     - Budget → `/budget-tracker`
+     ```tsx
+     <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
+       <Link href="/explore">Discover</Link>
+     </Button>
+     ```
+   - כל `<a href="#plan">Start Planning</a>` → `<Link href="/my-trips">Start Planning</Link>`
+   - כל `<a href="#">Learn More</a>` → `<Link href="/explore">Learn More</Link>`
+   - כל `href="#"` שאין לו יעד → תחליף ל־`<Button type="button">...</Button>` כדי למנוע רענון דף.
+
+3. **server/index.ts** (או קובץ השרת הראשי שלך)
+   - אחרי כל ה־API routes, תוסיף fallback ל־SPA:
+     ```ts
+     import path from "path";
+     import express from "express";
+
+     const publicDir = path.join(__dirname, "public");
+     app.use(express.static(publicDir));
+
+     app.get("*", (req, res) => {
+       if (req.path.startsWith("/api/")) return res.status(404).end();
+       res.sendFile(path.join(publicDir, "index.html"));
+     });
+     ```
+
+4. **fetch המרכזי בצד לקוח** (client/src/lib/api.ts או queryClient.ts)
+   - תוודא שכל fetch כולל:
+     ```ts
+     const res = await fetch(url, {
+       credentials: "include",
+       headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+       ...options,
+     });
+     ```
+
+✅ בסיום, אני מצפה:
+- שכל כפתור/לינק ינווט לעמוד הנכון ולא יגרום לטעינה מחדש.
+- לא יהיו יותר `href="#"` או `<Link><button>...</button></Link>`.
+- SPA fallback בצד השרת יאפשר רענון בדפדפן בכל route.
+- ה־auth ימשיך לעבוד כי fetch שולח cookies עם `credentials: 'include'`.
+
+בצע את כל השינויים האלו.

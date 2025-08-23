@@ -105,19 +105,22 @@ export default function Navigation() {
             <div className="absolute top-16 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
               <div className="px-4 py-4 space-y-4">
                 {navigationItems.map((item) => (
-                  <Link key={item.href} href={item.href}>
-                    <button
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`w-full flex items-center px-3 py-2 rounded-lg text-left ${
-                        location === item.href
-                          ? "bg-primary text-white"
-                          : "text-slate-600 hover:bg-gray-100"
-                      }`}
-                    >
+                  <Button
+                    key={item.href}
+                    asChild
+                    variant="ghost"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`w-full flex items-center px-3 py-2 rounded-lg text-left justify-start ${
+                      location === item.href
+                        ? "bg-primary text-white"
+                        : "text-slate-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    <Link href={item.href}>
                       <item.icon className="w-5 h-5 mr-3" />
                       {item.label}
-                    </button>
-                  </Link>
+                    </Link>
+                  </Button>
                 ))}
                 
                 <div className="border-t border-gray-200 pt-4">
@@ -156,18 +159,21 @@ export default function Navigation() {
         >
           <div className="flex justify-around items-center py-2 px-2">
             {navigationItems.slice(0, 5).map((item) => (
-              <Link key={item.href} href={item.href}>
-                <button
-                  className={`flex flex-col items-center py-2 px-2 rounded-lg transition-colors min-w-[60px] ${
-                    location === item.href
-                      ? "text-primary bg-primary/10"
-                      : "text-gray-600 hover:text-primary hover:bg-gray-50"
-                  }`}
-                >
+              <Button
+                key={item.href}
+                asChild
+                variant="ghost"
+                className={`flex flex-col items-center py-2 px-2 rounded-lg transition-colors min-w-[60px] h-auto ${
+                  location === item.href
+                    ? "text-primary bg-primary/10"
+                    : "text-gray-600 hover:text-primary hover:bg-gray-50"
+                }`}
+              >
+                <Link href={item.href}>
                   <item.icon className="w-5 h-5 mb-1" />
                   <span className="text-xs font-medium truncate">{item.label}</span>
-                </button>
-              </Link>
+                </Link>
+              </Button>
             ))}
           </div>
         </div>
@@ -187,17 +193,18 @@ export default function Navigation() {
             <div className="hidden md:block ml-10">
               <div className="flex items-baseline space-x-4">
                 {navigationItems.map((item) => (
-                  <Link key={item.href} href={item.href}>
-                    <button
-                      className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                        location === item.href
-                          ? "text-primary bg-orange-50"
-                          : "text-slate-600 hover:text-primary hover:bg-gray-50"
-                      }`}
-                    >
-                      {item.label}
-                    </button>
-                  </Link>
+                  <Button
+                    key={item.href}
+                    asChild
+                    variant="ghost"
+                    className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      location === item.href
+                        ? "text-primary bg-orange-50"
+                        : "text-slate-600 hover:text-primary hover:bg-gray-50"
+                    }`}
+                  >
+                    <Link href={item.href}>{item.label}</Link>
+                  </Button>
                 ))}
               </div>
             </div>

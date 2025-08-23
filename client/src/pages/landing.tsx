@@ -7,7 +7,7 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 // import { useAuth } from "@/hooks/useAuth"; // Demo mode
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { queryClient } from "@/lib/queryClient";
 import { SOUTH_AMERICAN_COUNTRIES } from "@/lib/constants";
 import logo from "@/assets/tripwise-logo.svg";
@@ -77,15 +77,6 @@ export default function Landing() {
     window.location.href = "/api/login?signup=true";
   };
 
-  const handleStartPlanning = () => {
-    console.log("Start Planning button clicked!");
-    alert("הכפתור נלחץ! עוברים לדף תכנון הטיולים");
-    console.log("Current location:", window.location.pathname);
-    
-    // Try direct navigation first to test if it works
-    console.log("Using direct navigation to /my-trips");
-    window.location.href = "/my-trips";
-  };
 
   const handleLogout = async () => {
     try {
@@ -122,10 +113,18 @@ export default function Landing() {
               </div>
               <div className="hidden md:block ml-10">
                 <div className="flex items-baseline space-x-4">
-                  <a href="#discover" className="text-slate-600 hover:text-primary px-3 py-2 text-sm font-medium">Discover</a>
-                  <a href="#plan" className="text-slate-600 hover:text-primary px-3 py-2 text-sm font-medium">Plan Trip</a>
-                  <a href="#community" className="text-slate-600 hover:text-primary px-3 py-2 text-sm font-medium">Community</a>
-                  <a href="#budget" className="text-slate-600 hover:text-primary px-3 py-2 text-sm font-medium">Budget</a>
+                  <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
+                    <Link href="/explore">Discover</Link>
+                  </Button>
+                  <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
+                    <Link href="/my-trips">Plan Trip</Link>
+                  </Button>
+                  <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
+                    <Link href="/community">Community</Link>
+                  </Button>
+                  <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
+                    <Link href="/budget-tracker">Budget</Link>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -167,21 +166,17 @@ export default function Landing() {
               AI-powered trip planning for backpackers. Get personalized itineraries, connect with fellow travelers, and explore South America like never before.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button 
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleStartPlanning();
-                }} 
-                className="bg-white text-primary px-8 py-4 rounded-xl font-semibold hover:bg-gray-100"
-              >
-                <Bot className="w-5 h-5 mr-2" />
-                Start Planning
+              <Button asChild className="bg-white text-primary px-8 py-4 rounded-xl font-semibold hover:bg-gray-100">
+                <Link href="/my-trips">
+                  <Bot className="w-5 h-5 mr-2" />
+                  Start Planning
+                </Link>
               </Button>
-              <Button variant="outline" className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-primary">
-                <Play className="w-5 h-5 mr-2" />
-                Watch Demo
+              <Button asChild variant="outline" className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-primary">
+                <Link href="/explore">
+                  <Play className="w-5 h-5 mr-2" />
+                  Learn More
+                </Link>
               </Button>
             </div>
             {!user && (
@@ -301,17 +296,11 @@ export default function Landing() {
               </div>
               
               <div className="text-center">
-                <Button 
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleStartPlanning();
-                  }} 
-                  className="bg-primary text-white px-8 py-4 rounded-xl font-semibold hover:bg-orange-600"
-                >
-                  <Bot className="w-5 h-5 mr-2" />
-                  {user ? "Generate My Trip" : "Start Planning"}
+                <Button asChild className="bg-primary text-white px-8 py-4 rounded-xl font-semibold hover:bg-orange-600">
+                  <Link href="/my-trips">
+                    <Bot className="w-5 h-5 mr-2" />
+                    {user ? "Generate My Trip" : "Start Planning"}
+                  </Link>
                 </Button>
                 <p className="text-sm text-gray-500 mt-2">
                   {user ? "Ready to plan your next adventure!" : "Sign in to start planning your adventure"}
@@ -397,8 +386,8 @@ export default function Landing() {
                         </div>
                       )}
                     </div>
-                    <Button onClick={handleLogin} className="bg-primary text-white hover:bg-orange-600">
-                      View Route
+                    <Button asChild className="bg-primary text-white hover:bg-orange-600">
+                      <Link href="/my-trips">View Route</Link>
                     </Button>
                   </div>
                 </CardContent>
@@ -487,33 +476,33 @@ export default function Landing() {
             <div>
               <h3 className="text-lg font-semibold mb-4">Features</h3>
               <ul className="space-y-2 text-gray-300">
-                <li><a href="#" className="hover:text-white">AI Trip Planning</a></li>
-                <li><a href="#" className="hover:text-white">Budget Tracking</a></li>
-                <li><a href="#" className="hover:text-white">Community</a></li>
-                <li><a href="#" className="hover:text-white">Reviews</a></li>
-                <li><a href="#" className="hover:text-white">Live Chat</a></li>
+                <li><Link href="/my-trips" className="hover:text-white">AI Trip Planning</Link></li>
+                <li><Link href="/budget-tracker" className="hover:text-white">Budget Tracking</Link></li>
+                <li><Link href="/community" className="hover:text-white">Community</Link></li>
+                <li><Link href="/community" className="hover:text-white">Reviews</Link></li>
+                <li><Link href="/community" className="hover:text-white">Live Chat</Link></li>
               </ul>
             </div>
             
             <div>
               <h3 className="text-lg font-semibold mb-4">Destinations</h3>
               <ul className="space-y-2 text-gray-300">
-                <li><a href="#" className="hover:text-white">Peru</a></li>
-                <li><a href="#" className="hover:text-white">Colombia</a></li>
-                <li><a href="#" className="hover:text-white">Bolivia</a></li>
-                <li><a href="#" className="hover:text-white">Chile</a></li>
-                <li><a href="#" className="hover:text-white">Argentina</a></li>
+                <li><Link href="/explore?country=Peru" className="hover:text-white">Peru</Link></li>
+                <li><Link href="/explore?country=Colombia" className="hover:text-white">Colombia</Link></li>
+                <li><Link href="/explore?country=Bolivia" className="hover:text-white">Bolivia</Link></li>
+                <li><Link href="/explore?country=Chile" className="hover:text-white">Chile</Link></li>
+                <li><Link href="/explore?country=Argentina" className="hover:text-white">Argentina</Link></li>
               </ul>
             </div>
             
             <div>
               <h3 className="text-lg font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-gray-300">
-                <li><a href="#" className="hover:text-white">Help Center</a></li>
-                <li><a href="#" className="hover:text-white">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white">About Us</a></li>
+                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">Help Center</Button></li>
+                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">Contact Us</Button></li>
+                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">Privacy Policy</Button></li>
+                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">Terms of Service</Button></li>
+                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">About Us</Button></li>
               </ul>
             </div>
           </div>
