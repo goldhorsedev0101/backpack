@@ -1,0 +1,60 @@
+🔧 משימה: להעביר את כל הטבלאות והמידע מ‑Replit Database אל Supabase (Postgres)
+
+בצעו את הפעולות הבאות אוטומטית, והחזירו דוח מסכם בסוף:
+
+0) דרישות:
+   - ב‑Replit Secrets מוגדר:
+     - DATABASE_URL  → חיבור ל‑Supabase (Transaction Pooler).
+   - נסו לאתר את מחרוזת החיבור של Replit Database (Postgres) באחד מאלה:
+     - סביבת Agent/Database pane (“Connect” → Connection string),
+     - או משתנה סביבה שמתאים ל‑replit DB, למשל REPLIT_DATABASE_URL / REPLIT_DB_URL / DATABASE_URL_REPLIT וכד'.
+
+1) התקנת כלים:
+   - התקינו את postgresql CLI (אם לא קיים): 
+     nix-env -iA nixpkgs.postgresql
+   - אימתו:
+     psql --version
+     pg_dump --version
+
+2) איתור מחרוזות חיבור:
+   - הדפיסו את כל משתני הסביבה שכוללים DB/POSTGRES/DATABASE (ללא סודות מלאים בפלט — טשטשו סיסמאות).
+   - אתרו:
+     - REPLIT_DB_URL (או דומה) → מקור (ה‑Replit Database)
+     - DATABASE_URL → יעד (Supabase)
+   - אם מצאתם חיבור Replit DB בפורמט Postgres (postgresql://…): המשיכו לשלב 3.
+   - אם **לא** מצאתם חיבור Postgres ל‑Replit DB → דלגו לשלב 5 (CSV).
+
+3) גיבוי מלא מה‑Replit DB (Postgres):
+   - בצעו dump בפורמט custom וגם בפורמט SQL טקסטואלי:
+     pg_dump --no-owner --no-acl --format=custom  "$REPLIT_DB_URL" -f replit_db.dump
+     pg_dump --no-owner --no-acl                   "$REPLIT_DB_URL" > replit_db.sql
+   - הציגו גודל קבצים ושמות סכמות/טבלאות (באמצעות \dt או pg_restore -l replit_db.dump).
+
+4) שחזור ל‑Supabase:
+   - ראשית סכימה בלבד (למניעת הרשאות/בעלות): 
+     pg_dump --no-owner --no-privileges --schema-only "$REPLIT_DB_URL" | psql "$DATABASE_URL"
+   - ואז דאטה בלבד:
+     pg_dump --no-owner --no-privileges --data-only "$REPLIT_DB_URL" | psql "$DATABASE_URL"
+   - אם יש שגיאות הרחבות/בעלויות — דווחו, ודלגו אוטומטית עם --no-owner/--no-privileges כבר הוחל.
+   - בסיום, אימתו:
+     psql "$DATABASE_URL" -c "\dt"
+     # החזירו ספירת רשומות לכל טבלה עיקרית (SELECT COUNT(*) ...).
+
+5) (Fallback) מסלול CSV אם אין חיבור Postgres ל‑Replit DB:
+   - השתמשו בכלי Database/Agent כדי לייצא **CSV לכל טבלה** (או שלפו בשאילתות וכתבו ל‑CSV).
+   - טענו ל‑Supabase:
+     psql "$DATABASE_URL" -c "\copy <table> FROM 'export/<table>.csv' CSV HEADER;"
+     (חזרו לכל טבלה).
+   - אם אין סכימה ב‑Supabase, צרו אותה קודם (באמצעות SQL generator של Replit DB/Agent או schemas קיימים), ואז טענו את ה‑CSV.
+
+6) דוח מסכם (החזירו אותו בסוף — נקודות חובה):
+   - 🔗 זוהה חיבור Replit DB? (כן/לא, וסוג המסלול: pg_dump או CSV)
+   - 📄 רשימת טבלאות שהועברו (שמות) + ספירות רשומות לכל טבלה.
+   - 🧾 קבצי dump שנוצרו (אם נוצרו): שם + גודל.
+   - ⚠️ שגיאות (אם היו) ומה דולג/תוקן.
+   - ✅ בדיקת סיום: תוצאת \dt ב‑Supabase + ספירת רשומות דוגמה מכל טבלה.
+
+כללים חשובים:
+- אל תדפיסו סיסמאות גלויות; אם צריך להציג URL, טשטשו חלקי סוד.
+- השתמשו באופציות --no-owner/--no-privileges כדי למנוע בעיות הרשאות בין ספקים.
+- אם יש PK/Unique שנוגדים דאטה קיים ב‑Supabase, דווחו והציעו להריץ TRUNCATE/UPSERT לפי הצורך.
