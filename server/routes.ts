@@ -47,7 +47,7 @@ interface UserItineraryDay {
 
 const userItineraries: Record<string, UserItineraryDay[]> = {};
 
-export async function registerRoutes(app: Express): Promise<Server> {
+export async function registerRoutes(app: Express): Promise<void> {
   // Auth middleware
   await setupAuth(app);
 
@@ -2250,11 +2250,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(apiDocs);
   });
 
-  const httpServer = createServer(app);
 
-  // WebSocket setup for real-time chat
-  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
-
+  // WebSocket setup for real-time chat (disabled - server created in index.ts)
+  // const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+  /*
   wss.on('connection', (ws: WebSocket) => {
     console.log('New WebSocket connection');
 
@@ -2291,6 +2290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('WebSocket connection closed');
     });
   });
+  */
 
   // TripAdvisor-style data API routes
   
@@ -2830,5 +2830,4 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  return httpServer;
 }
