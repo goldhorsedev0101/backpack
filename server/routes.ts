@@ -51,6 +51,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
+  // --- Debug cookie endpoints (temporary for diagnosis) ---
+  app.get('/api/debug/set-cookie', (req, res) => {
+    res.cookie('bb_debug', 'ok', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+      path: '/',
+      maxAge: 1000 * 60 * 10,
+    });
+    res.json({ ok: true });
+  });
+
+  app.get('/api/debug/echo-cookie', (req, res) => {
+    res.json({ cookiesSeen: req.headers.cookie || null });
+  });
+
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
