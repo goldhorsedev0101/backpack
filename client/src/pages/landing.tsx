@@ -126,7 +126,7 @@ export default function Landing() {
             <div className="hidden md:flex items-center space-x-4">
               {user ? (
                 <>
-                  <span className="text-slate-600">Welcome, {user.firstName || user.email}</span>
+                  <span className="text-slate-600">Welcome!</span>
                   <Button onClick={handleLogout} variant="outline" className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white">
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
@@ -186,7 +186,7 @@ export default function Landing() {
             )}
             {user && (
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-6">
-                <span className="text-white opacity-90">Welcome back, {user.firstName || user.email}!</span>
+                <span className="text-white opacity-90">Welcome back!</span>
                 <Button onClick={handleLogout} variant="outline" className="border-white text-white px-6 py-2 rounded-lg hover:bg-red-500 hover:text-white">
                   <LogOut className="w-4 h-4 mr-2" />
                   Logout
