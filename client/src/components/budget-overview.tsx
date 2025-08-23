@@ -49,7 +49,7 @@ export default function BudgetOverview({
   // Calculate category totals
   const categoryTotals = (EXPENSE_CATEGORIES || []).map(category => ({
     ...category,
-    total: expenses
+    total: (expenses || [])
       .filter(expense => expense.category === category.id)
       .reduce((sum, expense) => sum + expense.amount, 0)
   })).filter(category => category.total > 0);
