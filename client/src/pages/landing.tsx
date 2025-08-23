@@ -77,13 +77,8 @@ export default function Landing() {
   };
 
   const handleStartPlanning = () => {
-    if (user) {
-      // User is authenticated, go directly to trip planner
-      setLocation("/my-trips");
-    } else {
-      // User not authenticated, redirect to login first
-      window.location.href = "/api/login";
-    }
+    // Go directly to trip planner (works for both authenticated and non-authenticated users)
+    setLocation("/my-trips");
   };
 
   const handleLogout = async () => {

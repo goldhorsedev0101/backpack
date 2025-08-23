@@ -79,11 +79,17 @@ function Router() {
 
   return (
     <Switch>
-      <Route path="/" component={Landing} />
-      {isAuthenticated && (
+      {isAuthenticated ? (
         <Route path="*" component={AuthenticatedApp} />
+      ) : (
+        <>
+          <Route path="/" component={Landing} />
+          <Route path="/my-trips" component={MyTripsNew} />
+          <Route path="/community" component={Community} />
+          <Route path="/explore" component={Explore} />
+          <Route component={NotFound} />
+        </>
       )}
-      <Route component={NotFound} />
     </Switch>
   );
 }
