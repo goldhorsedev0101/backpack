@@ -135,7 +135,7 @@ export default function Community() {
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {displayReviews && displayReviews.length > 0 ? displayReviews.map((review: any) => (
+              {displayReviews && displayReviews.length > 0 ? (displayReviews || []).map((review: any) => (
                 <Card key={review.id} className="w-full">
                   <CardHeader>
                     <div className="flex items-start justify-between">

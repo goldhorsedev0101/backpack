@@ -333,7 +333,7 @@ export default function BudgetTracker() {
                   <BudgetOverview 
                     totalBudget={budget}
                     totalSpent={totalSpent}
-                    expenses={tripExpenses.map((expense: any) => ({
+                    expenses={(tripExpenses || []).map((expense: any) => ({
                       id: expense.id,
                       amount: parseFloat(expense.amount),
                       category: expense.category,
@@ -454,7 +454,7 @@ export default function BudgetTracker() {
               <CardContent>
                 {filteredExpenses.length > 0 ? (
                   <div className="space-y-4">
-                    {filteredExpenses.map((expense: any) => {
+                    {(filteredExpenses || []).map((expense: any) => {
                       const category = EXPENSE_CATEGORIES.find(c => c.id === expense.category);
                       const IconComponent = category?.icon || ShoppingBag;
                       

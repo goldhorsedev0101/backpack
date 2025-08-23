@@ -47,7 +47,7 @@ export default function BudgetOverview({
   const remaining = totalBudget - totalSpent;
 
   // Calculate category totals
-  const categoryTotals = EXPENSE_CATEGORIES.map(category => ({
+  const categoryTotals = (EXPENSE_CATEGORIES || []).map(category => ({
     ...category,
     total: expenses
       .filter(expense => expense.category === category.id)
@@ -55,7 +55,7 @@ export default function BudgetOverview({
   })).filter(category => category.total > 0);
 
   // Get recent expenses (last 5)
-  const recentExpenses = expenses
+  const recentExpenses = (expenses || [])
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
 
@@ -159,7 +159,7 @@ export default function BudgetOverview({
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {categoryTotals.map((category) => {
+              {(categoryTotals || []).map((category) => {
                 const CategoryIcon = category.icon;
                 const percentage = totalSpent > 0 ? (category.total / totalSpent) * 100 : 0;
                 
@@ -202,7 +202,7 @@ export default function BudgetOverview({
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {recentExpenses.map((expense, index) => {
+              {(recentExpenses || []).map((expense, index) => {
                 const category = EXPENSE_CATEGORIES.find(c => c.id === expense.category);
                 const CategoryIcon = category?.icon || ShoppingBag;
                 

@@ -474,7 +474,7 @@ export default function MyTripsScreen() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {Array.isArray(savedTrips) && savedTrips.map((trip: SavedTrip) => (
+                    {Array.isArray(savedTrips) && (savedTrips || []).map((trip: SavedTrip) => (
                       <div key={trip.id} className="border rounded-lg p-4 space-y-4">
                         <div>
                           <h3 className="text-xl font-bold text-slate-700 mb-1">
