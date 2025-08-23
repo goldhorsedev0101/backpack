@@ -83,7 +83,7 @@ export default function MyTripsScreen() {
   const [suggestions, setSuggestions] = useState<TripSuggestion[]>([]);
 
   // Fetch saved trips
-  const { data: savedTrips, isLoading: tripsLoading } = useQuery({
+  const { data: savedTrips = [], isLoading: tripsLoading } = useQuery<SavedTrip[]>({
     queryKey: ['/api/my-trips/guest'],
     enabled: activeTab === "saved"
   });
@@ -452,7 +452,7 @@ export default function MyTripsScreen() {
                 <CardTitle className="flex items-center">
                   <MapPin className="w-6 h-6 mr-2 text-primary" />
                   My Saved Trips
-                  {savedTrips && savedTrips.length > 0 && (
+                  {savedTrips && Array.isArray(savedTrips) && savedTrips.length > 0 && (
                     <Badge variant="secondary" className="ml-auto">{savedTrips.length} trips</Badge>
                   )}
                 </CardTitle>
@@ -464,7 +464,7 @@ export default function MyTripsScreen() {
                     <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-primary" />
                     <p className="text-lg font-medium text-gray-700">Loading your trips...</p>
                   </div>
-                ) : !savedTrips || savedTrips.length === 0 ? (
+                ) : !savedTrips || (Array.isArray(savedTrips) && savedTrips.length === 0) ? (
                   <div className="text-center py-8">
                     <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
                     <p className="text-lg font-medium text-gray-700 mb-2">No Saved Trips</p>
@@ -474,7 +474,7 @@ export default function MyTripsScreen() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {savedTrips.map((trip: SavedTrip) => (
+                    {Array.isArray(savedTrips) && savedTrips.map((trip: SavedTrip) => (
                       <div key={trip.id} className="border rounded-lg p-4 space-y-4">
                         <div>
                           <h3 className="text-xl font-bold text-slate-700 mb-1">

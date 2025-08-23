@@ -1,0 +1,188 @@
+בצעו אבחון + תיקון חיבור ל‑API בפרויקט BackpackBuddy לפי השלבים הבאים. אל תדלגו על אף סעיף.
+
+========================
+1) אבחון מהיר בצד לקוח
+========================
+פתחו בדפדפן → DevTools → Console, והריצו:
+
+await fetch('/api/auth/user', { credentials: 'include' }).then(r => [r.status, r.headers.get('content-type')]).catch(e => e)
+
+צפו בתוצאה:
+- 200 → יש סשן; המשיכו לסעיף 2 בכל זאת.
+- 401/403/302/0 או שגיאת CORS → בעיית אימות/קוקיז/CORS. המשיכו לסעיפים 2–4.
+
+בדקו גם:
+document.cookie
+// אם ריק (והמערכת אמורה לעבוד עם סשן) – בעיית קוקיז/דומיין/HTTPS/SameSite
+
+========================
+2) ודאו כתובת API אחידה (baseURL)
+========================
+במרכז קריאות ה‑fetch (למשל client/src/lib/api.ts או client/src/lib/queryClient.ts) ודאו:
+- משתמשים תמיד ב‑URL יחסי שמתחיל ב‑/api (לדוגמה: "/api/plan"), או הגדירו BASE_URL אחד קבוע לסביבה.
+
+החילו עטיפה אחידה:
+
+// client/src/lib/api.ts (חדש או לעדכן קיים)
+export const API_BASE = import.meta.env.VITE_API_BASE || '';
+
+export async function api(url: string, options: RequestInit = {}) {
+  const res = await fetch(`${API_BASE}${url}`, {
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    ...options,
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`${res.status} ${res.statusText}: ${text}`);
+  }
+  return res;
+}
+
+החליפו את כל fetch(...) ל‑api('/api/משהו', {...}).
+אם הלקוח והשרת על אותו דומיין → השאירו VITE_API_BASE ריק.
+אם הם על דומיינים שונים → הגדירו VITE_API_BASE="https://<דומיין‑השרת>" בקובץ .env.client (או .env).
+
+========================
+3) Vite proxy (לפיתוח) – אם השרת רץ בנפרד
+========================
+ב‑client/vite.config.ts הוסיפו (או תקנו) proxy:
+
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',   // או פורט השרת אצלכם
+        changeOrigin: true,
+        secure: false,
+      },
+      '/ws': {
+        target: 'ws://localhost:3000',
+        ws: true,
+        changeOrigin: true,
+        secure: false,
+      }
+    }
+  }
+});
+
+* אם ב‑Replit הלקוח והשרת באותו Repl/דומיין – אפשר בלי proxy, ולהשתמש ב‑/api ישירות.
+
+========================
+4) CORS + cookies בשרת (אם יש Cross‑Domain)
+========================
+אם הלקוח על דומיין A והשרת על דומיין B – יש להגדיר CORS שמאפשר credentials ו‑Origin מדויק.
+
+התקינו אם חסר:
+npm i cors
+
+בשרת הראשי (server/index.ts או מה שמאתחל את Express):
+import cors from 'cors';
+
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'https://YOUR-CLIENT-DOMAIN';
+
+app.use(cors({
+  origin: FRONTEND_ORIGIN,
+  credentials: true,
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization']
+}));
+
+* אל תשתמשו origin: '*' יחד עם credentials: true – זה יכשיל את הדפדפן.
+
+========================
+5) הגדרות Cookie/SameSite (אימות)
+========================
+אם ההתחברות מתבצעת עם קוקי סשן:
+- אם זה Cross‑Site → חייבים SameSite: 'none' ו‑Secure: true (רק HTTPS).
+- אם זה Same‑Site (אותו דומיין) → אפשר SameSite: 'lax' ו‑Secure בהתאם.
+
+במקום בו אתם מגדירים את הקוקי (למשל replitAuth או express-session), ודאו:
+
+res.cookie('session', tokenOrId, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV !== 'development', // ב‑prod: true
+  sameSite: process.env.CROSS_SITE ? 'none' : 'lax',
+  path: '/',
+  maxAge: 1000 * 60 * 60 * 24 * 7
+});
+
+וב‑prod ודאו HTTPS אמיתי בדומיין.
+
+========================
+6) נתיב SPA fallback בצד שרת
+========================
+ודאו שאחרי כל ה‑API, יש החזרת index.html לכל נתיב שאינו /api/*:
+
+import path from 'path';
+import express from 'express';
+
+const publicDir = path.join(__dirname, 'public');
+app.use(express.static(publicDir));
+
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api/')) return res.status(404).end();
+  res.sendFile(path.join(publicDir, 'index.html'));
+});
+
+========================
+7) Endpoint בדיקה (בריאות) – פתוח
+========================
+הוסיפו בשרת (routes/index או בכל מקום שמתאים):
+
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, time: new Date().toISOString() });
+});
+
+בדקו בדפדפן:
+fetch('/api/health', { credentials: 'include' }).then(r => r.json()).then(console.log)
+
+אם זה עובד (200 עם JSON) אבל endpoints אחרים מחזירים 401 → בעיית isAuthenticated/סשן.
+
+========================
+8) לוגים זמניים לאימות
+========================
+לפני ה‑middleware של isAuthenticated הוסיפו לוג:
+
+app.use((req, _res, next) => {
+  console.log('[REQ]', req.method, req.path, 'cookies:', req.headers.cookie ? 'present' : 'none', 'origin:', req.headers.origin);
+  next();
+});
+
+וב‑isAuthenticated (או סביבו) הוסיפו לוג כשדוחים בקשה:
+console.warn('[AUTH FAIL]', req.method, req.path);
+
+בדקו במסוף השרת מה באמת מגיע ומה נדחה.
+
+========================
+9) בדיקת ניתוב API נכון
+========================
+ודאו שכל הקריאות הקיימות בקוד באמת ל‑/api/... (כולל אותיות קטנות/גדולות, וללא // כפול).
+לדוגמה:
+- נכון: api('/api/itineraries', { method: 'POST', body: JSON.stringify(data) })
+- שגוי: api('api/itineraries')  // חסר הסלאש הראשון
+- שגוי: api('/api//itineraries') // שני סלאשים
+
+========================
+10) אם עדיין נופל – בטלו זמנית אימות על Endpoint אחד
+========================
+בחרו Endpoint אחד שמופעל בלחיצה על הכפתור (למשל POST /api/plan) והסירו זמנית את isAuthenticated ממנו:
+app.post('/api/plan', /* הסירו isAuthenticated כאן זמנית */, async (req, res) => { ... })
+
+בדקו האם הניווט עובד. אם כן → בעיה ב‑auth/cookies/SameSite/CORS; החזירו את ההגנה לאחר שתיקנתם סעיפים 4–5.
+
+========================
+11) צ'ק‑ליסט סיום
+========================
+- /api/health מחזיר 200
+- /api/auth/user מחזיר 200 (כשמחוברים)
+- בקריאת fetch יש credentials: 'include'
+- אם Cross‑Domain: יש CORS עם origin ספציפי ו‑credentials: true, והקוקי מוגדר SameSite 'none' ו‑Secure true
+- אין fetch ל‑http בזמן שהעמוד נטען מ‑https (מיקסד קונטנט)
+- הניווט בכפתורים כבר לא משתמש ב‑href="#"/עוגנים אלא ב‑Link לנתיבים אמיתיים
+
+בצעו כל סעיף כמפורט ושמרו. לאחר מכן נבדוק שוב את הזרימה: לחיצה על "Plan Trip" → קריאת API תקינה (200) → navigate לעמוד היעד ללא רענון מלא.

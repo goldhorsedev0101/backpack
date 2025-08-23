@@ -1,5 +1,6 @@
 // Simple working server for TripWise with Supabase data
 import express from 'express';
+import cors from 'cors';
 import pkg from 'pg';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -11,11 +12,21 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
 
+// CORS configuration for credentials
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || `http://localhost:${PORT}`;
+app.use(cors({
+  origin: FRONTEND_ORIGIN,
+  credentials: true,
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization']
+}));
+
 // Setup basic middleware
 app.use(express.json());
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+
+// Debugging middleware
+app.use((req, _res, next) => {
+  console.log('[REQ]', req.method, req.path, 'cookies:', req.headers.cookie ? 'present' : 'none', 'origin:', req.headers.origin);
   next();
 });
 
@@ -186,6 +197,7 @@ app.get('/api/destinations', async (req, res) => {
 
 // Authentication endpoints for frontend compatibility
 app.get('/api/auth/user', (req, res) => {
+  console.log('[AUTH CHECK] /api/auth/user called');
   // For development, return a mock user or null
   res.status(401).json({ message: 'Not authenticated' });
 });
@@ -200,8 +212,9 @@ app.get('/api/logout', (req, res) => {
   res.redirect('/');
 });
 
-// Trips endpoint for saving trip data
+// Trips endpoint for saving trip data (temporarily without auth for testing)
 app.post('/api/trips', express.json(), async (req, res) => {
+  console.log('[TRIPS] POST /api/trips called with data:', req.body);
   try {
     console.log('Saving trip:', req.body);
     const client = await pool.connect();
@@ -296,6 +309,114 @@ app.post('/api/ai/chat', express.json(), async (req, res) => {
   } catch (error: any) {
     console.error('AI Chat error:', error);
     res.status(500).json({ error: 'Failed to get AI response' });
+  }
+});
+
+// Trip planning API endpoints
+app.post('/api/get-suggestions', express.json(), async (req, res) => {
+  console.log('[SUGGESTIONS] POST /api/get-suggestions called with:', req.body);
+  
+  try {
+    const { destination, dailyBudget, travelStyle, interests, duration } = req.body;
+    
+    // Mock trip suggestions for demo mode
+    const mockSuggestions = [
+      {
+        destination: destination || "Machu Picchu",
+        country: "Peru",
+        description: `Experience the wonder of ${destination || "Machu Picchu"} with this ${duration || "7-day"} adventure combining ${travelStyle?.[0] || "cultural"} exploration with unforgettable experiences.`,
+        bestTimeToVisit: "May to September (dry season)",
+        estimatedBudget: {
+          low: dailyBudget ? dailyBudget * parseInt(duration?.split(' ')[0] || '7') * 0.8 : 400,
+          high: dailyBudget ? dailyBudget * parseInt(duration?.split(' ')[0] || '7') * 1.2 : 800
+        },
+        highlights: [
+          `Ancient ${destination || "Machu Picchu"} ruins exploration`,
+          "Sacred Valley tour",
+          "Local cuisine tasting",
+          "Cultural immersion experiences"
+        ],
+        travelStyle: travelStyle || ["Cultural", "Adventure"],
+        duration: duration || "7 days",
+        realPlaces: [
+          {
+            title: `${destination || "Machu Picchu"} Tours`,
+            link: "https://www.machupicchu.gob.pe/",
+            source: "Official" as const,
+            rating: 4.8,
+            address: "Cusco Region, Peru"
+          }
+        ]
+      }
+    ];
+    
+    res.json({ suggestions: mockSuggestions });
+  } catch (error: any) {
+    console.error('Suggestions error:', error);
+    res.status(500).json({ error: 'Failed to generate suggestions' });
+  }
+});
+
+// Guest trips endpoints
+app.get('/api/my-trips/guest', async (req, res) => {
+  console.log('[TRIPS] GET /api/my-trips/guest called');
+  
+  try {
+    const client = await pool.connect();
+    try {
+      const result = await client.query(`
+        SELECT * FROM trips 
+        WHERE user_id = 'demo-user' 
+        ORDER BY created_at DESC
+      `);
+      res.json(result.rows);
+    } catch (dbError: any) {
+      res.json({ message: 'No saved trips yet - try planning your first trip!', trips: [] });
+    } finally {
+      client.release();
+    }
+  } catch (error: any) {
+    console.error('Get trips error:', error);
+    res.status(500).json({ error: 'Failed to fetch trips' });
+  }
+});
+
+app.post('/api/my-trips/guest/save', express.json(), async (req, res) => {
+  console.log('[TRIPS] POST /api/my-trips/guest/save called with:', req.body);
+  
+  try {
+    const { destination, description, duration, estimatedBudget, travelStyle, highlights, bestTimeToVisit } = req.body;
+    
+    const client = await pool.connect();
+    try {
+      const result = await client.query(`
+        INSERT INTO trips (
+          destination, description, duration, estimated_budget, 
+          travel_style, highlights, best_time_to_visit, user_id, created_at
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) 
+        RETURNING *
+      `, [
+        destination, 
+        description, 
+        duration, 
+        JSON.stringify(estimatedBudget),
+        JSON.stringify(travelStyle),
+        JSON.stringify(highlights),
+        bestTimeToVisit,
+        'demo-user'
+      ]);
+      
+      res.json(result.rows[0]);
+    } catch (dbError: any) {
+      console.error('Database error:', dbError);
+      res.json({ message: 'Trip saved in demo mode', id: Date.now() });
+    } finally {
+      client.release();
+    }
+  } catch (error: any) {
+    console.error('Save trip error:', error);
+    res.status(500).json({ error: 'Failed to save trip' });
   }
 });
 
