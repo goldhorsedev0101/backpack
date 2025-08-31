@@ -19,10 +19,6 @@ async function startServer() {
 
   // Health check endpoint for monitoring
   app.get('/health-check', (_req, res) => res.send('OK'));
-  app.get('/api/health', (_req, res) => res.json({ ok: true, time: new Date().toISOString() }));
-
-  // Demo mode - skip auth for faster loading
-  console.log('Demo mode: running without authentication for faster startup');
 
   await registerRoutes(app);
 
@@ -37,9 +33,9 @@ async function startServer() {
   const PORT = Number(process.env.PORT) || 5000;
   const HOST = '0.0.0.0';
   const server = createServer(app);
-  server.keepAliveTimeout = 5000;  // Reduced for faster response
-  server.headersTimeout = 6000;   // Reduced for faster response
-  server.requestTimeout = 5000;   // Reduced for faster response
+  server.keepAliveTimeout = 61000;
+  server.headersTimeout = 65000;
+  server.requestTimeout = 60000;
 
   // Setup Vite in development mode
   if (process.env.NODE_ENV === 'development') {
@@ -49,7 +45,6 @@ async function startServer() {
   server.listen(PORT, HOST, () => {
     console.log(`[server] listening on http://${HOST}:${PORT}`);
     console.log(`[server] PORT env = ${process.env.PORT ?? "(undefined)"}`);
-    console.log(`[server] Ready to serve TripWise with right sidebar!`);
   });
 }
 
