@@ -1,16 +1,16 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
-import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
-import { db, pool } from "./db";
-import { googlePlaces } from "./googlePlaces";
-import { seedSouthAmericanData } from "./dataSeeder";
-import { weatherService } from "./weatherService";
-import { travelTimingService } from "./travelTimingService";
-import { achievements } from "@shared/schema";
+import { storage } from "./storage.js";
+import { setupAuth, isAuthenticated } from "./replitAuth.js";
+import { db, pool } from "./db.js";
+import { googlePlaces } from "./googlePlaces.js";
+import { seedSouthAmericanData } from "./dataSeeder.js";
+import { weatherService } from "./weatherService.js";
+import { travelTimingService } from "./travelTimingService.js";
+import { achievements } from "../shared/schema.js";
 import { eq } from "drizzle-orm";
-import { registerCollectorRoutes } from "./collectorRoutes";
+import { registerCollectorRoutes } from "./collectorRoutes.js";
 import {
   insertTripSchema,
   insertReviewSchema,
@@ -23,7 +23,7 @@ import {
   insertTravelBuddyPostSchema,
   insertTravelBuddyApplicationSchema,
   insertLocationReviewSchema,
-} from "@shared/schema";
+} from "../shared/schema.js";
 import {
   generateTravelSuggestions,
   generateItinerary,
@@ -33,8 +33,8 @@ import {
   conversationalTripAssistant,
   generateConversationalSuggestions,
   enrichSuggestionsWithRealPlaces
-} from "./openai";
-import { generateItinerary as generateDetailedItinerary } from "./generateItinerary";
+} from "./openai.js";
+import { generateItinerary as generateDetailedItinerary } from "./generateItinerary.js";
 
 // In-memory storage for user itineraries
 interface UserItineraryDay {
@@ -496,7 +496,7 @@ export async function registerRoutes(app: Express): Promise<void> {
       const client = await pool.connect();
       try {
         const placesResult = await client.query('SELECT * FROM places ORDER BY rating DESC LIMIT 50');
-        const places = placesResult.rows.map(place => ({
+        const places = placesResult.rows.map((place: any) => ({
           ...place,
           type: 'destination'
         }));
