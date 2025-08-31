@@ -142,7 +142,7 @@ export default function BudgetTracker() {
       .reduce((sum: number, expense: any) => sum + parseFloat(expense.amount), 0)
   }));
 
-  const selectedTripData = selectedTrip ? (userTrips || []).find((trip: any) => trip.id === selectedTrip) : null;
+  const selectedTripData = selectedTrip ? (Array.isArray(userTrips) ? userTrips.find((trip: any) => trip.id === selectedTrip) : null) : null;
   const budget = selectedTripData ? parseFloat(selectedTripData.budget || 0) : 0;
   const budgetUsed = budget > 0 ? (totalSpent / budget) * 100 : 0;
 
@@ -167,11 +167,11 @@ export default function BudgetTracker() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Expenses</SelectItem>
-                {(userTrips || []).map((trip: any) => (
+                {Array.isArray(userTrips) ? userTrips.map((trip: any) => (
                   <SelectItem key={trip.id} value={trip.id.toString()}>
                     {trip.title}
                   </SelectItem>
-                ))}
+                )) : null}
               </SelectContent>
             </Select>
 
@@ -209,11 +209,11 @@ export default function BudgetTracker() {
                       <SelectValue placeholder="Select a trip" />
                     </SelectTrigger>
                     <SelectContent>
-                      {(userTrips || []).map((trip: any) => (
+                      {Array.isArray(userTrips) ? userTrips.map((trip: any) => (
                         <SelectItem key={trip.id} value={trip.id.toString()}>
                           {trip.title}
                         </SelectItem>
-                      ))}
+                      )) : null}
                     </SelectContent>
                   </Select>
                   {form.formState.errors.tripId && (
