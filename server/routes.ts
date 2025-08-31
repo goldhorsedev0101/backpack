@@ -11,6 +11,8 @@ import { travelTimingService } from "./travelTimingService";
 import { achievements } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { registerCollectorRoutes } from "./collectorRoutes";
+import type { Request, Response, Router } from 'express';
+import { supabaseAdmin } from './supabase';
 import {
   insertTripSchema,
   insertReviewSchema,
@@ -53,6 +55,17 @@ export async function registerRoutes(app: Express): Promise<void> {
 
   // Basic health endpoint
   app.get('/api/health', (_req, res) => res.json({ ok: true, time: new Date().toISOString() }));
+
+  // Destinations endpoint using Supabase
+  app.get('/api/destinations', async (_req: Request, res: Response) => {
+    const { data, error } = await supabaseAdmin
+      .from('destinations')
+      .select('*')
+      .limit(50);
+
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+  });
 
   // --- Debug cookie endpoints (temporary for diagnosis) ---
   app.get('/api/debug/set-cookie', (req, res) => {
