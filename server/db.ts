@@ -10,9 +10,8 @@ if (!process.env.DATABASE_URL) {
 }
 
 // Use Transaction Pooler address to fix Supabase connection from Replit
-const DATABASE_URL = process.env.DATABASE_URL.includes('pooler.supabase.com') 
-  ? process.env.DATABASE_URL 
-  : 'postgresql://postgres.wuzhvkmfdyiwaaladyxc:!Dornt0740$@aws-1-sa-east-1.pooler.supabase.com:6543/postgres';
+// Force use of working Transaction Pooler URL
+const DATABASE_URL = 'postgresql://postgres.wuzhvkmfdyiwaaladyxc:!Dornt0740$@aws-1-sa-east-1.pooler.supabase.com:6543/postgres';
 
 console.log('Using DATABASE_URL via Transaction Pooler for Supabase compatibility');
 
