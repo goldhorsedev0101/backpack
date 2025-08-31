@@ -1,22 +1,11 @@
+// server/supabase.ts
 import { createClient } from '@supabase/supabase-js';
-import { config } from './config.js';
+import { env } from './config';
 
-// Public client - for client-side operations
-export const supabase = createClient(
-  config.supabase.url,
-  config.supabase.anonKey
-);
-
-// Admin client - for server-side operations with elevated permissions
 export const supabaseAdmin = createClient(
-  config.supabase.url,
-  config.supabase.serviceRoleKey,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  }
+  env.SUPABASE_URL,
+  env.SUPABASE_SERVICE_ROLE_KEY,
+  { auth: { persistSession: false } }
 );
 
 // Database table count helper using Supabase
