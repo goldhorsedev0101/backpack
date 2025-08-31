@@ -55,8 +55,8 @@ const statusIcons = {
 };
 
 export default function IngestionDashboard() {
-  const [countryFilter, setCountryFilter] = useState<string>("");
-  const [kindFilter, setKindFilter] = useState<string>("");
+  const [countryFilter, setCountryFilter] = useState<string>("all");
+  const [kindFilter, setKindFilter] = useState<string>("all");
   const [searchFilter, setSearchFilter] = useState<string>("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -78,8 +78,8 @@ export default function IngestionDashboard() {
 
   // Filter jobs based on current filters
   const filteredJobs = jobs.filter(job => {
-    const matchesCountry = !countryFilter || job.country === countryFilter;
-    const matchesKind = !kindFilter || job.kind === kindFilter;
+    const matchesCountry = !countryFilter || countryFilter === 'all' || job.country === countryFilter;
+    const matchesKind = !kindFilter || kindFilter === 'all' || job.kind === kindFilter;
     const matchesSearch = !searchFilter || 
       job.destination_name.toLowerCase().includes(searchFilter.toLowerCase());
     return matchesCountry && matchesKind && matchesSearch;
@@ -236,7 +236,7 @@ export default function IngestionDashboard() {
                   <SelectValue placeholder="בחר מדינה" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">כל המדינות</SelectItem>
+                  <SelectItem value="all">כל המדינות</SelectItem>
                   {countries.map(country => (
                     <SelectItem key={country} value={country}>
                       {country}
@@ -253,7 +253,7 @@ export default function IngestionDashboard() {
                   <SelectValue placeholder="בחר סוג" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">כל הסוגים</SelectItem>
+                  <SelectItem value="all">כל הסוגים</SelectItem>
                   <SelectItem value="attraction">אטרקציות</SelectItem>
                   <SelectItem value="restaurant">מסעדות</SelectItem>
                   <SelectItem value="accommodation">לינה</SelectItem>
@@ -275,14 +275,14 @@ export default function IngestionDashboard() {
             </div>
           </div>
           
-          {(countryFilter || kindFilter || searchFilter) && (
+          {(countryFilter !== 'all' || kindFilter !== 'all' || searchFilter) && (
             <div className="mt-4">
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={() => {
-                  setCountryFilter("");
-                  setKindFilter("");
+                  setCountryFilter("all");
+                  setKindFilter("all");
                   setSearchFilter("");
                 }}
               >
