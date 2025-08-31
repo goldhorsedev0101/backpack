@@ -9,17 +9,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
-
 import Community from "@/pages/Community";
 import BudgetTracker from "@/pages/budget-tracker";
 import Achievements from "@/pages/achievements";
-import TripAdvisorData from "@/pages/tripadvisor-data";
 import Explore from "@/pages/explore";
 import Weather from "@/pages/weather";
 import MyTripsNew from "@/pages/my-trips-new";
-import Onboarding from "@/pages/onboarding";
-import Registry from "@/pages/registry";
-import DemoRealPlaces from "@/pages/demo-real-places";
 import CollectorData from "@/pages/CollectorData";
 import IngestionDashboard from "@/pages/IngestionDashboard";
 import Navigation from "@/components/navigation";
@@ -40,12 +35,8 @@ function Router() {
           <Route path="/community" component={Community} />
           <Route path="/budget-tracker" component={BudgetTracker} />
           <Route path="/achievements" component={Achievements} />
-          <Route path="/tripadvisor-data" component={TripAdvisorData} />
           <Route path="/explore" component={Explore} />
           <Route path="/weather" component={Weather} />
-          <Route path="/onboarding" component={Onboarding} />
-          <Route path="/registry" component={Registry} />
-          <Route path="/demo-real-places" component={DemoRealPlaces} />
           <Route path="/collector-data" component={CollectorData} />
           <Route path="/ingestion-dashboard" component={IngestionDashboard} />
           <Route component={NotFound} />
