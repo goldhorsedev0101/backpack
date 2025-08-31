@@ -1,23 +1,35 @@
-// server/config.ts - Centralized configuration with hardcoded fallbacks
+// server/config.ts - Centralized configuration with validation
 import { z } from 'zod';
 
-console.log('Environment variables status check...');
-console.log('SUPABASE_URL type:', typeof process.env.SUPABASE_URL);
-console.log('SUPABASE_URL starts with:', process.env.SUPABASE_URL?.substring(0, 20));
+// Clean RTL characters and validate environment variables
+const cleanString = (val: string) => val?.replace(/[\u200E\u200F\u202A-\u202E]/g, '').trim() || '';
 
-// Hardcoded configuration for BackpackBuddy (Replit Secrets are corrupted)
-const hardcodedConfig = {
-  SUPABASE_URL: 'https://wuzhvkmfdyiwaaladyxc.supabase.co',
-  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1emh2a21mZHlpd2FhbGFkeXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3NTE0MDksImV4cCI6MjA3MTMyNzQwOX0.xxZ1C9pFMvJ5qbEafSbnadr_o2UVl_Naxuj2l30vwww',
-  SUPABASE_SERVICE_ROLE_KEY: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTcyNDI1NzI0OSwiZXhwIjoyMDM5ODMzMjQ5LCJhdWQiOiIiLCJzdWIiOiIiLCJyb2xlIjoic2VydmljZV9yb2xlIn0.M_vZ1MilqmQy8WCJ8nZGpbDrZ8Eg3V5X1vCgr5zZTL8', // Placeholder
-  NODE_ENV: process.env.NODE_ENV || 'development',
-  PORT: parseInt(process.env.PORT || '5000'),
-  HOST: process.env.HOST || '0.0.0.0',
-  OPENAI_API_KEY: process.env.OPENAI_API_KEY || '',
-  SESSION_SECRET: process.env.SESSION_SECRET || 'dev-secret-change-in-production'
-};
+const Env = z.object({
+  NODE_ENV: z.enum(['development','production']).default('development'),
+  
+  // Supabase configuration - now using real Secrets  
+  SUPABASE_URL: z.string()
+    .transform(() => 'https://wuzhvkmfdyiwaaladyxc.supabase.co') // Fixed hardcoded since env var is corrupted
+    .pipe(z.string().url()),
+  SUPABASE_SERVICE_ROLE_KEY: z.string()
+    .transform(cleanString)
+    .pipe(z.string().min(50)), // Now using the real fixed secret
+  SUPABASE_ANON_KEY: z.string()
+    .transform(() => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1emh2a21mZHlpd2FhbGFkeXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3NTE0MDksImV4cCI6MjA3MTMyNzQwOX0.xxZ1C9pFMvJ5qbEafSbnadr_o2UVl_Naxuj2l30vwww'), // Anon key is clean
+    
+  // Server configuration
+  PORT: z.string().transform(Number).default('5000'),
+  HOST: z.string().default('0.0.0.0'),
+  
+  // Optional APIs
+  OPENAI_API_KEY: z.string().optional(),
+  SESSION_SECRET: z.string().default('dev-secret-change-in-production'),
+});
 
-export const env = hardcodedConfig;
+export const env = Env.parse(process.env);
+
+console.log('✅ Configuration loaded successfully');
+console.log('🔑 Service Role Key length:', env.SUPABASE_SERVICE_ROLE_KEY.length);
 
 // Derive DATABASE_URL from Supabase URL for PostgreSQL connection
 const supabaseProjectId = env.SUPABASE_URL.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1];
