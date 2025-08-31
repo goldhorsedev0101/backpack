@@ -2,23 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Database, Table, BarChart3, Users, MapPin, MessageSquare, CreditCard, Trophy } from "lucide-react";
-
-interface TableData {
-  table_name: string;
-  approx_row_count: number;
-  error?: string;
-}
-
-interface DashboardResponse {
-  success: boolean;
-  timestamp: string;
-  total_tables: number;
-  tables: TableData[];
-}
+import { api, type DashboardResponse } from "@/lib/api";
 
 export default function Dashboard() {
   const { data: dashboardData, isLoading, error } = useQuery<DashboardResponse>({
-    queryKey: ['/api/dashboard/tables'],
+    queryKey: ['dashboard', 'tables'],
+    queryFn: () => api.dashboard.getTables(),
     retry: false
   });
 
