@@ -3118,4 +3118,54 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Database dashboard endpoint
+  app.get('/api/dashboard/tables', async (_req, res) => {
+    try {
+      const tablesData = [];
+      
+      // List of all tables to check
+      const tablesToCheck = [
+        'destinations', 'accommodations', 'attractions', 'restaurants', 
+        'places', 'place_reviews', 'location_photos', 'location_ancestors',
+        'users', 'sessions', 'trips', 'expenses', 'achievements',
+        'chat_rooms', 'messages', 'user_connections', 'travel_buddy_posts',
+        'raw_responses', 'ingestion_runs', 'ingestion_jobs', 'ingestion_dead_letters'
+      ];
+      
+      for (const tableName of tablesToCheck) {
+        try {
+          const result = await pool.query(`SELECT COUNT(*) as count FROM ${tableName}`);
+          tablesData.push({
+            table_name: tableName,
+            approx_row_count: parseInt(result.rows[0].count)
+          });
+        } catch (error) {
+          // Table might not exist, add with 0 count
+          tablesData.push({
+            table_name: tableName,
+            approx_row_count: 0,
+            error: 'Table not found or inaccessible'
+          });
+        }
+      }
+      
+      // Sort by row count descending
+      tablesData.sort((a, b) => b.approx_row_count - a.approx_row_count);
+      
+      res.json({
+        success: true,
+        timestamp: new Date().toISOString(),
+        total_tables: tablesData.length,
+        tables: tablesData
+      });
+    } catch (error) {
+      console.error("Error fetching database dashboard:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "Failed to fetch database dashboard data",
+        error: error.message 
+      });
+    }
+  });
+
 }
