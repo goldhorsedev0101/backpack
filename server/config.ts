@@ -1,45 +1,39 @@
+// server/config.ts
+import { z } from 'zod';
+
+const Env = z.object({
+  NODE_ENV: z.enum(['development','production']).default('development'),
+  SUPABASE_URL: z.string().url(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(20),
+  SUPABASE_ANON_KEY: z.string().min(20),
+  DATABASE_URL: z.string().min(10).optional(), // אופציונלי אם יש Drizzle/pg
+  PORT: z.string().transform(Number).default('5000'),
+  HOST: z.string().default('0.0.0.0'),
+  OPENAI_API_KEY: z.string().optional(),
+  SESSION_SECRET: z.string().default('dev-secret-change-in-production'),
+});
+
+export const env = Env.parse(process.env);
+
+// Legacy config object for backward compatibility
 export const config = {
-  // Supabase configuration
   supabase: {
-    url: process.env.SUPABASE_URL || '',
-    anonKey: process.env.SUPABASE_ANON_KEY || '',
-    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+    url: env.SUPABASE_URL,
+    anonKey: env.SUPABASE_ANON_KEY,
+    serviceRoleKey: env.SUPABASE_SERVICE_ROLE_KEY,
   },
-  
-  // Database configuration 
   database: {
-    url: process.env.DATABASE_URL || '',
+    url: env.DATABASE_URL || '',
   },
-
-  // Server configuration
   server: {
-    port: Number(process.env.PORT) || 5000,
-    host: process.env.HOST || '0.0.0.0',
-    nodeEnv: process.env.NODE_ENV || 'development',
+    port: env.PORT,
+    host: env.HOST,
+    nodeEnv: env.NODE_ENV,
   },
-
-  // API Keys
   openai: {
-    apiKey: process.env.OPENAI_API_KEY || '',
+    apiKey: env.OPENAI_API_KEY || '',
   },
-
-  // Security
   session: {
-    secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
+    secret: env.SESSION_SECRET,
   },
 } as const;
-
-// Validation function
-export function validateConfig() {
-  const required = [
-    'DATABASE_URL',
-    'SUPABASE_URL', 
-    'SUPABASE_ANON_KEY'
-  ];
-
-  const missing = required.filter(key => !process.env[key]);
-  
-  if (missing.length > 0) {
-    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
-  }
-}
