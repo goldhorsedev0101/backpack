@@ -67,20 +67,20 @@ export default function BudgetTracker() {
     },
   });
 
-  const { data: userTrips = [], isLoading: tripsLoading } = useQuery({
+  const { data: userTrips = [], isLoading: tripsLoading } = useQuery<any[]>({
     queryKey: ["/api/trips/user"]
   });
 
-  const { data: expenses = [], isLoading: expensesLoading } = useQuery({
+  const { data: expenses = [], isLoading: expensesLoading } = useQuery<any[]>({
     queryKey: ["/api/expenses/user"],
   });
 
-  const { data: tripExpenses = [], isLoading: tripExpensesLoading } = useQuery({
+  const { data: tripExpenses = [], isLoading: tripExpensesLoading } = useQuery<any[]>({
     queryKey: ["/api/expenses/trip", selectedTrip],
     enabled: !!selectedTrip,
   });
 
-  const { data: analytics, isLoading: analyticsLoading } = useQuery({
+  const { data: analytics, isLoading: analyticsLoading } = useQuery<any>({
     queryKey: ["/api/analytics/dashboard"]
   });
 
