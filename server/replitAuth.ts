@@ -8,9 +8,8 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 
-if (!process.env.REPLIT_DOMAINS) {
-  throw new Error("Environment variable REPLIT_DOMAINS not provided");
-}
+// Demo mode - skip auth checks
+console.log('Running in demo mode - no authentication required');
 
 const getOidcConfig = memoize(
   async () => {
@@ -24,18 +23,11 @@ const getOidcConfig = memoize(
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-  const pgStore = connectPg(session);
-  // Use the same Transaction Pooler URL that works with Supabase from Replit
-  const connectionString = 'postgresql://postgres.wuzhvkmfdyiwaaladyxc:!Dornt0740$@aws-1-sa-east-1.pooler.supabase.com:6543/postgres';
-  const sessionStore = new pgStore({
-    conString: connectionString,
-    createTableIfMissing: false,
-    ttl: sessionTtl,
-    tableName: "sessions",
-  });
+  
+  // Simple session configuration for development without external database
+  console.log('Using basic session store for development');
   return session({
     secret: process.env.SESSION_SECRET!,
-    store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
