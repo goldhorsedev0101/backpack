@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Database, Table, BarChart3, Users, MapPin, MessageSquare, CreditCard, Trophy } from "lucide-react";
 
 interface TableData {
@@ -23,32 +22,7 @@ export default function Dashboard() {
     retry: false
   });
 
-  // Fallback data based on your provided information
-  const fallbackData: TableData[] = [
-    { table_name: 'spatial_ref_sys', approx_row_count: 8500 },
-    { table_name: 'location_photos', approx_row_count: 1667 },
-    { table_name: 'accommodations', approx_row_count: 743 },
-    { table_name: 'attractions', approx_row_count: 542 },
-    { table_name: 'restaurants', approx_row_count: 221 },
-    { table_name: 'raw_responses', approx_row_count: 181 },
-    { table_name: 'ingestion_runs', approx_row_count: 73 },
-    { table_name: 'destinations', approx_row_count: 27 },
-    { table_name: 'ingestion_jobs', approx_row_count: 20 },
-    { table_name: 'place_reviews', approx_row_count: 5 },
-    { table_name: 'places', approx_row_count: 5 },
-    { table_name: 'chat_rooms', approx_row_count: 4 },
-    { table_name: 'travel_buddy_posts', approx_row_count: 3 },
-    { table_name: 'test_destinations', approx_row_count: 2 },
-    { table_name: 'messages', approx_row_count: 0 },
-    { table_name: 'users', approx_row_count: 0 },
-    { table_name: 'sessions', approx_row_count: 0 },
-    { table_name: 'trips', approx_row_count: 0 },
-    { table_name: 'expenses', approx_row_count: 0 },
-    { table_name: 'achievements', approx_row_count: 0 },
-    { table_name: 'user_connections', approx_row_count: 0 }
-  ];
-
-  const displayData = dashboardData?.tables || fallbackData;
+  const displayData = dashboardData?.tables || [];
   const totalRecords = displayData.reduce((sum, table) => sum + table.approx_row_count, 0);
   const tablesWithData = displayData.filter(table => table.approx_row_count > 0).length;
 
@@ -84,12 +58,12 @@ export default function Dashboard() {
       <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8">
-            <Skeleton className="h-12 w-96 mx-auto mb-4" />
-            <Skeleton className="h-6 w-64 mx-auto" />
+            <div className="h-12 w-96 mx-auto mb-4 bg-gray-200 rounded animate-pulse" />
+            <div className="h-6 w-64 mx-auto bg-gray-200 rounded animate-pulse" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-32" />
+              <div key={i} className="h-32 bg-gray-200 rounded animate-pulse" />
             ))}
           </div>
         </div>
