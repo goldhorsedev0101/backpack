@@ -56,14 +56,23 @@ export async function registerRoutes(app: Express): Promise<void> {
   // Basic health endpoint
   app.get('/api/health', (_req, res) => res.json({ ok: true, time: new Date().toISOString() }));
 
-  // Destinations endpoint using Supabase
+  // Destinations endpoint using Supabase - user-facing interface
   app.get('/api/destinations', async (_req: Request, res: Response) => {
     try {
-      console.log('Fetching destinations from Supabase...');
-      const { data, error } = await supabaseAdmin
-        .from('destinations')
-        .select('*')
-        .limit(50);
+      console.log('Fetching destinations (places) from Supabase for user interface...');
+      const { data: destinations, error } = await supabaseAdmin
+        .from('places')
+        .select(`
+          id,
+          external_id,
+          name,
+          lat,
+          lon,
+          country,
+          source,
+          inserted_at
+        `)
+        .order('name');
 
       if (error) {
         console.error('Supabase error:', error);
@@ -75,8 +84,34 @@ export async function registerRoutes(app: Express): Promise<void> {
         });
       }
 
-      console.log(`Found ${data?.length || 0} destinations`);
-      res.json(data || []);
+      // Format destinations for frontend display
+      const destinationsWithPhotos = destinations?.map(dest => ({
+        id: dest.id,
+        location_id: dest.external_id,
+        name: dest.name,
+        latitude: dest.lat?.toString(),
+        longitude: dest.lon?.toString(),
+        city: null, // Not available in current schema
+        state: null, // Not available in current schema
+        country: dest.country || 'Unknown',
+        address_string: null, // Not available in current schema
+        web_url: null, // Not available in current schema
+        photo_count: 0,
+        created_at: dest.inserted_at,
+        photos: [],
+        mainPhoto: null, // Will use placeholder in frontend
+        coordinates: dest.lat && dest.lon ? {
+          lat: parseFloat(dest.lat.toString()),
+          lng: parseFloat(dest.lon.toString())
+        } : null
+      })) || [];
+
+      console.log(`Found ${destinationsWithPhotos.length} destinations`);
+      res.json({
+        success: true,
+        count: destinationsWithPhotos.length,
+        destinations: destinationsWithPhotos
+      });
     } catch (err) {
       console.error('Unexpected error:', err);
       res.status(500).json({ 
