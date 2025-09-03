@@ -223,7 +223,7 @@ export default function CollectorData() {
                 <div className="flex gap-2">
                   {place.website && (
                     <Button variant="outline" size="sm" className="flex-1 text-xs sm:text-sm h-8 sm:h-9" asChild>
-                      <a href={place.website} target="_blank" rel="noopener noreferrer">
+                      <a href={place.website || '#'} target="_blank" rel="noopener noreferrer">
                         אתר
                       </a>
                     </Button>

@@ -1,6 +1,6 @@
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { MapPin, Globe, Camera, Clock } from 'lucide-react';
-import { useState } from 'react';
 
 interface DestinationPhoto {
   location_id: string;
