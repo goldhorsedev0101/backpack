@@ -598,14 +598,16 @@ export default function ExplorePage() {
     if (!weather) {
       console.log('🌤️ No weather data for destination', destinationId, 'showing loading state');
       return (
-        <div className="border-t pt-3 mt-3">
-          <div className="flex items-center gap-2 text-muted-foreground text-sm">
+        <div className="border-t pt-3 mt-3" style={{ backgroundColor: 'orange', padding: '4px' }}>
+          <div className="flex items-center gap-2 text-black text-sm">
             <span>🌤️</span>
-            <span>Loading weather...</span>
+            <span>No weather data for {destinationId}</span>
           </div>
         </div>
       );
     }
+
+    console.log('🌤️ Weather data found! Rendering widget for', destinationId, weather);
 
     const formatTime = () => {
       return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
