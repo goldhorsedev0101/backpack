@@ -1,0 +1,118 @@
+Tooltip לפרטי תמונה + ווידג’ט מזג אוויר בלשונית Destinations (שימוש ב-Weather API הקיים)
+
+עדכן את הדף הקיים /explore כך:
+
+A) Tooltip לפרטי תמונה (כל הלשוניות)
+
+השתמש בקומפוננט UI קיים (shadcn/ui Tooltip או ספרייה שקיימת בפרויקט). אם אין—הוסף Tooltip קליל נגיש (ESC לסגירה, focus/hover, aria-describedby).
+
+מקור הנתונים: מה־location_photos של אותו פריט (כבר נטען בשתי-קריאות). הצג ב-Tooltip את הפרטים (רק אם קיימים):
+
+Source (source)
+
+License (license)
+
+Attribution (attribution)
+
+Resolution (width × height אם יש)
+
+Inserted (inserted_at, תאריך מקומי מקוצר)
+
+URL (קישור “Open image” בטאב חדש)
+
+מיקום ה-Tooltip:
+
+אם יש אייקון “מצלמה”/overlay על התמונה—קשר אליו Tooltip “Photo info”.
+
+לחלופין, הוסף כפתור עגול קטן (“i”/camera) בקצה הימני העליון של התמונה עם aria-label="Photo info".
+
+נגישות/מובייל:
+
+Hover + Focus + קליק/לחיצה ארוכה במובייל.
+
+שמור מצב ה-Tooltip פר-כרטיס בלבד; סגור אוטומטית במעבר כרטיס.
+
+ללא תמונה: לא מציגים Tooltip. הצג placeholder רגיל.
+
+B) ווידג’ט מזג אוויר בלשונית Destinations בלבד
+
+שימוש ב-Weather API הקיים בפרויקט. אם קיים client/utility — השתמש בו. אם לא קיים כלל: צור עטיפה דקה סביב ה-API הקיים (אל תכניס שירות חדש), קרא מ-ENV מפתחות/URL, בלי הקשחות.
+
+מה להציף לכל יעד (card/row):
+
+טמפ’ נוכחית + אייקון מצב שמיים (Sunny/Cloudy/Rain).
+
+High/Low של היום (או של 24h הקרובות).
+
+תיאור קצר (e.g., “Light rain” / “Clear”).
+
+Badge של מדינה נשאר (כפי שקיים), אין צורך בעיר בלשונית Destinations.
+
+איך מביאים את הנתונים:
+
+קבל lat, lon של היעד. אם חסרים—דלג בעדינות והצג “Weather unavailable”.
+
+קרא ל-Weather API הקיים עם batch/fan-out מבוקר:
+
+Debounce לפי גלילה/דפדוף עמוד.
+
+Rate-limit פנימי (למשל 5-8 קריאות מקבילות לכל היותר).
+
+Cache בזיכרון + sessionStorage (מפתח: weather:{lat}:{lon}) ל-~30–60 דקות.
+
+אם ל-API יש endpoint batch לפי רשימת קואורדינטות—השתמש בו להקטין קריאות.
+
+שכבות עמידות:
+
+Timeout סביר (6–8s) + Retry אחד backoff קצר.
+
+Error boundary: הצג chip “Weather ⚠️” עם Tooltip “Couldn’t fetch weather”.
+
+UI:
+
+חלק עליון בכרטיס: תמונת היעד (כבר קיימת) עם Tooltip פרטי תמונה (סעיף A).
+
+מתחת לשם היעד: שורת מזג אוויר קומפקטית:
+
+אייקון מזג אוויר | tempNow° | H: high° / L: low° | תיאור קצר.
+
+הוסף Tooltip קטן מעל האזור הזה המציג:
+
+“Updated: hh:mm” (מה-cache).
+
+“Feels like”, “Humidity %”, “Wind km/h” — אם זמינים ב-API.
+
+פורמט & לוקליזציה:
+
+טמפ’ ב־°C (אם זה ברירת מחדל בפרויקט; אם לא—כבד הגדרה קיימת).
+
+תאריכים/שעות לפי לוקל ברירת מחדל קיימת.
+
+אופטימיזציה:
+
+אל תעשה N+1 לא מבוקר. רכז ids/latlon לדף הנוכחי ואז עבד בקבוצות.
+
+אל תטריגר מחדש פETCH אם יש cache טרי (TTL).
+
+ENV:
+
+קרא את מפתחות/URL ל-Weather API דרך אותו מודול ENV מרוכז (אם יצרנו src/config/env.ts — השתמש בו).
+
+אין להקשיח API keys בקוד.
+
+C) קבלה (Acceptance)
+
+Tooltip “Photo info” מוצג על כל תמונה שיש לה נתוני location_photos וחשוף בעכבר/מקלדת/מובייל; מציג source/license/attribution/resolution/inserted/url כשזמין.
+
+בלשונית Destinations בלבד: בכל כרטיס יעד מוצג מזג אוויר קומפקטי (אייקון + tempNow + High/Low + תיאור). Tooltip משני מציג נתונים מורחבים (Feels like/Humidity/Wind/Updated).
+
+אין האטה מורגשת בגלילה/דפדוף בין עמודים; יש cache + rate-limit לקריאות מזג אוויר.
+
+אין מפתחות קשיחים; שימוש ב-ENV בלבד.
+
+שאר הלשוניות (Accommodations/Attractions/Restaurants): רק Tooltip תמונה + כותרת משנה “עיר, מדינה” (לפי הלוגיקה שכבר הוספנו), ללא בלוק מזג אוויר.
+
+אין יצירת דפים חדשים; הכל במסך הקיים.
+
+Commit בסיום:
+feat(explore): photo tooltips + compact weather widget for destinations (cached & rate-limited)
