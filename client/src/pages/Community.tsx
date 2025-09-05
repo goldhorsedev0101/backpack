@@ -1,18 +1,23 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
-import { Star, MessageCircle, Users, MapPin, Calendar, ThumbsUp, Search } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
+import { Star, MessageCircle, Users, MapPin, Calendar, ThumbsUp, Search, Plus, Loader2, RefreshCw } from "lucide-react";
 import { apiRequest } from "../lib/queryClient";
+import { supabase } from "../lib/supabase";
 import { ChatSidebar } from "../components/community/ChatSidebar";
 import { RoomView } from "../components/community/RoomView";
 import { SidebarDMs } from "../components/community/SidebarDMs";
 import { TravelBuddyList } from "../components/community/TravelBuddyList";
 import { NewBuddyPostModal } from "../components/community/NewBuddyPostModal";
+import { useToast } from "../hooks/use-toast";
 
 const StarRating = ({ rating }: { rating: number }) => {
   return (
@@ -45,6 +50,18 @@ export default function Community() {
   
   // Travel Buddy state
   const [showNewPostModal, setShowNewPostModal] = useState(false);
+  
+  // Create Room state
+  const [showCreateRoomModal, setShowCreateRoomModal] = useState(false);
+  const [newRoomData, setNewRoomData] = useState({
+    name: '',
+    description: '',
+    destination: '',
+    guestName: ''
+  });
+  
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Fetch place reviews (simplified version without authentication requirement)
   const { data: reviewsData, isLoading: reviewsLoading, error: reviewsError } = useQuery({
@@ -216,6 +233,7 @@ export default function Community() {
                 setSelectedRoomName(`Room ${roomId}`);
                 setSelectedRoomDescription('');
               }}
+              onCreateRoom={() => setShowCreateRoomModal(true)}
             />
             <RoomView 
               roomId={selectedRoom}
@@ -258,6 +276,271 @@ export default function Community() {
         open={showNewPostModal} 
         onOpenChange={setShowNewPostModal} 
       />
+
+      {/* Create Room Modal */}
+      <CreateRoomModal 
+        open={showCreateRoomModal}
+        onOpenChange={setShowCreateRoomModal}
+        onRoomCreated={(roomId, roomName) => {
+          setSelectedRoom(roomId);
+          setSelectedRoomName(roomName);
+          setSelectedRoomDescription('');
+        }}
+      />
     </div>
+  );
+}
+
+// Create Room Modal Component
+function CreateRoomModal({ 
+  open, 
+  onOpenChange, 
+  onRoomCreated 
+}: { 
+  open: boolean; 
+  onOpenChange: (open: boolean) => void; 
+  onRoomCreated: (roomId: number, roomName: string) => void;
+}) {
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    destination: '',
+    guestName: ''
+  });
+  const [isCreating, setIsCreating] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Get guest name from localStorage
+  const storedGuestName = localStorage.getItem('tripwise_guest_name') || '';
+
+  // Create room mutation
+  const createRoomMutation = useMutation({
+    mutationFn: async (roomData: typeof formData) => {
+      const currentGuestName = roomData.guestName || storedGuestName;
+      
+      if (!currentGuestName) {
+        throw new Error('Guest name is required');
+      }
+
+      // Save guest name to localStorage
+      localStorage.setItem('tripwise_guest_name', currentGuestName);
+
+      // Create room data
+      const roomPayload = {
+        name: roomData.name.trim(),
+        description: roomData.description.trim() || null,
+        type: 'public',
+        destination: roomData.destination.trim() || null,
+        is_private: false,
+        created_by: 'guest', // Fallback for guest mode
+        is_active: true
+      };
+
+      // Insert room using Supabase client
+      const { data: room, error } = await supabase
+        .from('chat_rooms')
+        .insert([roomPayload])
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      // Add creator as member if chat_room_members table exists
+      try {
+        await supabase
+          .from('chat_room_members')
+          .insert([{
+            room_id: room.id,
+            guest_name: currentGuestName,
+            role: 'admin'
+          }]);
+      } catch (memberError) {
+        // Ignore if table doesn't exist - not critical
+        console.warn('Could not add room member:', memberError);
+      }
+
+      return room;
+    },
+    onSuccess: (room) => {
+      // Refresh chat rooms list
+      queryClient.invalidateQueries({ queryKey: ['/api/chat-rooms'] });
+      
+      // Clear form
+      setFormData({ name: '', description: '', destination: '', guestName: '' });
+      
+      // Close modal
+      onOpenChange(false);
+      
+      // Open the new room
+      onRoomCreated(room.id, room.name);
+      
+      toast({
+        title: "Room Created",
+        description: `Successfully created "${room.name}"`,
+      });
+    },
+    onError: (error: any) => {
+      console.error('Create room error:', error);
+      
+      if (error.code === '42501' || error.message?.includes('permission') || error.message?.includes('policy')) {
+        toast({
+          title: "Permission Denied",
+          description: "No permission to create rooms in current environment. Check docs/community-rls.md for DEV policy setup.",
+          variant: "destructive",
+        });
+      } else if (error.code === '23505' || error.message?.includes('unique')) {
+        toast({
+          title: "Room Name Taken",
+          description: "A room with this name already exists. Please choose a different name.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Failed to Create Room",
+          description: error.message || "An unexpected error occurred",
+          variant: "destructive",
+        });
+      }
+    }
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validation
+    if (!formData.name.trim()) {
+      toast({
+        title: "Room Name Required",
+        description: "Please enter a name for the room",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.name.length < 2 || formData.name.length > 60) {
+      toast({
+        title: "Invalid Room Name",
+        description: "Room name must be between 2-60 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.description.length > 200) {
+      toast({
+        title: "Description Too Long",
+        description: "Description must be under 200 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const guestName = formData.guestName || storedGuestName;
+    if (!guestName) {
+      toast({
+        title: "Your Name Required",
+        description: "Please enter your name to create a room",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    createRoomMutation.mutate(formData);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>Create New Chat Room</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="room-name">Room Name *</Label>
+            <Input
+              id="room-name"
+              placeholder="e.g., Peru Travel Planning"
+              value={formData.name}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              maxLength={60}
+              disabled={createRoomMutation.isPending}
+            />
+            <p className="text-xs text-gray-500 mt-1">{formData.name.length}/60 characters</p>
+          </div>
+
+          <div>
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              placeholder="Brief description of what this room is for..."
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              maxLength={200}
+              disabled={createRoomMutation.isPending}
+              rows={3}
+            />
+            <p className="text-xs text-gray-500 mt-1">{formData.description.length}/200 characters</p>
+          </div>
+
+          <div>
+            <Label htmlFor="destination">Location/Country</Label>
+            <Input
+              id="destination"
+              placeholder="e.g., Peru, Colombia, Chile"
+              value={formData.destination}
+              onChange={(e) => setFormData(prev => ({ ...prev, destination: e.target.value }))}
+              disabled={createRoomMutation.isPending}
+            />
+          </div>
+
+          {!storedGuestName && (
+            <div>
+              <Label htmlFor="guest-name">Your Name *</Label>
+              <Input
+                id="guest-name"
+                placeholder="Enter your name"
+                value={formData.guestName}
+                onChange={(e) => setFormData(prev => ({ ...prev, guestName: e.target.value }))}
+                disabled={createRoomMutation.isPending}
+              />
+            </div>
+          )}
+
+          {storedGuestName && (
+            <div className="text-sm text-gray-600">
+              Creating as: <strong>{storedGuestName}</strong>
+            </div>
+          )}
+
+          <div className="flex gap-3 pt-4">
+            <Button 
+              type="submit" 
+              disabled={createRoomMutation.isPending}
+              className="flex-1"
+            >
+              {createRoomMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                'Create Room'
+              )}
+            </Button>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => onOpenChange(false)}
+              disabled={createRoomMutation.isPending}
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

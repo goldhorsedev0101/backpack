@@ -1,0 +1,113 @@
+פרומפט: “Create Room” ל־Chat Rooms (עם Guest Mode) + טיפול בשגיאות טעינה
+
+עדכן את הדף הקיים /community (אל תיצור דף חדש) כך:
+
+1) UI — כפתור “Create Room”
+
+בטאב Chat Rooms הוסף כפתור ראשי Create Room (או אייקון + מימין לכותרת “Chat Rooms”).
+
+כאשר אין חדרים/יש שגיאת טעינה (“Unable to load chat rooms”), הצג גם Empty State עם אותו כפתור.
+
+הכפתור פתוח תמיד ב-DEV; ב-PROD אפשר להשאירו אם יש הרשאת כתיבה (ראה סעיף 4), אחרת להסתיר.
+
+2) מודל יצירת חדר
+
+פתח Modal עם הטופס:
+
+Room name (חובה, 2–60 תווים)
+
+Description (אופציונלי, עד 200 תווים)
+
+Location/Country (אופציונלי, אם יש עמודה מתאימה)
+
+Visibility / Type: ברירת מחדל public (שמור ב־type='public' אם העמודה קיימת; אם לא — שים metadata -> 'type' = 'public' אם יש עמודת JSON; אם אין גם זה — דלג בשקט).
+
+Creator:
+
+אם יש Auth - השתמש ב-auth.user() לשיוך.
+
+אם אין Auth - בקש/קרא guest_name מ-localStorage (אם חסר, שדה חובה בטופס) ושמור אותו ב-author_name/created_by_name אם קיימים שדות, או צור שורת חברות ב-chat_room_members (אם הטבלה קיימת) עם guest_name.
+
+ולידציה: שם חדר ייחודי יחסית (אם יש אינדקס ייחודי — לתפוס שגיאה ולהציג הודעה ידידותית).
+
+3) כתיבה ל-Supabase (ללא הקשחת מפתחות)
+
+השתמש ב-client הקיים (supabase).
+
+יצירה:
+
+const { data: room, error } = await supabase
+  .from('chat_rooms')
+  .insert([{
+    name, description,
+    ...(hasColumn('type') ? { type: 'public' } : {}),
+    ...(hasJsonColumn('metadata') ? { metadata: { type: 'public' } } : {})
+  }])
+  .select()
+  .single();
+
+
+אם קיימת טבלת chat_room_members — הוסף שורה ליוצר:
+
+עם Auth: user_id = auth.uid()
+
+בלי Auth: guest_name = local guest_name
+
+Optimistic UI: בזמן יצירה, נטרל את הכפתור והצג spinner קטן. בשגיאה — החזר את הכפתור והצג toast.
+
+4) הרשאות/RLS — גילוי ו-UX
+
+אם פעולת insert נכשלת עם 401/permission denied:
+
+הצג toast: “אין הרשאה ליצור חדרים בסביבה הנוכחית.”
+
+הצג קישור ל־docs/community-rls.md (אם קיים בפרויקט) עם הסבר על הפעלת מדיניות DEV:
+
+create policy "public write messages"... וכו’ (כפי שכבר הוספנו במסמכים).
+
+אפשרות: אפשרו את הכפתור רק כש־process.env.ALLOW_DEV_WRITES === 'true' (אם המשתנה קיים), אחרת השארו אותו אך תפסו את השגיאה.
+
+5) רענון הרשימה ופתיחת החדר החדש
+
+לאחר יצירה מוצלחת:
+
+רענן את רשימת ה-chat_rooms בסיידבר (או הוסף את החדר שנוצר ל-state).
+
+נווט/בחר אוטומטית את החדר החדש ופתח את RoomView (טען הודעות, חיבור realtime).
+
+הצג toast “Room created”.
+
+6) טיפול בשגיאות טעינת חדרים (המצב הנוכחי)
+
+עטוף את טעינת ה-chat_rooms ב-try/catch:
+
+בשגיאה — הצג כותרת משנה “Unable to load chat rooms” + כפתור Retry שמפעיל fetch מחדש.
+
+אם select מחזיר ‎0‎ שורות (אין חדרים) — הצג Empty State עם כפתור Create Room.
+
+אל תקריס אם לטבלה חסרות עמודות; ב-select() בקש רק עמודות קיימות (name/description/type/metadata/created_at).
+
+7) Guest Mode — תאימות מלאה
+
+ודא שב-composer קיימת בדיקה ל-guest_name (אם אין Auth). אם חסר — פתח prompt קטן לבחירת שם ושמור ב-localStorage.
+
+ביצירת חדר חדש, אם יש chat_room_members — הוסף את האורח כחבר חדר.
+
+8) בדיקות/קבלה (Acceptance)
+
+בטאב Chat Rooms מוצג כפתור Create Room בראש הטאב + ב-Empty State.
+
+מילוי הטופס ו-Create → יוצר רשומה ב-chat_rooms (עם type='public' או metadata.type='public' בהתאם לסכמה), מוסיף חברות בטבלה chat_room_members אם קיימת, מרענן רשימה ופותח את החדר.
+
+ב-DEV ללא Auth — תהליך עובד עם guest_name.
+
+בשגיאת הרשאה (RLS) — מתקבלת הודעה ברורה + קישור למסמך ההרשאות.
+
+מצב “Unable to load chat rooms” מציג Retry ועובד.
+
+אין הקשחת מפתחות; שימוש ב-ENV בלבד.
+
+אין שבירת Tabs אחרים ב-/community.
+
+Commit בסיום:
+feat(community): add “Create Room” flow (modal, insert, guest-mode), fix empty/error states & auto-open new room

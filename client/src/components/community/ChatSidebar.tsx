@@ -5,7 +5,7 @@ import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { ScrollArea } from '../ui/scroll-area';
 import { Avatar, AvatarFallback } from '../ui/avatar';
-import { MessageCircle, Users, MapPin, Plus, Clock } from 'lucide-react';
+import { MessageCircle, Users, MapPin, Plus, Clock, RefreshCw } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ChatRoom {
@@ -28,7 +28,7 @@ interface ChatSidebarProps {
 }
 
 export function ChatSidebar({ selectedRoom, onRoomSelect, onCreateRoom }: ChatSidebarProps) {
-  const { data: rooms = [], isLoading, error } = useQuery({
+  const { data: rooms = [], isLoading, error, refetch } = useQuery({
     queryKey: ['/api/chat-rooms'],
     retry: false
   });
@@ -89,12 +89,20 @@ export function ChatSidebar({ selectedRoom, onRoomSelect, onCreateRoom }: ChatSi
             <p className="text-gray-500 mb-4">
               {error ? 'Unable to load chat rooms' : 'Chat rooms are being set up'}
             </p>
-            {onCreateRoom && (
-              <Button onClick={onCreateRoom} variant="outline" size="sm">
-                <Plus className="w-4 h-4 mr-2" />
-                Create First Room
-              </Button>
-            )}
+            <div className="space-y-2">
+              {error && (
+                <Button onClick={() => refetch()} variant="outline" size="sm">
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Retry
+                </Button>
+              )}
+              {onCreateRoom && (
+                <Button onClick={onCreateRoom} variant="outline" size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Room
+                </Button>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -124,7 +132,13 @@ export function ChatSidebar({ selectedRoom, onRoomSelect, onCreateRoom }: ChatSi
               <div className="text-center py-8">
                 <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                 <p className="text-gray-500 mb-4">No chat rooms yet</p>
-                <p className="text-sm text-gray-400">Be the first to start a conversation! 👋</p>
+                <p className="text-sm text-gray-400 mb-4">Be the first to start a conversation! 👋</p>
+                {onCreateRoom && (
+                  <Button onClick={onCreateRoom} variant="outline" size="sm">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Room
+                  </Button>
+                )}
               </div>
             ) : (
               rooms.map((room: ChatRoom) => (
