@@ -190,24 +190,42 @@ export default function ExplorePage() {
       
       setTotalCount(count || 0);
       setDebugInfo((prev: any) => ({ ...prev, destinations: { count, rows: data?.length || 0 } }));
+      console.log('🗺️ Destinations query result:', data?.slice(0, 3)); // Log first 3 destinations
       return data as Destination[];
     }
   });
 
   // Fetch weather data for destinations (only when on destinations tab)
-  const { data: weatherResults } = useQuery({
+  const { data: weatherResults, isLoading: weatherLoading, error: weatherError } = useQuery({
     queryKey: ['weather-data', destinations.map(d => d.id).sort()],
     queryFn: async () => {
-      if (!destinations.length || activeTab !== 'destinations') return new Map();
+      console.log('🌤️ Weather query starting...', { destinations: destinations.length, activeTab });
+      
+      if (!destinations.length || activeTab !== 'destinations') {
+        console.log('🌤️ No destinations or wrong tab, skipping weather');
+        return new Map();
+      }
       
       const destinationsWithCoords = destinations.filter(d => 
         d.lat !== undefined && d.lon !== undefined && 
         !isNaN(d.lat) && !isNaN(d.lon)
       );
       
-      if (destinationsWithCoords.length === 0) return new Map();
+      console.log('🌤️ Destinations with coordinates:', destinationsWithCoords.length, destinationsWithCoords.map(d => ({ id: d.id, name: d.name, lat: d.lat, lon: d.lon })));
       
-      return await weatherClient.getWeatherForDestinations(destinationsWithCoords);
+      if (destinationsWithCoords.length === 0) {
+        console.log('🌤️ No destinations with valid coordinates');
+        return new Map();
+      }
+      
+      try {
+        const result = await weatherClient.getWeatherForDestinations(destinationsWithCoords);
+        console.log('🌤️ Weather data received:', result.size, 'destinations');
+        return result;
+      } catch (error) {
+        console.error('🌤️ Weather fetch error:', error);
+        throw error;
+      }
     },
     enabled: activeTab === 'destinations' && destinations.length > 0,
     staleTime: 30 * 60 * 1000, // 30 minutes
@@ -216,7 +234,9 @@ export default function ExplorePage() {
 
   // Update weather data state when results change
   useEffect(() => {
+    console.log('🌤️ useEffect: weatherResults changed:', weatherResults?.size || 0, 'items');
     if (weatherResults) {
+      console.log('🌤️ useEffect: updating weatherData state');
       setWeatherData(weatherResults);
     }
   }, [weatherResults]);
@@ -571,9 +591,12 @@ export default function ExplorePage() {
 
   // Weather widget component (only for destinations)
   const renderWeatherWidget = (destinationId: number) => {
+    console.log('🌤️ renderWeatherWidget called for destination:', destinationId, 'weatherData size:', weatherData.size);
     const weather = weatherData.get(destinationId);
+    console.log('🌤️ weather data for destination', destinationId, ':', weather);
     
     if (!weather) {
+      console.log('🌤️ No weather data for destination', destinationId, 'returning null');
       return null; // No weather data available
     }
 
@@ -698,6 +721,9 @@ export default function ExplorePage() {
         </TabsList>
 
         <TabsContent value="destinations" className="mt-6">
+          <div style={{ backgroundColor: 'yellow', padding: '10px', marginBottom: '10px' }}>
+            <strong>DEBUG:</strong> Destinations tab active. ActiveTab: {activeTab}, Destinations count: {destinations.length}, Weather data size: {weatherData.size}
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {destinationsLoading ? (
               Array.from({ length: 6 }).map((_, i) => (
@@ -752,7 +778,10 @@ export default function ExplorePage() {
                       </div>
                       
                       {/* Weather Widget - Only for destinations */}
-                      {renderWeatherWidget(destination.id)}
+                      <div style={{ border: '1px dashed red', padding: '4px', margin: '4px 0' }}>
+                        <small style={{ color: 'red' }}>DEBUG: Weather widget location for destination {destination.id}</small>
+                        {renderWeatherWidget(destination.id)}
+                      </div>
                     </CardContent>
                   </Card>
                 );

@@ -23,6 +23,7 @@ interface Destination {
 
 class WeatherClient {
   async getWeatherForDestinations(destinations: Destination[]): Promise<Map<number, WeatherData>> {
+    console.log('🌤️ WeatherClient: getWeatherForDestinations called with', destinations.length, 'destinations');
     const weatherData = new Map<number, WeatherData>();
     
     // Filter destinations with valid coordinates
@@ -33,11 +34,16 @@ class WeatherClient {
       !isNaN(dest.lon)
     );
 
+    console.log('🌤️ WeatherClient: valid destinations filtered:', validDestinations.length);
+
     if (validDestinations.length === 0) {
+      console.log('🌤️ WeatherClient: no valid destinations, returning empty map');
       return weatherData;
     }
     
     try {
+      console.log('🌤️ WeatherClient: calling /api/weather/batch with:', validDestinations);
+      
       // Call our server's batch weather endpoint
       const response = await fetch('/api/weather/batch', {
         method: 'POST',
@@ -47,19 +53,26 @@ class WeatherClient {
         body: JSON.stringify({ destinations: validDestinations }),
       });
       
+      console.log('🌤️ WeatherClient: response status:', response.status, response.statusText);
+      
       if (!response.ok) {
-        throw new Error(`Weather API request failed: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('🌤️ WeatherClient: API error response:', errorText);
+        throw new Error(`Weather API request failed: ${response.statusText} - ${errorText}`);
       }
       
       const data = await response.json();
+      console.log('🌤️ WeatherClient: received data:', data);
       
       // Convert response back to Map
       for (const [id, weather] of Object.entries(data)) {
         weatherData.set(parseInt(id), weather as WeatherData);
       }
       
+      console.log('🌤️ WeatherClient: final weather map size:', weatherData.size);
+      
     } catch (error) {
-      console.warn('Failed to get weather data:', error);
+      console.error('🌤️ WeatherClient: Failed to get weather data:', error);
     }
     
     return weatherData;
