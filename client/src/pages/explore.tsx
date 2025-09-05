@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,48 +6,93 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { MapPin, Star, Phone, Globe, Clock, DollarSign, Users, Camera, CloudSun } from "lucide-react";
+import { supabase, fetchPhotosForEntities, type LocationPhoto } from "@/lib/supabase";
+import { MapPin, Star, Phone, Globe, Clock, DollarSign, Users, Camera, CloudSun, Eye } from "lucide-react";
 import DestinationWeather from "@/components/DestinationWeather";
 import { BestTimeInfo } from "@/components/BestTimeInfo";
 
+// Updated types to match Supabase schema
 interface Destination {
   id: number;
   locationId: string;
   name: string;
+  city?: string;
+  state?: string;
   country: string;
-  description: string;
-  latitude: number;
-  longitude: number;
-  bestTimeToVisit: string;
-  averageTemperature: number;
-  attractions: string[];
-  activities: string[];
-  tags: string[];
+  addressString?: string;
+  latitude?: string;
+  longitude?: string;
+  photoCount?: number;
+  webUrl?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-interface LocationItem {
+interface Accommodation {
   id: number;
   locationId: string;
   name: string;
-  description: string;
-  address: string;
-  rating: number;
-  numReviews: number;
+  rating?: string;
+  numReviews?: number;
   priceLevel?: string;
-  phone?: string;
-  website?: string;
-  openingHours?: string[];
+  category?: string;
+  city?: string;
+  country: string;
+  addressString?: string;
+  webUrl?: string;
+  amenities?: string[];
+  createdAt: string;
+  updatedAt: string;
 }
 
-interface ApiResponse<T> {
-  success: boolean;
-  count: number;
-  destinations?: T[];
-  accommodations?: T[];
-  attractions?: T[];
-  restaurants?: T[];
+interface Attraction {
+  id: number;
+  locationId: string;
+  name: string;
+  rating?: string;
+  numReviews?: number;
+  category?: string;
+  city?: string;
+  country: string;
+  addressString?: string;
+  webUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Restaurant {
+  id: number;
+  locationId: string;
+  name: string;
+  rating?: string;
+  numReviews?: number;
+  priceLevel?: string;
+  category?: string;
+  cuisine?: string[];
+  city?: string;
+  country: string;
+  addressString?: string;
+  webUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Photo state management
+interface PhotoState {
+  destinations: Map<string, LocationPhoto>;
+  accommodations: Map<string, LocationPhoto>;
+  attractions: Map<string, LocationPhoto>;
+  restaurants: Map<string, LocationPhoto>;
+}
+
+// Detail modal state
+interface DetailModalState {
+  isOpen: boolean;
+  type: 'destination' | 'accommodation' | 'attraction' | 'restaurant' | null;
+  item: any;
+  photos: LocationPhoto[];
 }
 
 export default function ExplorePage() {
@@ -55,118 +100,241 @@ export default function ExplorePage() {
   const [selectedCountry, setSelectedCountry] = useState("all");
   const [weatherFilter, setWeatherFilter] = useState("all");
   const [activeTab, setActiveTab] = useState("destinations");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [photos, setPhotos] = useState<PhotoState>({
+    destinations: new Map(),
+    accommodations: new Map(),
+    attractions: new Map(),
+    restaurants: new Map()
+  });
+  const [detailModal, setDetailModal] = useState<DetailModalState>({
+    isOpen: false,
+    type: null,
+    item: null,
+    photos: []
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch destinations
-  const { data: destinationsResponse, isLoading: destinationsLoading } = useQuery<ApiResponse<Destination>>({
-    queryKey: ['/api/destinations'],
-  });
-  const destinations = (destinationsResponse?.destinations || []) as Destination[];
+  const ITEMS_PER_PAGE = 20;
 
-  // Fetch accommodations
-  const { data: accommodationsResponse, isLoading: accommodationsLoading } = useQuery<ApiResponse<LocationItem>>({
-    queryKey: ['/api/accommodations'],
-  });
-  const accommodations = (accommodationsResponse?.accommodations || []) as LocationItem[];
-
-  // Fetch attractions
-  const { data: attractionsResponse, isLoading: attractionsLoading } = useQuery<ApiResponse<LocationItem>>({
-    queryKey: ['/api/attractions'],
-  });
-  const attractions = (attractionsResponse?.attractions || []) as LocationItem[];
-
-  // Fetch restaurants
-  const { data: restaurantsResponse, isLoading: restaurantsLoading } = useQuery<ApiResponse<LocationItem>>({
-    queryKey: ['/api/ta-restaurants'],
-  });
-  const restaurants = (restaurantsResponse?.restaurants || []) as LocationItem[];
-
-  // Seed database mutation
-  const seedDataMutation = useMutation({
-    mutationFn: () => apiRequest('/api/data/seed', { method: 'POST' }),
-    onSuccess: () => {
-      toast({
-        title: "Database Updated",
-        description: "South American travel data has been loaded successfully.",
-      });
-      // Refresh all data
-      queryClient.invalidateQueries({ queryKey: ['/api/destinations'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/accommodations'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/attractions'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/ta-restaurants'] });
-    },
-    onError: (error) => {
-      toast({
-        title: "Update Failed",
-        description: "Could not load travel data. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Local search mutation for all data types
-  const localSearchMutation = useMutation({
-    mutationFn: async ({ query, type }: { query: string; type: string }) => {
-      const endpoints = {
-        destinations: '/api/destinations/search',
-        accommodations: '/api/accommodations/search', 
-        attractions: '/api/attractions/search',
-        restaurants: '/api/ta-restaurants/search'
-      };
+  // Fetch destinations from Supabase
+  const { data: destinations = [], isLoading: destinationsLoading } = useQuery({
+    queryKey: ['supabase-destinations', currentPage, searchQuery, selectedCountry],
+    queryFn: async () => {
+      let query = supabase
+        .from('destinations')
+        .select('*', { count: 'exact', head: false })
+        .order('updatedAt', { ascending: false })
+        .range(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE - 1);
       
-      const endpoint = endpoints[type as keyof typeof endpoints] || endpoints.destinations;
-      return apiRequest(`${endpoint}?q=${encodeURIComponent(query)}`);
-    },
-    onSuccess: (data: any) => {
-      toast({
-        title: "Search Complete",
-        description: `Found results in your database.`,
-      });
-      // Refresh the current tab data
-      queryClient.invalidateQueries({ queryKey: [`/api/${activeTab === 'destinations' ? 'destinations' : activeTab === 'accommodations' ? 'accommodations' : activeTab === 'attractions' ? 'attractions' : 'ta-restaurants'}`] });
-    },
-    onError: () => {
-      toast({
-        title: "Search Failed",
-        description: "Could not search local data. Please try again.",
-        variant: "destructive",
-      });
-    },
+      if (searchQuery) {
+        query = query.or(`name.ilike.%${searchQuery}%,country.ilike.%${searchQuery}%,addressString.ilike.%${searchQuery}%`);
+      }
+      if (selectedCountry !== 'all') {
+        query = query.eq('country', selectedCountry);
+      }
+      
+      const { data, error, count } = await query;
+      if (error) throw error;
+      
+      setTotalCount(count || 0);
+      return data as Destination[];
+    }
   });
 
-  const filteredDestinations = destinations.filter((dest: Destination) => {
-    const matchesSearch = dest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         dest.country.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCountry = selectedCountry === "all" || dest.country === selectedCountry;
-    return matchesSearch && matchesCountry;
+  // Fetch accommodations from Supabase
+  const { data: accommodations = [], isLoading: accommodationsLoading } = useQuery({
+    queryKey: ['supabase-accommodations', currentPage, searchQuery],
+    queryFn: async () => {
+      let query = supabase
+        .from('accommodations')
+        .select('*', { count: 'exact', head: false })
+        .order('updatedAt', { ascending: false })
+        .range(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE - 1);
+      
+      if (searchQuery) {
+        query = query.or(`name.ilike.%${searchQuery}%,country.ilike.%${searchQuery}%,addressString.ilike.%${searchQuery}%`);
+      }
+      
+      const { data, error, count } = await query;
+      if (error) throw error;
+      
+      setTotalCount(count || 0);
+      return data as Accommodation[];
+    },
+    enabled: activeTab === 'accommodations'
   });
+
+  // Fetch attractions from Supabase
+  const { data: attractions = [], isLoading: attractionsLoading } = useQuery({
+    queryKey: ['supabase-attractions', currentPage, searchQuery],
+    queryFn: async () => {
+      let query = supabase
+        .from('attractions')
+        .select('*', { count: 'exact', head: false })
+        .order('updatedAt', { ascending: false })
+        .range(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE - 1);
+      
+      if (searchQuery) {
+        query = query.or(`name.ilike.%${searchQuery}%,country.ilike.%${searchQuery}%,addressString.ilike.%${searchQuery}%`);
+      }
+      
+      const { data, error, count } = await query;
+      if (error) throw error;
+      
+      setTotalCount(count || 0);
+      return data as Attraction[];
+    },
+    enabled: activeTab === 'attractions'
+  });
+
+  // Fetch restaurants from Supabase
+  const { data: restaurants = [], isLoading: restaurantsLoading } = useQuery({
+    queryKey: ['supabase-restaurants', currentPage, searchQuery],
+    queryFn: async () => {
+      let query = supabase
+        .from('restaurants')
+        .select('*', { count: 'exact', head: false })
+        .order('updatedAt', { ascending: false })
+        .range(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE - 1);
+      
+      if (searchQuery) {
+        query = query.or(`name.ilike.%${searchQuery}%,country.ilike.%${searchQuery}%,addressString.ilike.%${searchQuery}%`);
+      }
+      
+      const { data, error, count } = await query;
+      if (error) throw error;
+      
+      setTotalCount(count || 0);
+      return data as Restaurant[];
+    },
+    enabled: activeTab === 'restaurants'
+  });
+
+  // Load photos for current tab items
+  useEffect(() => {
+    const loadPhotosForCurrentTab = async () => {
+      let items: any[] = [];
+      let category: LocationPhoto['locationCategory'] | null = null;
+      
+      switch (activeTab) {
+        case 'destinations':
+          items = destinations;
+          category = 'destination';
+          break;
+        case 'accommodations':
+          items = accommodations;
+          category = 'accommodation';
+          break;
+        case 'attractions':
+          items = attractions;
+          category = 'attraction';
+          break;
+        case 'restaurants':
+          items = restaurants;
+          category = 'restaurant';
+          break;
+      }
+      
+      if (items.length > 0 && category) {
+        const locationIds = items.map(item => item.locationId);
+        const photoMap = await fetchPhotosForEntities(category, locationIds);
+        
+        setPhotos(prev => ({
+          ...prev,
+          [activeTab]: photoMap
+        }));
+      }
+    };
+    
+    loadPhotosForCurrentTab();
+  }, [activeTab, destinations, accommodations, attractions, restaurants]);
 
   const countries = [...new Set(destinations.map((dest: Destination) => dest.country))];
 
-  const renderStars = (rating: number) => {
+  const renderStars = (rating: string | number | undefined) => {
+    const numRating = typeof rating === 'string' ? parseFloat(rating) : (rating || 0);
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`w-4 h-4 ${i < Math.floor(rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+        className={`w-4 h-4 ${i < Math.floor(numRating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
       />
     ));
   };
 
-  const handleLocalSearch = () => {
-    if (!searchQuery.trim()) {
-      toast({
-        title: "Search Required",
-        description: "Please enter a search term to find places.",
-        variant: "destructive",
-      });
-      return;
+  const handleSearch = () => {
+    setCurrentPage(0); // Reset to first page
+    queryClient.invalidateQueries({ queryKey: [`supabase-${activeTab}`] });
+  };
+
+  const openDetailModal = async (type: DetailModalState['type'], item: any) => {
+    // Fetch all photos for this specific item
+    const { data: itemPhotos } = await supabase
+      .from('location_photos')
+      .select('*')
+      .eq('locationCategory', type)
+      .eq('locationId', item.locationId)
+      .order('createdAt', { ascending: false })
+      .limit(6);
+    
+    setDetailModal({
+      isOpen: true,
+      type,
+      item,
+      photos: itemPhotos || []
+    });
+  };
+
+  const closeDetailModal = () => {
+    setDetailModal({ isOpen: false, type: null, item: null, photos: [] });
+  };
+
+  const renderPhoto = (locationId: string, alt: string) => {
+    const tabPhotos = photos[activeTab as keyof PhotoState];
+    const photo = tabPhotos.get(locationId);
+    
+    if (photo) {
+      const imageUrl = photo.thumbnailUrl || photo.photoUrl;
+      return (
+        <img
+          src={imageUrl}
+          alt={alt}
+          className="w-full h-150px object-cover rounded-md mb-4"
+          style={{ height: '150px' }}
+          onError={(e) => {
+            // Fallback to placeholder if image fails to load
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            target.nextElementSibling?.classList.remove('hidden');
+          }}
+        />
+      );
     }
     
-    localSearchMutation.mutate({
-      query: searchQuery,
-      type: activeTab
-    });
+    return (
+      <div className="w-full h-150px bg-gray-200 dark:bg-gray-700 rounded-md mb-4 flex items-center justify-center" style={{ height: '150px' }}>
+        <Camera className="w-8 h-8 text-gray-400" />
+      </div>
+    );
+  };
+
+  const handleTabChange = (newTab: string) => {
+    setActiveTab(newTab);
+    setCurrentPage(0);
+  };
+
+  const nextPage = () => {
+    if ((currentPage + 1) * ITEMS_PER_PAGE < totalCount) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(prev => prev - 1);
+    }
   };
 
   return (
@@ -187,11 +355,10 @@ export default function ExplorePage() {
               className="flex-1"
             />
             <Button 
-              onClick={handleLocalSearch}
-              disabled={localSearchMutation.isPending}
+              onClick={handleSearch}
               variant="outline"
             >
-              {localSearchMutation.isPending ? "Searching..." : "Search Database"}
+              Search
             </Button>
           </div>
           
@@ -209,33 +376,20 @@ export default function ExplorePage() {
             </SelectContent>
           </Select>
 
-          <Select value={weatherFilter} onValueChange={setWeatherFilter}>
-            <SelectTrigger className="w-full md:w-40">
-              <SelectValue placeholder="Weather" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Weather</SelectItem>
-              <SelectItem value="sunny">☀️ Sunny</SelectItem>
-              <SelectItem value="mild">🌤️ Mild</SelectItem>
-              <SelectItem value="cool">☁️ Cool</SelectItem>
-              <SelectItem value="best-time">✨ Best Time</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Button 
-            onClick={() => seedDataMutation.mutate()}
-            disabled={seedDataMutation.isPending}
-            variant="secondary"
-          >
-            {seedDataMutation.isPending ? "Loading..." : "Load Sample Data"}
-          </Button>
+          <div className="text-sm text-muted-foreground flex items-center gap-2">
+            {totalCount > 0 && (
+              <span>
+                Showing {currentPage * ITEMS_PER_PAGE + 1} to {Math.min((currentPage + 1) * ITEMS_PER_PAGE, totalCount)} of {totalCount} items
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="destinations">Destinations</TabsTrigger>
-          <TabsTrigger value="accommodations">Hotels</TabsTrigger>
+          <TabsTrigger value="accommodations">Accommodations (Hotels)</TabsTrigger>
           <TabsTrigger value="attractions">Attractions</TabsTrigger>
           <TabsTrigger value="restaurants">Restaurants</TabsTrigger>
         </TabsList>
@@ -246,66 +400,56 @@ export default function ExplorePage() {
               Array.from({ length: 6 }).map((_, i) => (
                 <Card key={i} className="animate-pulse">
                   <CardHeader>
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      <div className="h-3 bg-gray-200 rounded"></div>
-                      <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+                      <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
                     </div>
                   </CardContent>
                 </Card>
               ))
-            ) : filteredDestinations.length === 0 ? (
+            ) : destinations.length === 0 ? (
               <div className="col-span-full text-center py-12">
-                <p className="text-muted-foreground">No destinations found. Try adjusting your search or load sample data.</p>
+                <p className="text-muted-foreground">No destinations found matching your criteria.</p>
               </div>
             ) : (
-              filteredDestinations.map((destination: Destination) => (
-                <Card key={destination.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <MapPin className="w-5 h-5 text-blue-600" />
-                      {destination.name}, {destination.country}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {destination.description}
-                    </p>
-
-                    {/* Weather Integration */}
-                    <div className="mb-4">
-                      <DestinationWeather 
-                        destination={destination.name}
-                        country={destination.country}
-                        compact={true}
-                      />
-                    </div>
+              destinations.map((destination: Destination) => (
+                <Card key={destination.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => openDetailModal('destination', destination)}>
+                  <CardContent className="p-4">
+                    {renderPhoto(destination.locationId, destination.name)}
                     
-                    <div className="space-y-3">
-                      {/* Best Time to Travel Information */}
-                      <div className="border-t pt-3">
-                        <BestTimeInfo 
-                          destination={destination.name}
-                          country={destination.country}
-                          compact={true}
-                        />
-                      </div>
+                    <CardTitle className="flex items-center gap-2 mb-2">
+                      <MapPin className="w-4 h-4 text-blue-600" />
+                      <span className="text-lg">{destination.name}</span>
+                    </CardTitle>
+                    
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        {destination.city && `${destination.city}, `}{destination.country}
+                      </p>
                       
-                      <div className="flex flex-wrap gap-1">
-                        {destination.tags?.slice(0, 4).map((tag: string) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      
-                      <div>
-                        <p className="text-sm font-medium mb-1">Top Attractions:</p>
-                        <p className="text-xs text-muted-foreground">
-                          {destination.attractions?.slice(0, 3).join(", ")}
+                      {destination.addressString && (
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {destination.addressString}
                         </p>
+                      )}
+                      
+                      <div className="flex items-center justify-between pt-2">
+                        <div className="flex items-center gap-2">
+                          {destination.photoCount && destination.photoCount > 0 && (
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Camera className="w-3 h-3" />
+                              {destination.photoCount}
+                            </div>
+                          )}
+                        </div>
+                        <Button size="sm" variant="outline" className="text-xs">
+                          <Eye className="w-3 h-3 mr-1" />
+                          More Details
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -313,6 +457,29 @@ export default function ExplorePage() {
               ))
             )}
           </div>
+          
+          {/* Pagination */}
+          {totalCount > ITEMS_PER_PAGE && (
+            <div className="flex justify-center items-center gap-4 mt-8">
+              <Button 
+                onClick={prevPage} 
+                disabled={currentPage === 0}
+                variant="outline"
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Page {currentPage + 1} of {Math.ceil(totalCount / ITEMS_PER_PAGE)}
+              </span>
+              <Button 
+                onClick={nextPage} 
+                disabled={(currentPage + 1) * ITEMS_PER_PAGE >= totalCount}
+                variant="outline"
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="accommodations" className="mt-6">
@@ -321,68 +488,83 @@ export default function ExplorePage() {
               Array.from({ length: 6 }).map((_, i) => (
                 <Card key={i} className="animate-pulse">
                   <CardHeader>
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      <div className="h-3 bg-gray-200 rounded"></div>
-                      <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+                      <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
                     </div>
                   </CardContent>
                 </Card>
               ))
+            ) : accommodations.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-muted-foreground">No accommodations found matching your criteria.</p>
+              </div>
             ) : (
-              accommodations.map((hotel: LocationItem) => (
-                <Card key={hotel.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="text-lg">{hotel.name}</CardTitle>
-                    <div className="flex items-center gap-2">
-                      <div className="flex">{renderStars(hotel.rating)}</div>
-                      <span className="text-sm text-muted-foreground">
-                        ({hotel.numReviews} reviews)
-                      </span>
-                      {hotel.priceLevel && (
-                        <Badge variant="outline">{hotel.priceLevel}</Badge>
+              accommodations.map((accommodation: Accommodation) => (
+                <Card key={accommodation.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => openDetailModal('accommodation', accommodation)}>
+                  <CardContent className="p-4">
+                    {renderPhoto(accommodation.locationId, accommodation.name)}
+                    
+                    <CardTitle className="text-lg mb-2">{accommodation.name}</CardTitle>
+                    
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex">{renderStars(accommodation.rating)}</div>
+                      {accommodation.numReviews && (
+                        <span className="text-sm text-muted-foreground">
+                          ({accommodation.numReviews} reviews)
+                        </span>
+                      )}
+                      {accommodation.priceLevel && (
+                        <Badge variant="outline">{accommodation.priceLevel}</Badge>
                       )}
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {hotel.description}
-                    </p>
                     
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <MapPin className="w-4 h-4" />
-                        {hotel.address}
+                        <span>{accommodation.city && `${accommodation.city}, `}{accommodation.country}</span>
                       </div>
                       
-                      {hotel.phone && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <Phone className="w-4 h-4" />
-                          {hotel.phone}
-                        </div>
+                      {accommodation.category && (
+                        <Badge variant="secondary" className="text-xs">
+                          {accommodation.category}
+                        </Badge>
                       )}
                       
-                      {hotel.website && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <Globe className="w-4 h-4" />
-                          <a 
-                            href={hotel.website} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline"
-                          >
-                            Visit Website
-                          </a>
+                      <div className="flex items-center justify-between pt-2">
+                        <div className="flex items-center gap-2">
+                          {accommodation.amenities && accommodation.amenities.length > 0 && (
+                            <div className="text-xs text-muted-foreground">
+                              {accommodation.amenities.slice(0, 2).join(", ")}
+                              {accommodation.amenities.length > 2 && " ..."}
+                            </div>
+                          )}
                         </div>
-                      )}
+                        <Button size="sm" variant="outline" className="text-xs">
+                          <Eye className="w-3 h-3 mr-1" />
+                          More Details
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               ))
             )}
           </div>
+          
+          {totalCount > ITEMS_PER_PAGE && (
+            <div className="flex justify-center items-center gap-4 mt-8">
+              <Button onClick={prevPage} disabled={currentPage === 0} variant="outline">Previous</Button>
+              <span className="text-sm text-muted-foreground">
+                Page {currentPage + 1} of {Math.ceil(totalCount / ITEMS_PER_PAGE)}
+              </span>
+              <Button onClick={nextPage} disabled={(currentPage + 1) * ITEMS_PER_PAGE >= totalCount} variant="outline">Next</Button>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="attractions" className="mt-6">
@@ -391,51 +573,72 @@ export default function ExplorePage() {
               Array.from({ length: 6 }).map((_, i) => (
                 <Card key={i} className="animate-pulse">
                   <CardHeader>
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      <div className="h-3 bg-gray-200 rounded"></div>
-                      <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+                      <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
                     </div>
                   </CardContent>
                 </Card>
               ))
+            ) : attractions.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-muted-foreground">No attractions found matching your criteria.</p>
+              </div>
             ) : (
-              attractions.map((attraction: LocationItem) => (
-                <Card key={attraction.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="text-lg">{attraction.name}</CardTitle>
-                    <div className="flex items-center gap-2">
+              attractions.map((attraction: Attraction) => (
+                <Card key={attraction.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => openDetailModal('attraction', attraction)}>
+                  <CardContent className="p-4">
+                    {renderPhoto(attraction.locationId, attraction.name)}
+                    
+                    <CardTitle className="text-lg mb-2">{attraction.name}</CardTitle>
+                    
+                    <div className="flex items-center gap-2 mb-3">
                       <div className="flex">{renderStars(attraction.rating)}</div>
-                      <span className="text-sm text-muted-foreground">
-                        ({attraction.numReviews} reviews)
-                      </span>
+                      {attraction.numReviews && (
+                        <span className="text-sm text-muted-foreground">
+                          ({attraction.numReviews} reviews)
+                        </span>
+                      )}
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {attraction.description}
-                    </p>
                     
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <MapPin className="w-4 h-4" />
-                        {attraction.address}
+                        <span>{attraction.city && `${attraction.city}, `}{attraction.country}</span>
                       </div>
                       
-                      {attraction.openingHours && attraction.openingHours.length > 0 && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <Clock className="w-4 h-4" />
-                          {attraction.openingHours[0]}
-                        </div>
+                      {attraction.category && (
+                        <Badge variant="secondary" className="text-xs">
+                          {attraction.category}
+                        </Badge>
                       )}
+                      
+                      <div className="flex items-center justify-end pt-2">
+                        <Button size="sm" variant="outline" className="text-xs">
+                          <Eye className="w-3 h-3 mr-1" />
+                          More Details
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               ))
             )}
           </div>
+          
+          {totalCount > ITEMS_PER_PAGE && (
+            <div className="flex justify-center items-center gap-4 mt-8">
+              <Button onClick={prevPage} disabled={currentPage === 0} variant="outline">Previous</Button>
+              <span className="text-sm text-muted-foreground">
+                Page {currentPage + 1} of {Math.ceil(totalCount / ITEMS_PER_PAGE)}
+              </span>
+              <Button onClick={nextPage} disabled={(currentPage + 1) * ITEMS_PER_PAGE >= totalCount} variant="outline">Next</Button>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="restaurants" className="mt-6">
@@ -444,56 +647,231 @@ export default function ExplorePage() {
               Array.from({ length: 6 }).map((_, i) => (
                 <Card key={i} className="animate-pulse">
                   <CardHeader>
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      <div className="h-3 bg-gray-200 rounded"></div>
-                      <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+                      <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
                     </div>
                   </CardContent>
                 </Card>
               ))
+            ) : restaurants.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-muted-foreground">No restaurants found matching your criteria.</p>
+              </div>
             ) : (
-              restaurants.map((restaurant: LocationItem) => (
-                <Card key={restaurant.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="text-lg">{restaurant.name}</CardTitle>
-                    <div className="flex items-center gap-2">
+              restaurants.map((restaurant: Restaurant) => (
+                <Card key={restaurant.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => openDetailModal('restaurant', restaurant)}>
+                  <CardContent className="p-4">
+                    {renderPhoto(restaurant.locationId, restaurant.name)}
+                    
+                    <CardTitle className="text-lg mb-2">{restaurant.name}</CardTitle>
+                    
+                    <div className="flex items-center gap-2 mb-3">
                       <div className="flex">{renderStars(restaurant.rating)}</div>
-                      <span className="text-sm text-muted-foreground">
-                        ({restaurant.numReviews} reviews)
-                      </span>
+                      {restaurant.numReviews && (
+                        <span className="text-sm text-muted-foreground">
+                          ({restaurant.numReviews} reviews)
+                        </span>
+                      )}
                       {restaurant.priceLevel && (
                         <Badge variant="outline">{restaurant.priceLevel}</Badge>
                       )}
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {restaurant.description}
-                    </p>
                     
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <MapPin className="w-4 h-4" />
-                        {restaurant.address}
+                        <span>{restaurant.city && `${restaurant.city}, `}{restaurant.country}</span>
                       </div>
                       
-                      {restaurant.phone && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <Phone className="w-4 h-4" />
-                          {restaurant.phone}
-                        </div>
-                      )}
+                      <div className="flex flex-wrap gap-1">
+                        {restaurant.cuisine?.slice(0, 3).map((cuisineType, idx) => (
+                          <Badge key={idx} variant="secondary" className="text-xs">
+                            {cuisineType}
+                          </Badge>
+                        ))}
+                      </div>
+                      
+                      <div className="flex items-center justify-end pt-2">
+                        <Button size="sm" variant="outline" className="text-xs">
+                          <Eye className="w-3 h-3 mr-1" />
+                          More Details
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               ))
             )}
           </div>
+          
+          {totalCount > ITEMS_PER_PAGE && (
+            <div className="flex justify-center items-center gap-4 mt-8">
+              <Button onClick={prevPage} disabled={currentPage === 0} variant="outline">Previous</Button>
+              <span className="text-sm text-muted-foreground">
+                Page {currentPage + 1} of {Math.ceil(totalCount / ITEMS_PER_PAGE)}
+              </span>
+              <Button onClick={nextPage} disabled={(currentPage + 1) * ITEMS_PER_PAGE >= totalCount} variant="outline">Next</Button>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
+
+      {/* Detail Modal */}
+      <Dialog open={detailModal.isOpen} onOpenChange={closeDetailModal}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          {detailModal.item && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-xl">
+                  <MapPin className="w-5 h-5 text-blue-600" />
+                  {detailModal.item.name}
+                </DialogTitle>
+              </DialogHeader>
+              
+              <div className="space-y-6">
+                {/* Photos Gallery */}
+                {detailModal.photos.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {detailModal.photos.map((photo, idx) => (
+                      <div key={photo.id} className="relative group">
+                        <img
+                          src={photo.thumbnailUrl || photo.photoUrl}
+                          alt={photo.caption || `${detailModal.item.name} ${idx + 1}`}
+                          className="w-full h-32 object-cover rounded-lg cursor-pointer transition-transform group-hover:scale-105"
+                          onClick={() => window.open(photo.photoUrl, '_blank')}
+                        />
+                        {photo.caption && (
+                          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-2 rounded-b-lg">
+                            {photo.caption}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Details */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Location Details</h3>
+                    
+                    <div className="space-y-2 text-sm">
+                      {detailModal.item.city && (
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4" />
+                          <span>{detailModal.item.city}, {detailModal.item.country}</span>
+                        </div>
+                      )}
+                      
+                      {detailModal.item.addressString && (
+                        <div className="text-muted-foreground">
+                          {detailModal.item.addressString}
+                        </div>
+                      )}
+                      
+                      {detailModal.item.webUrl && (
+                        <div className="flex items-center gap-2">
+                          <Globe className="w-4 h-4" />
+                          <a 
+                            href={detailModal.item.webUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            Visit Website
+                          </a>
+                        </div>
+                      )}
+                      
+                      {detailModal.item.latitude && detailModal.item.longitude && (
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4" />
+                          <a
+                            href={`https://www.google.com/maps?q=${detailModal.item.latitude},${detailModal.item.longitude}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            View on Maps
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Additional Info</h3>
+                    
+                    <div className="space-y-3 text-sm">
+                      {detailModal.item.rating && (
+                        <div className="flex items-center gap-2">
+                          <div className="flex">{renderStars(detailModal.item.rating)}</div>
+                          <span className="text-muted-foreground">
+                            {parseFloat(detailModal.item.rating).toFixed(1)} stars
+                          </span>
+                          {detailModal.item.numReviews && (
+                            <span className="text-muted-foreground">
+                              ({detailModal.item.numReviews} reviews)
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      
+                      {detailModal.item.priceLevel && (
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="w-4 h-4" />
+                          <Badge variant="outline">{detailModal.item.priceLevel}</Badge>
+                        </div>
+                      )}
+                      
+                      {detailModal.item.category && (
+                        <div>
+                          <Badge variant="secondary">{detailModal.item.category}</Badge>
+                        </div>
+                      )}
+                      
+                      {detailModal.item.cuisine && detailModal.item.cuisine.length > 0 && (
+                        <div className="space-y-1">
+                          <span className="font-medium">Cuisine:</span>
+                          <div className="flex flex-wrap gap-1">
+                            {detailModal.item.cuisine.map((cuisineType: string, idx: number) => (
+                              <Badge key={idx} variant="outline" className="text-xs">
+                                {cuisineType}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {detailModal.item.amenities && detailModal.item.amenities.length > 0 && (
+                        <div className="space-y-1">
+                          <span className="font-medium">Amenities:</span>
+                          <div className="flex flex-wrap gap-1">
+                            {detailModal.item.amenities.map((amenity: string, idx: number) => (
+                              <Badge key={idx} variant="outline" className="text-xs">
+                                {amenity}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="text-xs text-muted-foreground pt-2">
+                        Last updated: {new Date(detailModal.item.updatedAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
     </div>
   );

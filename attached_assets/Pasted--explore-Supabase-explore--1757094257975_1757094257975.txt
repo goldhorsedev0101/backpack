@@ -1,0 +1,122 @@
+✂️ פרומפט להתאמת הדף הקיים ‎/explore‎ לדרישות (Supabase + תמונות)
+
+עדכן את הדף הקיים ‎/explore‎ מבלי ליצור דף חדש. בצע את השינויים הבאים באופן מינימלי ולא הרסני (refactor עדין, reuse של קומפוננטים קיימים). אין להקשיח מפתחות/URLs בקוד — הכל דרך ENV.
+
+1) איתור והישענות על הקוד הקיים
+
+אתר את קובץ(י) הדף/המסך ‎/explore‎ (למשל pages/explore.tsx או app/explore/page.tsx או route קיימת בפרויקט).
+
+אל תיצור קובץ דף חדש. עבוד על הקובץ(ים) הקיימים בלבד.
+
+השתמש ב-Supabase client שכבר קיים (supabase.ts/supabaseClient.ts). אם אין — צור רק את הקובץ החסר, בלי לשנות את מבנה הפרויקט.
+
+2) לשוניות קיימות — מיפוי לטבלאות
+
+יש 4 לשוניות קיימות. ודא שכל לשונית מושכת נתונים מהטבלה הנכונה:
+
+Destinations → מטבלת public.destinations
+
+Hotels → להחליף כותרת תצוגה בלבד ל-“Accommodations (Hotels)” ולמשוך נתונים מטבלת public.accommodations
+
+Attractions → מטבלת public.attractions
+
+Restaurants → מטבלת public.restaurants
+
+שמור על מבנה ה-Tabs הקיים (קומפוננט/ספרייה קיימת). החלף רק את לייבל ה-UI של “Hotels” ואת מקור הנתונים שלה.
+
+3) שליפת נתונים ו-UX בסיסי
+
+בכל לשונית:
+
+טען נתונים אמיתיים מ-Supabase עם:
+
+select() של העמודות המרכזיות (דלג בעדינות על שדות שלא קיימים בסכמה בפועל).
+
+order('updated_at', { ascending: false }) כברירת מחדל.
+
+עימוד range() ל-20 פריטים בעמוד.
+
+חיפוש חופשי (ilike) על name (+ אופציונלי country/address אם קיימים).
+
+הצג בראש: “מציג X מתוך Y” באמצעות count: 'exact' עם head: true.
+
+אם יש לוגיקת חיפוש/מיון/עמוד קיימת — התאמה עדינה במקום לכתוב מחדש.
+
+4) תמונות מ-location_photos
+
+לכל רשומה הצג תמונה (thumbnail) מתוך public.location_photos לפי:
+
+התאמה ע״י (entity_type, entity_id):
+
+Destinations → entity_type='destination', entity_id = destinations.id
+
+Accommodations → entity_type='accommodation', entity_id = accommodations.id
+
+Attractions → entity_type='attraction', entity_id = attractions.id
+
+Restaurants → entity_type='restaurant', entity_id = restaurants.id
+
+הימנע מ-N+1: עבור כל עמוד, אסוף את כל ה-id של הרשומות ואז בצע קריאת תמונות אחת עם:
+
+eq('entity_type', '<type>') + in('entity_id', [...ids])
+
+סמן לכל רשומה “תמונה מועדפת” ע״י סדר order('inserted_at', { ascending: false }) ו/או עדיפות thumbnail_url> url.
+
+תצוגה:
+
+אם יש thumbnail_url — השתמש בו; אחרת url.
+
+גובה ~150px, object-cover, פינות מעוגלות.
+
+אם אין תמונה — placeholder ידידותי.
+
+הוסף Cache/State כך שלא נטען תמונות מחדש כשמעבירים עמוד בלשוניות אחרות (reuse של map {[entity_type/id]: photo} אם אפשר).
+
+5) “עוד פרטים” — בלי ליצור מסלולים חדשים
+
+אם בדף ‎/explore‎ כבר קיים כפתור “עוד פרטים”/קישור — חבר אותו לפריט המתאים (שמור פרמטרים קיימים).
+
+אל תיצור דפי פרטים חדשים. אם אין יעד ניווט מוכן:
+
+הפעל Modal/Drawer קיים (אם יש) להצגת פרטים מורחבים (name, rating, price_level/tags/cuisine, address, lat/lon עם לינק ל-Maps, website).
+
+במודל הצג גם גלריה עד 6 תמונות מאותה ישות (מאותה location_photos), עם thumbs שנפתחים בחלון חדש.
+
+שמור חזרה למצב (tab/q/page/sort) לאחר סגירת המודל.
+
+6) תאימות קיימת והקשחה עדינה
+
+שמור API ENV: SUPABASE_URL, SUPABASE_ANON_KEY.
+
+אל תשנה שמות/מיקומים של קומפוננטים קיימים אם לא חייבים.
+
+אל תיגע בקוד שאינו שייך ל-/explore.
+
+הוסף טיפול שגיאות עדין (toast/banner) ו-skeleton בזמן טעינה — רק אם חסר כבר.
+
+7) קבלה (Acceptance)
+
+הניווט ל-/explore נשאר כפי שהוא (לא נוצר דף חדש).
+
+4 הלשוניות קיימות; “Hotels” מופיע כ-Accommodations (Hotels) בלבד ברמת התצוגה.
+
+כל לשונית מושכת נתונים מהטבלה הנכונה:
+
+Destinations → destinations
+
+Accommodations (Hotels) → accommodations
+
+Attractions → attractions
+
+Restaurants → restaurants
+
+מוצגות תמונות לכל פריט מ-location_photos בהתאם ל-entity_type/entity_id, ללא N+1.
+
+חיפוש, מיון, עימוד, וספירת סה״כ עובדים כראוי.
+
+כפתור/פעולת “עוד פרטים” משתמש במודל/Drawer קיים (אם יש); אין יצירת מסלולי router חדשים.
+
+אין מפתחות קשיחים; אין שינויי מבנה הרסניים; אין רגרסיות בחלקים אחרים של האפליקציה.
+
+בסיום, בצע commit אחד עם הודעה:
+feat(explore): map tabs to Supabase tables + photos join + rename Hotels label
