@@ -30,12 +30,10 @@ import {
   Database,
   MapPin,
   Cloud,
-  Mountain
 } from "lucide-react";
 
 const navigationItems = [
   { href: "/", label: "Home", icon: Home },
-  { href: "/destinations", label: "Destinations", icon: Mountain },
   { href: "/my-trips", label: "Plan Trip", icon: Calendar },
   { href: "/explore", label: "Explore", icon: MapPin },
   { href: "/weather", label: "Weather", icon: Cloud },
