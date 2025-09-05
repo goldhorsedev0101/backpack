@@ -1,9 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
+import { getSupabaseUrl, getSupabaseAnonKey } from '@/config/env'
 
-const supabaseUrl = 'https://wuzhvkmfdyiwaaladyxc.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1emh2a21mZHlpd2FhbGFkeXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxMzUzOTEsImV4cCI6MjAzOTcxMTM5MX0.MWpORmQyq2m8TgAM5g2KcH69hJd1aFc0YKI5nOYNvxs'
-
-export const supabase = createClient(supabaseUrl, supabaseKey)
+export const supabase = createClient(
+  getSupabaseUrl(),
+  getSupabaseAnonKey(),
+  { auth: { persistSession: false } }
+)
 
 export interface LocationPhoto {
   entity_id: number

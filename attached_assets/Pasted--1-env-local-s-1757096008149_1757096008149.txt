@@ -1,0 +1,105 @@
+בצע את כל הפעולות הבאות מבלי לשבור את המבנה הקיים:
+
+1) קובץ סנכרון סיקרטים ל-.env.local
+
+צור קובץ: scripts/sync-secrets-to-dotenv.ts שמבצע:
+
+קורא את process.env.SUPABASE_URL ו־process.env.SUPABASE_ANON_KEY (מ-Replit Secrets).
+
+מוודא שהם קיימים; אחרת — מדפיס אזהרה ברורה לטרמינל ומפסיק.
+
+יוצר/מעדכן קובץ .env.local בשורש הפרויקט עם כל הווריאנטים הנדרשים לצורך פרונטאנד:
+
+NEXT_PUBLIC_SUPABASE_URL=<value>
+
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<value>
+
+VITE_SUPABASE_URL=<value>
+
+VITE_SUPABASE_ANON_KEY=<value>
+
+אם יש ערכים קיימים — דרוס אותם בעדינות (שמור שאר משתני הסביבה אם יש).
+
+הדפס “synced secrets → .env.local”.
+
+מטרה: ב־Next.js/React/Vite ערכי ENV לפרונט חייבים להיות עם פריפיקס (NEXT_PUBLIC_/VITE_). הסקריפט הזה דואג לזה אוטומטית מה-Secrets.
+
+2) gitignore
+
+ודא שב־.gitignore יש את .env.local כדי שלא ייכנס ל-git.
+
+3) npm scripts
+
+הוסף ל־package.json:
+
+"predev": "tsx scripts/sync-secrets-to-dotenv.ts"
+
+"prebuild": "tsx scripts/sync-secrets-to-dotenv.ts"
+
+אל תשנה סקריפטים קיימים; רק הוסף את השניים האלו.
+
+מטרה: בכל dev/build נייצר .env.local עדכני מה-Secrets.
+
+4) מודול ENV מרוכז
+
+צור src/config/env.ts שמייצא פונקציות/קבועים:
+
+getSupabaseUrl() ו־getSupabaseAnonKey() שמחפשות לפי סדר:
+
+process.env.SUPABASE_URL / process.env.SUPABASE_ANON_KEY
+
+process.env.NEXT_PUBLIC_SUPABASE_URL / process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+import.meta.env.VITE_SUPABASE_URL / import.meta.env.VITE_SUPABASE_ANON_KEY (עטוף ב-try כדי לא להישבר ב-Node)
+
+אם לא נמצא — זרוק שגיאה קריאה וברורה:
+"Missing Supabase ENV. Set SUPABASE_URL / SUPABASE_ANON_KEY in Replit Secrets."
+
+5) supabaseClient
+
+אתר את הקובץ הקיים (src/lib/supabaseClient.ts או supabase.ts) ועדכן:
+
+ייבוא מ־src/config/env
+
+יצירת לקוח:
+
+import { createClient } from '@supabase/supabase-js';
+import { getSupabaseUrl, getSupabaseAnonKey } from '@/config/env';
+
+export const supabase = createClient(
+  getSupabaseUrl(),
+  getSupabaseAnonKey(),
+  { auth: { persistSession: false } }
+);
+
+
+אל תשאיר מפתחות קשיחים. ודא שכל הקריאות בקוד משתמשות בלקוח הזה.
+
+6) עדכון ה-health script
+
+בקובץ src/health/supabaseCheck.ts (שכבר קיים) החלף/עדכן שימוש ישיר ב-process.env לייבוא מ-src/config/env כדי שהבדיקה תתבסס על אותה לוגיקה.
+
+שמור את פלט ה-console הקריא (rows/count/error).
+
+7) בדיקות מהירות
+
+הרץ npm run dev (או תהליך ה-dev בפרויקט). ודא שה-predev יוצר .env.local ומדפיס “synced secrets”.
+
+הרץ tsx src/health/supabaseCheck.ts ובדוק שיש נתונים אמיתיים (לא 401).
+
+פתח /explore — ה-UI צריך להיטען עם נתונים (בהנחה שה-RLS/Policies כבר כנדרש).
+
+8) קבלה (Acceptance)
+
+.env.local נוצר אוטומטית מ-Replit Secrets בעת dev/build.
+
+קיימים 4 מפתחות זהים בקובץ: NEXT_PUBLIC_* ו־VITE_* (תמיכה גם ב-Next וגם ב-Vite).
+
+מודול src/config/env.ts מרוכז בשימוש בכל מקום (כולל health).
+
+אין מפתחות קשיחים בשום מקום.
+
+/explore מציג נתונים; בדיקת supabaseCheck עוברת ללא “Invalid API key”.
+
+בסיום בצע commit:
+chore(env): sync Replit Secrets to .env.local + unify Supabase env access

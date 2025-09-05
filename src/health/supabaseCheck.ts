@@ -1,9 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
+import { getSupabaseUrl, getSupabaseAnonKey } from '../config/env'
 
-const supabaseUrl = 'https://wuzhvkmfdyiwaaladyxc.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1emh2a21mZHlpd2FhbGFkeXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxMzUzOTEsImV4cCI6MjAzOTcxMTM5MX0.MWpORmQyq2m8TgAM5g2KcH69hJd1aFc0YKI5nOYNvxs'
-
-const supabase = createClient(supabaseUrl, supabaseKey)
+const supabase = createClient(getSupabaseUrl(), getSupabaseAnonKey())
 
 interface TableCheck {
   name: string
@@ -19,6 +17,9 @@ const tables: TableCheck[] = [
 ]
 
 export async function runSupabaseHealthCheck() {
+  const supabaseUrl = getSupabaseUrl()
+  const supabaseKey = getSupabaseAnonKey()
+  
   console.log('=== Supabase Health Check ===')
   console.log(`URL: ${supabaseUrl}`)
   console.log(`Key: ${supabaseKey.substring(0, 20)}...`)
@@ -28,10 +29,10 @@ export async function runSupabaseHealthCheck() {
     console.log(`--- ${name} (${table}) ---`)
     
     try {
-      // Basic count and sample
+      // Basic count and sample  
       const { data: sample, error: sampleError, count } = await supabase
         .from(table)
-        .select('id,name,country', { count: 'exact', head: false })
+        .select('id,name', { count: 'exact', head: false })
         .limit(3)
       
       if (sampleError) {
@@ -43,7 +44,7 @@ export async function runSupabaseHealthCheck() {
         console.log(`✅ Total count: ${count}`)
         console.log(`   Sample rows: ${sample?.length || 0}`)
         sample?.slice(0, 2).forEach((row, i) => {
-          console.log(`   ${i + 1}. ${row.name} (${row.country || 'N/A'})`)
+          console.log(`   ${i + 1}. ${row.name}`)
         })
       }
 
