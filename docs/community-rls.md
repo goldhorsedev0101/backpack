@@ -1,6 +1,6 @@
-# Community RLS Policies
+# Community RLS Policies - TripWise Chat System
 
-This document provides Row Level Security (RLS) policies for TripWise community features in both DEV and PROD environments.
+This document outlines the Row Level Security (RLS) policies for the TripWise community chat system featuring public/private rooms, direct messages, and guest mode support with participant invitations.
 
 ## ⚠️ Important: DEV vs PROD
 

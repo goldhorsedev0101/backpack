@@ -1,10 +1,14 @@
 import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { formatDistanceToNow, format } from 'date-fns';
-import { User, Bot, Download, File, Image, Eye } from 'lucide-react';
+import { User, Bot, Download, File, Image, Eye, MoreVertical, MessageSquare } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+import { useToast } from '../../hooks/use-toast';
 
 interface Attachment {
   id: number;
@@ -32,11 +36,14 @@ interface Message {
 
 interface MessageItemProps {
   message: Message;
+  onNavigateToDM?: (dmRoomId: number) => void;
 }
 
-export function MessageItem({ message }: MessageItemProps) {
+export function MessageItem({ message, onNavigateToDM }: MessageItemProps) {
   const [imageError, setImageError] = useState(false);
   const [imagePreviewOpen, setImagePreviewOpen] = useState<string | null>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const formatTime = (timestamp: string) => {
     try {
@@ -77,6 +84,109 @@ export function MessageItem({ message }: MessageItemProps) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  // Invite to DM mutation
+  const inviteToDMMutation = useMutation({
+    mutationFn: async () => {
+      const currentGuestName = localStorage.getItem('tripwise_guest_name') || '';
+      const targetAuthor = message.author_name || message.user_id || 'Unknown';
+      
+      if (!currentGuestName) {
+        throw new Error('Please set your name first');
+      }
+      
+      if (currentGuestName === targetAuthor) {
+        throw new Error('Cannot create DM with yourself');
+      }
+      
+      // Check if DM room already exists
+      const { data: existingRooms } = await supabase
+        .from('chat_rooms')
+        .select('id, name')
+        .eq('type', 'private')
+        .or(`name.ilike.%${currentGuestName}%${targetAuthor}%,name.ilike.%${targetAuthor}%${currentGuestName}%`);
+      
+      if (existingRooms && existingRooms.length > 0) {
+        return existingRooms[0];
+      }
+      
+      // Create new DM room
+      const roomPayload = {
+        name: `DM: ${currentGuestName} & ${targetAuthor}`,
+        description: `Private conversation`,
+        type: 'private',
+        is_private: true,
+        created_by: 'guest',
+        is_active: true,
+        metadata: { type: 'private', dm: true }
+      };
+      
+      const { data: room, error } = await supabase
+        .from('chat_rooms')
+        .insert([roomPayload])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      // Add both participants as members
+      const members = [
+        {
+          room_id: room.id,
+          guest_name: currentGuestName,
+          role: 'admin'
+        },
+        {
+          room_id: room.id,
+          guest_name: targetAuthor,
+          role: 'member'
+        }
+      ];
+      
+      try {
+        await supabase
+          .from('chat_room_members')
+          .insert(members);
+      } catch (memberError) {
+        console.warn('Could not add DM members:', memberError);
+      }
+      
+      return room;
+    },
+    onSuccess: (room) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/dm-rooms'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/chat-rooms'] });
+      
+      if (onNavigateToDM) {
+        onNavigateToDM(room.id);
+      }
+      
+      toast({
+        title: "DM Opened",
+        description: `Started conversation with ${message.author_name || 'user'}`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Create DM",
+        description: error.message || "Could not create direct message",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleInviteToDM = () => {
+    if (!message.author_name && !message.user_id) {
+      toast({
+        title: "Cannot Invite",
+        description: "Unable to identify message author",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    inviteToDMMutation.mutate();
   };
 
   const getAvatarContent = () => {
@@ -214,45 +324,67 @@ export function MessageItem({ message }: MessageItemProps) {
       </Avatar>
       
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="font-medium text-sm text-gray-900">
-            {message.author_name || (message.user_id ? `User ${message.user_id.slice(0, 8)}` : 'Guest')}
-          </span>
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-sm text-gray-900">
+              {message.author_name || (message.user_id ? `User ${message.user_id.slice(0, 8)}` : 'Guest')}
+            </span>
+            
+            {!message.user_id && (
+              <Badge variant="outline" className="text-xs px-1 py-0">
+                Guest
+              </Badge>
+            )}
+            
+            {message.is_edited && (
+              <Badge variant="secondary" className="text-xs px-1 py-0">
+                edited
+              </Badge>
+            )}
+            
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <span className="text-xs text-gray-500 hover:text-gray-700">
+                    {formatTime(message.created_at)}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm">
+                    {formatFullTime(message.created_at)}
+                    {message.is_edited && message.edited_at && (
+                      <>
+                        <br />
+                        <span className="text-xs text-gray-400">
+                          Edited: {formatFullTime(message.edited_at)}
+                        </span>
+                      </>
+                    )}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           
-          {!message.user_id && (
-            <Badge variant="outline" className="text-xs px-1 py-0">
-              Guest
-            </Badge>
+          {/* Message Actions Menu */}
+          {(message.author_name || message.user_id) && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0">
+                  <MoreVertical className="w-3 h-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem 
+                  onClick={handleInviteToDM}
+                  disabled={inviteToDMMutation.isPending}
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  {inviteToDMMutation.isPending ? 'Creating DM...' : 'Invite to DM'}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
-          
-          {message.is_edited && (
-            <Badge variant="secondary" className="text-xs px-1 py-0">
-              edited
-            </Badge>
-          )}
-          
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <span className="text-xs text-gray-500 hover:text-gray-700">
-                  {formatTime(message.created_at)}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-sm">
-                  {formatFullTime(message.created_at)}
-                  {message.is_edited && message.edited_at && (
-                    <>
-                      <br />
-                      <span className="text-xs text-gray-400">
-                        Edited: {formatFullTime(message.edited_at)}
-                      </span>
-                    </>
-                  )}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </div>
         
         <div className="text-sm space-y-2">

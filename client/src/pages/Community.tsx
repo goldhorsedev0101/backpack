@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import { Star, MessageCircle, Users, MapPin, Calendar, ThumbsUp, Search, Plus, Loader2, RefreshCw } from "lucide-react";
 import { apiRequest } from "../lib/queryClient";
 import { supabase } from "../lib/supabase";
@@ -43,6 +44,7 @@ export default function Community() {
   const [selectedRoom, setSelectedRoom] = useState<number | null>(null);
   const [selectedRoomName, setSelectedRoomName] = useState<string>('');
   const [selectedRoomDescription, setSelectedRoomDescription] = useState<string>('');
+  const [selectedRoomIsPrivate, setSelectedRoomIsPrivate] = useState<boolean>(false);
   
   // DM state
   const [selectedDMRoom, setSelectedDMRoom] = useState<number | null>(null);
@@ -53,12 +55,6 @@ export default function Community() {
   
   // Create Room state
   const [showCreateRoomModal, setShowCreateRoomModal] = useState(false);
-  const [newRoomData, setNewRoomData] = useState({
-    name: '',
-    description: '',
-    destination: '',
-    guestName: ''
-  });
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -227,11 +223,11 @@ export default function Community() {
           <div className="flex h-[600px] gap-4">
             <ChatSidebar 
               selectedRoom={selectedRoom}
-              onRoomSelect={(roomId) => {
+              onRoomSelect={(roomId, roomName, roomDescription, roomType) => {
                 setSelectedRoom(roomId);
-                // TODO: Fetch room details for name and description
-                setSelectedRoomName(`Room ${roomId}`);
-                setSelectedRoomDescription('');
+                setSelectedRoomName(roomName || `Room ${roomId}`);
+                setSelectedRoomDescription(roomDescription || '');
+                setSelectedRoomIsPrivate(roomType === 'private');
               }}
               onCreateRoom={() => setShowCreateRoomModal(true)}
             />
@@ -239,6 +235,11 @@ export default function Community() {
               roomId={selectedRoom}
               roomName={selectedRoomName}
               roomDescription={selectedRoomDescription}
+              isPrivate={selectedRoomIsPrivate}
+              onNavigateToDM={(dmRoomId) => {
+                setSelectedDMRoom(dmRoomId);
+                setSelectedDMUser('');
+              }}
             />
           </div>
         </TabsContent>
@@ -262,6 +263,11 @@ export default function Community() {
               roomId={selectedDMRoom}
               roomName={selectedDMUser ? `${selectedDMUser}` : undefined}
               roomDescription={selectedDMUser ? `Direct message with ${selectedDMUser}` : undefined}
+              isPrivate={true}
+              onNavigateToDM={(dmRoomId) => {
+                setSelectedDMRoom(dmRoomId);
+                setSelectedDMUser('');
+              }}
             />
           </div>
         </TabsContent>
@@ -281,10 +287,12 @@ export default function Community() {
       <CreateRoomModal 
         open={showCreateRoomModal}
         onOpenChange={setShowCreateRoomModal}
-        onRoomCreated={(roomId, roomName) => {
+        onRoomCreated={(roomId, roomName, roomType) => {
           setSelectedRoom(roomId);
           setSelectedRoomName(roomName);
           setSelectedRoomDescription('');
+          setSelectedRoomIsPrivate(roomType === 'private');
+          setShowCreateRoomModal(false);
         }}
       />
     </div>
@@ -299,15 +307,16 @@ function CreateRoomModal({
 }: { 
   open: boolean; 
   onOpenChange: (open: boolean) => void; 
-  onRoomCreated: (roomId: number, roomName: string) => void;
+  onRoomCreated: (roomId: number, roomName: string, roomType?: string) => void;
 }) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     destination: '',
-    guestName: ''
+    visibility: 'public',
+    guestName: '',
+    inviteGuests: ''
   });
-  const [isCreating, setIsCreating] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -326,15 +335,18 @@ function CreateRoomModal({
       // Save guest name to localStorage
       localStorage.setItem('tripwise_guest_name', currentGuestName);
 
+      const isPrivate = roomData.visibility === 'private';
+      
       // Create room data
       const roomPayload = {
         name: roomData.name.trim(),
         description: roomData.description.trim() || null,
-        type: 'public',
+        type: isPrivate ? 'private' : 'public',
         destination: roomData.destination.trim() || null,
-        is_private: false,
+        is_private: isPrivate,
         created_by: 'guest', // Fallback for guest mode
-        is_active: true
+        is_active: true,
+        metadata: { type: isPrivate ? 'private' : 'public' }
       };
 
       // Insert room using Supabase client
@@ -348,18 +360,39 @@ function CreateRoomModal({
         throw error;
       }
 
-      // Add creator as member if chat_room_members table exists
-      try {
-        await supabase
-          .from('chat_room_members')
-          .insert([{
+      // Prepare members list
+      const members = [{
+        room_id: room.id,
+        guest_name: currentGuestName,
+        role: 'admin'
+      }];
+      
+      // Add invited guests if any
+      if (isPrivate && roomData.inviteGuests.trim()) {
+        const invitedGuests = roomData.inviteGuests
+          .split(',')
+          .map(name => name.trim())
+          .filter(name => name && name !== currentGuestName);
+        
+        invitedGuests.forEach(guestName => {
+          members.push({
             room_id: room.id,
-            guest_name: currentGuestName,
-            role: 'admin'
-          }]);
+            guest_name: guestName,
+            role: 'member'
+          });
+        });
+      }
+      
+      // Add all members if chat_room_members table exists
+      try {
+        if (members.length > 0) {
+          await supabase
+            .from('chat_room_members')
+            .insert(members);
+        }
       } catch (memberError) {
         // Ignore if table doesn't exist - not critical
-        console.warn('Could not add room member:', memberError);
+        console.warn('Could not add room members:', memberError);
       }
 
       return room;
@@ -369,13 +402,13 @@ function CreateRoomModal({
       queryClient.invalidateQueries({ queryKey: ['/api/chat-rooms'] });
       
       // Clear form
-      setFormData({ name: '', description: '', destination: '', guestName: '' });
+      setFormData({ name: '', description: '', destination: '', visibility: 'public', guestName: '', inviteGuests: '' });
       
       // Close modal
       onOpenChange(false);
       
       // Open the new room
-      onRoomCreated(room.id, room.name);
+      onRoomCreated(room.id, room.name, room.type);
       
       toast({
         title: "Room Created",
@@ -437,6 +470,19 @@ function CreateRoomModal({
       });
       return;
     }
+    
+    // Private room validation
+    if (formData.visibility === 'private') {
+      const invitedGuests = formData.inviteGuests.trim();
+      if (!invitedGuests) {
+        toast({
+          title: "Participants Required",
+          description: "Private rooms must have at least one invited participant",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
 
     const guestName = formData.guestName || storedGuestName;
     if (!guestName) {
@@ -496,6 +542,41 @@ function CreateRoomModal({
             />
           </div>
 
+          <div>
+            <Label>Room Visibility</Label>
+            <RadioGroup
+              value={formData.visibility}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, visibility: value }))}
+              disabled={createRoomMutation.isPending}
+              className="flex gap-6 mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="public" id="public" />
+                <Label htmlFor="public" className="cursor-pointer">Public - Anyone can join</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="private" id="private" />
+                <Label htmlFor="private" className="cursor-pointer">🔒 Private - Invite only</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          {formData.visibility === 'private' && (
+            <div>
+              <Label htmlFor="invite-guests">Invite Participants *</Label>
+              <Input
+                id="invite-guests"
+                placeholder="Guest names separated by commas (e.g., Alice, Bob, Charlie)"
+                value={formData.inviteGuests}
+                onChange={(e) => setFormData(prev => ({ ...prev, inviteGuests: e.target.value }))}
+                disabled={createRoomMutation.isPending}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Enter guest names separated by commas. They will be added to the private room.
+              </p>
+            </div>
+          )}
+
           {!storedGuestName && (
             <div>
               <Label htmlFor="guest-name">Your Name *</Label>
@@ -510,8 +591,13 @@ function CreateRoomModal({
           )}
 
           {storedGuestName && (
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 p-3 bg-gray-50 rounded">
               Creating as: <strong>{storedGuestName}</strong>
+              {formData.visibility === 'private' && formData.inviteGuests && (
+                <div className="mt-1 text-xs">
+                  Inviting: {formData.inviteGuests.split(',').map(name => name.trim()).filter(Boolean).join(', ')}
+                </div>
+              )}
             </div>
           )}
 

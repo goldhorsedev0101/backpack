@@ -1,0 +1,142 @@
+Create Room (Public/Private) + הזמנת משתתפים
+
+עדכן את טאב Chat Rooms ב־/community כך:
+
+1) UI — כפתור “Create Room”
+
+ודא שכפתור Create Room מופיע בכותרת הסיידבר וב־Empty State (אם אין חדרים/יש שגיאה).
+
+לחיצה עליו פותחת Modal יצירת חדר.
+
+2) Modal יצירת חדר (טופס)
+
+שדות:
+
+Room name (חובה, 2–60 תווים; ייחודי באופן רופף)
+
+Description (אופציונלי, עד 200)
+
+Visibility / Type (בחירה: Public / Private)
+
+אם קיימת עמודה type → שמור type='public' | 'private'
+
+אם אין type ויש metadata jsonb → שמור metadata->>'type'
+
+Invite participants (ל־Private בלבד):
+
+אם יש Auth: שדה Users עם autocomplete (מטבלת users או מקור קיים) לבחירת 1–10 משתמשים.
+
+Guests: רשימת guest nicknames (טקסט מופרד בפסיקים) — יצור שורות chat_room_members עם guest_name.
+
+You (היוצר):
+
+Auth → הוסף אותך אוטומטית כחבר חדר (user_id = auth.uid())
+
+Guest Mode → בקש/קרא guest_name מ-localStorage, שדה חובה אם חסר
+
+ולידציה:
+
+name לא ריק; לא חורג אורך; לא כולל תווים בעייתיים
+
+אם Private → חייב להיות לפחות משתתף אחד נוסף (User או Guest)
+
+3) Insert ל-Supabase (ללא הקשחת מפתחות)
+
+יצירת חדר:
+
+const base = { name, description };
+const roomPayload = {
+  ...base,
+  ...(hasColumn('type') ? { type: isPrivate ? 'private' : 'public' } : {}),
+  ...(hasJsonColumn('metadata') ? { metadata: { type: isPrivate ? 'private' : 'public' } } : {})
+};
+
+const { data: room, error: roomErr } = await supabase
+  .from('chat_rooms')
+  .insert([roomPayload])
+  .select()
+  .single();
+
+
+הוספת חברים (אם קיימת chat_room_members):
+
+יוצר (Auth/Guest) + כל המוזמנים (Users/Guests) בשאילתת insert אחת (batch).
+
+אם אין chat_room_members — דלג בשקט (החדר עדיין יופיע כציבורי; לפרטי שמור את ה-type ב-type/metadata).
+
+טיפול בשגיאות: הצג toast ברור; אם permission denied → הפנה ל-docs/community-rls.md.
+
+4) רענון ופתיחה
+
+לאחר הצלחה:
+
+רענן את רשימת החדרים בסיידבר (או הוסף את החדר ל-state).
+
+בחר ופתח את החדר החדש (RoomView).
+
+הצג toast “Room created”.
+
+5) Empty/Error states
+
+אם טעינת חדרים נכשלה → הצג “Unable to load chat rooms” + Retry.
+
+אם אין חדרים → Empty State עם כפתור Create Room.
+
+אל תקריס אם חסרות עמודות — בקש רק עמודות קיימות ב-select() (למשל: id,name,description,created_at,type,metadata כשאפשר).
+
+6) Private visibility (UI בלבד)
+
+ליד שם חדר פרטי בסיידבר הצג אייקון 🔒/Badge “Private”.
+
+ב-RoomView: אם private → הצג Tooltip “Only invited members can see messages”.
+
+7) Invite to DM (מהודעה קיימת)
+
+ב-MessageItem הוסף תפריט ⋯ עם Invite to DM:
+
+With Auth → פתח/צור DM מול user_id של המחבר;
+
+Guest → פתח/צור DM מול author_name.
+
+לאחר יצירה/איתור החדר → נווט ל-DM והצג toast “DM opened with X”.
+
+8) Guest Mode
+
+אם אין Auth, ודא שבכל יצירה/שליחת הודעה קיים guest_name ב-localStorage; אם חסר — בקש בפופ-אפ קטן.
+
+ב-Private room עם Guests בלבד — יצירה תעבוד גם בלי users, באמצעות chat_room_members.guest_name.
+
+9) RLS/Policies — תיעוד נלווה (לא להריץ אוטומטית)
+
+עדכן/צור docs/community-rls.md עם SQL לדוגמה:
+
+DEV (פתוח לכתיבה בסיסית): create policy ... for insert with check (true) על chat_rooms, chat_room_members.
+
+PROD:
+
+יצירת חדר: auth.uid() בלבד;
+
+chat_room_members: insert רק ע"י בעל החדר;
+
+messages: select/insert רק לחברי חדר;
+
+Storage (אם יש צירופים): קריאה/כתיבה לפי חברות בחדר.
+
+10) קבלה (Acceptance)
+
+כפתור Create Room זמין; Modal נפתח.
+
+אפשר ליצור Public או Private; ב-Private ניתן להזמין Users/Guests.
+
+נוצרת רשומה ב-chat_rooms (עם type/metadata) + (אם קיימת) רשומות ב-chat_room_members לכל המשתתפים.
+
+הסיידבר מתעדכן מיד, והחדר החדש נפתח.
+
+Invite-to-DM פעיל מתפריט הודעה.
+
+אין הקשחת מפתחות; שימוש ב-ENV בלבד.
+
+אין שבירה של Tabs אחרים.
+
+Commit בסיום:
+feat(community): Create Room modal (public/private) with invitations + sidebar refresh & auto-open; Invite-to-DM

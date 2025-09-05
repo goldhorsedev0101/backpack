@@ -5,7 +5,7 @@ import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { ScrollArea } from '../ui/scroll-area';
 import { Avatar, AvatarFallback } from '../ui/avatar';
-import { MessageCircle, Users, MapPin, Plus, Clock, RefreshCw } from 'lucide-react';
+import { MessageCircle, Users, MapPin, Plus, Clock, RefreshCw, Lock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ChatRoom {
@@ -23,7 +23,7 @@ interface ChatRoom {
 
 interface ChatSidebarProps {
   selectedRoom: number | null;
-  onRoomSelect: (roomId: number) => void;
+  onRoomSelect: (roomId: number, roomName?: string, roomDescription?: string, roomType?: string) => void;
   onCreateRoom?: () => void;
 }
 
@@ -147,7 +147,7 @@ export function ChatSidebar({ selectedRoom, onRoomSelect, onCreateRoom }: ChatSi
                   className={`p-3 rounded-lg border cursor-pointer transition-colors hover:bg-gray-50 ${
                     selectedRoom === room.id ? 'bg-blue-50 border-blue-200' : 'border-gray-200'
                   }`}
-                  onClick={() => onRoomSelect(room.id)}
+                  onClick={() => onRoomSelect(room.id, room.name, room.description, room.type)}
                 >
                   <div className="flex items-start gap-3">
                     <Avatar className="w-10 h-10 flex-shrink-0">
@@ -158,7 +158,13 @@ export function ChatSidebar({ selectedRoom, onRoomSelect, onCreateRoom }: ChatSi
                     
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-medium text-sm truncate">{room.name}</h3>
+                        <h3 className="font-medium text-sm truncate flex items-center gap-1">
+                          {room.type === 'private' && <Lock className="w-3 h-3 text-gray-500" />}
+                          {room.name}
+                        </h3>
+                        {room.type === 'private' && (
+                          <Badge variant="outline" className="text-xs px-1">Private</Badge>
+                        )}
                         {!room.isActive && (
                           <Badge variant="secondary" className="text-xs">Inactive</Badge>
                         )}

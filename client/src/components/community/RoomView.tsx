@@ -5,7 +5,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { ScrollArea } from '../ui/scroll-area';
 import { Badge } from '../ui/badge';
-import { Send, Loader2, RefreshCw, Hash } from 'lucide-react';
+import { Send, Loader2, RefreshCw, Hash, Lock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { MessageItem } from './MessageItem';
 import { FileUpload } from './FileUpload';
@@ -45,9 +45,11 @@ interface RoomViewProps {
   roomId: number;
   roomName?: string;
   roomDescription?: string;
+  isPrivate?: boolean;
+  onNavigateToDM?: (dmRoomId: number) => void;
 }
 
-export function RoomView({ roomId, roomName, roomDescription }: RoomViewProps) {
+export function RoomView({ roomId, roomName, roomDescription, isPrivate, onNavigateToDM }: RoomViewProps) {
   const [newMessage, setNewMessage] = useState('');
   const [guestName, setGuestName] = useState('');
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -240,11 +242,17 @@ export function RoomView({ roomId, roomName, roomDescription }: RoomViewProps) {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Hash className="w-5 h-5" />
+              {isPrivate ? <Lock className="w-5 h-5" /> : <Hash className="w-5 h-5" />}
               {roomName || `Room ${roomId}`}
+              {isPrivate && (
+                <Badge variant="outline" className="text-xs">Private</Badge>
+              )}
             </CardTitle>
             {roomDescription && (
               <p className="text-sm text-gray-600 mt-1">{roomDescription}</p>
+            )}
+            {isPrivate && (
+              <p className="text-xs text-gray-500 mt-1">🔒 Only invited members can see messages</p>
             )}
           </div>
           <Button 
@@ -304,7 +312,8 @@ export function RoomView({ roomId, roomName, roomDescription }: RoomViewProps) {
                 .map((message: Message) => (
                   <MessageItem 
                     key={message.id} 
-                    message={message} 
+                    message={message}
+                    onNavigateToDM={onNavigateToDM}
                   />
                 ))
               }
