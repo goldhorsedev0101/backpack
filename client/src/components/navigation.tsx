@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
-// import { useAuth } from "@/hooks/useAuth"; // Disabled for demo mode
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { queryClient } from "@/lib/queryClient";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AuthModal } from "@/components/auth/AuthModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,9 +45,10 @@ const navigationItems = [
 
 export default function Navigation() {
   const [location] = useLocation();
-  const user = null; // Demo mode - no auth
+  const { user, signOut, loading } = useAuth();
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   const { isVisible } = useScrollDirection();
 
   const handleLogout = async () => {
@@ -54,26 +56,19 @@ export default function Navigation() {
       // Clear all React Query cache
       queryClient.clear();
       
-      // Clear localStorage and sessionStorage
-      localStorage.clear();
-      sessionStorage.clear();
+      // Sign out using Supabase Auth
+      await signOut();
       
-      // Clear all cookies by setting them to expire
-      document.cookie.split(";").forEach(function(c) { 
-        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-      });
-      
-      // Navigate to logout endpoint which will destroy server session
-      window.location.href = "/api/logout";
+      setMobileMenuOpen(false);
     } catch (error) {
       console.error("Logout error:", error);
-      // Fallback: force reload to clear everything
-      window.location.href = "/api/logout";
     }
   };
 
-  const userInitials = "U"; // Demo mode
-  const userName = "Demo User"; // Demo mode
+  const userInitials = user?.user_metadata?.full_name
+    ? user.user_metadata.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
+    : user?.email?.charAt(0).toUpperCase() || "U";
+  const userName = user?.user_metadata?.full_name || user?.email || "Guest User";
 
   if (isMobile) {
     return (
@@ -126,24 +121,54 @@ export default function Navigation() {
                 ))}
                 
                 <div className="border-t border-gray-200 pt-4">
-                  <div className="flex items-center px-3 py-2 mb-4">
-                    <Avatar className="w-8 h-8 mr-3">
-                      <AvatarImage src={(user as any)?.profileImageUrl} />
-                      <AvatarFallback>{userInitials}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="text-sm font-medium text-slate-700">{userName}</p>
-                      <p className="text-xs text-gray-500">{(user as any)?.email}</p>
+                  {user ? (
+                    <>
+                      <div className="flex items-center px-3 py-2 mb-4">
+                        <Avatar className="w-8 h-8 mr-3">
+                          <AvatarImage src={user.user_metadata?.avatar_url} />
+                          <AvatarFallback>{userInitials}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-sm font-medium text-slate-700">{userName}</p>
+                          <p className="text-xs text-gray-500">{user.email}</p>
+                        </div>
+                      </div>
+                      
+                      <button
+                        onClick={handleLogout}
+                        disabled={loading}
+                        className="w-full flex items-center px-3 py-2 text-slate-600 hover:bg-gray-100 rounded-lg disabled:opacity-50"
+                      >
+                        <LogOut className="w-5 h-5 mr-3" />
+                        {loading ? "Signing Out..." : "Sign Out"}
+                      </button>
+                    </>
+                  ) : (
+                    <div className="space-y-2">
+                      <Button
+                        onClick={() => {
+                          setAuthModalOpen(true);
+                          setMobileMenuOpen(false);
+                        }}
+                        className="w-full"
+                        disabled={loading}
+                      >
+                        <User className="w-5 h-5 mr-2" />
+                        Sign In
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setAuthModalOpen(true);
+                          setMobileMenuOpen(false);
+                        }}
+                        variant="outline"
+                        className="w-full"
+                        disabled={loading}
+                      >
+                        Create Account
+                      </Button>
                     </div>
-                  </div>
-                  
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center px-3 py-2 text-slate-600 hover:bg-gray-100 rounded-lg"
-                  >
-                    <LogOut className="w-5 h-5 mr-3" />
-                    Sign Out
-                  </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -183,6 +208,13 @@ export default function Navigation() {
             ))}
           </div>
         </div>
+        
+        {/* Auth Modal for Mobile */}
+        <AuthModal 
+          open={authModalOpen} 
+          onOpenChange={setAuthModalOpen}
+          redirectTo={location}
+        />
       </>
     );
   }
@@ -224,29 +256,60 @@ export default function Navigation() {
           ))}
         </nav>
         
-        {/* User Profile and Logout at Bottom */}
+        {/* User Profile and Auth Section at Bottom */}
         <div className="p-4 border-t border-gray-200">
-          <div className="flex items-center mb-4 p-3 bg-gray-50 rounded-lg">
-            <Avatar className="w-10 h-10 mr-3">
-              <AvatarImage src={(user as any)?.profileImageUrl} />
-              <AvatarFallback className="bg-orange-200 text-orange-800">{userInitials}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-slate-900 truncate">{userName}</p>
-              <p className="text-xs text-gray-500 truncate">{(user as any)?.email || "demo@tripwise.com"}</p>
+          {user ? (
+            <>
+              <div className="flex items-center mb-4 p-3 bg-gray-50 rounded-lg">
+                <Avatar className="w-10 h-10 mr-3">
+                  <AvatarImage src={user.user_metadata?.avatar_url} />
+                  <AvatarFallback className="bg-orange-200 text-orange-800">{userInitials}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-slate-900 truncate">{userName}</p>
+                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                </div>
+              </div>
+              
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                disabled={loading}
+                className="w-full justify-start px-4 py-3 text-slate-700 border-gray-300 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
+              >
+                <LogOut className="w-5 h-5 mr-3" />
+                {loading ? "Signing Out..." : "Sign Out"}
+              </Button>
+            </>
+          ) : (
+            <div className="space-y-2">
+              <Button
+                onClick={() => setAuthModalOpen(true)}
+                className="w-full"
+                disabled={loading}
+              >
+                <User className="w-5 h-5 mr-2" />
+                Sign In
+              </Button>
+              <Button
+                onClick={() => setAuthModalOpen(true)}
+                variant="outline"
+                className="w-full"
+                disabled={loading}
+              >
+                Create Account
+              </Button>
             </div>
-          </div>
-          
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="w-full justify-start px-4 py-3 text-slate-700 border-gray-300 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
-          >
-            <LogOut className="w-5 h-5 mr-3" />
-            Sign Out
-          </Button>
+          )}
         </div>
       </aside>
+      
+      {/* Auth Modal */}
+      <AuthModal 
+        open={authModalOpen} 
+        onOpenChange={setAuthModalOpen}
+        redirectTo={location}
+      />
     </>
   );
 }

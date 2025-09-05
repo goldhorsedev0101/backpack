@@ -2,9 +2,16 @@ import { createClient } from '@supabase/supabase-js'
 
 // Get environment variables - use VITE_ prefix for Vite
 const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://wuzhvkmfdyiwaaladyxc.supabase.co'
-const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1emh2a21mZHlpd2FhbGFkeXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxMzUzOTEsImV4cCI6MjAzOTcxMTM5MX0.MWpORmQyq2m8TgAM5g2KcH69hJd1aFc0YKI5nOYNvxs'
+const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1emh2a21mZHlpd2FhbGFkeXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3NTE0MDksImV4cCI6MjA3MTMyNzQwOX0.xxZ1C9pFMvJ5qbEafSbnadr_o2UVl_Naxuj2l30vwww'
 
-export const supabase = createClient(supabaseUrl, supabaseKey)
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce'
+  }
+})
 
 // Photo related types and functions (matching schema.ts structure)
 export interface LocationPhoto {

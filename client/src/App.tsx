@@ -2,13 +2,13 @@ import React from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient.js";
 import { QueryClientProvider } from "@tanstack/react-query";
-// import { useQuery } from "@tanstack/react-query"; // Not needed in demo mode
 import { Toaster } from "./components/ui/toaster.js";
 import { TooltipProvider } from "./components/ui/tooltip.js";
-// import { useAuth } from "@/hooks/useAuth"; // Demo mode
+import { AuthProvider } from "./context/AuthContext";
 import NotFound from "./pages/not-found.js";
 import Landing from "./pages/landing.js";
 import Home from "./pages/home.js";
+import { AuthCallback } from "./pages/auth/Callback";
 
 import Community from "./pages/Community.js";
 import BudgetTracker from "./pages/budget-tracker.js";
@@ -48,6 +48,7 @@ function Router() {
           <Route path="/demo-real-places" component={DemoRealPlaces} />
           <Route path="/collector-data" component={CollectorData} />
           <Route path="/dashboard" component={Dashboard} />
+          <Route path="/auth/callback" component={AuthCallback} />
           <Route component={NotFound} />
         </Switch>
       </main>
@@ -59,10 +60,12 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

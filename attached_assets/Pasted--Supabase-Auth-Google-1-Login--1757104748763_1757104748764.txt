@@ -1,0 +1,95 @@
+שדרוג התחברות (Supabase Auth + Google)
+
+עדכן את מערכת ההתחברות הקיימת כך:
+
+1) שיפור ביצועים (Login מהיר)
+
+טעינה אסינכרונית:
+
+הימנע מ־blocking fetchים מיותרים בזמן טעינת האתר.
+
+טען session עם supabase.auth.getSession() מיד ב־app load, ושמור ב־Context/State גלובלי.
+
+Persist session:
+
+הפעל persistSession: true ו־autoRefreshToken: true ב־client (supabase.createClient).
+
+זה ימנע התחברות מחדש בכל רענון דף.
+
+Cache ב־localStorage:
+
+שמור פרטי משתמש בסיסיים (id, email, name, avatar_url) כדי להציג מיד UI, ורענן ברקע מול Supabase.
+
+Handling תקיעות:
+
+הוסף Timeout (8–10 שניות) לקריאת login/signup; הצג toast ידידותי אם “נראה שנתקע”.
+
+הוסף Spinner קטן ומסך “טוען…” ולא חסימה של כל הדף.
+
+2) UI: מסך Auth מודרני
+
+מסך Login/Signup יחיד (Modal/דף):
+
+טאב Sign In (דוא״ל+סיסמה או Provider)
+
+טאב Sign Up (דוא״ל+סיסמה+שדה שם)
+
+אחרי login → נווט חזרה לעמוד שבו היית (redirectTo).
+
+3) Auth Providers — Google
+
+הפעל את Google ב־Supabase Dashboard (Auth → Providers → Google).
+
+קח את Client ID/Secret של Google Console.
+
+בקוד:
+
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: 'google',
+  options: {
+    redirectTo: `${window.location.origin}/auth/callback`
+  }
+});
+
+
+צור דף pages/auth/callback.tsx שמקבל את הקוד מה־redirect, ומשלים את ה־login.
+
+לאחר הצלחה → שמור session ונווט חזרה ל־/.
+
+4) דרכים נוספות (רשות)
+
+אפשרות login via Magic Link (שלח מייל חד־פעמי).
+
+await supabase.auth.signInWithOtp({ email });
+
+
+אפשרות להוסיף GitHub/Apple בהמשך באותו מבנה.
+
+5) Context/Auth Hook
+
+צור src/context/AuthContext.tsx:
+
+טען session ב־useEffect אחד,
+
+הקשב ל־supabase.auth.onAuthStateChange לעדכון בזמן אמת,
+
+ספק user, session, loading ל־children.
+
+עדכן קומפוננטים קיימים להשתמש ב־AuthContext במקום קריאות חוזרות.
+
+6) קבלה (Acceptance)
+
+התחברות בדוא״ל/סיסמה פועלת מיד, ללא תקיעות.
+
+Google Sign-In זמין (כפתור עם אייקון גוגל).
+
+session נשמר ב־localStorage ולא נעלם ברענון.
+
+טעינת משתמשים מהירה — מופיע פרופיל (שם/אוואטר) מידית.
+
+במצב offline → fallback להצגת נתוני session האחרונים.
+
+אין הקשחת מפתחות בקוד — שימוש רק ב־ENV (SUPABASE_URL, SUPABASE_ANON_KEY).
+
+Commit בסוף:
+feat(auth): faster login flow with Supabase session cache + Google OAuth provider
