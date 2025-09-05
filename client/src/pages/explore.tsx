@@ -787,7 +787,14 @@ export default function ExplorePage() {
                       
                       {/* Weather Widget - Only for destinations */}
                       <div style={{ border: '1px dashed red', padding: '4px', margin: '4px 0' }}>
-                        <small style={{ color: 'red' }}>DEBUG: Weather widget location for destination {destination.id}</small>
+                        <small style={{ color: 'red' }}>
+                          DEBUG: Weather widget for destination {destination.id}<br/>
+                          Has coordinates: lat={destination.lat}, lon={destination.lon}<br/>
+                          ActiveTab: {activeTab}<br/>
+                          Weather loading: {weatherLoading ? 'YES' : 'NO'}<br/>
+                          Weather error: {weatherError ? 'YES' : 'NO'}<br/>
+                          Weather data size: {weatherData.size}
+                        </small>
                         {renderWeatherWidget(destination.id)}
                       </div>
                     </CardContent>
