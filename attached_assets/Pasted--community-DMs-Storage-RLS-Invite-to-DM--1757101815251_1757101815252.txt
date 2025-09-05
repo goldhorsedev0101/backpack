@@ -1,0 +1,250 @@
+תיקון /community — חדרים נראים, שליחת הודעות, DMs, קבצים/תמונות, Storage, RLS + Invite to DM
+
+עדכן את הדף הקיים /community והקוד התומך כך:
+
+0) עקרונות (חשוב)
+
+אין הקשחת מפתחות בקוד. שימוש אך ורק ב-ENV:
+
+Client: SUPABASE_URL, SUPABASE_ANON_KEY
+
+Admin/DEV בלבד: SUPABASE_SERVICE_KEY (רק לצד שרת/סקריפטים, לעולם לא לדפדפן)
+
+לא שוברים סכימה קיימת. אם טבלה/עמודה חסרה — לעבוד ב-fallback ולא לקרוס.
+
+נפריד בין DEV ↔ PROD: סקריפטים/מדיניות DEV יהיו במסמכים/סקריפטים יעודיים; לא רצים אוטומטית בפרודקשן.
+
+1) Health & Diagnostics (קהילה)
+
+הוסף src/health/communityCheck.ts שמדפיס:
+
+דגימה מ־chat_rooms (id,name,type/metadata,created_at)
+
+דגימה מ־messages (id,room_id,author_name/content,created_at)
+
+דגימה מ־travel_buddy_posts
+
+בדיקת insert הודעה לדמה (ב-DEV בלבד, נשלט ע"י ENV ALLOW_DEV_WRITES=true)
+
+תוצאות: { rows, count, error } לכל טבלה
+
+הוסף script: "health:community": "tsx src/health/communityCheck.ts"
+
+2) סכימה רכה — טבלאות עזר
+
+אם אין chat_room_members — הוסף מינימום תמיכה ל-DM ב-fallback (לפי שם חדר dm:<left>-<right> / metadata->>'type') בלי לשבור.
+
+אם אפשר (עדיף), תכין קובץ SQL ליצירת הטבלה לשימוש ידני:
+
+scripts/sql/create_chat_room_members.sql
+
+create table if not exists public.chat_room_members (
+  id uuid primary key default gen_random_uuid(),
+  room_id uuid not null,
+  user_id uuid null,
+  guest_name text null,
+  created_at timestamptz not null default now()
+);
+create index if not exists ix_crm_room on public.chat_room_members(room_id);
+create index if not exists ix_crm_user on public.chat_room_members(user_id);
+
+
+attachments:
+
+אם אין chat_attachments — הכין SQL ידני ב־scripts/sql/create_chat_attachments.sql:
+
+create table if not exists public.chat_attachments (
+  id uuid primary key default gen_random_uuid(),
+  message_id uuid not null,
+  bucket text not null,
+  path text not null,
+  url text null,
+  mime_type text null,
+  size_bytes int null,
+  width int null,
+  height int null,
+  created_at timestamptz not null default now()
+);
+create index if not exists ix_ca_msg on public.chat_attachments(message_id);
+
+
+אם אין יכולת ליצור טבלה — עבד ב-fallback על attachments jsonb ב-messages אם קיים; אחרת Markdown בקונטנט (רק fallback).
+
+אל תריץ SQL אוטומטית. רק שים קבצים + הוראות (ראה סעיף RLS/Docs).
+
+3) RLS/Policies — קבצי עזרה ו-DEV Setup בטוח
+
+צור docs/community-rls.md עם שני מצבים:
+
+DEV פתוח (להדגמה):
+
+alter table public.chat_rooms enable row level security;
+alter table public.messages enable row level security;
+alter table public.travel_buddy_posts enable row level security;
+alter table if exists public.chat_room_members enable row level security;
+alter table if exists public.chat_attachments enable row level security;
+
+-- SELECT לכולם
+create policy if not exists "public read chat_rooms" on public.chat_rooms for select using (true);
+create policy if not exists "public read messages" on public.messages for select using (true);
+create policy if not exists "public read tb_posts" on public.travel_buddy_posts for select using (true);
+create policy if not exists "public read members" on public.chat_room_members for select using (true);
+create policy if not exists "public read attachments" on public.chat_attachments for select using (true);
+
+-- INSERT ב-DEV (זהירות! לא לפרודקשן)
+create policy if not exists "public write messages" on public.messages for insert with check (true);
+create policy if not exists "public write tb_posts" on public.travel_buddy_posts for insert with check (true);
+create policy if not exists "public write members" on public.chat_room_members for insert with check (true);
+create policy if not exists "public write attachments" on public.chat_attachments for insert with check (true);
+
+
+PROD מומלץ (אם יש Auth): insert/update/delete רק ל-auth.uid()/חבר חדר; select לפי חברות בחדר. (הסבר+דוגמאות).
+
+צור scripts/sql/printCommunityPolicies.sql להצגת המדיניות לטבלאות הקהילה.
+
+צרף הפניה במסך DEV לפעולות אלו (קישור למסמכים, לא להריץ אוטומטית בדפדפן).
+
+4) Storage — bucket ו-Policies (DEV Script)
+
+הוסף סקריפט Node ל-DEV בלבד: scripts/setupStorage.ts (רץ בצד שרת בלבד עם SUPABASE_SERVICE_KEY):
+
+יוצר bucket בשם chat-uploads אם לא קיים
+
+מוודא public=false (מומלץ), ו-createSignedUrl לשיתוף
+
+הוסף script: "dev:setup:storage": "tsx scripts/setupStorage.ts"
+
+בקבצי Docs הסבר כיצד להגדיר Storage Policies ל-DEV/PROD (לפי חברות בחדר דרך message_id → room_id).
+
+5) UI: הצגת חדרים (נראות) + Empty States
+
+ב-/community → Tab: Chat Rooms:
+
+ודא שה-sidebar טוען chat_rooms עם select('id,name,description,created_at, type, metadata') (בדוק מה קיים; אם אין type, חפש metadata->>'type'; אם אין גם זה — התייחס כ-public)
+
+order('created_at', { ascending: false })
+
+הצג Empty State אם אין חדרים + כפתור “Create Room” (רק אם ALLOW_DEV_WRITES=true)
+
+קליק על חדר → טען הודעות + realtime (כבר קיים אצלך; ודא פילטר לפי room_id)
+
+6) שליחת הודעה (Insert) — עובדת ב-DEV וב-PROD
+
+ב-composer:
+
+אם יש Auth: השתמש ב-user_id/author_name מתאים
+
+אם אין Auth: שמור guest_name ב-localStorage והשתמש בו בשדה author_name
+
+הוסף טיפול שגיאה ברור אם insert נחסם (RLS) והצג לינק ל-docs/community-rls.md
+
+Optimistic UI + retry קטן
+
+7) DMs (חדרים פרטיים 1-על-1)
+
+הוסף טאב Direct Messages (אם עוד לא קיים)
+
+SidebarDMs:
+
+רשימת קונברסציות DM; אם אין chat_room_members — השתמש בזיהוי לפי שם חדר dm:<lhs>-<rhs>; אחרת לפי טבלת המיפוי
+
+כפתור New DM:
+
+עם Auth: modal בחירת משתמש (או מזהה)
+
+בלי Auth: קליטת partner_nickname
+
+createDmRoom(partner):
+
+אם chat_room_members קיים: צור chat_room עם type='dm' + שתי שורות ב-members
+
+אם לא: צור חדר עם שם מוסכם dm:<a>-<b> ושמור ב-metadata את הצדדים
+
+פתיחת DM: אם קיים — פתח; אם לא — צור ואז פתח
+
+RoomView ל-DM זהה לחדר רגיל
+
+8) 📎 צירוף תמונות/קבצים (Rooms + DMs)
+
+ב-composer הוסף כפתור 📎:
+
+בחר עד 5 קבצים, עד 10MB כל אחד; סנן סיומות חשודות
+
+Flow מומלץ:
+
+createMessage → קבל message_id
+
+העלה כל קובץ ל-chat-uploads/{room_id}/{yyyy}/{mm}/{dd}/{random}-{filename}
+
+insert ל-chat_attachments עם message_id, bucket, path, mime, size, ועוד
+
+הצג preview (תמונה = thumbnail; אחר = אייקון והורדה)
+
+אם אין chat_attachments: fallback ל-attachments jsonb או ל-Markdown בקונטנט (רק fallback)
+
+Signed URLs: אם bucket לא ציבורי — צור signed URL להורדה/תצוגה
+
+Realtime attachments (רשות): האזן ל-chat_attachments על message_id in (...) אם יצירה מתבצעת אחרי ההודעה
+
+9) Invite to DM (חדש)
+
+ב-MessageItem הוסף תפריט (⋯) או קליק ימני עם פעולה Invite to DM:
+
+אם אין Auth: נצל author_name (אורח) ופתח/צור DM מולו
+
+עם Auth: אם יש user_id לשולח — פתח/צור DM מולו; אם אין — נפל ל-author_name
+
+הצג Toast: “DM opened with X”
+
+10) תוספות קטנות
+
+Typing indicator (אופציונלי): realtime channel per room עם debounce; “X is typing…”
+
+Unread badges: שמור last_read_ts ב-members (אם קיים) או localStorage fallback
+
+חיפוש בהודעות (אופציונלי): ilike('content','%q%') בחדר הנוכחי
+
+11) קבצים/מבנה (עדכון עדין)
+
+src/components/community/SidebarDMs.tsx — דפדוף DM + New DM
+
+עדכוני RoomView.tsx, MessageItem.tsx, ChatSidebar.tsx — attachments, invite to DM, typing (אם מופעל)
+
+src/lib/communityApi.ts — פונקציות: listRooms(), listMessages(roomId), createMessage, createDmRoom, listDmRooms, uploadAttachment, listAttachmentsByMessageIds
+
+scripts/sql/create_chat_room_members.sql, scripts/sql/create_chat_attachments.sql, scripts/sql/printCommunityPolicies.sql
+
+scripts/setupStorage.ts, docs/community-rls.md
+
+12) זריעת נתוני דמה ל-DEV (לא חובה, נוח להדגמה)
+
+הוסף scripts/seedCommunity.ts (רץ עם SUPABASE_SERVICE_KEY) שמוסיף:
+
+חדר General (public)
+
+עוד 1–2 חדרים לדוגמה
+
+3–5 הודעות לדוגמה לכל חדר
+
+script: "dev:seed:community": "tsx scripts/seedCommunity.ts"
+
+13) Acceptance (קבלה)
+
+רואים חדרים (Chat Rooms sidebar); Empty State יפה אם אין
+
+שליחת הודעה עובדת (DEV/PROD לפי RLS), עם טיפול שגיאה ברור אם חסום
+
+DMs: טאב פעיל; ניתן לפתוח DM חדש או למחזר קיים; הודעות בזמן אמת
+
+Attachments: העלאה ל-Storage, שמירה ב-DB, הצגה בתור thumbnails/קבצים, הורדה (signed URL אם נדרש)
+
+Invite to DM קיים בתפריט הודעה ופותח/יוצר DM
+
+אין הקשחת מפתחות; ENV בלבד
+
+אין שבירת Travel Buddy / חלקים אחרים
+
+קבצי Docs/SQL/Setup קיימים וברורים; לא רצים אוטומטית בפרודקשן
+
+בסיום בצע commit:
+feat(community): fix visibility & writes, add DMs, attachments, storage setup, and Invite-to-DM (+docs & health)
