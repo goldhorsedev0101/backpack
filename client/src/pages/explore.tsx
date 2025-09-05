@@ -18,7 +18,7 @@ import { weatherClient, type WeatherData } from "@/utils/weatherUtils";
 
 // Updated types to match actual Supabase schema
 interface Destination {
-  id: number;
+  id: string; // Changed to string (UUID)
   name: string;
   country: string;
   lat?: number;
@@ -128,7 +128,7 @@ export default function ExplorePage() {
   const [debugInfo, setDebugInfo] = useState<any>({});
   const [photoCache, setPhotoCache] = useState<Map<string, LocationPhoto>>(new Map());
   const [destinationsMini, setDestinationsMini] = useState<DestinationMini[]>([]);
-  const [weatherData, setWeatherData] = useState<Map<number, WeatherData>>(new Map());
+  const [weatherData, setWeatherData] = useState<Map<string, WeatherData>>(new Map());
 
   // Fetch destinations mini for location resolution (cached)
   const { data: destinationsMiniData = [] } = useQuery({
@@ -590,7 +590,7 @@ export default function ExplorePage() {
   };
 
   // Weather widget component (only for destinations)
-  const renderWeatherWidget = (destinationId: number) => {
+  const renderWeatherWidget = (destinationId: string) => {
     console.log('🌤️ renderWeatherWidget called for destination:', destinationId, 'weatherData size:', weatherData.size);
     const weather = weatherData.get(destinationId);
     console.log('🌤️ weather data for destination', destinationId, ':', weather);

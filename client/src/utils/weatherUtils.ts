@@ -1,7 +1,7 @@
 // Weather API client utilities - uses server-side weather API
 
 export interface WeatherData {
-  id: number;
+  id: string; // Changed to string to match UUID
   temperature: number;
   tempMin: number;
   tempMax: number;
@@ -15,16 +15,16 @@ export interface WeatherData {
 }
 
 interface Destination {
-  id: number;
+  id: string; // Changed to string to match UUID
   name: string;
   lat: number;
   lon: number;
 }
 
 class WeatherClient {
-  async getWeatherForDestinations(destinations: Destination[]): Promise<Map<number, WeatherData>> {
+  async getWeatherForDestinations(destinations: Destination[]): Promise<Map<string, WeatherData>> {
     console.log('🌤️ WeatherClient: getWeatherForDestinations called with', destinations.length, 'destinations');
-    const weatherData = new Map<number, WeatherData>();
+    const weatherData = new Map<string, WeatherData>();
     
     // Filter destinations with valid coordinates
     const validDestinations = destinations.filter(dest => 
@@ -66,7 +66,7 @@ class WeatherClient {
       
       // Convert response back to Map
       for (const [id, weather] of Object.entries(data)) {
-        weatherData.set(parseInt(id), weather as WeatherData);
+        weatherData.set(id, weather as WeatherData); // Keep as string, no parsing needed
       }
       
       console.log('🌤️ WeatherClient: final weather map size:', weatherData.size);

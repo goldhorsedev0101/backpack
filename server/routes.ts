@@ -1388,7 +1388,7 @@ export async function registerRoutes(app: Express): Promise<void> {
         return res.status(400).json({ message: "Invalid destinations data" });
       }
       
-      const weatherResults = new Map<number, any>();
+      const weatherResults = new Map<string, any>();
       
       // Process each destination
       for (const dest of destinations) {
