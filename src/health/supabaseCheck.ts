@@ -10,7 +10,6 @@ interface TableCheck {
 }
 
 const tables: TableCheck[] = [
-  { name: 'Destinations', table: 'destinations' },
   { name: 'Accommodations', table: 'accommodations', entityType: 'accommodation' },
   { name: 'Attractions', table: 'attractions', entityType: 'attraction' },
   { name: 'Restaurants', table: 'restaurants', entityType: 'restaurant' }

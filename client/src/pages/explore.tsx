@@ -13,22 +13,6 @@ import { MapPin, Star, Phone, Globe, Clock, DollarSign, Users, Camera, CloudSun,
 import DestinationWeather from "@/components/DestinationWeather";
 import { BestTimeInfo } from "@/components/BestTimeInfo";
 
-// Updated types to match Supabase schema
-interface Destination {
-  id: number;
-  locationId: string;
-  name: string;
-  city?: string;
-  state?: string;
-  country: string;
-  addressString?: string;
-  latitude?: string;
-  longitude?: string;
-  photoCount?: number;
-  webUrl?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 interface Accommodation {
   id: number;
@@ -81,7 +65,6 @@ interface Restaurant {
 
 // Photo state management
 interface PhotoState {
-  destinations: Map<string, LocationPhoto>;
   accommodations: Map<string, LocationPhoto>;
   attractions: Map<string, LocationPhoto>;
   restaurants: Map<string, LocationPhoto>;
@@ -99,11 +82,10 @@ export default function ExplorePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("all");
   const [weatherFilter, setWeatherFilter] = useState("all");
-  const [activeTab, setActiveTab] = useState("destinations");
+  const [activeTab, setActiveTab] = useState("accommodations");
   const [currentPage, setCurrentPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [photos, setPhotos] = useState<PhotoState>({
-    destinations: new Map(),
     accommodations: new Map(),
     attractions: new Map(),
     restaurants: new Map()
@@ -122,37 +104,6 @@ export default function ExplorePage() {
   const [debugInfo, setDebugInfo] = useState<any>({});
   const [photoCache, setPhotoCache] = useState<Map<string, LocationPhoto>>(new Map());
 
-  // Fetch destinations from Supabase
-  const { data: destinations = [], isLoading: destinationsLoading } = useQuery({
-    queryKey: ['supabase-destinations', currentPage, searchQuery, selectedCountry],
-    queryFn: async () => {
-      const pageStart = currentPage * ITEMS_PER_PAGE;
-      const pageEnd = pageStart + ITEMS_PER_PAGE - 1;
-      
-      let query = supabase
-        .from('destinations')
-        .select('*', { count: 'exact', head: false })
-        .order('updated_at', { ascending: false })
-        .range(pageStart, pageEnd);
-      
-      if (searchQuery) {
-        query = query.ilike('name', `%${searchQuery}%`);
-      }
-      if (selectedCountry !== 'all') {
-        query = query.eq('country', selectedCountry);
-      }
-      
-      const { data, error, count } = await query;
-      if (error) {
-        console.error('Destinations query error:', error);
-        throw error;
-      }
-      
-      setTotalCount(count || 0);
-      setDebugInfo((prev: any) => ({ ...prev, destinations: { count, rows: data?.length || 0 } }));
-      return data as Destination[];
-    }
-  });
 
   // Fetch accommodations from Supabase
   const { data: accommodations = [], isLoading: accommodationsLoading } = useQuery({
@@ -251,10 +202,6 @@ export default function ExplorePage() {
       let entityType: LocationPhoto['entity_type'] | null = null;
       
       switch (activeTab) {
-        case 'destinations':
-          items = destinations;
-          entityType = 'destination';
-          break;
         case 'accommodations':
           items = accommodations;
           entityType = 'accommodation';
@@ -301,9 +248,9 @@ export default function ExplorePage() {
     };
     
     loadPhotosForCurrentTab();
-  }, [activeTab, destinations, accommodations, attractions, restaurants, currentPage]);
+  }, [activeTab, accommodations, attractions, restaurants, currentPage]);
 
-  const countries = [...new Set(destinations.map((dest: Destination) => dest.country))];
+  const countries = [];
 
   const renderStars = (rating: string | number | undefined) => {
     const numRating = typeof rating === 'string' ? parseFloat(rating) : (rating || 0);
@@ -456,100 +403,12 @@ export default function ExplorePage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="destinations">Destinations</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="accommodations">Accommodations (Hotels)</TabsTrigger>
           <TabsTrigger value="attractions">Attractions</TabsTrigger>
           <TabsTrigger value="restaurants">Restaurants</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="destinations" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {destinationsLoading ? (
-              Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardHeader>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : destinations.length === 0 ? (
-              <div className="col-span-full text-center py-12">
-                <p className="text-muted-foreground">No destinations found matching your criteria.</p>
-              </div>
-            ) : (
-              destinations.map((destination: Destination) => (
-                <Card key={destination.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => openDetailModal('destination', destination)}>
-                  <CardContent className="p-4">
-                    {renderPhoto(destination.locationId, destination.name)}
-                    
-                    <CardTitle className="flex items-center gap-2 mb-2">
-                      <MapPin className="w-4 h-4 text-blue-600" />
-                      <span className="text-lg">{destination.name}</span>
-                    </CardTitle>
-                    
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">
-                        {destination.city && `${destination.city}, `}{destination.country}
-                      </p>
-                      
-                      {destination.addressString && (
-                        <p className="text-xs text-muted-foreground line-clamp-2">
-                          {destination.addressString}
-                        </p>
-                      )}
-                      
-                      <div className="flex items-center justify-between pt-2">
-                        <div className="flex items-center gap-2">
-                          {destination.photoCount && destination.photoCount > 0 && (
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                              <Camera className="w-3 h-3" />
-                              {destination.photoCount}
-                            </div>
-                          )}
-                        </div>
-                        <Button size="sm" variant="outline" className="text-xs">
-                          <Eye className="w-3 h-3 mr-1" />
-                          More Details
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-          
-          {/* Pagination */}
-          {totalCount > ITEMS_PER_PAGE && (
-            <div className="flex justify-center items-center gap-4 mt-8">
-              <Button 
-                onClick={prevPage} 
-                disabled={currentPage === 0}
-                variant="outline"
-              >
-                Previous
-              </Button>
-              <span className="text-sm text-muted-foreground">
-                Page {currentPage + 1} of {Math.ceil(totalCount / ITEMS_PER_PAGE)}
-              </span>
-              <Button 
-                onClick={nextPage} 
-                disabled={(currentPage + 1) * ITEMS_PER_PAGE >= totalCount}
-                variant="outline"
-              >
-                Next
-              </Button>
-            </div>
-          )}
-        </TabsContent>
 
         <TabsContent value="accommodations" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
