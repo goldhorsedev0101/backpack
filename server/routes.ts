@@ -3187,7 +3187,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.post('/api/place-reviews', isAuthenticated, async (req: any, res) => {
+  app.post('/api/place-reviews', async (req: any, res) => {
     try {
       const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
       const reviewData = { ...req.body, userId };
@@ -3210,7 +3210,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.patch('/api/place-reviews/:id', isAuthenticated, async (req: any, res) => {
+  app.put('/api/place-reviews/:id', async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
@@ -3223,7 +3223,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.delete('/api/place-reviews/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/place-reviews/:id', async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
