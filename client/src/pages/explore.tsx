@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { supabase, fetchPhotosForEntities, type LocationPhoto } from "@/lib/supabase";
+import { supabase, fetchPhotosForEntities, type LocationPhoto } from "../../src/lib/supabaseClient";
 import { MapPin, Star, Phone, Globe, Clock, DollarSign, Users, Camera, CloudSun, Eye } from "lucide-react";
 import DestinationWeather from "@/components/DestinationWeather";
 import { BestTimeInfo } from "@/components/BestTimeInfo";
@@ -118,28 +118,38 @@ export default function ExplorePage() {
   const queryClient = useQueryClient();
 
   const ITEMS_PER_PAGE = 20;
+  const isDev = process.env.NODE_ENV !== 'production';
+  const [debugInfo, setDebugInfo] = useState<any>({});
+  const [photoCache, setPhotoCache] = useState<Map<string, LocationPhoto>>(new Map());
 
   // Fetch destinations from Supabase
   const { data: destinations = [], isLoading: destinationsLoading } = useQuery({
     queryKey: ['supabase-destinations', currentPage, searchQuery, selectedCountry],
     queryFn: async () => {
+      const pageStart = currentPage * ITEMS_PER_PAGE;
+      const pageEnd = pageStart + ITEMS_PER_PAGE - 1;
+      
       let query = supabase
         .from('destinations')
         .select('*', { count: 'exact', head: false })
-        .order('updatedAt', { ascending: false })
-        .range(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE - 1);
+        .order('updated_at', { ascending: false })
+        .range(pageStart, pageEnd);
       
       if (searchQuery) {
-        query = query.or(`name.ilike.%${searchQuery}%,country.ilike.%${searchQuery}%,addressString.ilike.%${searchQuery}%`);
+        query = query.ilike('name', `%${searchQuery}%`);
       }
       if (selectedCountry !== 'all') {
         query = query.eq('country', selectedCountry);
       }
       
       const { data, error, count } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error('Destinations query error:', error);
+        throw error;
+      }
       
       setTotalCount(count || 0);
+      setDebugInfo(prev => ({ ...prev, destinations: { count, rows: data?.length || 0 } }));
       return data as Destination[];
     }
   });
@@ -148,20 +158,27 @@ export default function ExplorePage() {
   const { data: accommodations = [], isLoading: accommodationsLoading } = useQuery({
     queryKey: ['supabase-accommodations', currentPage, searchQuery],
     queryFn: async () => {
+      const pageStart = currentPage * ITEMS_PER_PAGE;
+      const pageEnd = pageStart + ITEMS_PER_PAGE - 1;
+      
       let query = supabase
         .from('accommodations')
         .select('*', { count: 'exact', head: false })
-        .order('updatedAt', { ascending: false })
-        .range(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE - 1);
+        .order('updated_at', { ascending: false })
+        .range(pageStart, pageEnd);
       
       if (searchQuery) {
-        query = query.or(`name.ilike.%${searchQuery}%,country.ilike.%${searchQuery}%,addressString.ilike.%${searchQuery}%`);
+        query = query.ilike('name', `%${searchQuery}%`);
       }
       
       const { data, error, count } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error('Accommodations query error:', error);
+        throw error;
+      }
       
       setTotalCount(count || 0);
+      setDebugInfo(prev => ({ ...prev, accommodations: { count, rows: data?.length || 0 } }));
       return data as Accommodation[];
     },
     enabled: activeTab === 'accommodations'
@@ -171,20 +188,27 @@ export default function ExplorePage() {
   const { data: attractions = [], isLoading: attractionsLoading } = useQuery({
     queryKey: ['supabase-attractions', currentPage, searchQuery],
     queryFn: async () => {
+      const pageStart = currentPage * ITEMS_PER_PAGE;
+      const pageEnd = pageStart + ITEMS_PER_PAGE - 1;
+      
       let query = supabase
         .from('attractions')
         .select('*', { count: 'exact', head: false })
-        .order('updatedAt', { ascending: false })
-        .range(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE - 1);
+        .order('updated_at', { ascending: false })
+        .range(pageStart, pageEnd);
       
       if (searchQuery) {
-        query = query.or(`name.ilike.%${searchQuery}%,country.ilike.%${searchQuery}%,addressString.ilike.%${searchQuery}%`);
+        query = query.ilike('name', `%${searchQuery}%`);
       }
       
       const { data, error, count } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error('Attractions query error:', error);
+        throw error;
+      }
       
       setTotalCount(count || 0);
+      setDebugInfo(prev => ({ ...prev, attractions: { count, rows: data?.length || 0 } }));
       return data as Attraction[];
     },
     enabled: activeTab === 'attractions'
@@ -194,53 +218,76 @@ export default function ExplorePage() {
   const { data: restaurants = [], isLoading: restaurantsLoading } = useQuery({
     queryKey: ['supabase-restaurants', currentPage, searchQuery],
     queryFn: async () => {
+      const pageStart = currentPage * ITEMS_PER_PAGE;
+      const pageEnd = pageStart + ITEMS_PER_PAGE - 1;
+      
       let query = supabase
         .from('restaurants')
         .select('*', { count: 'exact', head: false })
-        .order('updatedAt', { ascending: false })
-        .range(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE - 1);
+        .order('updated_at', { ascending: false })
+        .range(pageStart, pageEnd);
       
       if (searchQuery) {
-        query = query.or(`name.ilike.%${searchQuery}%,country.ilike.%${searchQuery}%,addressString.ilike.%${searchQuery}%`);
+        query = query.ilike('name', `%${searchQuery}%`);
       }
       
       const { data, error, count } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error('Restaurants query error:', error);
+        throw error;
+      }
       
       setTotalCount(count || 0);
+      setDebugInfo(prev => ({ ...prev, restaurants: { count, rows: data?.length || 0 } }));
       return data as Restaurant[];
     },
     enabled: activeTab === 'restaurants'
   });
 
-  // Load photos for current tab items
+  // Load photos for current tab items (two-stage fetch)
   useEffect(() => {
     const loadPhotosForCurrentTab = async () => {
       let items: any[] = [];
-      let category: LocationPhoto['locationCategory'] | null = null;
+      let entityType: LocationPhoto['entity_type'] | null = null;
       
       switch (activeTab) {
         case 'destinations':
           items = destinations;
-          category = 'destination';
+          entityType = 'destination';
           break;
         case 'accommodations':
           items = accommodations;
-          category = 'accommodation';
+          entityType = 'accommodation';
           break;
         case 'attractions':
           items = attractions;
-          category = 'attraction';
+          entityType = 'attraction';
           break;
         case 'restaurants':
           items = restaurants;
-          category = 'restaurant';
+          entityType = 'restaurant';
           break;
       }
       
-      if (items.length > 0 && category) {
-        const locationIds = items.map(item => item.locationId);
-        const photoMap = await fetchPhotosForEntities(category, locationIds);
+      if (items.length > 0 && entityType) {
+        const cacheKey = `${entityType}-${currentPage}`;
+        if (photoCache.has(cacheKey)) {
+          return; // Use cached photos
+        }
+        
+        const entityIds = items.map(item => item.id);
+        const photoMap = await fetchPhotosForEntities(entityType, entityIds);
+        
+        // Cache the photos
+        setPhotoCache(prev => new Map([...prev, [cacheKey, ...photoMap.entries()].flat(2)]));
+        
+        setDebugInfo(prev => ({
+          ...prev,
+          photos: {
+            [`${entityType}_loaded`]: photoMap.size,
+            [`${entityType}_entities`]: entityIds.length
+          }
+        }));
         
         setPhotos(prev => ({
           ...prev,
@@ -250,7 +297,7 @@ export default function ExplorePage() {
     };
     
     loadPhotosForCurrentTab();
-  }, [activeTab, destinations, accommodations, attractions, restaurants]);
+  }, [activeTab, destinations, accommodations, attractions, restaurants, currentPage]);
 
   const countries = [...new Set(destinations.map((dest: Destination) => dest.country))];
 
@@ -266,7 +313,25 @@ export default function ExplorePage() {
 
   const handleSearch = () => {
     setCurrentPage(0); // Reset to first page
+    setSearchQuery(searchQuery.trim());
     queryClient.invalidateQueries({ queryKey: [`supabase-${activeTab}`] });
+  };
+  
+  const clearFilters = () => {
+    setSearchQuery('');
+    setSelectedCountry('all');
+    setCurrentPage(0);
+    queryClient.invalidateQueries({ queryKey: [`supabase-${activeTab}`] });
+  };
+  
+  const runSupabaseHealth = async () => {
+    try {
+      const { runSupabaseHealthCheck } = await import('../health/supabaseCheck');
+      console.log('=== Running Supabase Health Check ===');
+      await runSupabaseHealthCheck();
+    } catch (err) {
+      console.error('Health check failed:', err);
+    }
   };
 
   const openDetailModal = async (type: DetailModalState['type'], item: any) => {

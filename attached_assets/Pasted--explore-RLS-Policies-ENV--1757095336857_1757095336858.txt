@@ -1,0 +1,112 @@
+עדכן את הדף הקיים ‎/explore‎ (אל תיצור דף חדש) כך ש:
+
+תאובחן ותתוקן חשיפת הנתונים (RLS/Policies/ENV).
+
+ייבדקו ויתוקנו החיפוש/הטווח/המיון שמונעים הופעת תוצאות.
+
+שליפת התמונות מהטבלה location_photos תתבצע בשתי-קריאות יעילות, ללא N+1, לפי (entity_type, entity_id).
+
+בצע את כל הבאים. אל תסביר — תייצר קוד/קבצים/בדיקות.
+
+A) בדיקות מהירות (Health)
+
+הוסף יוטיל src/health/supabaseCheck.ts שמבצע קריאה עם anon (מה-ENV) ומדפיס לקונסול:
+
+דגימה מ־destinations (id,name,country) + count.
+
+ilike על name עם %Cusco% (ודא שימוש ב-% ולא *).
+
+בדיקת טווח עימוד בסיסית (range(0,19)).
+
+הוסף רצת ברירת מחדל (npm script) בשם health:supabase שמריץ את הבדיקה ומדפיס תוצאות ברורות (rows/count/error) לכל טבלה: destinations, accommodations, attractions, restaurants.
+
+אם חסר Supabase client — השתמש בקיים; אחרת צור src/lib/supabaseClient.ts עם קריאה ל-SUPABASE_URL, SUPABASE_ANON_KEY (לא להקשיח מפתחות).
+
+B) RLS/Policies (לקריאה בלבד בצד לקוח)
+
+הוסף סקריפט אבחוני בלבד scripts/printPolicies.sql (בקובץ) שמציג את המדיניות הקיימת ל־destinations/accommodations/attractions/restaurants/location_photos.
+
+הוסף דוקומנטציה קצרה (MD) כיצד להריץ את ה-SQL ב-Supabase SQL Editor, ואם חסרות מדיניות SELECT → הכן קטע SQL מוכן ל-copy-paste שיוצר:
+
+create policy "public read …" on public.… for select using (true);
+
+אל תריץ SQL אוטומטית מהאפליקציה. רק ספק את הקבצים/הוראות + הדפס אזהרה ש-RLS צריכה להיות enabled בטבלאות.
+
+C) תיקוני UI/לוגיקה ב-/explore (ללא יצירת דף חדש)
+
+אתר את קובץ(י) ‎/explore‎ הקיימים ועבוד עליהם.
+
+ודא מיפוי הלשוניות הקיימות לטבלאות:
+
+Destinations → public.destinations
+
+Hotels → שנה לייבל תצוגה ל: Accommodations (Hotels) ונתונים מ־public.accommodations
+
+Attractions → public.attractions
+
+Restaurants → public.restaurants
+
+בכל לשונית:
+
+חיפוש: ilike('name', '%' + q + '%') (אל תשתמש ב־*). אם יש country/address — אפשר or() מתון.
+
+מיון: ברירת מחדל order('updated_at', { ascending: false }).
+
+עימוד: range(pageStart, pageEnd) ברירת מחדל 0–19.
+
+ספירה: select('id', { count: 'exact', head: true }) להצגת “מציג X מתוך Y”.
+
+נקה/אפס חיפוש/פילטרים אם משתמש מגיע עם query string “דביק”.
+
+D) טעינת תמונות בשתי-קריאות (ללא N+1)
+
+לכל לשונית, לאחר שליפת הרשומות (עמוד נוכחי):
+
+הפק ids = rows.map(r => r.id).
+
+בצע שאילתת תמונות אחת לכולן:
+
+from('location_photos').select('entity_id, thumbnail_url, url')
+
+eq('entity_type', '<type>') (destination/accommodation/attraction/restaurant)
+
+in('entity_id', ids)
+
+order('inserted_at', { ascending: false })
+
+מַפה בצד לקוח: בחר לכל entity_id תמונה מועדפת — thumbnail_url אם יש, אחרת url.
+
+בתצוגה: גובה ~150px, object-cover, פינות מעוגלות; אם אין תמונה — placeholder ידידותי.
+
+שמור cache במצב הדף כדי לא לטעון מחדש תמונות שכבר נטענו בעת מעבר בין לשוניות.
+
+E) לוג פלט ופאנל DEV קטן
+
+הוסף פאנל DEV אופציונלי (מופעל רק אם process.env.NODE_ENV !== 'production') בראש ‎/explore המציג:
+
+ספירת רשומות לכל לשונית (Y), וכמות מוצגת (X), וה-query params הפעילים.
+
+אינדיקציה אם התבצעה טעינת תמונות בשתי-קריאות וכמות התמונות שנבחרו (distinct entity_id).
+
+הוסף כפתור DEV “Run Supabase Health” שמריץ את health:supabase בקונסול (או מפעיל route dev פנימי אם יש כזה בפרויקט).
+
+F) קבלה (Acceptance)
+
+הדף ‎/explore נשאר קיים (לא נוצר דף חדש).
+
+לייבל “Hotels” השתנה ל-Accommodations (Hotels) בלבד ברמת התצוגה; מקור הנתונים משויך ל-accommodations.
+
+בכל לשונית: תוצאות מוצגות עם חיפוש/מיון/עימוד/ספירה תקינים.
+
+תמונות נטענות בשתי-קריאות ללא N+1, מוצגת תמונה מועדפת לכל פריט; אם אין — placeholder.
+
+סקריפט הבריאות health:supabase קיים ועובד, ומדפיס דגימות/שגיאות ברורות.
+
+קיים קובץ SQL לבדיקת/יצירת Policies (לשימוש ידני ב-Supabase), עם תיעוד קצר.
+
+אין מפתחות קשיחים; הכל דרך SUPABASE_URL ו-SUPABASE_ANON_KEY.
+
+אין רגרסיות בחלקים אחרים של האפליקציה.
+
+בסיום בצע commit אחד:
+fix(explore): RLS/filters diagnostics + two-stage photos fetch; map tabs to correct tables; rename Hotels label
