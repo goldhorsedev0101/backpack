@@ -57,12 +57,12 @@ export function AuthCallback() {
         
         // If we get here, no session was found after all attempts
         console.warn('No session found after multiple attempts');
-        setError('Authentication timed out. Please try again.');
+        setError('ההתחברות לא הסתיימה בהצלחה. אנא נסה שוב.');
         setLoading(false);
         
       } catch (error) {
         console.error('Unexpected auth callback error:', error);
-        setError('An unexpected error occurred during authentication');
+        setError('אירעה שגיאה במהלך ההתחברות. אנא נסה שוב.');
         setLoading(false);
       }
     };

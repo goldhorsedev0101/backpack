@@ -139,6 +139,12 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/callback", (req, res, next) => {
+    // Skip Replit Auth callback if this is a Supabase callback
+    if (req.query.state && req.query.code) {
+      // This looks like a Supabase OAuth callback, let it pass through
+      return res.redirect('/auth/callback' + req.url.substring(req.url.indexOf('?')));
+    }
+    
     // Map localhost to localhost:5000 for development
     const hostname = req.hostname === 'localhost' ? 'localhost:5000' : req.hostname;
     
