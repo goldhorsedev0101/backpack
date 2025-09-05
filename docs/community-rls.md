@@ -239,9 +239,111 @@ DROP POLICY IF EXISTS "public write tb_posts" ON public.travel_buddy_posts;
 
 3. Update environment: Remove `ALLOW_DEV_WRITES=true`
 
+## Place Reviews and Voting Policies
+
+### Place Reviews Table
+
+```sql
+-- Enable RLS on place_reviews
+ALTER TABLE public.place_reviews ENABLE ROW LEVEL SECURITY;
+
+-- DEV: Allow all operations for development
+CREATE POLICY IF NOT EXISTS "dev_place_reviews_read" 
+  ON public.place_reviews FOR SELECT USING (true);
+
+CREATE POLICY IF NOT EXISTS "dev_place_reviews_write" 
+  ON public.place_reviews FOR INSERT WITH CHECK (true);
+
+CREATE POLICY IF NOT EXISTS "dev_place_reviews_update" 
+  ON public.place_reviews FOR UPDATE USING (true) WITH CHECK (true);
+
+CREATE POLICY IF NOT EXISTS "dev_place_reviews_delete" 
+  ON public.place_reviews FOR DELETE USING (true);
+
+-- PROD: Secure policies
+CREATE POLICY "secure_view_place_reviews" 
+  ON public.place_reviews FOR SELECT USING (true);
+
+CREATE POLICY "secure_create_place_reviews" 
+  ON public.place_reviews FOR INSERT WITH CHECK (
+    auth.uid() IS NOT NULL 
+    OR current_setting('app.guest_name', true) IS NOT NULL
+  );
+
+CREATE POLICY "secure_update_place_reviews" 
+  ON public.place_reviews FOR UPDATE USING (
+    user_id = auth.uid() 
+    OR (user_id IS NULL AND author_name = current_setting('app.guest_name', true))
+  );
+
+CREATE POLICY "secure_delete_place_reviews" 
+  ON public.place_reviews FOR DELETE USING (
+    user_id = auth.uid() 
+    OR (user_id IS NULL AND author_name = current_setting('app.guest_name', true))
+  );
+```
+
+### Place Review Votes Table
+
+```sql
+-- Enable RLS on place_review_votes
+ALTER TABLE public.place_review_votes ENABLE ROW LEVEL SECURITY;
+
+-- DEV: Allow all operations
+CREATE POLICY IF NOT EXISTS "dev_place_review_votes_read" 
+  ON public.place_review_votes FOR SELECT USING (true);
+
+CREATE POLICY IF NOT EXISTS "dev_place_review_votes_write" 
+  ON public.place_review_votes FOR INSERT WITH CHECK (true);
+
+CREATE POLICY IF NOT EXISTS "dev_place_review_votes_delete" 
+  ON public.place_review_votes FOR DELETE USING (true);
+
+-- PROD: Secure voting policies
+CREATE POLICY "secure_view_place_review_votes" 
+  ON public.place_review_votes FOR SELECT USING (true);
+
+CREATE POLICY "secure_create_place_review_votes" 
+  ON public.place_review_votes FOR INSERT WITH CHECK (
+    auth.uid() IS NOT NULL 
+    OR current_setting('app.guest_vote_token', true) IS NOT NULL
+  );
+
+CREATE POLICY "secure_delete_place_review_votes" 
+  ON public.place_review_votes FOR DELETE USING (
+    user_id = auth.uid() 
+    OR guest_token = current_setting('app.guest_vote_token', true)
+  );
+```
+
+### Guest Support for Reviews
+
+```typescript
+// Set guest name for review authoring
+const setGuestName = async (guestName: string) => {
+  await supabase.rpc('set_config', {
+    setting_name: 'app.guest_name',
+    setting_value: guestName,
+    is_local: true
+  });
+};
+
+// Set guest vote token for helpful votes
+const setGuestVoteToken = async (token: string) => {
+  await supabase.rpc('set_config', {
+    setting_name: 'app.guest_vote_token', 
+    setting_value: token,
+    is_local: true
+  });
+};
+```
+
 ## Troubleshooting
 
 - **"Policy violation" errors**: Check if user is member of the room
 - **Can't see messages**: Verify room membership and RLS policies
 - **File upload fails**: Check storage policies and bucket permissions
 - **Guest users blocked**: Ensure guest session is set with `set_config`
+- **Review creation fails**: Verify guest name is set in session
+- **Helpful votes not working**: Check guest vote token is configured
+- **Can't edit reviews**: Verify ownership (user_id match or guest name match)

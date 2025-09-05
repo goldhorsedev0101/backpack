@@ -19,6 +19,7 @@ import { SidebarDMs } from "../components/community/SidebarDMs";
 import { TravelBuddyList } from "../components/community/TravelBuddyList";
 import { NewBuddyPostModal } from "../components/community/NewBuddyPostModal";
 import { useToast } from "../hooks/use-toast";
+import { ReviewsTab } from "../components/community/ReviewsTab";
 
 const StarRating = ({ rating }: { rating: number }) => {
   return (
@@ -128,6 +129,10 @@ export default function Community() {
         </TabsList>
         
         <TabsContent value="reviews" className="mt-6">
+          <ReviewsTab />
+        </TabsContent>
+        
+        <TabsContent value="old-reviews" className="mt-6 hidden">
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-2">Authentic Place Reviews</h2>
             <p className="text-gray-600">

@@ -1,0 +1,268 @@
+ביקורות — יצירה, תצוגה, עריכה/מחיקה, “Helpful”, תמונות, סינון ו-Guest Mode
+
+עדכן את טאב “Place Reviews” ב־/community כך:
+
+1) מודל נתונים (התאמה רכה, בלי לשבור קיים)
+
+השתמש ב־public.place_reviews (יש כבר נתונים). הנח שדות אפשריים:
+
+id uuid pk, entity_type text, entity_id uuid, rating int, title text, body text,
+author_name text null, user_id uuid null, created_at timestamptz, updated_at timestamptz
+טבלת עזר חדשה (אם לא קיימת — רק ספק SQL בקובץ, לא להריץ אוטומטית):
+
+public.place_review_votes (ל־“Helpful”):
+
+id uuid pk default gen_random_uuid()
+
+review_id uuid not null
+
+user_id uuid null
+
+guest_token text null -- לזיהוי מצביעי אורח (שמירה ב-localStorage)
+
+is_helpful boolean not null default true
+
+created_at timestamptz default now()
+
+אינדקסים: על (review_id), ועל (review_id,user_id/guest_token) ייחודי רופף למניעת כפילויות.
+
+אם שדות מסוימים לא קיימים אצלך — דלג בשקט (אל תקריס). ה־UI צריך להתאים את עצמו אוטומטית למה שקיים.
+
+2) UI ראשי — רשימת ביקורות
+
+Toolbar עליון:
+
+חיפוש חופשי (title/body ilike)
+
+סינון לפי סוג ישות: All | Destinations | Accommodations | Attractions | Restaurants
+
+סינון דירוג מינימלי (1–5)
+
+מיון: Newest (ברירת מחדל), Top Rated, Lowest Rated, Most Helpful
+
+כפתור Write a Review (פתח מודל יצירה)
+
+רשימת ביקורות עם עימוד (20 לעמוד), מצב ריק ידידותי.
+
+כרטיס ביקורת (ReviewCard):
+
+כותרת, ⭐⭐⭐⭐⭐ (תמיכה בחצאי כוכב אם יש), שם המקום + Chip סוג הישות,
+
+שם כותב (או “Guest”), זמן יחסי + Tooltip זמן מלא,
+
+גוף מקוצר (3–4 שורות) עם “Show more / less”,
+
+Thumbnail של המקום מ־location_photos (ללא N+1 — ראה §5),
+
+שורת פעולות:
+
+“Helpful” (👍) עם מונה (מס’ הצבעות ייחודיות) — Toggle,
+
+“Edit” / “Delete” — מוצגים רק לבעל הרשומה (Auth: user_id===auth.uid(); Guest: author_name===guest_name כ-fallback),
+
+“Report” (לחצן UI בלבד, ללא שרת),
+
+לחיצה על שם/תמונה → ניווט ל־/explore?tab=<type>&q=<name>.
+
+3) יצירת ביקורת — Write a Review
+
+Modal טופס:
+
+Select Place:
+
+בחר סוג ישות (Destination/Accommodation/Attraction/Restaurant),
+
+Auto-complete על שם (ilike) מהטבלה המתאימה, עם עימוד קטן ו-debounce,
+
+Rating (1–5) — חובה,
+
+Title (4–80) — חובה,
+
+Review (body) (20–2000) — חובה,
+
+Your name — חובה במצב אורח; נשמר ב-localStorage כ-guest_name.
+
+Submit:
+
+await supabase.from('place_reviews').insert([{
+  entity_type, entity_id, rating, title, body,
+  ...(hasCol('user_id') ? { user_id: auth?.user()?.id ?? null } : {}),
+  ...(hasCol('author_name') ? { author_name: currentDisplayNameOrGuest } : {})
+}]).select().single();
+
+
+Optimistic UI + Toasts; חסימת Spam קלה: debounce + מנע multi-submit.
+
+4) עריכה/מחיקה של ביקורת
+
+“Edit” פותחModal עריכה עם שדות: Rating/Title/Body (לא משנים מקום).
+
+Guard הרשאות בצד לקוח:
+
+Auth: user_id === auth.uid()
+
+Guest: author_name === guest_name (אם זה המודל אצלך)
+
+Update:
+
+await supabase.from('place_reviews')
+  .update({ rating, title, body, ...(hasCol('updated_at') ? { updated_at: new Date().toISOString() } : {}) })
+  .eq('id', reviewId)
+  .select().single();
+
+
+Delete:
+
+await supabase.from('place_reviews').delete().eq('id', reviewId);
+
+
+UI: Toast הצלחה/שגיאה, הסרה מהרשימה/רענון.
+
+5) תמונות ללא N+1 + ממוצעים
+
+לאחר שליפת עמוד ביקורות:
+
+אסוף pairs = [{ entity_type, entity_id }] (ייחודיים),
+
+תמונות: בצע קריאה אחת (או 4 בקבוצות לפי type) ל־location_photos
+עם eq('entity_type', <type>) + in('entity_id', ids) + order('inserted_at desc'),
+בחר לכל id thumbnail_url ?? url.
+
+Aggregates (ממוצע/מונה): בקשה מקובצת ל־place_reviews:
+select('entity_type,entity_id, avg(rating), count:id') עם in(entity_id, ...) לפי type,
+הצג “★ {avg.toFixed(1)} · {count} reviews” (דלג אם אין).
+
+6) “Helpful” Votes
+
+זיהוי מצביע:
+
+Auth: user_id
+
+Guest: הפק guest_token (UUID) ושמור ב-localStorage; שלח בבקשות ההצבעה.
+
+פעולת Toggle:
+
+בדוק אם קיימת הצבעה לאותו (review_id, user_id/guest_token):
+
+אם קיימת → מחק (בטל Helpful)
+
+אם לא → הכנס שורה חדשה עם is_helpful=true
+
+מונה Helpful:
+
+בקשת count יעילה (select('review_id', { count: 'exact', head: true }) עם סינון), או שמור cache אחרי פעולה.
+
+UI: כפתור 👍 משנה מצב, מונה מתעדכן מיידית (Optimistic).
+
+7) ביצועים
+
+עימוד .range(pageStart, pageEnd) (20 פריטים),
+
+חיפוש/סינון עם ilike ו-or() מתון,
+
+Cache קצר (60 שניות) לאוטוקומפליט,
+
+אל תבצע קריאות תמונות/אגרגציות אם הרשימה ריקה.
+
+8) Guest Mode + Auth
+
+אם אין Auth:
+
+ודא שיש guest_name לפני יצירה/עריכה/מחיקה (Prompt עדין אם חסר),
+
+Helpful משתמש ב-guest_token (localStorage).
+
+אם יש Auth: הצג Avatar/שם; הגבל עריכה/מחיקה לבעלים בלבד (RLS ב-PROD).
+
+9) RLS/Policies (מסמכים בלבד — לא להריץ אוטומטית)
+
+עדכן/צור docs/community-rls.md עם מקטעי SQL:
+
+place_reviews
+
+DEV:
+
+alter table public.place_reviews enable row level security;
+create policy if not exists "public read place_reviews" on public.place_reviews for select using (true);
+create policy if not exists "public write place_reviews" on public.place_reviews for insert with check (true);
+-- אופציונלי ל-DEV: עריכה/מחיקה חופשית (לא מומלץ לפרודקשן)
+
+
+PROD (מומלץ):
+
+select לכולם,
+
+insert רק user_id = auth.uid() או מודל אורח מבוקר (אם יש endpoint שרת),
+
+update/delete רק לבעלים (user_id = auth.uid()).
+
+place_review_votes
+
+DEV: select/insert/delete פתוחים,
+
+PROD:
+
+insert: מותר לכל משתמש מחובר; לאורחים – רק דרך פונקציית RPC מבוקרת (או מדיניות שמאפשרת guest_token אם בחרת לשמור אותו בשדה),
+
+delete: רק מי שהצביע (user_id או guest_token תואם).
+
+הוסף scripts/sql/create_place_review_votes.sql עם יצירת הטבלה + אינדקסים.
+
+10) חיבור ל־/explore
+
+ReviewCard: לחיצה על שם המקום/Thumb:
+
+ניווט ל־/explore?tab=<type>&q=<placeName>
+
+שמור query string כדי לטעון את אותו מצב.
+
+11) קבצים / קומפוננטים (התאם למבנה אצלך)
+
+src/components/community/ReviewsTab.tsx — לוגיקת הדף, Toolbar, עימוד, טעינות
+
+src/components/community/ReviewCard.tsx — תצוגת ביקורת + פעולות (Helpful/Edit/Delete/Report)
+
+src/components/community/WriteReviewModal.tsx — יצירה
+
+src/components/community/EditReviewModal.tsx — עריכה
+
+src/lib/reviewsApi.ts
+
+listReviews(filters)
+
+createReview(payload)
+
+updateReview(id, payload)
+
+deleteReview(id)
+
+toggleHelpful(reviewId) (מחליט Auth/Guest)
+
+listPlacesForType(type, q)
+
+fetchPhotosForEntities(pairs)
+
+fetchAggregatesForEntities(pairs)
+
+scripts/sql/create_place_review_votes.sql
+
+עדכון docs/community-rls.md עם המדיניות לעיל.
+
+12) קבלה (Acceptance)
+
+טאב Place Reviews מציג רשימת ביקורות עם תמונות (ללא N+1), חיפוש/סינון/מיון, ועימוד.
+
+Write a Review יוצר ביקורת חדשה (Auth/Guest), מרענן את הרשימה, Toast הצלחה.
+
+Edit/Delete זמינים לבעלים בלבד, פועלים עם Toastים.
+
+Helpful עובד (Toggle), מונה מתעדכן מיד.
+
+לחיצה על שם/תמונה מעבירה ל־/explore עם הטאב/חיפוש הרלוונטי.
+
+אין הקשחת מפתחות; שימוש רק ב-ENV.
+
+אין שבירת Tabs אחרים ב־/community.
+
+Commit בסיום:
+feat(community): full reviews system — create, list, filter, edit/delete, helpful votes, photos batching, guest/auth support
