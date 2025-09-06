@@ -247,56 +247,99 @@ export async function fetchLeaderboard30d(limit = 10): Promise<LeaderboardEntry[
   return leaderboard;
 }
 
-// Fetch user's points history
-export async function fetchMyPointsHistory(limit = 50): Promise<PointsLedgerEntry[]> {
+// History: יומן נקודות (Ledger) - updated version
+export async function fetchMyPointsHistory(limit = 50, page = 0) {
   const user = await getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
-  const { data, error } = await supabase
+  const from = page * limit;
+  const to = from + limit - 1;
+
+  const { data, error, count } = await supabase
     .from('points_ledger')
-    .select('*')
+    .select('*', { count: 'exact' })
     .eq('userId', user.id)
-    .order('createdAt', { ascending: false })
-    .limit(limit);
+    .order('created_at', { ascending: false })
+    .range(from, to);
 
   if (error) throw error;
-  return data || [];
+  return { rows: data ?? [], total: count ?? 0 };
 }
 
-// Award points via RPC (idempotent)
-export async function awardPoints(
+// Generic history function (for all users)
+export async function fetchMyHistory(limit = 50, page = 0) {
+  const from = page * limit;
+  const to = from + limit - 1;
+
+  const { data, error, count } = await supabase
+    .from('points_ledger')
+    .select('*', { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range(from, to);
+
+  if (error) throw error;
+  return { rows: data ?? [], total: count ?? 0 };
+}
+
+// RPC award_points: זיכוי נקודות אידמפוטנטי - updated version
+type AwardParams = {
+  action: string;
+  points: number;
+  actionKey?: string | null;
+  meta?: Record<string, any>;
+};
+
+export async function awardPoints({ action, points, actionKey = null, meta = {} }: AwardParams) {
+  const { data, error } = await supabase.rpc('award_points', {
+    p_action: action,
+    p_points: points,
+    p_action_key: actionKey,
+    p_meta: meta
+  });
+
+  // Duplicate action_key (idempotency) לא נחשב לשגיאה קריטית — אפשר לטפל בטוסט "כבר זוכתה פעולה זו"
+  if (error) {
+    console.warn('awardPoints error', error);
+  }
+  // data = [{ total_points, lifetime_points }]
+  return (data?.[0]) ?? { total_points: undefined, lifetime_points: undefined };
+}
+
+// Backward compatibility wrapper
+export async function awardPointsOld(
   action: string,
   points: number,
   actionKey: string,
   meta?: any
 ): Promise<{ success: boolean; message: string }> {
-  const user = await getCurrentUser();
-  if (!user) throw new Error('User not authenticated');
-
-  const { data, error } = await supabase.rpc('award_points', {
-    p_user_id: user.id,
-    p_action: action,
-    p_points: points,
-    p_action_key: actionKey,
-    p_meta: meta || {}
-  });
-
-  if (error) {
-    if (error.code === '23505') { // Unique violation - duplicate action_key
-      return { success: false, message: 'כבר קיבלת נקודות עבור פעולה זו' };
-    }
-    throw error;
+  try {
+    const result = await awardPoints({ action, points, actionKey, meta });
+    return { success: true, message: 'נקודות נוספו בהצלחה!' };
+  } catch (error) {
+    return { success: false, message: 'שגיאה בהענקת נקודות' };
   }
-
-  return { success: true, message: 'נקודות נוספו בהצלחה!' };
 }
 
-// Daily check-in
+// Daily check-in - updated to use new awardPoints
 export async function dailyCheckIn(): Promise<{ success: boolean; message: string }> {
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  const actionKey = `checkin:${today}`;
-  
-  return awardPoints('daily.checkin', 5, actionKey, { date: today });
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const result = await awardPoints({
+      action: 'daily.checkin',
+      points: 5,
+      actionKey: `checkin:${today}`,
+      meta: { date: today }
+    });
+    
+    if (result.total_points !== undefined) {
+      return { success: true, message: `צ'ק-אין מוצלח! +5 נקודות` };
+    } else {
+      return { success: false, message: 'כבר ביצעת צ'ק-אין היום' };
+    }
+  } catch (error) {
+    console.error('Daily check-in error:', error);
+    return { success: false, message: 'שגיאה בביצוע הצ'ק-אין' };
+  }
 }
 
 // Award points for specific actions
@@ -313,5 +356,118 @@ export async function awardItineraryPoints(itineraryId: number) {
 }
 
 export async function awardSharePoints(itineraryId: number, slug: string) {
-  return awardPoints('itinerary.share', 20, `share:${itineraryId}:${slug}`, { itineraryId, slug });
+  return awardPointsOld('itinerary.share', 20, `share:${itineraryId}:${slug}`, { itineraryId, slug });
+}
+
+// עדכון התקדמות הישגים (Progress) + פתיחה (Unlock)
+export async function bumpAchievementsProgressForAction(action: string, bump = 1) {
+  // משוך את ההישגים הרלוונטיים (אפשר לשמור בקאש)
+  const { data: ach, error } = await supabase
+    .from('achievements')
+    .select('id, code, criteria_json, points_reward, name')
+    .eq('active', true);
+
+  if (error) throw error;
+
+  const targets = (ach ?? []).filter(a =>
+    a.criteria_json?.type === 'count' &&
+    a.criteria_json?.action === action
+  );
+
+  for (const t of targets) {
+    // upsert לשורת user_achievements, הגדלת progress עד progress_max
+    const { data: ua } = await supabase
+      .from('user_achievements')
+      .select('progress, progress_max, unlocked_at')
+      .eq('achievement_id', t.id)
+      .single();
+
+    let newProgress = (ua?.progress ?? 0) + bump;
+    const progressMax = ua?.progress_max ?? (t.criteria_json?.target ?? 1);
+    if (newProgress > progressMax) newProgress = progressMax;
+
+    // אם אין שורה קיימת — ניצור; אחרת נעדכן
+    await supabase
+      .from('user_achievements')
+      .upsert({
+        achievement_id: t.id,
+        progress: newProgress,
+        progress_max: progressMax,
+        // unlocked_at יתעדכן אחרי שנדע שהושלם
+      }, { onConflict: 'user_id,achievement_id' });
+
+    // אם הושלם — נפתח באדג' ונזכה בבונוס (פעם אחת)
+    if (!ua?.unlocked_at && newProgress >= progressMax) {
+      await supabase
+        .from('user_achievements')
+        .update({ unlocked_at: new Date().toISOString() })
+        .eq('achievement_id', t.id);
+
+      // בונוס נקודות על unlock (אם קיים)
+      const bonus = t.points_reward ?? 0;
+      if (bonus > 0) {
+        await awardPoints({
+          action: `achievement.unlock:${t.code}`,
+          points: bonus,
+          actionKey: `ach_unlock:${t.code}`,
+          meta: { achievement_id: t.id }
+        });
+      }
+
+      // החזרה של מידע על הישג שנפתח להצגת Toast
+      return { 
+        unlocked: true, 
+        achievement: { id: t.id, name: t.name, points: bonus },
+        newProgress,
+        progressMax
+      };
+    }
+  }
+
+  return { unlocked: false };
+}
+
+// פונקציות עזר לפעולות נפוצות עם התקדמות הישגים
+export async function awardReviewPointsWithProgress(reviewId: string, placeId: string) {
+  const result = await awardPoints({
+    action: 'review.create',
+    points: 50,
+    actionKey: `review:${reviewId}`,
+    meta: { place_id: placeId, review_id: reviewId }
+  });
+  
+  // עדכון התקדמות הישגים
+  const progressResult = await bumpAchievementsProgressForAction('review.create');
+  
+  return { pointsResult: result, progressResult };
+}
+
+export async function awardPhotoPointsWithProgress(photoId: string, placeId: string) {
+  const result = await awardPoints({
+    action: 'photo.upload',
+    points: 10,
+    actionKey: `photo:${photoId}`,
+    meta: { place_id: placeId, photo_id: photoId }
+  });
+  
+  const progressResult = await bumpAchievementsProgressForAction('photo.upload');
+  
+  return { pointsResult: result, progressResult };
+}
+
+export async function awardItineraryPointsWithProgress(itineraryId: string, isShare = false) {
+  const action = isShare ? 'itinerary.share' : 'itinerary.save';
+  const points = isShare ? 20 : 10;
+  const actionKey = isShare ? `share:${itineraryId}` : `itinerary:${itineraryId}`;
+  
+  const result = await awardPoints({
+    action,
+    points,
+    actionKey,
+    meta: { itinerary_id: itineraryId }
+  });
+  
+  const progressResult = await bumpAchievementsProgressForAction(action);
+  
+  return { pointsResult: result, progressResult };
 }

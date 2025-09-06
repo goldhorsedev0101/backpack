@@ -1,0 +1,148 @@
+History: יומן נקודות (Ledger)
+export async function fetchMyHistory(limit = 50, page = 0) {
+  const from = page * limit;
+  const to = from + limit - 1;
+
+  const { data, error, count } = await supabase
+    .from('points_ledger')
+    .select('*', { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range(from, to);
+
+  if (error) throw error;
+  return { rows: data ?? [], total: count ?? 0 };
+}
+
+RPC award_points: זיכוי נקודות אידמפוטנטי
+type AwardParams = {
+  action: string;
+  points: number;
+  actionKey?: string | null;
+  meta?: Record<string, any>;
+};
+
+export async function awardPoints({ action, points, actionKey = null, meta = {} }: AwardParams) {
+  const { data, error } = await supabase.rpc('award_points', {
+    p_action: action,
+    p_points: points,
+    p_action_key: actionKey,
+    p_meta: meta
+  });
+
+  // Duplicate action_key (idempotency) לא נחשב לשגיאה קריטית — אפשר לטפל בטוסט “כבר זוכתה פעולה זו”
+  if (error) {
+    // בד"כ conflict על action_key יחזור מה-DB כ-23505 אם קורא ישירות ל-ledger,
+    // ב-RPC שלנו חוזר פשוט ללא שינוי. כאן נלך בגישה שמראה שגיאה רק אם באמת בעייתית:
+    console.warn('awardPoints error', error);
+  }
+  // data = [{ total_points, lifetime_points }]
+  return (data?.[0]) ?? { total_points: undefined, lifetime_points: undefined };
+}
+
+שימושים נפוצים
+// אחרי יצירת ביקורת:
+await awardPoints({
+  action: 'review.create',
+  points: 50,
+  actionKey: `review:${reviewId}`,
+  meta: { place_id, review_id: reviewId }
+});
+
+// אחרי העלאת תמונה:
+await awardPoints({
+  action: 'photo.upload',
+  points: 10,
+  actionKey: `photo:${photoId}`,
+  meta: { place_id, photo_id: photoId }
+});
+
+// שמירת Itinerary:
+await awardPoints({
+  action: 'itinerary.save',
+  points: 10,
+  actionKey: `itinerary:${itineraryId}`,
+  meta: { itinerary_id: itineraryId }
+});
+
+// שיתוף Itinerary:
+await awardPoints({
+  action: 'itinerary.share',
+  points: 20,
+  actionKey: `share:${itineraryId}:${shareSlug}`,
+  meta: { itinerary_id: itineraryId, slug: shareSlug }
+});
+
+// Check-in יומי:
+const today = new Date().toISOString().slice(0,10);
+await awardPoints({
+  action: 'daily.checkin',
+  points: 5,
+  actionKey: `checkin:${today}`
+});
+
+עדכון התקדמות הישגים (Progress) + פתיחה (Unlock)
+
+אפשר להתחיל פשוט בצד הלקוח:
+
+// הגדלת progress עבור הישגים שרלוונטיים לפעולה
+export async function bumpAchievementsProgressForAction(action: string, bump = 1) {
+  // משוך את ההישגים הרלוונטיים (אפשר לשמור בקאש)
+  const { data: ach, error } = await supabase
+    .from('achievements')
+    .select('id, code, criteria_json, points_reward, name')
+    .eq('active', true);
+
+  if (error) throw error;
+
+  const targets = (ach ?? []).filter(a =>
+    a.criteria_json?.type === 'count' &&
+    a.criteria_json?.action === action
+  );
+
+  for (const t of targets) {
+    // upsert לשורת user_achievements, הגדלת progress עד progress_max
+    const { data: ua } = await supabase
+      .from('user_achievements')
+      .select('progress, progress_max, unlocked_at')
+      .eq('achievement_id', t.id)
+      .single();
+
+    let newProgress = (ua?.progress ?? 0) + bump;
+    const progressMax = ua?.progress_max ?? (t.criteria_json?.target ?? 1);
+    if (newProgress > progressMax) newProgress = progressMax;
+
+    // אם אין שורה קיימת — ניצור; אחרת נעדכן
+    await supabase
+      .from('user_achievements')
+      .upsert({
+        achievement_id: t.id,
+        progress: newProgress,
+        progress_max: progressMax,
+        // unlocked_at יתעדכן אחרי שנדע שהושלם
+      }, { onConflict: 'user_id,achievement_id' });
+
+    // אם הושלם — נפתח באדג' ונזכה בבונוס (פעם אחת)
+    if (!ua?.unlocked_at && newProgress >= progressMax) {
+      await supabase
+        .from('user_achievements')
+        .update({ unlocked_at: new Date().toISOString() })
+        .eq('achievement_id', t.id);
+
+      // בונוס נקודות על unlock (אם קיים)
+      const bonus = t.points_reward ?? 0;
+      if (bonus > 0) {
+        await awardPoints({
+          action: `achievement.unlock:${t.code}`,
+          points: bonus,
+          actionKey: `ach_unlock:${t.code}`,
+          meta: { achievement_id: t.id }
+        });
+      }
+
+      // כאן תציג Toast “🏆 השגת באדג' חדש: t.name”
+    }
+  }
+}
+
+
+בהמשך אפשר להעביר את כל לוגיקת ה-progress ל־RPC/DB לשקיפות וביצועים, אבל זה מספק לגמרי לשלב ראשון.
