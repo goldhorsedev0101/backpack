@@ -139,6 +139,18 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/callback", (req, res, next) => {
+    // Check if this is a Supabase OAuth callback
+    const hasSupabaseParams = req.query.code && 
+      (req.query.state || req.originalUrl.includes('supabase'));
+    
+    if (hasSupabaseParams) {
+      console.log('Supabase OAuth detected, redirecting to client callback');
+      // Redirect to client-side callback with all query parameters
+      const queryString = new URLSearchParams(req.query as Record<string, string>).toString();
+      return res.redirect(`/auth/callback?${queryString}`);
+    }
+    
+    // Otherwise, handle as Replit Auth callback
     // Map localhost to localhost:5000 for development
     const hostname = req.hostname === 'localhost' ? 'localhost:5000' : req.hostname;
     
