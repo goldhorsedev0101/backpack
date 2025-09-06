@@ -445,17 +445,19 @@ export default function ItineraryDetail() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Print Styles */}
-      <style>{`
-        @media print {
-          .no-print { display: none !important; }
-          .print-only { display: block !important; }
-          body { background: white !important; }
-          .bg-gray-50 { background: white !important; }
-          .border { border: 1px solid #ddd !important; }
-          .shadow-lg { box-shadow: none !important; }
-          .sticky { position: static !important; }
-        }
-      `}</style>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white !important; }
+            .bg-gray-50 { background: white !important; }
+            .border { border: 1px solid #ddd !important; }
+            .shadow-lg { box-shadow: none !important; }
+            .sticky { position: static !important; }
+          }
+        `
+      }} />
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10 no-print">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
