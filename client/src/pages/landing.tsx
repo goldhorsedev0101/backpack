@@ -118,16 +118,25 @@ window.location.href = "/?logout=true";
               <div className="hidden md:block ml-10">
                 <div className="flex items-baseline space-x-4">
                   <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
-                    <Link href="/explore">Discover</Link>
+                    <Link href="/">Home</Link>
                   </Button>
                   <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
                     <Link href="/my-trips">Plan Trip</Link>
+                  </Button>
+                  <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
+                    <Link href="/explore">Explore</Link>
+                  </Button>
+                  <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
+                    <Link href="/weather">Weather</Link>
                   </Button>
                   <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
                     <Link href="/community">Community</Link>
                   </Button>
                   <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
                     <Link href="/budget-tracker">Budget</Link>
+                  </Button>
+                  <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
+                    <Link href="/dashboard">Database Dashboard</Link>
                   </Button>
                 </div>
               </div>
