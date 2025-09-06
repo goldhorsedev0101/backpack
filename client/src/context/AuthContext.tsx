@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from '../lib/supabase.js';
+import { getRedirectBase } from '../utils/redirectBase.js';
 import type { User, Session } from '@supabase/supabase-js';
 import { useToast } from '../hooks/use-toast.js';
 
@@ -77,10 +78,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true);
       
+      // שמירת יעד החזרה לפני הניסיון לroutingההתחברות
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('redirectAfterLogin', window.location.pathname + window.location.search);
+      }
+      
+      const redirectTo = `${getRedirectBase()}/auth/callback`;
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo,
         }
       });
       
