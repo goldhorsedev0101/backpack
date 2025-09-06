@@ -1,0 +1,189 @@
+יקון OAuth Redirect + בדיקת בריאות התחברות
+
+בצע את כל הפעולות הבאות, צעד־אחר־צעד:
+
+1) עדכון supabaseClient להגדרות Auth מלאות
+
+אתר את src/lib/supabaseClient.ts (או הקובץ המקביל) ועדכן:
+
+persistSession: true
+
+autoRefreshToken: true
+
+detectSessionInUrl: true
+
+אין הקשחת מפתחות; שימוש ב-ENV בלבד:
+process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
+
+import { createClient } from '@supabase/supabase-js';
+
+export const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.SUPABASE_ANON_KEY!,
+  { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
+);
+
+2) Redirect דינמי (מזהה Replit/localhost/פרודקשן)
+
+צור יוטיל חדש src/utils/redirectBase.ts שמחזיר בסיס ל־redirect באופן חכם:
+
+עדיפות ל־process.env.NEXT_PUBLIC_APP_URL אם קיים (פרודקשן).
+
+אחרת window.location.origin.
+
+וודא https (החלף http:// ב־https://).
+
+חתוך סלאש סופי אם קיים.
+
+export function getRedirectBase(): string {
+  const base = (typeof window !== 'undefined'
+    ? window.location.origin
+    : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000');
+  const httpsBase = base.replace('http://', 'https://');
+  return httpsBase.endsWith('/') ? httpsBase.slice(0, -1) : httpsBase;
+}
+
+3) שימוש ביוטיל בקריאת Google OAuth
+
+אתר את נקודת הקריאה ל־supabase.auth.signInWithOAuth (כפתור “Sign in with Google”) ועדכן:
+
+import { getRedirectBase } from '@/utils/redirectBase';
+
+const redirectTo = `${getRedirectBase()}/auth/callback`;
+const { error } = await supabase.auth.signInWithOAuth({
+  provider: 'google',
+  options: { redirectTo },
+});
+if (error) console.error('OAuth error', error);
+
+4) דף/ראוט Callback מינימלי
+
+צור/עדכן pages/auth/callback.tsx (או ראוט מתאים אצלך) כך:
+
+מציג “מסיים התחברות…”
+
+קורא supabase.auth.getSession()
+
+אם יש session → ניווט ל-/ (או sessionStorage.redirectAfterLogin אם קיים).
+
+אם יש שגיאה → נווט ל-/login?error=callback.
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { supabase } from '@/lib/supabaseClient';
+
+export default function AuthCallback() {
+  const router = useRouter();
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase.auth.getSession();
+      const back = sessionStorage.getItem('redirectAfterLogin') || '/';
+      if (error) return router.replace('/login?error=callback');
+      if (!cancelled) router.replace(back);
+    })();
+    return () => { cancelled = true; };
+  }, [router]);
+  return <div className="p-6">מסיים התחברות…</div>;
+}
+
+5) שמירת יעד חזרה (אופציונלי אך מומלץ)
+
+לפני פתיחת OAuth (בלחיצה על כפתור כניסה), שמור:
+
+sessionStorage.setItem('redirectAfterLogin', window.location.pathname + window.location.search);
+
+6) מסך/קומפוננט התחברות – UX שאינו “נתקע”
+
+ודא שמופיע Spinner קטן ולא “מסך לבן”.
+
+עטוף פעולות התחברות/הרשמה ב-timeout: 10s → אם חורג, הצג toast “נראה שנתקע, נסו שוב”.
+
+async function withTimeout<T>(p: Promise<T>, ms = 10000) {
+  return Promise.race([p, new Promise<never>((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+}
+
+7) בדיקת בריאות (Health) ל-Auth
+
+הוסף סקריפט src/health/authCheck.ts שמדפיס OK/FAIL:
+
+בודק ש-ENV קריטיים קיימים: SUPABASE_URL, SUPABASE_ANON_KEY.
+
+בודק GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET (מזהיר אם חסרים).
+
+מוודא ש-redirectTo מחושב לערך שאינו localhost כשמריצים ב-Replit (שדה process.env.REPL_SLUG/window.location).
+
+מבצע supabase.auth.getSession() ומדפיס מצב.
+
+מדפיס כתובת redirect הנוכחית.
+
+import { supabase } from '@/lib/supabaseClient';
+import { getRedirectBase } from '@/utils/redirectBase';
+
+(async () => {
+  const envOk = !!(process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL)
+    && !!(process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  console.log('ENV::SUPABASE_URL/ANON_KEY', envOk ? 'OK' : 'MISSING');
+
+  console.log('ENV::GOOGLE_CLIENT_ID', process.env.GOOGLE_CLIENT_ID ? 'SET' : 'MISSING');
+  console.log('ENV::GOOGLE_CLIENT_SECRET', process.env.GOOGLE_CLIENT_SECRET ? 'SET' : 'MISSING');
+
+  const redirectTo = `${getRedirectBase()}/auth/callback`;
+  console.log('RedirectTo:', redirectTo, redirectTo.includes('localhost') ? '⚠️ localhost' : '✅');
+
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    console.log('getSession:', error ? `ERROR ${error.message}` : data?.session ? 'OK (session present or null OK)' : 'OK (no session)');
+  } catch (e:any) {
+    console.log('getSession threw:', e?.message);
+  }
+})();
+
+
+הוסף ל־package.json סקריפט:
+
+{
+  "scripts": {
+    "health:auth": "tsx src/health/authCheck.ts"
+  }
+}
+
+8) דף DEBUG קטן (לבחירה, רק ל-DEV)
+
+צור pages/_debug/auth.tsx המראה:
+
+ENV שנקלטו (מוסתר סודות, רק אם set/missing),
+
+ה-redirectTo המחושב,
+
+כפתור “Test Google Sign-In” שמפעיל את הקריאה המעודכנת,
+
+כפתור “Clear local session” שמוחק tw_user/sessionStorage.
+
+הפוך אותו לזמין רק אם process.env.NODE_ENV !== 'production'.
+
+9) תיעוד קצר
+
+צור/עדכן docs/auth-setup.md עם:
+
+רשימת Redirect URLs שצריך להגדיר בגוגל וב-Supabase.
+
+הסבר על NEXT_PUBLIC_APP_URL לפרודקשן קבוע.
+
+פקודות בדיקה: npm run health:auth.
+
+10) Acceptance (קבלה)
+
+אין יותר חזרה ל-localhost ברפליט — OAuth חוזר ל-/auth/callback בדומיין Replit.
+
+התחברות עם Google עובדת; חזרה לאתר וה-session נשמר.
+
+ב-Reload המשתמש נשאר מחובר (persistSession).
+
+npm run health:auth מדפיס מצב ברור של ENV/redirect/session.
+
+אין מפתחות קשיחים בקוד.
+
+Commit בסיום:
+fix(auth): dynamic OAuth redirect (Replit/Prod), add callback + health check, improve login UX & session handling
