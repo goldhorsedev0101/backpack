@@ -1,0 +1,137 @@
+ביטול התחברות Replit OAuth והשארת Google-only (Supabase)
+
+בצע את כל הפעולות הבאות בעדינות (בלי לשבור את המבנה), ובשינויים מינימליים:
+
+1) הסרת אינטגרציית Replit OAuth מהקוד
+
+סרוק את הקוד ומחק/נטרל כל שימוש ב:
+
+חבילות: @replit/auth, replit-auth, repl-auth ואחרות הקשורות ל-Replit OAuth.
+
+קריאות/ייבוא: ReplitAuthClient, authWithReplit, window.Replit, __replauth, repl.co/auth, replit.dev/auth, login.replit.com, replit.com/auth.
+
+נתיבים/redirectים דמויי: /__replauth*, /replit/callback, /oauth/replit*.
+
+כפתורי UI: “Login with Replit”, “Continue with Replit”, לוגו Replit.
+
+אם יש כפתור או קישור שמנווט ל-Replit OAuth – מחק אותו.
+
+אם יש Provider selector שמציג כמה ספקים – השאר רק את Google (Supabase).
+
+אם נמצאו קבצים/קומפוננטים ייעודיים (למשל ReplitLoginButton.tsx, useReplitAuth.ts, api/replit/*) — מחק אותם, ועדכן מקומות שמייבאים אותם.
+
+2) ניקוי קונפיגורציה/ENV שקשורים ל-Replit OAuth
+
+הסר משתני סביבה (אם קיימים):
+REPLIT_CLIENT_ID, REPLIT_CLIENT_SECRET, REPLIT_REDIRECT_URI, REPLIT_AUTH_ENABLED, וכל משתנה דומה.
+
+עדכן .env(.local)/Replit Secrets — השאר רק:
+
+SUPABASE_URL, SUPABASE_ANON_KEY
+
+GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+
+(אופציונלי לפרודקשן) NEXT_PUBLIC_APP_URL
+
+אם יש קובצי קונפיג של Replit OAuth (manifest/credentials), מחק אותם.
+
+3) הבטחת Google-only ב-UI
+
+במסך/מודאל ההתחברות:
+
+השאר כפתור אחד: “Sign in with Google”.
+
+השאר/הוסף אופציית Email + Magic Link (רשות) של Supabase, אם כבר קיימת.
+
+ודא שאין שום כפתור/לוגו של Replit.
+
+אם יש ProviderList קומפוננט – העבר אותו למצב שמציג רק google.
+
+4) קריאת OAuth של Supabase (Google) בלבד
+
+ודא שהקריאה נראית כך ומשתמשת ב-redirect דינמי (Replit/Prod/Local):
+
+import { supabase } from '@/lib/supabaseClient';
+import { getRedirectBase } from '@/utils/redirectBase';
+
+export async function signInWithGoogle() {
+  const redirectTo = `${getRedirectBase()}/auth/callback`;
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo },
+  });
+  if (error) console.error('OAuth error', error);
+}
+
+
+ודא שב-supabaseClient מופעל:
+persistSession: true, autoRefreshToken: true, detectSessionInUrl: true.
+
+5) הגנות ניתוב – חסימת נתיבי Replit אם נשארו
+
+אם קיימת שכבת ראוטינג/שרת (Next API/Express):
+
+הוסף middleware שחוסם כל בקשה לנתיבים: /__replauth, /oauth/replit, /replit/* ומחזיר 404.
+
+מחק כל API-route שמקבלת קוד/טוקן מרפליט.
+
+6) ניקוי תלותים
+
+מחק מה-package.json תלויות Replit Auth (אם קיימות) והרץ התקנות:
+
+הסרת חבילות מיותרות
+
+npm install מחדש
+
+7) בדיקת בריאות — אין Replit OAuth
+
+צור src/health/authProvidersCheck.ts שמדפיס מצב:
+
+מאמת שאין import/קבצים/נתיבים עם “replit/auth”, “__replauth”, “login.replit”.
+
+מאמת שיש ENV ל-Google ו-Supabase.
+
+מדפיס את redirectTo המחושב שאינו localhost.
+
+דוגמה (סטטי/לוגי):
+
+(() => {
+  const suspicious = [
+    'replit.com/auth', '__replauth', '@replit/auth', 'repl.co/auth', 'replit.dev/auth'
+  ];
+  console.log('Check::No Replit OAuth strings in code: MANUAL GREP already done in this prompt');
+  console.log('ENV::SUPABASE_URL', !!(process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL) ? 'OK' : 'MISSING');
+  console.log('ENV::SUPABASE_ANON_KEY', !!(process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) ? 'OK' : 'MISSING');
+  console.log('ENV::GOOGLE_CLIENT_ID', process.env.GOOGLE_CLIENT_ID ? 'SET' : 'MISSING');
+  console.log('ENV::GOOGLE_CLIENT_SECRET', process.env.GOOGLE_CLIENT_SECRET ? 'SET' : 'MISSING');
+})();
+
+
+הוסף ל-package.json:
+
+{
+  "scripts": {
+    "health:auth:providers": "tsx src/health/authProvidersCheck.ts"
+  }
+}
+
+8) קבצי תיעוד (רשות)
+
+עדכן docs/auth-setup.md:
+
+“The app uses Supabase Auth (Google) only.”
+
+מחק/סמן deprecated כל אזכור ל-Replit OAuth.
+
+9) קבלה (Acceptance)
+
+אין הופעה של מסך “Log in secured by replit”.
+
+יש רק כפתור “Sign in with Google”, והזרימה חוזרת ל-/auth/callback בדומיין של Replit/Prod.
+
+npm run health:auth:providers מדפיס ENV תקינים וללא סימני Replit.
+
+התחברות/יציאה עובדות; session נשמר.
+
+Commit בסיום:
+chore(auth): remove Replit OAuth; keep Google-only via Supabase (cleanup + health check)
