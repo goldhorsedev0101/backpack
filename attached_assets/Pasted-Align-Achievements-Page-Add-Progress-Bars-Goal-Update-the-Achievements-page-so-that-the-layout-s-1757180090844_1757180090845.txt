@@ -1,0 +1,76 @@
+Align Achievements Page & Add Progress Bars
+
+Goal:
+Update the Achievements page so that the layout starts flush from the left edge and extends all the way to the right sidebar. In addition, add progress bars to missions (especially weekly missions with multi-step progress).
+
+Layout
+
+Make sure the main content area begins at the very left margin (no extra padding/margin).
+
+Use a two-column grid:
+
+Left: main content (Quick Actions, tabs, missions, badges, leaderboard, history).
+
+Right: fixed sidebar (e.g., 320px) aligned to the edge of the page.
+
+On smaller screens: stack vertically (main first, sidebar below).
+
+Keep Achievements page direction LTR even if the rest of the app is RTL. Text aligned left.
+
+Quick Actions & Tabs
+
+Quick Actions row and tabs should align with the same left margin as the rest of the content.
+
+If the Quick Actions row is wide, enable horizontal scrolling on mobile.
+
+Tabs (Overview, Missions, Badges, Leaderboard, History) should always line up with the left margin.
+
+Missions Section
+
+Daily missions:
+
+Show as a simple card (usually progress_max = 1).
+
+No progress bar needed, just description and “+points” label.
+
+Weekly missions (or any with progress_max > 1):
+
+Add a visible progress bar.
+
+Show current progress count (e.g., 1/3 Reviews) and percentage.
+
+Bar fills as user completes steps.
+
+When full, highlight completion visually (e.g., different color or “Completed” label).
+
+Progress Tracking
+
+Connect progress bar to real values from user_mission_progress.
+
+Update dynamically after each action (e.g., review created).
+
+Refresh automatically after awarding progress so the user sees real-time updates.
+
+UX Notes
+
+Keep daily and weekly sections clearly separated with headings.
+
+Daily reset: indicate “Reset every day at midnight”.
+
+Weekly reset: indicate “Reset every Monday”.
+
+When mission completes, show toast notification in English:
+
+Example: “✅ Mission complete: Write 3 Reviews (+100 pts)”.
+
+Maintain consistent styling with Tailwind (rounded cards, shadows, spacing).
+
+Testing
+
+Daily check-in mission shows as a single card without progress bar.
+
+Weekly mission (e.g., Write 3 Reviews) shows a progress bar and increments correctly.
+
+Page layout starts at left margin and runs smoothly to sidebar on the right.
+
+Mobile view stacks elements properly and progress bars shrink gracefully.
