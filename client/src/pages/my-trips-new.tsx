@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -1158,7 +1159,11 @@ export default function MyTripsNew() {
                           <CardHeader className="pb-3">
                             <div className="flex items-start justify-between">
                               <div>
-                                <CardTitle className="text-lg">{itinerary.title}</CardTitle>
+                                <CardTitle className="text-lg">
+                                  <Link href={`/itineraries/${itinerary.id}`} className="hover:text-primary cursor-pointer transition-colors">
+                                    {itinerary.title}
+                                  </Link>
+                                </CardTitle>
                                 <p className="text-sm text-gray-500 mt-1">
                                   נוצר ב-{new Date(itinerary.created_at).toLocaleDateString('he-IL')}
                                 </p>
