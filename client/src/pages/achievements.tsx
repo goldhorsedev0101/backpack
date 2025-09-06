@@ -116,6 +116,31 @@ export default function Achievements() {
     enabled: !!user,
   });
 
+  // Achievement values from single source of truth
+  const { data: dailyCheckinValue } = useQuery({
+    queryKey: ["achievement-value", "daily.checkin"],
+    queryFn: () => rewardsService.getAchievementValue("daily.checkin"),
+    enabled: !!user,
+  });
+
+  const { data: reviewValue } = useQuery({
+    queryKey: ["achievement-value", "review.create"],
+    queryFn: () => rewardsService.getAchievementValue("review.create"),
+    enabled: !!user,
+  });
+
+  const { data: photoValue } = useQuery({
+    queryKey: ["achievement-value", "photo.upload"],
+    queryFn: () => rewardsService.getAchievementValue("photo.upload"),
+    enabled: !!user,
+  });
+
+  const { data: itineraryValue } = useQuery({
+    queryKey: ["achievement-value", "itinerary.share"],
+    queryFn: () => rewardsService.getAchievementValue("itinerary.share"),
+    enabled: !!user,
+  });
+
   // Helper function to show mission progress toasts
   const showMissionProgressToast = (result: any) => {
     if (!result) {
@@ -316,7 +341,11 @@ export default function Achievements() {
                   className="flex items-center gap-2 whitespace-nowrap"
                 >
                   <Calendar className="w-4 h-4" />
-                  {dailyCheckInMutation.isPending ? "Checking in..." : `Daily Check-in (+${POINT_VALUES.DAILY_CHECKIN} pts)`}
+                  {dailyCheckInMutation.isPending ? "Checking in..." : 
+                    dailyCheckinValue ? 
+                      `${dailyCheckinValue.label} (+${dailyCheckinValue.points} pts)` :
+                      `Daily Check-in (+${POINT_VALUES.DAILY_CHECKIN} pts)`
+                  }
                 </Button>
                 
                 <Button 
@@ -327,7 +356,11 @@ export default function Achievements() {
                   aria-label="Track review writing progress"
                 >
                   <MessageSquare className="w-4 h-4" />
-                  {awardReviewPointsMutation.isPending ? "Tracking..." : `Write Review (+${POINT_VALUES.WRITE_REVIEW} pts)`}
+                  {awardReviewPointsMutation.isPending ? "Tracking..." : 
+                    reviewValue ? 
+                      `${reviewValue.label} (+${reviewValue.points} pts)` :
+                      `Write Review (+${POINT_VALUES.WRITE_REVIEW} pts)`
+                  }
                 </Button>
                 
                 <Button 
@@ -338,7 +371,11 @@ export default function Achievements() {
                   aria-label="Track photo upload progress"
                 >
                   <Camera className="w-4 h-4" />
-                  {awardPhotoPointsMutation.isPending ? "Tracking..." : `Upload Photo (+${POINT_VALUES.UPLOAD_PHOTO} pts)`}
+                  {awardPhotoPointsMutation.isPending ? "Tracking..." : 
+                    photoValue ? 
+                      `${photoValue.label} (+${photoValue.points} pts)` :
+                      `Upload Photo (+${POINT_VALUES.UPLOAD_PHOTO} pts)`
+                  }
                 </Button>
                 
                 <Button 
@@ -349,7 +386,11 @@ export default function Achievements() {
                   aria-label="Track itinerary sharing progress"
                 >
                   <MapPin className="w-4 h-4" />
-                  {awardItineraryPointsMutation.isPending ? "Tracking..." : `Share Itinerary (+${POINT_VALUES.SHARE_ITINERARY} pts)`}
+                  {awardItineraryPointsMutation.isPending ? "Tracking..." : 
+                    itineraryValue ? 
+                      `${itineraryValue.label} (+${itineraryValue.points} pts)` :
+                      `Share Itinerary (+${POINT_VALUES.SHARE_ITINERARY} pts)`
+                  }
                 </Button>
               </div>
             </CardContent>
