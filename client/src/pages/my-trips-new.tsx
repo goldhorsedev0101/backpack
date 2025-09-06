@@ -132,10 +132,8 @@ const INTERESTS = [
 export default function MyTripsNew() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isAuthenticated, user, signInWithGoogle } = useAuth();
   const [activeTab, setActiveTab] = useState("preferences");
-  
-  // Auth state
-  const { user, isLoading: authLoading, isAuthenticated, signInWithGoogle } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   
   // Form state
@@ -1089,6 +1087,99 @@ export default function MyTripsNew() {
                         </CardContent>
                       </Card>
                     ))}
+                  </div>
+                )}
+
+                {/* My Saved Itineraries Section */}
+                {isAuthenticated && (
+                  <div className="mt-8 pt-8 border-t border-gray-200">
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center">
+                        <Save className="w-6 h-6 mr-2 text-primary" />
+                        <h3 className="text-xl font-bold text-slate-700">My Saved Itineraries</h3>
+                      </div>
+                      <Badge variant="secondary">{savedItineraries.length}</Badge>
+                    </div>
+
+                    {isLoadingItineraries ? (
+                      <div className="text-center py-8">
+                        <Loader2 className="w-8 h-8 mx-auto mb-2 animate-spin text-primary" />
+                        <p className="text-sm text-gray-600">Loading your saved itineraries...</p>
+                      </div>
+                    ) : savedItineraries.length === 0 ? (
+                      <div className="text-center py-8 bg-gray-50 rounded-lg">
+                        <Save className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                        <p className="text-gray-600 mb-2">אין איטינררים שמורים עדיין</p>
+                        <p className="text-sm text-gray-500">האיטינררים שתשמור יופיעו כאן</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {savedItineraries.map((itinerary) => {
+                          const planData = itinerary.plan_json as any;
+                          return (
+                            <Card key={itinerary.id} className="border hover:shadow-md transition-shadow">
+                              <CardHeader className="pb-3">
+                                <div className="flex items-start justify-between">
+                                  <div>
+                                    <CardTitle className="text-lg">{itinerary.title}</CardTitle>
+                                    <p className="text-sm text-gray-500 mt-1">
+                                      נוצר ב-{new Date(itinerary.created_at).toLocaleDateString('he-IL')}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Badge variant="outline" className="text-xs">
+                                      {planData?.totalDays || 0} ימים
+                                    </Badge>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => deleteItineraryMutation.mutate(itinerary.id)}
+                                      disabled={deleteItineraryMutation.isPending}
+                                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    >
+                                      {deleteItineraryMutation.isPending ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                      ) : (
+                                        <Trash2 className="w-4 h-4" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                </div>
+                              </CardHeader>
+                              <CardContent>
+                                <div className="space-y-2">
+                                  <div className="flex items-center text-sm text-gray-600">
+                                    <MapPin className="w-4 h-4 mr-2" />
+                                    {planData?.mainDestination || 'יעד לא ידוע'}
+                                  </div>
+                                  {planData?.totalCost && (
+                                    <div className="flex items-center text-sm text-gray-600">
+                                      <DollarSign className="w-4 h-4 mr-2" />
+                                      עלות משוערת: ${planData.totalCost}
+                                    </div>
+                                  )}
+                                  {planData?.itinerary && planData.itinerary.length > 0 && (
+                                    <div className="text-sm text-gray-600">
+                                      <span className="font-medium">{planData.itinerary.length} ימי פעילויות:</span>
+                                      <div className="mt-1 text-xs">
+                                        {planData.itinerary.slice(0, 2).map((day: any, idx: number) => (
+                                          <div key={idx} className="text-gray-500">
+                                            יום {day.day}: {day.location}
+                                          </div>
+                                        ))}
+                                        {planData.itinerary.length > 2 && (
+                                          <div className="text-gray-400">ועוד {planData.itinerary.length - 2} ימים...</div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 )}
               </CardContent>
