@@ -315,13 +315,13 @@ export async function dailyCheckIn(): Promise<{ success: boolean; message: strin
     });
     
     if (result.total_points !== undefined) {
-      return { success: true, message: 'צ׳ק-אין מוצלח! +5 נקודות' };
+      return { success: true, message: 'Daily check-in successful! +5 points' };
     } else {
-      return { success: false, message: 'כבר ביצעת צ׳ק-אין היום' };
+      return { success: false, message: 'Already checked in today' };
     }
   } catch (error) {
     console.error('Daily check-in error:', error);
-    return { success: false, message: 'שגיאה בביצוע הצ׳ק-אין' };
+    return { success: false, message: 'Error processing check-in' };
   }
 }
 
