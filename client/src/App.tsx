@@ -8,7 +8,7 @@ import { AuthProvider } from "./context/AuthContext.js";
 import NotFound from "./pages/not-found.js";
 import Landing from "./pages/landing.js";
 import Home from "./pages/home.js";
-import { AuthCallback } from "./pages/auth/Callback.js";
+import Callback from "./pages/auth/Callback.js";
 
 import Community from "./pages/Community.js";
 import BudgetTracker from "./pages/budget-tracker.js";
@@ -48,7 +48,7 @@ function Router() {
           <Route path="/demo-real-places" component={DemoRealPlaces} />
           <Route path="/collector-data" component={CollectorData} />
           <Route path="/dashboard" component={Dashboard} />
-          <Route path="/auth/callback" component={AuthCallback} />
+          <Route path="/auth/callback" component={Callback} />
           <Route component={NotFound} />
         </Switch>
       </main>

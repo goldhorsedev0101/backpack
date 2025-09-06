@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/AuthContext';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog.js';
+import { Button } from '../ui/button.js';
+import { useAuth } from '../../context/AuthContext.js';
+import { useToast } from '../../hooks/use-toast.js';
+import { withTimeout } from '../../utils/withTimeout.js';
 import { Loader2 } from 'lucide-react';
 
 interface AuthModalProps {
@@ -11,6 +13,7 @@ interface AuthModalProps {
 
 export function AuthModal({ open, onOpenChange }: AuthModalProps) {
   const { signInWithGoogle, isLoading } = useAuth();
+  const { toast } = useToast();
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   const handleGoogleSignIn = async () => {
@@ -18,10 +21,21 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
     
     try {
       setIsSigningIn(true);
-      await signInWithGoogle();
-      // The modal will close automatically after successful auth
-    } catch (error) {
+      
+      // הוספת timeout למניעת "תקיעות"
+      await withTimeout(signInWithGoogle(), 10000);
+      
+      // Modal will close automatically after successful auth
+    } catch (error: any) {
       console.error('Sign in failed:', error);
+      
+      if (error.message === 'timeout') {
+        toast({
+          title: "התחברות נתקעה",
+          description: "נראה שנתקע, נסה שוב",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsSigningIn(false);
     }
