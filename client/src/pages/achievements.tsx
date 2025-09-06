@@ -391,7 +391,7 @@ export default function Achievements() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold text-blue-900 mb-2">
-                      {(achievements as any)?.unlocked?.length || 0}
+                      {unlockedBadgesCount || 0}
                     </div>
                     <p className="text-blue-700 text-sm">Achievements completed</p>
                   </CardContent>
@@ -426,7 +426,9 @@ export default function Achievements() {
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-semibold text-green-900">Points This Week</h4>
-                          <p className="text-2xl font-bold text-green-700">+125</p>
+                          <p className="text-2xl font-bold text-green-700">
+                            {weeklyPoints > 0 ? `+${weeklyPoints}` : weeklyPoints || 0}
+                          </p>
                         </div>
                         <TrendingUp className="w-8 h-8 text-green-500" />
                       </div>
@@ -435,7 +437,7 @@ export default function Achievements() {
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-semibold text-blue-900">Badges Unlocked</h4>
-                          <p className="text-2xl font-bold text-blue-700">2</p>
+                          <p className="text-2xl font-bold text-blue-700">{unlockedBadgesCount || 0}</p>
                         </div>
                         <Medal className="w-8 h-8 text-blue-500" />
                       </div>
