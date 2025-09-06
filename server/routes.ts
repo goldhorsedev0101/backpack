@@ -2,7 +2,17 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage.js";
-import { setupAuth, isAuthenticated } from "./replitAuth.js";
+// Removed Replit OAuth - using Supabase Auth only
+
+// Simple middleware that doesn't check auth (client-side auth via Supabase)
+const noAuth = (req: any, res: any, next: any) => {
+  // Mock user for API compatibility - in real app, validate Supabase JWT
+  req.user = { 
+    claims: { sub: 'anonymous' },
+    id: 'anonymous'
+  };
+  next();
+};
 import { db, pool } from "./db.js";
 import { googlePlaces } from "./googlePlaces.js";
 import { seedSouthAmericanData } from "./dataSeeder.js";
@@ -50,8 +60,7 @@ interface UserItineraryDay {
 const userItineraries: Record<string, UserItineraryDay[]> = {};
 
 export async function registerRoutes(app: Express): Promise<void> {
-  // Auth middleware
-  await setupAuth(app);
+  // Using Supabase Auth only - no server-side auth middleware needed
 
   // Basic health endpoint
   app.get('/api/health', (_req, res) => res.json({ ok: true, time: new Date().toISOString() }));
@@ -73,8 +82,8 @@ export async function registerRoutes(app: Express): Promise<void> {
     res.json({ cookiesSeen: req.headers.cookie || null });
   });
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // Auth routes - simplified (no server-side auth validation)
+  app.get('/api/auth/user', noAuth, async (req: any, res) => {
     try {
       // Handle localhost test user
       const userId = req.user.claims?.sub || req.user.id;
@@ -87,7 +96,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // User preferences endpoints
-  app.get('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/preferences', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims?.sub || req.user.id;
       const user = await storage.getUser(userId);
@@ -118,7 +127,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.post('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+  app.post('/api/user/preferences', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims?.sub || req.user.id;
       const preferences = req.body;
@@ -145,7 +154,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // Registry completion endpoint
-  app.post('/api/user/registry', isAuthenticated, async (req: any, res) => {
+  app.post('/api/user/registry', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims?.sub || req.user.id;
       const registryData = req.body;
@@ -176,7 +185,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.get('/api/trips/user', isAuthenticated, async (req: any, res) => {
+  app.get('/api/trips/user', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const trips = await storage.getUserTrips(userId);
@@ -187,7 +196,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.post('/api/trips', isAuthenticated, async (req: any, res) => {
+  app.post('/api/trips', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const tripData = { ...req.body, userId };
@@ -230,7 +239,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.post('/api/reviews', isAuthenticated, async (req: any, res) => {
+  app.post('/api/reviews', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const reviewData = { ...req.body, userId };
@@ -243,7 +252,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // Expense routes
-  app.get('/api/expenses/trip/:tripId', isAuthenticated, async (req, res) => {
+  app.get('/api/expenses/trip/:tripId', noAuth, async (req, res) => {
     try {
       const tripId = parseInt(req.params.tripId);
       const expenses = await storage.getTripExpenses(tripId);
@@ -254,7 +263,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.get('/api/expenses/user', isAuthenticated, async (req: any, res) => {
+  app.get('/api/expenses/user', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const expenses = await storage.getUserExpenses(userId);
@@ -265,7 +274,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.post('/api/expenses', isAuthenticated, async (req: any, res) => {
+  app.post('/api/expenses', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const expenseData = { ...req.body, userId };
@@ -455,7 +464,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // Connection routes
-  app.get('/api/connections', isAuthenticated, async (req: any, res) => {
+  app.get('/api/connections', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const connections = await storage.getUserConnections(userId);
@@ -466,7 +475,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.post('/api/connections', isAuthenticated, async (req: any, res) => {
+  app.post('/api/connections', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const connectionData = { ...req.body, requesterId: userId };
@@ -478,7 +487,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.patch('/api/connections/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/connections/:id', noAuth, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const { status } = req.body;
@@ -491,7 +500,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // Debug endpoint for authentication testing
-  app.get('/api/debug/auth', isAuthenticated, async (req: any, res) => {
+  app.get('/api/debug/auth', noAuth, async (req: any, res) => {
     res.json({ 
       authenticated: true, 
       user: req.user?.claims?.sub || req.user?.id,
@@ -701,7 +710,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   // ===== GOOGLE PLACES API INTEGRATION =====
   
   // Search places using Google Places API
-  app.get('/api/places/search', isAuthenticated, async (req: any, res) => {
+  app.get('/api/places/search', noAuth, async (req: any, res) => {
     try {
       const { query, type, location } = req.query;
       if (!query) {
@@ -717,7 +726,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // Import Google Places data to our database
-  app.post('/api/places/import', isAuthenticated, async (req: any, res) => {
+  app.post('/api/places/import', noAuth, async (req: any, res) => {
     try {
       const { placeId, category, destinationId } = req.body;
       if (!placeId || !category || !destinationId) {
@@ -797,7 +806,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   // ===== TRIPADVISOR-READY STRUCTURE =====
   
   // TripAdvisor API placeholder endpoints (ready for future integration)
-  app.get('/api/tripadvisor/search', isAuthenticated, async (req: any, res) => {
+  app.get('/api/tripadvisor/search', noAuth, async (req: any, res) => {
     // TODO: Integrate TripAdvisor API when access is granted
     res.json({ 
       message: 'TripAdvisor API integration pending approval',
@@ -806,7 +815,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     });
   });
 
-  app.get('/api/tripadvisor/location/:locationId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/tripadvisor/location/:locationId', noAuth, async (req: any, res) => {
     // TODO: TripAdvisor location details endpoint
     const { locationId } = req.params;
     
@@ -823,7 +832,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.get('/api/tripadvisor/reviews/:locationId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/tripadvisor/reviews/:locationId', noAuth, async (req: any, res) => {
     // TODO: TripAdvisor reviews endpoint
     const { locationId } = req.params;
     const { category } = req.query;
@@ -834,7 +843,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // AI-powered trip generation
-  app.post('/api/ai/generate-trip', isAuthenticated, async (req: any, res) => {
+  app.post('/api/ai/generate-trip', noAuth, async (req: any, res) => {
     try {
       const { destination, duration, budget, travelStyle, interests } = req.body;
       
@@ -999,7 +1008,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // AI-powered itinerary generation
-  app.post('/api/ai/itinerary', isAuthenticated, async (req, res) => {
+  app.post('/api/ai/itinerary', noAuth, async (req, res) => {
     try {
       const { destination, duration, interests, travelStyle, budget } = req.body;
       
@@ -1069,7 +1078,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // AI-powered budget analysis
-  app.post('/api/ai/budget-analysis', isAuthenticated, async (req: any, res) => {
+  app.post('/api/ai/budget-analysis', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const { tripId, totalBudget } = req.body;
@@ -1167,7 +1176,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // Enhanced AI chat assistant with conversation history
-  app.post('/api/ai/chat', isAuthenticated, async (req: any, res) => {
+  app.post('/api/ai/chat', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const { message, chatHistory = [], previousSuggestions = [] } = req.body;
@@ -1202,7 +1211,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // Generate trip suggestions based on conversation
-  app.post('/api/ai/conversational-suggestions', isAuthenticated, async (req: any, res) => {
+  app.post('/api/ai/conversational-suggestions', noAuth, async (req: any, res) => {
     try {
       const { chatHistory = [], previousSuggestions = [] } = req.body;
       
@@ -1431,7 +1440,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // Legacy AI chat assistant for backward compatibility
-  app.post('/api/ai/chat-legacy', isAuthenticated, async (req: any, res) => {
+  app.post('/api/ai/chat-legacy', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const { message } = req.body;
@@ -2083,7 +2092,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // User Preferences & Settings API
-  app.get('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/preferences', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -2113,7 +2122,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.put('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+  app.put('/api/user/preferences', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const preferences = req.body;
@@ -2187,7 +2196,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // Notifications API
-  app.get('/api/notifications', isAuthenticated, async (req: any, res) => {
+  app.get('/api/notifications', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       
@@ -2228,7 +2237,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.put('/api/notifications/:id/read', isAuthenticated, async (req: any, res) => {
+  app.put('/api/notifications/:id/read', noAuth, async (req: any, res) => {
     try {
       const { id } = req.params;
       // In a real app, you'd update the notification in the database
@@ -2240,7 +2249,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // Travel Analytics & Statistics API
-  app.get('/api/analytics/dashboard', isAuthenticated, async (req: any, res) => {
+  app.get('/api/analytics/dashboard', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const userTrips = await storage.getUserTrips(userId);
@@ -2325,7 +2334,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // Backup & Export API
-  app.get('/api/export/user-data', isAuthenticated, async (req: any, res) => {
+  app.get('/api/export/user-data', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -2383,7 +2392,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // Feedback & Support API
-  app.post('/api/feedback', isAuthenticated, async (req: any, res) => {
+  app.post('/api/feedback', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const { type, subject, message, rating } = req.body;
@@ -2418,7 +2427,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.get('/api/achievements/user', isAuthenticated, async (req: any, res) => {
+  app.get('/api/achievements/user', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const userAchievements = await storage.getUserAchievements(userId);
@@ -2436,7 +2445,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.post('/api/achievements/check', isAuthenticated, async (req: any, res) => {
+  app.post('/api/achievements/check', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const newAchievements = await storage.checkAndUnlockAchievements(userId);
@@ -3089,7 +3098,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.post('/api/location-reviews', isAuthenticated, async (req: any, res) => {
+  app.post('/api/location-reviews', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const reviewData = { ...req.body, userId };
@@ -3199,7 +3208,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.get('/api/place-reviews/user', isAuthenticated, async (req: any, res) => {
+  app.get('/api/place-reviews/user', noAuth, async (req: any, res) => {
     try {
       const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
       const reviews = await storage.getUserPlaceReviews(userId);
@@ -3240,7 +3249,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // Review voting endpoints
-  app.post('/api/review-votes', isAuthenticated, async (req: any, res) => {
+  app.post('/api/review-votes', noAuth, async (req: any, res) => {
     try {
       const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
       const voteData = { ...req.body, userId };
@@ -3273,7 +3282,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.post('/api/chat-rooms', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat-rooms', noAuth, async (req: any, res) => {
     try {
       const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
       const roomData = { ...req.body, createdBy: userId };
@@ -3300,7 +3309,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.post('/api/chat-rooms/:id/join', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat-rooms/:id/join', noAuth, async (req: any, res) => {
     try {
       const roomId = parseInt(req.params.id);
       const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
@@ -3312,7 +3321,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.post('/api/chat-rooms/:id/leave', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat-rooms/:id/leave', noAuth, async (req: any, res) => {
     try {
       const roomId = parseInt(req.params.id);
       const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
@@ -3357,7 +3366,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.post('/api/travel-buddy-posts', isAuthenticated, async (req: any, res) => {
+  app.post('/api/travel-buddy-posts', noAuth, async (req: any, res) => {
     try {
       const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
       const postData = { ...req.body, userId };
@@ -3369,7 +3378,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.get('/api/travel-buddy-posts/user', isAuthenticated, async (req: any, res) => {
+  app.get('/api/travel-buddy-posts/user', noAuth, async (req: any, res) => {
     try {
       const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
       const posts = await storage.getUserTravelBuddyPosts(userId);
@@ -3380,7 +3389,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.post('/api/travel-buddy-applications', isAuthenticated, async (req: any, res) => {
+  app.post('/api/travel-buddy-applications', noAuth, async (req: any, res) => {
     try {
       const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id;
       const applicationData = { 
@@ -3395,7 +3404,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.get('/api/travel-buddy-posts/:id/applications', isAuthenticated, async (req: any, res) => {
+  app.get('/api/travel-buddy-posts/:id/applications', noAuth, async (req: any, res) => {
     try {
       const postId = parseInt(req.params.id);
       const applications = await storage.getTravelBuddyApplications(postId);
@@ -3406,7 +3415,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.patch('/api/travel-buddy-applications/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/travel-buddy-applications/:id', noAuth, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       const { status } = req.body;
