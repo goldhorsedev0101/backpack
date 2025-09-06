@@ -9,6 +9,7 @@ import {
   integer,
   decimal,
   boolean,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
@@ -448,8 +449,6 @@ export const itineraries = pgTable("itineraries", {
 }, (table) => [
   index("itineraries_user_id_idx").on(table.userId),
   index("itineraries_created_at_idx").on(table.createdAt),
-  // GIN index for JSONB queries
-  index("itineraries_plan_json_gin_idx").on(table.planJson).using("gin"),
 ]);
 
 // Optional: Itinerary items table for detailed breakdown
@@ -465,7 +464,6 @@ export const itineraryItems = pgTable("itinerary_items", {
 }, (table) => [
   index("items_itinerary_id_idx").on(table.itineraryId),
   index("items_day_idx").on(table.dayIndex),
-  index("items_meta_gin_idx").on(table.meta).using("gin"),
 ]);
 
 // Relations
