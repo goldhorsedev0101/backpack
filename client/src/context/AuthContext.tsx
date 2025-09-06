@@ -201,10 +201,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Store current location for redirect after auth
       localStorage.setItem('auth_redirect_to', window.location.pathname);
       
+      // Always use the current page's origin for redirect
+      // This handles both localhost development and production Replit URLs
+      const currentOrigin = window.location.origin;
+      const redirectUrl = `${currentOrigin}/auth/callback`;
+      
+      console.log('OAuth redirect URL:', redirectUrl);
+      console.log('Current window origin:', currentOrigin);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
