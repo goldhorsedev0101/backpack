@@ -208,6 +208,63 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Itinerary routes
+  app.get('/api/itineraries', noAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.claims?.sub || req.user.id;
+      if (!userId || userId === 'anonymous') {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      const itineraries = await storage.getUserItineraries(userId);
+      res.json(itineraries);
+    } catch (error) {
+      console.error("Error fetching itineraries:", error);
+      res.status(500).json({ message: "Failed to fetch itineraries" });
+    }
+  });
+
+  app.post('/api/itineraries', noAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.claims?.sub || req.user.id;
+      if (!userId || userId === 'anonymous') {
+        return res.status(401).json({ message: "Authentication required to save itinerary" });
+      }
+      
+      const { title, plan_json } = req.body;
+      if (!plan_json) {
+        return res.status(400).json({ message: "Plan data is required" });
+      }
+
+      const itineraryData = {
+        userId,
+        title: title || `Itinerary - ${new Date().toLocaleDateString()}`,
+        planJson: plan_json
+      };
+
+      const newItinerary = await storage.createItinerary(itineraryData);
+      res.json(newItinerary);
+    } catch (error) {
+      console.error("Error creating itinerary:", error);
+      res.status(400).json({ message: "Failed to save itinerary" });
+    }
+  });
+
+  app.delete('/api/itineraries/:id', noAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.claims?.sub || req.user.id;
+      if (!userId || userId === 'anonymous') {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const itineraryId = req.params.id;
+      await storage.deleteItinerary(itineraryId, userId);
+      res.json({ message: "Itinerary deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting itinerary:", error);
+      res.status(400).json({ message: "Failed to delete itinerary" });
+    }
+  });
+
   app.get('/api/trips/:id', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
