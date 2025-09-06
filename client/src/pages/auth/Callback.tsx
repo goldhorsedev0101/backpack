@@ -1,64 +1,53 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useLocation } from 'wouter';
 import { supabase } from '@/lib/supabase';
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useLocation } from 'wouter';
 
 export function AuthCallback() {
+  const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const { user } = useAuth();
-  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        console.log('Starting auth callback handling...');
-        console.log('Current URL:', window.location.href);
+        setLoading(true);
         
-        // Let Supabase automatically detect and handle the session from URL
-        // This is handled by detectSessionInUrl: true in our Supabase config
-        let attempts = 0;
-        const maxAttempts = 10;
+        // Supabase handles the OAuth callback automatically
+        const { data, error } = await supabase.auth.getSession();
         
-        while (attempts < maxAttempts) {
-          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-          
-          if (sessionError) {
-            console.error('Session error:', sessionError);
-            setError('Failed to retrieve session');
-            setLoading(false);
-            return;
-          }
-
-          if (session && session.user) {
-            console.log('Authentication successful for:', session.user.email);
-            setSuccess(true);
-            setLoading(false);
-            
-            // Redirect after showing success message
-            setTimeout(() => {
-              const redirectTo = localStorage.getItem('auth_redirect_to') || '/';
-              localStorage.removeItem('auth_redirect_to');
-              
-              // Clear the URL from OAuth params and redirect
-              window.history.replaceState({}, document.title, redirectTo);
-              setLocation(redirectTo);
-            }, 1000);
-            return;
-          }
-          
-          // Wait before next attempt
-          await new Promise(resolve => setTimeout(resolve, 300));
-          attempts++;
+        if (error) {
+          console.error('Auth callback error:', error);
+          setError('אירעה שגיאה במהלך ההתחברות: ' + error.message);
+          setLoading(false);
+          return;
         }
         
-        // If we get here, no session was found after all attempts
-        console.warn('No session found after multiple attempts');
-        setError('ההתחברות לא הסתיימה בהצלחה. אנא נסה שוב.');
-        setLoading(false);
+        if (data.session) {
+          setSuccess(true);
+          setLoading(false);
+          
+          // Redirect after a short delay to show success message
+          setTimeout(() => {
+            setLocation('/');
+          }, 2000);
+        } else {
+          // No session found - try to get it again after a brief delay
+          setTimeout(async () => {
+            const { data: retryData, error: retryError } = await supabase.auth.getSession();
+            
+            if (retryError || !retryData.session) {
+              setError('ההתחברות לא הושלמה בהצלחה. אנא נסה שוב.');
+              setLoading(false);
+            } else {
+              setSuccess(true);
+              setLoading(false);
+              setTimeout(() => setLocation('/'), 2000);
+            }
+          }, 1000);
+        }
         
       } catch (error) {
         console.error('Unexpected auth callback error:', error);
@@ -67,7 +56,6 @@ export function AuthCallback() {
       }
     };
 
-    // Always try to handle the callback
     handleAuthCallback();
   }, [setLocation]);
 
@@ -117,10 +105,7 @@ export function AuthCallback() {
             ברוך הבא ל-TripWise!
           </h2>
           <p className="text-muted-foreground">
-            {user?.email ? `התחברת בהצלחה כ-${user.email}` : 'התחברת בהצלחה'}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            מעביר אותך לאפליקציה...
+            התחברת בהצלחה! מעביר אותך לאפליקציה...
           </p>
         </div>
       </div>
