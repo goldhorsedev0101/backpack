@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../lib/supabase.js';
 import type { User, Session } from '@supabase/supabase-js';
-import { useToast } from '../hooks/use-toast';
+import { useToast } from '../hooks/use-toast.js';
 
 interface AuthContextType {
   user: User | null;
@@ -46,7 +46,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     getInitialSession();
     
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: string, session: Session | null) => {
       console.log('Auth state changed:', event, session?.user?.email || 'no user');
       
       if (isMounted) {

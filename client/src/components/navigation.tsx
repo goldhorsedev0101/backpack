@@ -45,7 +45,7 @@ const navigationItems = [
 
 export default function Navigation() {
   const [location] = useLocation();
-  const { user, signOut, loading } = useAuth();
+  const { user, signOut, isLoading } = useAuth();
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
