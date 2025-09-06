@@ -1,0 +1,86 @@
+Mission Progress Toasts (every step)
+
+Goal:
+Show a toast on every mission progress increment, not only on completion. Keep Achievements in English and the page LTR. Integrate with existing missions + award_mission_progress RPC and live Supabase data.
+
+Requirements
+
+Trigger a toast after each successful progress bump (daily/weekly/special).
+
+Toast content style (English only):
+
+On progress (not complete):
+Title: Progress saved
+Body: {{missionName}} — {{current}} / {{target}} (+{{awarded}} pts if any)
+Example: Write 3 Reviews — 1 / 3
+
+On completion: (keep existing completion toast)
+Title: ✅ Mission complete
+Body: {{missionName}} (+{{pointsReward}} pts)
+
+If the bump was ignored (e.g., same-day daily already completed / period already credited):
+
+Show a neutral toast: Already credited for this period.
+
+All toasts are non-blocking, auto-dismiss (3–4s), and stack without overlap.
+
+Integration
+
+After calling award_mission_progress(missionCode, bump, meta):
+
+If success → determine progress, progress_max, completed, awarded_points, total_points from RPC result.
+
+Emit progress toast immediately using these values.
+
+If completed = true and reward was granted → emit completion toast (or upgrade the progress toast to completion styling).
+
+Update UI:
+
+Revalidate missions data (progress bars), Overview balance, and History after each bump.
+
+Ensure numbers in toasts reflect the updated progress.
+
+UX Details
+
+Toast placement: top-right (desktop), top-center (mobile).
+
+Variants:
+
+Info variant for progress.
+
+Success variant for completion.
+
+Neutral/gray for “already credited”.
+
+Do not duplicate toasts for the same user action; de-dup by missionCode + period key if needed.
+
+Keep wording concise; no Hebrew fallback in Achievements.
+
+Accessibility
+
+Toasts must be ARIA live (polite), keyboard dismissible (Esc), and have clear contrast.
+
+Include aria-label summarizing the progress:
+Mission progress: {{missionName}} {{current}} of {{target}}.
+
+Edge Cases
+
+If RPC returns error → show error toast: Error saving progress. Please try again.
+
+If progress_max = 1 (e.g., daily check-in):
+
+Show only one toast: either completed (first time) or already-credited (subsequent times).
+
+If multiple bumps happen quickly (e.g., bulk uploads):
+
+Collapse to at most one progress toast per mission per second.
+
+Testing
+
+Daily check-in first call → completion toast; second call same day → “already credited”.
+
+Weekly mission with target 3: 1/3 → progress toast; 2/3 → progress toast; 3/3 → completion toast (+points).
+
+Overview total points increases where applicable; History logs the credit once per period.
+
+Mobile and desktop layouts: toasts do not overlap tab bar or sidebar.

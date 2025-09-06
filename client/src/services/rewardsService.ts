@@ -432,3 +432,72 @@ export async function awardItineraryPointsWithProgress(itineraryId: string, isSh
   
   return { pointsResult: result, progressResult };
 }
+
+// Mission Progress RPC Types
+export interface MissionProgressResult {
+  mission_code: string;
+  mission_name: string;
+  current_progress: number;
+  target_progress: number;
+  completed: boolean;
+  awarded_points: number;
+  total_points: number;
+  period_key: string;
+  already_credited: boolean;
+}
+
+// RPC award_mission_progress: Track mission progress with automatic completion
+export async function awardMissionProgress(
+  missionCode: string, 
+  bump = 1, 
+  meta = {}
+): Promise<MissionProgressResult | null> {
+  try {
+    const { data, error } = await supabase.rpc('award_mission_progress', {
+      p_mission_code: missionCode,
+      p_bump: bump,
+      p_meta: meta
+    });
+
+    if (error) {
+      console.warn('awardMissionProgress error', error);
+      return null;
+    }
+    
+    return data?.[0] || null;
+  } catch (error) {
+    console.error('Mission progress error:', error);
+    return null;
+  }
+}
+
+// Helper functions for common mission actions with progress tracking
+export async function trackDailyCheckIn() {
+  return await awardMissionProgress('daily_checkin', 1, { 
+    action: 'checkin',
+    timestamp: new Date().toISOString()
+  });
+}
+
+export async function trackReviewCreation(reviewId: string, placeId: string) {
+  return await awardMissionProgress('write_reviews', 1, {
+    action: 'review_created',
+    review_id: reviewId,
+    place_id: placeId
+  });
+}
+
+export async function trackPhotoUpload(photoId: string, placeId: string) {
+  return await awardMissionProgress('upload_photos', 1, {
+    action: 'photo_uploaded',
+    photo_id: photoId,
+    place_id: placeId
+  });
+}
+
+export async function trackItineraryShare(itineraryId: string) {
+  return await awardMissionProgress('share_itineraries', 1, {
+    action: 'itinerary_shared',
+    itinerary_id: itineraryId
+  });
+}
