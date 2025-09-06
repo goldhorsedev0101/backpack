@@ -22,6 +22,7 @@ import { eq } from "drizzle-orm";
 import { registerCollectorRoutes } from "./collectorRoutes.js";
 import type { Request, Response, Router } from 'express';
 import { supabaseAdmin } from './supabase.js';
+import { rewardsService } from './rewardsService.js';
 // Temporarily commenting out schema imports until we fix the shared module
 // import {
 //   insertTripSchema,
@@ -3575,6 +3576,232 @@ export async function registerRoutes(app: Express): Promise<void> {
         message: "Failed to fetch database dashboard data",
         error: error instanceof Error ? error.message : 'Unknown error' 
       });
+    }
+  });
+
+  // ====== REWARDS & ACHIEVEMENTS API ROUTES ======
+
+  // Initialize achievements
+  app.post('/api/rewards/init', noAuth, async (_req, res) => {
+    try {
+      await rewardsService.initializeDefaultAchievements();
+      res.json({ success: true, message: 'Achievements initialized' });
+    } catch (error) {
+      console.error("Error initializing achievements:", error);
+      res.status(500).json({ message: "Failed to initialize achievements" });
+    }
+  });
+
+  // Get user's rewards summary
+  app.get('/api/rewards/summary', noAuth, async (req: any, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id || 'anonymous';
+      const totalPoints = await rewardsService.getUserTotalPoints(userId);
+      
+      res.json({
+        userId,
+        totalPoints,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error getting rewards summary:", error);
+      res.status(500).json({ message: "Failed to get rewards summary" });
+    }
+  });
+
+  // Award points to user
+  app.post('/api/rewards/award', noAuth, async (req: any, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id || 'anonymous';
+      const { action, description } = req.body;
+      
+      const points = await rewardsService.awardPoints(userId, action, description);
+      
+      res.json({ 
+        success: true, 
+        pointsAwarded: points,
+        message: `Awarded ${points} points for ${action}` 
+      });
+    } catch (error) {
+      console.error("Error awarding points:", error);
+      res.status(500).json({ message: "Failed to award points" });
+    }
+  });
+
+  // Get achievements
+  app.get('/api/achievements', noAuth, async (req: any, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id || 'anonymous';
+      
+      // For now, return mock achievements with progress
+      const mockAchievements = [
+        {
+          id: '1',
+          name: 'First Review',
+          nameHe: 'הביקורת הראשונה',
+          description: 'Write your first travel review',
+          descriptionHe: 'כתוב את הביקורת הראשונה שלך',
+          points: 100,
+          rarity: 'common',
+          isCompleted: false,
+          progress: 0,
+          progressMax: 1
+        },
+        {
+          id: '2',
+          name: 'Photo Enthusiast',
+          nameHe: 'חובב צילום',
+          description: 'Upload 20 travel photos',
+          descriptionHe: 'העלה 20 תמונות נסיעה',
+          points: 200,
+          rarity: 'common',
+          isCompleted: false,
+          progress: 3,
+          progressMax: 20
+        },
+        {
+          id: '3',
+          name: 'Trip Planner',
+          nameHe: 'מתכנן מסלולים',
+          description: 'Create and share 5 itineraries',
+          descriptionHe: 'צור ושתף 5 מסלולים',
+          points: 1000,
+          rarity: 'epic',
+          isCompleted: true,
+          progress: 5,
+          progressMax: 5
+        }
+      ];
+      
+      res.json(mockAchievements);
+    } catch (error) {
+      console.error("Error getting achievements:", error);
+      res.status(500).json({ message: "Failed to get achievements" });
+    }
+  });
+
+  // Get missions
+  app.get('/api/missions', noAuth, async (req: any, res) => {
+    try {
+      const mockMissions = [
+        {
+          id: '1',
+          type: 'daily',
+          name: 'Write a Review',
+          nameHe: 'כתוב ביקורת',
+          description: 'Share your experience about a place',
+          descriptionHe: 'שתף את החוויה שלך על מקום',
+          pointsReward: 50,
+          targetCount: 1,
+          currentCount: 0,
+          isCompleted: false,
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+        },
+        {
+          id: '2',
+          type: 'daily',
+          name: 'Upload Photo',
+          nameHe: 'העלה תמונה',
+          description: 'Add a photo to your travel collection',
+          descriptionHe: 'הוסף תמונה לאוסף הנסיעות שלך',
+          pointsReward: 10,
+          targetCount: 1,
+          currentCount: 0,
+          isCompleted: false,
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+        },
+        {
+          id: '3',
+          type: 'weekly',
+          name: 'Create Itinerary',
+          nameHe: 'צור מסלול',
+          description: 'Plan a new travel itinerary',
+          descriptionHe: 'תכנן מסלול נסיעה חדש',
+          pointsReward: 200,
+          targetCount: 1,
+          currentCount: 0,
+          isCompleted: false,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        }
+      ];
+      
+      res.json(mockMissions);
+    } catch (error) {
+      console.error("Error getting missions:", error);
+      res.status(500).json({ message: "Failed to get missions" });
+    }
+  });
+
+  // Get leaderboard
+  app.get('/api/rewards/leaderboard', noAuth, async (req: any, res) => {
+    try {
+      const leaderboard = await rewardsService.getLeaderboard(10);
+      res.json(leaderboard);
+    } catch (error) {
+      console.error("Error getting leaderboard:", error);
+      // Return mock data if service fails
+      const mockLeaderboard = [
+        {
+          id: '1',
+          firstName: 'Sarah',
+          lastName: 'Cohen',
+          totalPoints: 2450,
+          profileImageUrl: null
+        },
+        {
+          id: '2', 
+          firstName: 'David',
+          lastName: 'Levi',
+          totalPoints: 1890,
+          profileImageUrl: null
+        },
+        {
+          id: '3',
+          firstName: 'Maya',
+          lastName: 'Goldberg',
+          totalPoints: 1654,
+          profileImageUrl: null
+        }
+      ];
+      res.json(mockLeaderboard);
+    }
+  });
+
+  // Get user's points history
+  app.get('/api/rewards/history', noAuth, async (req: any, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id || 'anonymous';
+      const history = await rewardsService.getUserPointsHistory(userId, 50);
+      
+      // If no history, return mock data
+      if (history.length === 0) {
+        const mockHistory = [
+          {
+            id: '1',
+            points: 50,
+            description: 'ביקורת נכתבה על Machu Picchu',
+            createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000)
+          },
+          {
+            id: '2',
+            points: 10,
+            description: 'תמונה הועלתה',
+            createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000)
+          },
+          {
+            id: '3',
+            points: 100,
+            description: 'הישג נפתח: הביקורת הראשונה',
+            createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+          }
+        ];
+        return res.json(mockHistory);
+      }
+      
+      res.json(history);
+    } catch (error) {
+      console.error("Error getting points history:", error);
+      res.status(500).json({ message: "Failed to get points history" });
     }
   });
 
