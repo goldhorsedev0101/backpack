@@ -192,6 +192,7 @@ export default function Achievements() {
       queryClient.invalidateQueries({ queryKey: ["rewards", "weekly-points"] });
       queryClient.invalidateQueries({ queryKey: ["rewards", "unlocked-badges-count"] });
       queryClient.invalidateQueries({ queryKey: ["rewards", "history"] });
+      queryClient.invalidateQueries({ queryKey: ["achievement-value"] });
     },
     onError: (error) => {
       toast({
@@ -215,6 +216,7 @@ export default function Achievements() {
       queryClient.invalidateQueries({ queryKey: ["rewards", "weekly-points"] });
       queryClient.invalidateQueries({ queryKey: ["rewards", "unlocked-badges-count"] });
       queryClient.invalidateQueries({ queryKey: ["rewards", "history"] });
+      queryClient.invalidateQueries({ queryKey: ["achievement-value"] });
     },
     onError: () => {
       toast({
@@ -237,6 +239,7 @@ export default function Achievements() {
       queryClient.invalidateQueries({ queryKey: ["rewards", "weekly-points"] });
       queryClient.invalidateQueries({ queryKey: ["rewards", "unlocked-badges-count"] });
       queryClient.invalidateQueries({ queryKey: ["rewards", "history"] });
+      queryClient.invalidateQueries({ queryKey: ["achievement-value"] });
     },
     onError: () => {
       toast({
@@ -258,6 +261,7 @@ export default function Achievements() {
       queryClient.invalidateQueries({ queryKey: ["rewards", "weekly-points"] });
       queryClient.invalidateQueries({ queryKey: ["rewards", "unlocked-badges-count"] });
       queryClient.invalidateQueries({ queryKey: ["rewards", "history"] });
+      queryClient.invalidateQueries({ queryKey: ["achievement-value"] });
     },
     onError: () => {
       toast({
