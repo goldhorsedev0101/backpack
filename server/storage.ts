@@ -22,6 +22,8 @@ import {
   reviewVotes,
   travelBuddyPosts,
   travelBuddyApplications,
+  itineraries,
+  itineraryItems,
   type User,
   type UpsertUser,
   type Trip,
@@ -66,6 +68,10 @@ import {
   type InsertTravelBuddyPost,
   type TravelBuddyApplication,
   type InsertTravelBuddyApplication,
+  type Itinerary,
+  type InsertItinerary,
+  type ItineraryItem,
+  type InsertItineraryItem,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, sql } from "drizzle-orm";
@@ -205,6 +211,12 @@ export interface IStorage {
   getTravelBuddyApplications(postId: number): Promise<TravelBuddyApplication[]>;
   getUserTravelBuddyApplications(userId: string): Promise<TravelBuddyApplication[]>;
   updateTravelBuddyApplication(id: number, status: string): Promise<TravelBuddyApplication>;
+
+  // Itinerary operations
+  createItinerary(itinerary: InsertItinerary): Promise<Itinerary>;
+  getUserItineraries(userId: string): Promise<Itinerary[]>;
+  deleteItinerary(id: string, userId: string): Promise<void>;
+  getItineraryById(id: string): Promise<Itinerary | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1337,6 +1349,37 @@ export class DatabaseStorage implements IStorage {
       .where(eq(travelBuddyApplications.id, id))
       .returning();
     return updatedApp;
+  }
+
+  // Itinerary operations
+  async createItinerary(itinerary: InsertItinerary): Promise<Itinerary> {
+    const [newItinerary] = await db
+      .insert(itineraries)
+      .values(itinerary)
+      .returning();
+    return newItinerary;
+  }
+
+  async getUserItineraries(userId: string): Promise<Itinerary[]> {
+    return await db
+      .select()
+      .from(itineraries)
+      .where(eq(itineraries.userId, userId))
+      .orderBy(desc(itineraries.createdAt));
+  }
+
+  async deleteItinerary(id: string, userId: string): Promise<void> {
+    await db
+      .delete(itineraries)
+      .where(and(eq(itineraries.id, id), eq(itineraries.userId, userId)));
+  }
+
+  async getItineraryById(id: string): Promise<Itinerary | undefined> {
+    const [itinerary] = await db
+      .select()
+      .from(itineraries)
+      .where(eq(itineraries.id, id));
+    return itinerary;
   }
 }
 
