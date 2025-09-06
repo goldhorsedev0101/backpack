@@ -331,30 +331,39 @@ export default function MyTripsNew() {
       const mainDestination = itinerary[0]?.location || "Unknown";
       const totalCost = itinerary.reduce((sum, day) => sum + day.estimatedCost, 0);
       
-      const response = await apiRequest('/api/trips', {
+      const response = await apiRequest('/api/itineraries', {
         method: 'POST',
         body: JSON.stringify({
-          title: `${mainDestination} - Daily Itinerary`,
-          destinations: JSON.stringify([{
-            name: mainDestination,
-            country: "South America",
-            description: `Detailed ${itinerary.length}-day itinerary`,
-            highlights: itinerary.map(day => day.activities[0]).filter(Boolean)
-          }]),
-          description: `Detailed ${itinerary.length}-day itinerary for ${mainDestination}`,
-          budget: totalCost.toString(),
-          travelStyle: "detailed planning",
-          itinerary: JSON.stringify(itinerary), // Save the full itinerary as JSON
+          title: `${mainDestination} Itinerary - ${new Date().toLocaleDateString()}`,
+          plan_json: {
+            mainDestination,
+            totalDays: itinerary.length,
+            totalCost,
+            generatedAt: new Date().toISOString(),
+            itinerary: itinerary.map(day => ({
+              day: day.day,
+              location: day.location,
+              activities: day.activities,
+              estimatedCost: day.estimatedCost,
+              tips: day.tips || []
+            }))
+          }
         }),
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to save itinerary');
+      }
+      
       return response.json();
     },
     onSuccess: () => {
       toast({
         title: "Itinerary Saved!",
-        description: "Daily itinerary saved to My Trips",
+        description: "Your detailed itinerary has been saved to My Itineraries",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/trips/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/itineraries'] });
     },
     onError: (error) => {
       console.error('Error saving itinerary:', error);

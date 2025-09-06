@@ -65,6 +65,50 @@ export async function registerRoutes(app: Express): Promise<void> {
   // Basic health endpoint
   app.get('/api/health', (_req, res) => res.json({ ok: true, time: new Date().toISOString() }));
 
+  // Create itinerary tables endpoint (development only)
+  app.post('/api/setup/create-itinerary-tables', async (_req, res) => {
+    try {
+      // Create tables using direct SQL through db client
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS itineraries (
+            id varchar PRIMARY KEY DEFAULT gen_random_uuid(),
+            user_id varchar NOT NULL,
+            title varchar NOT NULL,
+            plan_json jsonb NOT NULL,
+            created_at timestamp DEFAULT NOW(),
+            updated_at timestamp DEFAULT NOW()
+        );
+      `);
+      
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS itinerary_items (
+            id varchar PRIMARY KEY DEFAULT gen_random_uuid(),
+            itinerary_id varchar NOT NULL REFERENCES itineraries(id) ON DELETE CASCADE,
+            day_number integer NOT NULL,
+            location varchar NOT NULL,
+            activity_type varchar,
+            description text,
+            estimated_cost decimal(10,2),
+            start_time time,
+            end_time time,
+            notes text,
+            created_at timestamp DEFAULT NOW()
+        );
+      `);
+      
+      res.json({ 
+        success: true, 
+        message: "Itinerary tables created successfully" 
+      });
+    } catch (error) {
+      console.error('Error creating itinerary tables:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to create tables' 
+      });
+    }
+  });
+
 
   // --- Debug cookie endpoints (temporary for diagnosis) ---
   app.get('/api/debug/set-cookie', (req, res) => {

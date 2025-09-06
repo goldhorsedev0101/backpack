@@ -38,6 +38,7 @@ export async function getActualTables() {
     'places', 'place_reviews', 'location_photos', 'location_ancestors',
     'users', 'sessions', 'trips', 'expenses', 'achievements',
     'chat_rooms', 'messages', 'user_connections', 'travel_buddy_posts',
+    'itineraries', 'itinerary_items',
     'raw_responses', 'ingestion_runs', 'ingestion_jobs', 'ingestion_dead_letters'
   ];
 

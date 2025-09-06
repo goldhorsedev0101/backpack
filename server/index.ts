@@ -99,8 +99,6 @@ async function startServer() {
     }
   });
 
-  await registerRoutes(app);
-
   // Get port from configuration
   const { config } = await import('./config.js');
   const PORT = config.server.port;
@@ -113,6 +111,56 @@ async function startServer() {
   server.headersTimeout = 65000;
   server.requestTimeout = 60000;
   server.timeout = 65000;
+
+  // TEMP: Create itinerary tables setup endpoint - MUST be before Vite
+  app.post('/api/setup/create-itinerary-tables', async (_req, res) => {
+    try {
+      const { db } = await import('./db.js');
+      const { sql } = await import('drizzle-orm');
+      
+      // Create tables using direct SQL through db client
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS itineraries (
+            id varchar PRIMARY KEY DEFAULT gen_random_uuid(),
+            user_id varchar NOT NULL,
+            title varchar NOT NULL,
+            plan_json jsonb NOT NULL,
+            created_at timestamp DEFAULT NOW(),
+            updated_at timestamp DEFAULT NOW()
+        );
+      `);
+      
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS itinerary_items (
+            id varchar PRIMARY KEY DEFAULT gen_random_uuid(),
+            itinerary_id varchar NOT NULL REFERENCES itineraries(id) ON DELETE CASCADE,
+            day_number integer NOT NULL,
+            location varchar NOT NULL,
+            activity_type varchar,
+            description text,
+            estimated_cost decimal(10,2),
+            start_time time,
+            end_time time,
+            notes text,
+            created_at timestamp DEFAULT NOW()
+        );
+      `);
+      
+      res.json({ 
+        success: true, 
+        message: "Itinerary tables created successfully" 
+      });
+    } catch (error) {
+      console.error('Error creating itinerary tables:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to create tables' 
+      });
+    }
+  });
+
+  // IMPORTANT: Register API routes BEFORE Vite middleware in development
+  await registerRoutes(app);
 
   // Setup Vite in development mode
   if (process.env.NODE_ENV === 'development') {
