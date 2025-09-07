@@ -59,7 +59,7 @@ export default function TripAdvisorData() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="overflow-x-auto">
-          <TabsList className="inline-flex w-auto min-w-full justify-start h-10">
+          <TabsList className="inline-flex w-auto min-w-full justify-evenly h-10">
             <TabsTrigger value="destinations" className="whitespace-nowrap">Destinations</TabsTrigger>
             <TabsTrigger value="accommodations" className="whitespace-nowrap">Hotels</TabsTrigger>
             <TabsTrigger value="attractions" className="whitespace-nowrap">Attractions</TabsTrigger>

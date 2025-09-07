@@ -403,7 +403,7 @@ export default function Achievements() {
           {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <div className="overflow-x-auto">
-              <TabsList className="inline-flex w-auto min-w-full justify-start h-10 bg-white/80 backdrop-blur-sm">
+              <TabsList className="inline-flex w-auto min-w-full justify-evenly h-10 bg-white/80 backdrop-blur-sm">
                 <TabsTrigger value="overview" className="whitespace-nowrap">Overview</TabsTrigger>
                 <TabsTrigger value="missions" className="whitespace-nowrap">Missions</TabsTrigger>
                 <TabsTrigger value="badges" className="whitespace-nowrap">Badges</TabsTrigger>

@@ -122,7 +122,7 @@ export default function Community() {
 
       <Tabs defaultValue="reviews" className="w-full">
         <div className="overflow-x-auto">
-          <TabsList className="inline-flex w-auto min-w-full justify-start h-10">
+          <TabsList className="inline-flex w-auto min-w-full justify-evenly h-10">
             <TabsTrigger value="reviews" className="whitespace-nowrap">
               Place Reviews
             </TabsTrigger>
