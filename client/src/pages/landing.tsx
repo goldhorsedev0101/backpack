@@ -74,9 +74,6 @@ export default function Landing() {
     setAuthModalOpen(true);
   };
 
-  const handleRegister = () => {
-    setAuthModalOpen(true);
-  };
 
 
   const handleLogout = async () => {
@@ -154,31 +151,6 @@ export default function Landing() {
                 </Link>
               </Button>
             </div>
-            {!user && (
-              <div className="flex flex-col gap-3 justify-center items-center mt-6 flex-row-mobile">
-                <span className="text-white opacity-75 text-sm sm:text-base">Already have an account?</span>
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-                  <Button onClick={handleLogin} variant="outline" className="w-full sm:w-auto border-white text-white px-4 sm:px-6 py-2 text-sm sm:text-base rounded-lg hover:bg-white hover:text-primary">
-                    <LogIn className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                    Login
-                  </Button>
-                  <span className="text-white opacity-75 text-center sm:self-center">or</span>
-                  <Button onClick={handleRegister} className="w-full sm:w-auto bg-accent text-white px-4 sm:px-6 py-2 text-sm sm:text-base rounded-lg hover:bg-orange-600">
-                    <UserPlus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                    Register
-                  </Button>
-                </div>
-              </div>
-            )}
-            {user && (
-              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-6">
-                <span className="text-white opacity-90 text-sm sm:text-base">Welcome back!</span>
-                <Button onClick={handleLogout} variant="outline" className="w-full sm:w-auto border-white text-white px-4 sm:px-6 py-2 text-sm sm:text-base rounded-lg hover:bg-red-500 hover:text-white">
-                  <LogOut className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  Logout
-                </Button>
-              </div>
-            )}
           </div>
         </div>
       </section>
