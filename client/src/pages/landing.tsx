@@ -108,46 +108,41 @@ window.location.href = "/?logout=true";
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <nav className="bg-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className="bg-white shadow-lg sticky top-0 z-50 mobile-nav">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <img src={logo} alt="TripWise" className="h-10" />
+                <img src={logo} alt="TripWise" className="h-8 sm:h-10" />
               </div>
-              <div className="hidden md:block ml-10">
-                <div className="flex items-baseline space-x-4">
-                  <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
+              <div className="hidden lg:block ml-6">
+                <div className="flex items-baseline space-x-2 nav-links">
+                  <Button asChild variant="ghost" className="px-2 py-2 text-xs sm:text-sm font-medium">
                     <Link href="/">Home</Link>
                   </Button>
-                  <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
-                    <Link href="/my-trips">Plan Trip</Link>
+                  <Button asChild variant="ghost" className="px-2 py-2 text-xs sm:text-sm font-medium">
+                    <Link href="/my-trips">Plan</Link>
                   </Button>
-                  <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
+                  <Button asChild variant="ghost" className="px-2 py-2 text-xs sm:text-sm font-medium">
                     <Link href="/explore">Explore</Link>
                   </Button>
-                  <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
-                    <Link href="/weather">Weather</Link>
-                  </Button>
-                  <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
+                  <Button asChild variant="ghost" className="px-2 py-2 text-xs sm:text-sm font-medium">
                     <Link href="/community">Community</Link>
                   </Button>
-                  <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
+                  <Button asChild variant="ghost" className="px-2 py-2 text-xs sm:text-sm font-medium">
                     <Link href="/budget-tracker">Budget</Link>
-                  </Button>
-                  <Button asChild variant="ghost" className="px-3 py-2 text-sm font-medium">
-                    <Link href="/dashboard">Database Dashboard</Link>
                   </Button>
                 </div>
               </div>
             </div>
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="flex items-center space-x-2 nav-buttons">
               {user ? (
                 <>
-                  <span className="text-slate-600">Welcome!</span>
-                  <Button onClick={handleLogout} variant="outline" className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white">
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
+                  <span className="hidden sm:block text-slate-600 text-sm">Welcome!</span>
+                  <Button onClick={handleLogout} variant="outline" className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2">
+                    <LogOut className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Logout</span>
+                    <span className="sm:hidden">Out</span>
                   </Button>
                 </>
               ) : null}
@@ -157,49 +152,52 @@ window.location.href = "/?logout=true";
       </nav>
 
       {/* Hero Section */}
-      <section className="gradient-bg py-20 px-4 sm:px-6 lg:px-8">
+      <section className="gradient-bg py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
-              Plan Your Perfect<br />
+          <div className="text-center flex-center-mobile">
+            <h1 className="text-2xl sm:text-4xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 animate-fade-in">
+              Plan Your Perfect<br className="hidden sm:block" />
+              <span className="sm:hidden"> </span>
               <span className="text-accent">Adventure</span>
             </h1>
-            <p className="text-xl text-white opacity-90 mb-8 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg lg:text-xl text-white opacity-90 mb-6 sm:mb-8 max-w-3xl mx-auto px-2">
               AI-powered trip planning for backpackers. Get personalized itineraries, connect with fellow travelers, and explore South America like never before.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button asChild className="bg-white text-primary px-8 py-4 rounded-xl font-semibold hover:bg-gray-100">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center button-group">
+              <Button asChild className="w-full sm:w-auto bg-white text-primary px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-gray-100">
                 <Link href="/my-trips">
-                  <Bot className="w-5 h-5 mr-2" />
+                  <Bot className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Start Planning
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-primary">
+              <Button asChild variant="outline" className="w-full sm:w-auto border-2 border-white text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-white hover:text-primary">
                 <Link href="/explore">
-                  <Play className="w-5 h-5 mr-2" />
+                  <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Learn More
                 </Link>
               </Button>
             </div>
             {!user && (
-              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-6">
-                <span className="text-white opacity-75">Already have an account?</span>
-                <Button onClick={handleLogin} variant="outline" className="border-white text-white px-6 py-2 rounded-lg hover:bg-white hover:text-primary">
-                  <LogIn className="w-4 h-4 mr-2" />
-                  Login
-                </Button>
-                <span className="text-white opacity-75">or</span>
-                <Button onClick={handleRegister} className="bg-accent text-white px-6 py-2 rounded-lg hover:bg-orange-600">
-                  <UserPlus className="w-4 h-4 mr-2" />
-                  Register
-                </Button>
+              <div className="flex flex-col gap-3 justify-center items-center mt-6 flex-row-mobile">
+                <span className="text-white opacity-75 text-sm sm:text-base">Already have an account?</span>
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                  <Button onClick={handleLogin} variant="outline" className="w-full sm:w-auto border-white text-white px-4 sm:px-6 py-2 text-sm sm:text-base rounded-lg hover:bg-white hover:text-primary">
+                    <LogIn className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    Login
+                  </Button>
+                  <span className="text-white opacity-75 text-center sm:self-center">or</span>
+                  <Button onClick={handleRegister} className="w-full sm:w-auto bg-accent text-white px-4 sm:px-6 py-2 text-sm sm:text-base rounded-lg hover:bg-orange-600">
+                    <UserPlus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    Register
+                  </Button>
+                </div>
               </div>
             )}
             {user && (
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-6">
-                <span className="text-white opacity-90">Welcome back!</span>
-                <Button onClick={handleLogout} variant="outline" className="border-white text-white px-6 py-2 rounded-lg hover:bg-red-500 hover:text-white">
-                  <LogOut className="w-4 h-4 mr-2" />
+                <span className="text-white opacity-90 text-sm sm:text-base">Welcome back!</span>
+                <Button onClick={handleLogout} variant="outline" className="w-full sm:w-auto border-white text-white px-4 sm:px-6 py-2 text-sm sm:text-base rounded-lg hover:bg-red-500 hover:text-white">
+                  <LogOut className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   Logout
                 </Button>
               </div>
@@ -314,14 +312,14 @@ window.location.href = "/?logout=true";
       </section>
 
       {/* Popular Destinations */}
-      <section id="discover" className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <section id="discover" className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-700 mb-4">Popular South American Routes</h2>
-            <p className="text-gray-600 text-lg">Discover the most loved destinations by fellow backpackers</p>
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-700 mb-3 sm:mb-4">Popular South American Routes</h2>
+            <p className="text-gray-600 text-base sm:text-lg px-2">Discover the most loved destinations by fellow backpackers</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 card-grid">
             {[
               {
                 title: "Peru Explorer",
@@ -400,14 +398,14 @@ window.location.href = "/?logout=true";
       </section>
 
       {/* Features Overview */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-700 mb-4">Everything You Need in One App</h2>
-            <p className="text-gray-600 text-lg">Discover what makes TripWise the perfect travel companion</p>
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-700 mb-3 sm:mb-4">Everything You Need in One App</h2>
+            <p className="text-gray-600 text-base sm:text-lg px-2">Discover what makes TripWise the perfect travel companion</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 card-grid">
             {[
               {
                 icon: Bot,
