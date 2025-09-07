@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
-// import { useAuth } from "@/hooks/useAuth"; // Demo mode
+import { useAuth } from "@/context/AuthContext";
 import { useLocation, Link } from "wouter";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { queryClient } from "@/lib/queryClient";
@@ -43,8 +43,7 @@ export default function Landing() {
   const [budget, setBudget] = useState([2500]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [destination, setDestination] = useState<string>("");
-  // const { user } = useAuth(); // Demo mode - no auth needed
-  const user = null as any;
+  const { user, signOut } = useAuth();
   const [, setLocation] = useLocation();
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
@@ -89,19 +88,10 @@ export default function Landing() {
       localStorage.clear();
       sessionStorage.clear();
       
-      // Clear all cookies by setting them to expire
-      document.cookie.split(";").forEach(function(c) { 
-        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-      });
-      
-      // Navigate to logout endpoint which will destroy server session
-      // Logout handled by Supabase Auth Context
-window.location.href = "/?logout=true";
+      // Sign out using Supabase Auth
+      await signOut();
     } catch (error) {
       console.error("Logout error:", error);
-      // Fallback: force reload to clear everything
-      // Logout handled by Supabase Auth Context
-window.location.href = "/?logout=true";
     }
   };
 
@@ -115,25 +105,6 @@ window.location.href = "/?logout=true";
               <div className="flex-shrink-0 flex items-center">
                 <img src={logo} alt="TripWise" className="h-8 sm:h-10" />
               </div>
-              <div className="hidden lg:block ml-6">
-                <div className="flex items-baseline space-x-2 nav-links">
-                  <Button asChild variant="ghost" className="px-2 py-2 text-xs sm:text-sm font-medium">
-                    <Link href="/">Home</Link>
-                  </Button>
-                  <Button asChild variant="ghost" className="px-2 py-2 text-xs sm:text-sm font-medium">
-                    <Link href="/my-trips">Plan</Link>
-                  </Button>
-                  <Button asChild variant="ghost" className="px-2 py-2 text-xs sm:text-sm font-medium">
-                    <Link href="/explore">Explore</Link>
-                  </Button>
-                  <Button asChild variant="ghost" className="px-2 py-2 text-xs sm:text-sm font-medium">
-                    <Link href="/community">Community</Link>
-                  </Button>
-                  <Button asChild variant="ghost" className="px-2 py-2 text-xs sm:text-sm font-medium">
-                    <Link href="/budget-tracker">Budget</Link>
-                  </Button>
-                </div>
-              </div>
             </div>
             <div className="flex items-center space-x-2 nav-buttons">
               {user ? (
@@ -145,7 +116,13 @@ window.location.href = "/?logout=true";
                     <span className="sm:hidden">Out</span>
                   </Button>
                 </>
-              ) : null}
+              ) : (
+                <Button onClick={handleLogin} variant="outline" className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2">
+                  <LogIn className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Login</span>
+                  <span className="sm:hidden">In</span>
+                </Button>
+              )}
             </div>
           </div>
         </div>
