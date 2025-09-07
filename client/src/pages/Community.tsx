@@ -82,29 +82,29 @@ export default function Community() {
   const displayReviews = placeReviews;
 
   return (
-    <div className="container mx-auto py-4 sm:py-6 px-2 sm:px-4">
-      <div className="mb-6 sm:mb-8 px-2">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+    <div className="container mx-auto py-6 px-4">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
           TripWise Community
         </h1>
-        <p className="text-gray-600 text-sm sm:text-base">
+        <p className="text-gray-600">
           Connect with fellow travelers, share experiences, and find travel companions
         </p>
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6 px-2">
+      <div className="flex gap-4 mb-6">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Search reviews, chat rooms, or destinations..."
             value={searchTerm}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-            className="pl-10 text-sm sm:text-base"
+            className="pl-10"
           />
         </div>
         <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="w-48">
             <SelectValue placeholder="Filter by location" />
           </SelectTrigger>
           <SelectContent>
@@ -120,25 +120,23 @@ export default function Community() {
         </Select>
       </div>
 
-      <Tabs defaultValue="reviews" className="w-full px-2">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-          <TabsTrigger value="reviews" className="text-xs sm:text-sm p-2">
-            <span className="hidden sm:inline">Place Reviews</span>
-            <span className="sm:hidden">Reviews</span>
-          </TabsTrigger>
-          <TabsTrigger value="chat" className="text-xs sm:text-sm p-2">
-            <span className="hidden sm:inline">Chat Rooms</span>
-            <span className="sm:hidden">Chat</span>
-          </TabsTrigger>
-          <TabsTrigger value="dms" className="text-xs sm:text-sm p-2">
-            <span className="hidden sm:inline">Direct Messages</span>
-            <span className="sm:hidden">DMs</span>
-          </TabsTrigger>
-          <TabsTrigger value="buddies" className="text-xs sm:text-sm p-2">
-            <span className="hidden sm:inline">Travel Buddies</span>
-            <span className="sm:hidden">Buddies</span>
-          </TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="reviews" className="w-full">
+        <div className="overflow-x-auto">
+          <TabsList className="inline-flex w-auto min-w-full justify-start h-10">
+            <TabsTrigger value="reviews" className="whitespace-nowrap">
+              Place Reviews
+            </TabsTrigger>
+            <TabsTrigger value="chat" className="whitespace-nowrap">
+              Chat Rooms
+            </TabsTrigger>
+            <TabsTrigger value="dms" className="whitespace-nowrap">
+              Direct Messages
+            </TabsTrigger>
+            <TabsTrigger value="buddies" className="whitespace-nowrap">
+              Travel Buddies
+            </TabsTrigger>
+          </TabsList>
+        </div>
         
         <TabsContent value="reviews" className="mt-6">
           <ReviewsTab />
@@ -236,8 +234,8 @@ export default function Community() {
           )}
         </TabsContent>
         
-        <TabsContent value="chat" className="mt-4 sm:mt-6">
-          <div className="flex flex-col sm:flex-row h-[500px] sm:h-[600px] gap-2 sm:gap-4">
+        <TabsContent value="chat" className="mt-6">
+          <div className="flex h-[600px] gap-4">
             <ChatSidebar 
               selectedRoom={selectedRoom}
               onRoomSelect={(roomId, roomName, roomDescription, roomType) => {
@@ -261,14 +259,14 @@ export default function Community() {
           </div>
         </TabsContent>
         
-        <TabsContent value="dms" className="mt-4 sm:mt-6">
-          <div className="mb-4 sm:mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold mb-2">Direct Messages</h2>
-            <p className="text-gray-600 text-sm sm:text-base">
+        <TabsContent value="dms" className="mt-6">
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold mb-2">Direct Messages</h2>
+            <p className="text-gray-600">
               Private conversations with fellow travelers
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row h-[500px] sm:h-[600px] gap-2 sm:gap-4">
+          <div className="flex h-[600px] gap-4">
             <SidebarDMs 
               selectedDMRoom={selectedDMRoom}
               onDMSelect={(roomId, userName) => {
