@@ -193,20 +193,22 @@ export default function MyTripsScreen() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="generate">
-              <Users className="w-4 h-4 mr-2" />
-              Preferences
-            </TabsTrigger>
-            <TabsTrigger value="suggestions">
-              <Star className="w-4 h-4 mr-2" />
-              Suggestions
-            </TabsTrigger>
-            <TabsTrigger value="saved">
-              <MapPin className="w-4 h-4 mr-2" />
-              My Trips
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="inline-flex w-auto min-w-full justify-start h-10">
+              <TabsTrigger value="generate" className="whitespace-nowrap">
+                <Users className="w-4 h-4 mr-2" />
+                Preferences
+              </TabsTrigger>
+              <TabsTrigger value="suggestions" className="whitespace-nowrap">
+                <Star className="w-4 h-4 mr-2" />
+                Suggestions
+              </TabsTrigger>
+              <TabsTrigger value="saved" className="whitespace-nowrap">
+                <MapPin className="w-4 h-4 mr-2" />
+                My Trips
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Tab 1: Trip Generation Form */}
           <TabsContent value="generate" className="mt-6">

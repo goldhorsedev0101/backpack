@@ -94,11 +94,13 @@ export function BestTimeInfo({ destination, country, compact = false }: BestTime
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="seasons">Seasons</TabsTrigger>
-            <TabsTrigger value="monthly">Monthly</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="inline-flex w-auto min-w-full justify-start h-10">
+              <TabsTrigger value="overview" className="whitespace-nowrap">Overview</TabsTrigger>
+              <TabsTrigger value="seasons" className="whitespace-nowrap">Seasons</TabsTrigger>
+              <TabsTrigger value="monthly" className="whitespace-nowrap">Monthly</TabsTrigger>
+            </TabsList>
+          </div>
           
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

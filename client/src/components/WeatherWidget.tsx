@@ -178,11 +178,13 @@ export function WeatherWidget({ destination, country = 'Peru', showRecommendatio
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="current">Current Weather</TabsTrigger>
-            <TabsTrigger value="forecast">5-Day Forecast</TabsTrigger>
-            {showRecommendations && <TabsTrigger value="recommendations">Travel Tips</TabsTrigger>}
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="inline-flex w-auto min-w-full justify-start h-10">
+              <TabsTrigger value="current" className="whitespace-nowrap">Current Weather</TabsTrigger>
+              <TabsTrigger value="forecast" className="whitespace-nowrap">5-Day Forecast</TabsTrigger>
+              {showRecommendations && <TabsTrigger value="recommendations" className="whitespace-nowrap">Travel Tips</TabsTrigger>}
+            </TabsList>
+          </div>
 
           <TabsContent value="current" className="space-y-4">
             {weatherData && (

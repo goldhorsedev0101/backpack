@@ -402,13 +402,15 @@ export default function Achievements() {
 
           {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5 bg-white/80 backdrop-blur-sm">
-              <TabsTrigger value="overview" className="text-left">Overview</TabsTrigger>
-              <TabsTrigger value="missions" className="text-left">Missions</TabsTrigger>
-              <TabsTrigger value="badges" className="text-left">Badges</TabsTrigger>
-              <TabsTrigger value="leaderboard" className="text-left">Leaderboard</TabsTrigger>
-              <TabsTrigger value="history" className="text-left">History</TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto">
+              <TabsList className="inline-flex w-auto min-w-full justify-start h-10 bg-white/80 backdrop-blur-sm">
+                <TabsTrigger value="overview" className="whitespace-nowrap">Overview</TabsTrigger>
+                <TabsTrigger value="missions" className="whitespace-nowrap">Missions</TabsTrigger>
+                <TabsTrigger value="badges" className="whitespace-nowrap">Badges</TabsTrigger>
+                <TabsTrigger value="leaderboard" className="whitespace-nowrap">Leaderboard</TabsTrigger>
+                <TabsTrigger value="history" className="whitespace-nowrap">History</TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">

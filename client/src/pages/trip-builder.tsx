@@ -470,20 +470,22 @@ export default function TripBuilder() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="preferences" className="flex items-center">
-              <Bot className="w-4 h-4 mr-2" />
-              Preferences
-            </TabsTrigger>
-            <TabsTrigger value="suggestions" className="flex items-center">
-              <Sparkles className="w-4 h-4 mr-2" />
-              Suggestions
-            </TabsTrigger>
-            <TabsTrigger value="itinerary" className="flex items-center">
-              <Route className="w-4 h-4 mr-2" />
-              Itinerary
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="inline-flex w-auto min-w-full justify-start h-10">
+              <TabsTrigger value="preferences" className="flex items-center whitespace-nowrap">
+                <Bot className="w-4 h-4 mr-2" />
+                Preferences
+              </TabsTrigger>
+              <TabsTrigger value="suggestions" className="flex items-center whitespace-nowrap">
+                <Sparkles className="w-4 h-4 mr-2" />
+                Suggestions
+              </TabsTrigger>
+              <TabsTrigger value="itinerary" className="flex items-center whitespace-nowrap">
+                <Route className="w-4 h-4 mr-2" />
+                Itinerary
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="preferences" className="mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

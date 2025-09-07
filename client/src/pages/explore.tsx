@@ -694,12 +694,14 @@ export default function ExplorePage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="destinations">Destinations</TabsTrigger>
-          <TabsTrigger value="accommodations">Accommodations (Hotels)</TabsTrigger>
-          <TabsTrigger value="attractions">Attractions</TabsTrigger>
-          <TabsTrigger value="restaurants">Restaurants</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList className="inline-flex w-auto min-w-full justify-start h-10">
+            <TabsTrigger value="destinations" className="whitespace-nowrap">Destinations</TabsTrigger>
+            <TabsTrigger value="accommodations" className="whitespace-nowrap">Accommodations (Hotels)</TabsTrigger>
+            <TabsTrigger value="attractions" className="whitespace-nowrap">Attractions</TabsTrigger>
+            <TabsTrigger value="restaurants" className="whitespace-nowrap">Restaurants</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="destinations" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

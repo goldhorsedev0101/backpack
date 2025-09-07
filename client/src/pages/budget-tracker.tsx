@@ -296,24 +296,26 @@ export default function BudgetTracker() {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4" />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="expenses" className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4" />
-              Expenses
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <PieChart className="w-4 h-4" />
-              Analytics
-            </TabsTrigger>
-            <TabsTrigger value="insights" className="flex items-center gap-2">
-              <Lightbulb className="w-4 h-4" />
-              AI Insights
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="inline-flex w-auto min-w-full justify-start h-10">
+              <TabsTrigger value="overview" className="flex items-center gap-2 whitespace-nowrap">
+                <BarChart3 className="w-4 h-4" />
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="expenses" className="flex items-center gap-2 whitespace-nowrap">
+                <DollarSign className="w-4 h-4" />
+                Expenses
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="flex items-center gap-2 whitespace-nowrap">
+                <PieChart className="w-4 h-4" />
+                Analytics
+              </TabsTrigger>
+              <TabsTrigger value="insights" className="flex items-center gap-2 whitespace-nowrap">
+                <Lightbulb className="w-4 h-4" />
+                AI Insights
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
