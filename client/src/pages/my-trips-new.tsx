@@ -628,7 +628,7 @@ export default function MyTripsNew() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto">
-            <TabsList className="inline-flex w-auto min-w-full justify-start h-10">
+            <TabsList className="inline-flex w-auto min-w-full justify-evenly h-10">
               <TabsTrigger value="preferences" className="flex items-center whitespace-nowrap">
                 <Bot className="w-4 h-4 mr-2" />
                 Preferences
