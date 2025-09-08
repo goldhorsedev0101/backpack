@@ -461,11 +461,20 @@ export class DatabaseStorage implements IStorage {
         id: chatRooms.id,
         name: chatRooms.name,
         description: chatRooms.description,
-        isPrivate: chatRooms.isPrivate,
         type: chatRooms.type,
+        destination: chatRooms.destination,
+        travelDates: chatRooms.travelDates,
+        maxMembers: chatRooms.maxMembers,
+        memberCount: chatRooms.memberCount,
+        isPrivate: chatRooms.isPrivate,
+        requiresApproval: chatRooms.requiresApproval,
+        tags: chatRooms.tags,
+        languages: chatRooms.languages,
+        createdBy: chatRooms.createdBy,
+        isActive: chatRooms.isActive,
+        lastActivity: chatRooms.lastActivity,
         createdAt: chatRooms.createdAt,
-        updatedAt: chatRooms.updatedAt,
-        isActive: chatRooms.isActive
+        updatedAt: chatRooms.updatedAt
       })
       .from(chatRooms)
       .leftJoin(chatRoomMembers, eq(chatRooms.id, chatRoomMembers.roomId))
@@ -485,11 +494,20 @@ export class DatabaseStorage implements IStorage {
         id: chatRooms.id,
         name: chatRooms.name,
         description: chatRooms.description,
-        isPrivate: chatRooms.isPrivate,
         type: chatRooms.type,
+        destination: chatRooms.destination,
+        travelDates: chatRooms.travelDates,
+        maxMembers: chatRooms.maxMembers,
+        memberCount: chatRooms.memberCount,
+        isPrivate: chatRooms.isPrivate,
+        requiresApproval: chatRooms.requiresApproval,
+        tags: chatRooms.tags,
+        languages: chatRooms.languages,
+        createdBy: chatRooms.createdBy,
+        isActive: chatRooms.isActive,
+        lastActivity: chatRooms.lastActivity,
         createdAt: chatRooms.createdAt,
-        updatedAt: chatRooms.updatedAt,
-        isActive: chatRooms.isActive
+        updatedAt: chatRooms.updatedAt
       })
       .from(chatRooms)
       .where(
