@@ -2872,7 +2872,7 @@ export async function registerRoutes(app: Express): Promise<void> {
       const { destinationId } = req.query;
       console.log('Fetching accommodations from places table');
       
-      let accommodations = [];
+      let accommodations: any[] = [];
       const client = await pool.connect();
       try {
         // Query places table for accommodation-type places
@@ -2967,7 +2967,7 @@ export async function registerRoutes(app: Express): Promise<void> {
       const { destinationId } = req.query;
       console.log('Fetching attractions from places table');
       
-      let attractions = [];
+      let attractions: any[] = [];
       const client = await pool.connect();
       try {
         // Query places table for attraction-type places
@@ -3071,7 +3071,7 @@ export async function registerRoutes(app: Express): Promise<void> {
       const { destinationId } = req.query;
       console.log('Fetching restaurants from places table');
       
-      let restaurants = [];
+      let restaurants: any[] = [];
       const client = await pool.connect();
       try {
         // Query places table for restaurant-type places
