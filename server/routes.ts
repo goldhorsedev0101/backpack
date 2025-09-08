@@ -511,6 +511,7 @@ export async function registerRoutes(app: Express): Promise<void> {
       if (attachments && attachments.length > 0) {
         for (const attachment of attachments) {
           await storage.createChatAttachment({
+            path: attachment.path || attachment.url || '',
             messageId: newMessage.id,
             url: attachment.url,
             filename: attachment.filename,
