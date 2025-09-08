@@ -594,21 +594,13 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select({
         id: userAchievements.id,
+        createdAt: userAchievements.createdAt,
         userId: userAchievements.userId,
         achievementId: userAchievements.achievementId,
         unlockedAt: userAchievements.unlockedAt,
         progress: userAchievements.progress,
+        progressMax: userAchievements.progressMax,
         isCompleted: userAchievements.isCompleted,
-        achievement: {
-          id: achievements.id,
-          name: achievements.name,
-          description: achievements.description,
-          category: achievements.category,
-          iconName: achievements.iconName,
-          badgeColor: achievements.badgeColor,
-          points: achievements.points,
-          rarity: achievements.rarity,
-        },
       })
       .from(userAchievements)
       .leftJoin(achievements, eq(userAchievements.achievementId, achievements.id))
