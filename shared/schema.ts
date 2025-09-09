@@ -249,7 +249,7 @@ export const achievements = pgTable("achievements", {
   iconName: varchar("icon_name").notNull(),
   badgeColor: varchar("badge_color").notNull(),
   requirement: text("requirement").notNull(), // JSON string describing requirements
-  points: integer("points").notNull().default(10),
+  pointsReward: integer("points_reward").notNull().default(10),
   rarity: varchar("rarity").notNull().default("common"), // common, rare, epic, legendary
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
@@ -326,8 +326,8 @@ export const destinations = pgTable("destinations", {
   id: serial("id").primaryKey(),
   locationId: varchar("location_id").unique().notNull(), // TripAdvisor location ID
   name: varchar("name").notNull(),
-  latitude: decimal("latitude", { precision: 10, scale: 8 }),
-  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+  lat: decimal("lat", { precision: 10, scale: 8 }),
+  lon: decimal("lon", { precision: 11, scale: 8 }),
   addressStreet1: varchar("address_street1"),
   addressStreet2: varchar("address_street2"),
   city: varchar("city"),
@@ -351,8 +351,8 @@ export const accommodations = pgTable("accommodations", {
   numReviews: integer("num_reviews").default(0),
   priceLevel: varchar("price_level"), // $, $$, $$$, $$$$
   category: varchar("category").notNull().default("hotel"), // hotel, bed_and_breakfast, etc.
-  latitude: decimal("latitude", { precision: 10, scale: 8 }),
-  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+  lat: decimal("lat", { precision: 10, scale: 8 }),
+  lon: decimal("lon", { precision: 11, scale: 8 }),
   addressStreet1: varchar("address_street1"),
   addressStreet2: varchar("address_street2"),
   city: varchar("city"),
@@ -387,8 +387,8 @@ export const attractions = pgTable("attractions", {
   category: varchar("category").notNull(), // attraction
   subcategory: varchar("subcategory"),
   attractionTypes: text("attraction_types").array(),
-  latitude: decimal("latitude", { precision: 10, scale: 8 }),
-  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+  lat: decimal("lat", { precision: 10, scale: 8 }),
+  lon: decimal("lon", { precision: 11, scale: 8 }),
   addressStreet1: varchar("address_street1"),
   addressStreet2: varchar("address_street2"),
   city: varchar("city"),
@@ -421,8 +421,8 @@ export const restaurants = pgTable("restaurants", {
   priceLevel: varchar("price_level"), // $, $$, $$$, $$$$
   category: varchar("category").notNull().default("restaurant"),
   cuisine: text("cuisine").array(), // Array of cuisine types
-  latitude: decimal("latitude", { precision: 10, scale: 8 }),
-  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+  lat: decimal("lat", { precision: 10, scale: 8 }),
+  lon: decimal("lon", { precision: 11, scale: 8 }),
   addressStreet1: varchar("address_street1"),
   addressStreet2: varchar("address_street2"),
   city: varchar("city"),
