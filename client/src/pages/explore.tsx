@@ -136,7 +136,7 @@ export default function ExplorePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('destinations')
-        .select('id, name, country, latitude, longitude')
+        .select('id, name, country, lat, lon')
         .order('name');
       
       if (error) {
@@ -148,8 +148,8 @@ export default function ExplorePage() {
         id: d.id.toString(),
         name: d.name,
         country: d.country,
-        lat: d.latitude ? parseFloat(d.latitude) : null,
-        lon: d.longitude ? parseFloat(d.longitude) : null
+        lat: d.lat ? parseFloat(d.lat) : null,
+        lon: d.lon ? parseFloat(d.lon) : null
       })) as DestinationMini[];
     },
     staleTime: 5 * 60 * 1000 // Cache for 5 minutes

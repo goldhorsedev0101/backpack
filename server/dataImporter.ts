@@ -106,8 +106,8 @@ export async function importCollectorData() {
               name: city,
               country: country,
               description: place.summary || `Discover ${city} in ${country}`,
-              latitude: place.lat,
-              longitude: place.lng,
+              lat: place.lat,
+              lon: place.lng,
               bestTimeToVisit: 'Year-round',
               averageTemperature: 20,
               costLevel: 'budget'
@@ -130,8 +130,8 @@ export async function importCollectorData() {
             amenities: [],
             contactInfo: place.phone || '',
             website: place.website || '',
-            latitude: place.lat,
-            longitude: place.lng,
+            lat: place.lat,
+            lon: place.lng,
             googlePlaceId: place.place_id
           });
           accommodationsCount++;
@@ -147,8 +147,8 @@ export async function importCollectorData() {
             priceRange: '$',
             openingHours: '',
             website: place.website || '',
-            latitude: place.lat,
-            longitude: place.lng,
+            lat: place.lat,
+            lon: place.lng,
             googlePlaceId: place.place_id
           });
           attractionsCount++;
@@ -164,8 +164,8 @@ export async function importCollectorData() {
             description: place.summary || `${place.name} restaurant`,
             specialties: [],
             website: place.website || '',
-            latitude: place.lat,
-            longitude: place.lng,
+            lat: place.lat,
+            lon: place.lng,
             googlePlaceId: place.place_id
           });
           restaurantsCount++;

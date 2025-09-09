@@ -25,7 +25,7 @@ async function startServer() {
       const supabase = getSupabaseAdmin();
       
       // Quick connection test
-      const { data, error } = await supabase.from('destinations').select('count').limit(1);
+      const { data, error } = await supabase.from('destinations').select('*', { count: 'exact' }).limit(1);
       
       res.json({
         status: 'healthy',
