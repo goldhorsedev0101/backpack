@@ -1,0 +1,183 @@
+Title:
+BackpackBuddy — Save “Suggested Trips” from /my-trips into My Trip (persisted, editable)
+
+Goal:
+On the /my-trips page, turn “Suggested Trips” cards into real, persisted trips under a Saved Trips/My Trip tab. Users can: Save, Save & Open, or Merge a suggested trip into an existing trip; edit items (day/time/order/notes); and see their saved trips after reload. All UI text in English.
+
+Do (don’t ask):
+
+UI / Page Structure (in /my-trips)
+
+Split the page into two sections/tabs:
+
+Suggested Trips (left/top): cards the system recommends.
+
+Saved Trips (right/bottom): the user’s persisted trips.
+
+On each Suggested Trip card add actions:
+
+Save → persist as a new trip, stay on page.
+
+Save & Open → persist, then open the newly created trip in an editor view.
+
+Merge into… → modal with a dropdown of existing saved trips; merging appends items (with conflict handling below).
+
+On Saved Trips, show:
+
+Trip title, date range (if known), days count, #items, and “Open”, “Rename”, “Delete”.
+
+“Open” enters an Editor mode (inline or routed) with day-by-day columns and items.
+
+Editor essentials:
+
+Day columns (D1, D2, … or real dates if start/end known).
+
+Items list per day with: time (optional), place name, type (Attraction/Restaurant/Accommodation/Transport/Other), notes.
+
+Drag & drop to reorder within a day; move across days.
+
+Quick edit for time/notes; delete item.
+
+“Save” (persist), “Cancel” (revert), optimistic UI with rollback on error.
+
+Data Model (reuse existing; align with actual schema)
+
+Assume / adapt to these core entities (use exact column names if they already exist; otherwise add migration):
+
+trips: id (uuid), user_id (uuid), title (text), start_date (date, nullable), end_date (date, nullable), created_at, updated_at, source (text, nullable), source_ref (text, nullable)
+
+trip_days (optional if you store day index on items): id, trip_id, day_index (int), date (date, nullable)
+
+trip_items:
+
+Keys: id, trip_id, day_index (int), position (int),
+
+Core: item_type (text enum: 'attraction'|'restaurant'|'accommodation'|'transport'|'other'),
+
+Linking: ref_table (text), ref_id (uuid/text) → to link into attractions / restaurants / accommodations / destinations (do not enforce FK if mixed),
+
+Timing: start_time (time/timestamptz, nullable), end_time (time/timestamptz, nullable),
+
+Free text: title (text, fallback if no ref), notes (text, nullable),
+
+Audit: created_at, updated_at,
+
+Idempotency helpers: source (text, nullable), source_ref (text, nullable) (e.g., suggested_trip_id / suggestion_item_id).
+
+Mapping from a Suggested Trip card:
+
+Trip-level: title, optional start_date/end_date, source='suggested', source_ref='<suggestion_id>'.
+
+Items: for each suggested POI/day entry → create trip_items with trip_id, day_index, position sequential, type inferred, ref_table/ref_id if a known entity, otherwise set title/notes.
+
+Timezone: use the app’s default tz; store times in timestamptz if practical.
+
+Persistence Logic (Supabase)
+
+Save (new):
+
+Create a trips row for the current auth.user().
+
+Bulk-insert trip_items with correct day_index & position.
+
+Set source/source_ref both for trips and each trip_item.
+
+Use idempotency: if the same suggestion is saved again for the same user, skip duplicates by enforcing a unique key on (trip_id, source, source_ref) at item-level or by pre-checking existing items.
+
+Merge:
+
+Pick target trip_id.
+
+For each suggested item: choose the target day_index = suggested day or append after last day if undefined.
+
+Position = max(position for that day) + 1.
+
+Avoid duplicates by checking (trip_id, item_type, ref_table, ref_id, day_index, start_time) OR by source_ref.
+
+Open editor: fetch trip_items ordered by (day_index, position, created_at).
+
+Reorder / Move: update day_index and re-number position contiguously per day.
+
+Edit item: update start_time/end_time/notes/title.
+
+Delete: soft delete (recommended) or hard delete; keep UI consistent.
+
+Optimistic UI: apply local state first; on Supabase error, roll back and show an English error toast.
+
+RLS & Ownership
+
+Ensure all trips / trip_items rows have user_id (for trips) and inherit ownership via trip_id.
+
+RLS: user may select/update/delete only own trips and trip_items.
+
+Reads for Suggested Trips source data can remain public or authenticated per current app policy.
+
+Validation & UX details
+
+Title cannot be empty; default to “My Trip” if missing.
+
+Day indices must be >= 1. If no dates set, show D1/D2…; if dates exist, show calendar dates and compute day index accordingly.
+
+If an item has both ref_table/ref_id and title, display name from the referenced entity when present; fallback to title.
+
+For time inputs, validate end_time >= start_time if both are set.
+
+Show clear English toasts: “Saved to My Trip”, “Merged successfully”, “Reordered”, “Changes saved”, “Couldn’t save — please retry”.
+
+Loading states and empty states (e.g., “No saved trips yet — pick one from Suggested Trips”).
+
+Performance
+
+Batch inserts/updates where possible (avoid N network calls).
+
+Limit fetch size; lazy load items when opening a trip.
+
+Indexes assumed present: trip_items(trip_id, day_index, position); add if missing.
+
+Error Handling (explicit)
+
+Distinguish Network / Auth / RLS / Schema / Data validation errors; log a concise English line with the category and the operation (e.g., SAVE_TRIP_ITEMS failed — RLS).
+
+On merge conflicts (duplicate detection), deduplicate silently and show “Merged (skipped X duplicates)”.
+
+Acceptance Checklist (must pass)
+
+From /my-trips, click Save on a Suggestion → a new trip appears under Saved Trips with correct item counts.
+
+Save & Open jumps to the editor with items grouped per day.
+
+Merge into… appends items to an existing trip; on duplicate content, skips gracefully and reports count.
+
+Reorder items across days and persist; refresh page → order is preserved.
+
+Edit time/notes and persist; refresh → changes stay.
+
+Reload the app: Saved Trips shows all user’s trips; Suggested remains separate.
+
+All UI and toasts are English-only.
+
+Console shows a final log once after successful save/merge: ✅ Suggested trip persisted (trip_id=...).
+
+Deliverables
+
+Working /my-trips page with the two sections and editor flow.
+
+A short diff summary (files touched + one-liner each).
+
+Two screenshots: (1) Suggested → Save & Open result (editor view open), (2) Saved Trips list after reload.
+
+Confirmed RLS ownership (only the owner sees/edits their trips).
+
+Constraints:
+
+Do not break existing schema; if field names differ, adapt to the actual table/column names already in the project.
+
+No secrets in code or logs.
+
+Follow the app’s established lat/lon and points_reward naming consistency.
+
+Notes for the agent:
+
+If the project already contains itinerary tables (e.g., create-itinerary-tables.sql), reuse them and align names. If missing columns are required (e.g., source_ref, position, day_index), propose a minimal migration and apply it.
+
+Keep the implementation modular: a small data-access layer for trips/trip_items, and a clean UI component for the editor.
