@@ -1,0 +1,119 @@
+Title:
+BackpackBuddy — Supabase schema sync, auth cleanup & query hardening (English)
+
+Goal:
+Align the app code with the actual Supabase schema, remove Replit-auth flows in favor of Google OAuth via Supabase, harden DB queries and error handling, and ensure the entire app UI and messages are in English.
+
+Requirements (do, don’t ask):
+
+Schema → Code field mapping
+
+Search the entire project for all supabase.from('…') usages and any raw SQL.
+
+Align code with the following schema rules:
+
+destinations: use lat, lon. If you find latitude/longitude in code, replace with lat/lon (you may rely on DB alias columns if present, but prefer updating code).
+
+achievements: use points_reward. For backward-compatibility, reads may still accept points, but writes must target points_reward.
+
+Do not select a physical count column. In Supabase/PostgREST, use the count option (e.g., count: 'exact' or 'planned') rather than requesting a count field.
+
+Robust error handling for DB calls
+
+For every Supabase chain (select/insert/update/delete): add clear error handling and human-friendly logs that distinguish between:
+
+Network/transport errors
+
+RLS/authorization failures
+
+Schema mismatches (missing/renamed columns)
+
+For insert/update, verify the payload keys strictly match actual column names.
+
+Add lightweight unit tests (mock or test env) for DB-access helpers covering:
+
+Read from destinations including lat/lon
+
+Read/write in achievements using points_reward (and backward-compatible read via points if still referenced)
+
+Auth cleanup (Supabase only, Google OAuth)
+
+Remove/disable any Replit Auth UI or flows. Keep only Google OAuth through Supabase.
+
+Ensure environment variables exist and are used: SUPABASE_URL, SUPABASE_ANON_KEY.
+
+Enable session persistence and ensure a clean separation between Guest and Signed-in states.
+
+Provide a single, clean Sign in with Google screen (no other providers or local forms).
+
+Query optimization & safety
+
+For counting, use select(..., { count: 'exact' }) (or an RPC) instead of fetching a count column.
+
+For large tables (e.g., location_photos, attractions), always set reasonable limit/order defaults and avoid select('*') unless absolutely necessary.
+
+Ensure pagination is handled sanely (don’t pull thousands of rows by default).
+
+Acceptance checks (must implement)
+
+Add a temporary health endpoint /health/db returning { "ok": true } if select 1 succeeds against Supabase.
+
+Add a single npm script to run fast DB smoke checks:
+
+Read 3 rows from destinations (verifying lat/lon fields come through).
+
+Read from achievements (verifying points_reward is returned).
+
+Call user_points_summary if it exists.
+
+Validate RLS does not block expected public reads or use an authenticated session where needed.
+
+Print a final console summary: “✅ schema synced & queries hardened” on success.
+
+Documentation updates
+
+Update API_DOCUMENTATION.md and FEATURES_OVERVIEW.md to:
+
+Reflect lat/lon (not latitude/longitude)
+
+Reflect points_reward (and note any backward-compatible reads via points)
+
+Explain correct count usage in Supabase/PostgREST (via the count option).
+
+Deliverables
+
+Apply changes across the codebase with clear commit messages (e.g., refactor: align destinations lat/lon, fix: achievements writes to points_reward, chore: auth cleanup to Supabase Google only, feat: /health/db + smoke tests).
+
+Provide:
+
+A brief diff summary of key files changed (paths + one-liners)
+
+One screenshot of the working Google sign-in screen
+
+One screenshot of the /health/db endpoint showing { "ok": true }
+
+A short note confirming that all UI texts/error messages are in English
+
+Language policy
+
+All UI labels, error messages, logs shown to users, and documentation must be in English.
+
+Keep internal code comments in English as well.
+
+Constraints:
+
+Don’t remove any existing data.
+
+Avoid breaking changes to public APIs; if unavoidable, keep a compatibility layer and document it.
+
+No secrets in logs or committed files.
+
+Success criteria:
+
+App boots with Google OAuth only (Supabase), sessions persist, guest vs signed-in flows are correct.
+
+All DB calls align with the schema (lat/lon, points_reward).
+
+Health endpoint and smoke script pass, with the final success log printed.
+
+Documentation reflects the updated field names and best practices for counting.
