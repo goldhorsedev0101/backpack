@@ -101,3 +101,9 @@ Preferred communication style: Simple, everyday language.
 - **Comprehensive Gamification**: Full rewards service with real-time point tracking, achievements progress, missions, leaderboard, and history
 - **Enhanced User Experience**: Added daily check-in functionality, achievement unlock notifications, and progress tracking across all user actions
 - **Database Integration**: Connected all 6 rewards tables (achievements, user_achievements, points_ledger, missions, user_mission_progress, user_points_summary) with proper queries and relations
+- **Schema Field Alignment (Sep 2025)**: Updated all database tables to match Supabase schema requirements - destinations, accommodations, attractions, restaurants use lat/lon fields instead of latitude/longitude; achievements table uses points_reward field instead of points
+- **Database Error Handling**: Implemented robust error categorization system (network, authorization, schema, data errors) with specialized error types and user-friendly messages
+- **Authentication Cleanup**: Completely removed Replit Auth dependency, maintaining only Google OAuth via Supabase for simplified and secure authentication flow
+- **Query Hardening**: Updated all database queries to use proper count options instead of selecting count columns, added pagination safety, and implemented comprehensive health checks
+- **Health Monitoring**: Added /health/db endpoint and smoke test suite with 5 comprehensive tests validating schema alignment, field mappings, and query safety
+- **UI Language Standardization**: Converted all interface text from Hebrew to English for consistent user experience
