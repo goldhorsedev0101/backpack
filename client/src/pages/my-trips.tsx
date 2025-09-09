@@ -11,7 +11,9 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Loader2, MapPin, DollarSign, Calendar, Star, Users, ExternalLink, Camera, Mountain, Utensils } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { TripEditor } from "@/components/TripEditor";
+import { Loader2, MapPin, DollarSign, Calendar, Star, Users, ExternalLink, Camera, Mountain, Utensils, Save, Eye, Merge, Edit, Trash2 } from "lucide-react";
 import { RealPlaceLinks } from "@/components/RealPlaceLinks";
 import { SOUTH_AMERICAN_COUNTRIES } from "@/lib/constants";
 
@@ -51,6 +53,22 @@ interface SavedTrip {
   createdAt: string;
 }
 
+interface SavedTripWithItems {
+  id: string;
+  userId: string;
+  title: string;
+  startDate?: string;
+  endDate?: string;
+  source?: string;
+  sourceRef?: string;
+  planJson?: any;
+  createdAt: string;
+  updatedAt: string;
+  items: any[];
+  itemCount: number;
+  dayCount: number;
+}
+
 interface TripFormData {
   destination: string;
   dailyBudget: number;
@@ -81,10 +99,23 @@ export default function MyTripsScreen() {
     duration: ""
   });
   const [suggestions, setSuggestions] = useState<TripSuggestion[]>([]);
+  const [selectedTripForEditor, setSelectedTripForEditor] = useState<string | null>(null);
+  const [selectedTripForMerge, setSelectedTripForMerge] = useState<string | null>(null);
 
-  // Fetch saved trips
+  // Fetch saved trips (old API)
   const { data: savedTrips = [], isLoading: tripsLoading } = useQuery<SavedTrip[]>({
     queryKey: ['/api/my-trips/guest'],
+    enabled: activeTab === "saved"
+  });
+
+  // Fetch saved itineraries (new API) 
+  const { data: savedItineraries = [], isLoading: itinerariesLoading } = useQuery<SavedTripWithItems[]>({
+    queryKey: ['/api/itineraries'],
+    queryFn: async () => {
+      const response = await apiRequest('/api/itineraries?userId=guest-user');
+      const result = await response.json();
+      return result.itineraries || [];
+    },
     enabled: activeTab === "saved"
   });
 
@@ -115,7 +146,91 @@ export default function MyTripsScreen() {
     }
   });
 
-  // Save trip mutation using the new endpoint
+  // Save trip mutation using the new itinerary endpoint
+  const saveItineraryMutation = useMutation({
+    mutationFn: async (suggestion: TripSuggestion) => {
+      const response = await apiRequest('/api/itineraries/save', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          userId: 'guest-user',
+          suggestion 
+        })
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/itineraries'] });
+      toast({
+        title: "Trip Saved!",
+        description: "Your trip has been saved as an editable itinerary.",
+      });
+    },
+    onError: (error) => {
+      console.error('Save itinerary error:', error);
+      toast({
+        title: "Save Error",
+        description: "Failed to save trip. Please try again.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Merge trip mutation 
+  const mergeItineraryMutation = useMutation({
+    mutationFn: async ({ existingTripId, suggestion }: { existingTripId: string; suggestion: TripSuggestion }) => {
+      const response = await apiRequest(`/api/itineraries/${existingTripId}/merge`, {
+        method: 'POST',
+        body: JSON.stringify({ 
+          userId: 'guest-user',
+          suggestion 
+        })
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/itineraries'] });
+      setSelectedTripForMerge(null);
+      toast({
+        title: "Trip Merged!",
+        description: "The suggestion has been added to your existing trip.",
+      });
+    },
+    onError: (error) => {
+      console.error('Merge itinerary error:', error);
+      toast({
+        title: "Merge Error",
+        description: "Failed to merge trip. Please try again.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Delete itinerary mutation
+  const deleteItineraryMutation = useMutation({
+    mutationFn: async (itineraryId: string) => {
+      const response = await apiRequest(`/api/itineraries/${itineraryId}?userId=guest-user`, {
+        method: 'DELETE'
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/itineraries'] });
+      toast({
+        title: "Trip Deleted",
+        description: "The trip has been removed from your itineraries.",
+      });
+    },
+    onError: (error) => {
+      console.error('Delete itinerary error:', error);
+      toast({
+        title: "Delete Error",
+        description: "Failed to delete trip. Please try again.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Save trip mutation using the old endpoint (kept for backward compatibility)
   const saveTrip = useMutation({
     mutationFn: async (suggestion: TripSuggestion) => {
       const tripData = {
@@ -420,22 +535,69 @@ export default function MyTripsScreen() {
                         {/* Real Places Links Component */}
                         <RealPlaceLinks suggestion={suggestion} />
 
-                        <div className="pt-2 space-y-2">
+                        {/* Action Buttons */}
+                        <div className="pt-4 space-y-2">
+                          <div className="grid grid-cols-3 gap-2">
+                            <Button 
+                              onClick={() => saveItineraryMutation.mutate(suggestion)}
+                              disabled={saveItineraryMutation.isPending}
+                              variant="default"
+                              size="sm"
+                              className="flex items-center justify-center"
+                            >
+                              {saveItineraryMutation.isPending ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <>
+                                  <Save className="w-3 h-3 mr-1" />
+                                  Save
+                                </>
+                              )}
+                            </Button>
+                            
+                            <Button 
+                              onClick={() => {
+                                saveItineraryMutation.mutate(suggestion, {
+                                  onSuccess: (data) => {
+                                    // Open editor after saving
+                                    setSelectedTripForEditor(data.itinerary.id);
+                                  }
+                                });
+                              }}
+                              disabled={saveItineraryMutation.isPending}
+                              variant="outline"
+                              size="sm"
+                              className="flex items-center justify-center"
+                            >
+                              <Eye className="w-3 h-3 mr-1" />
+                              Save & Open
+                            </Button>
+                            
+                            <Button 
+                              onClick={() => setSelectedTripForMerge(suggestion)}
+                              variant="secondary"
+                              size="sm"
+                              className="flex items-center justify-center"
+                            >
+                              <Merge className="w-3 h-3 mr-1" />
+                              Merge
+                            </Button>
+                          </div>
+                          
                           <Button 
                             onClick={() => saveTrip.mutate(suggestion)}
                             disabled={saveTrip.isPending}
-                            className="w-full"
+                            variant="ghost"
+                            size="sm"
+                            className="w-full text-xs"
                           >
                             {saveTrip.isPending ? (
                               <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Saving...
+                                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                Saving to legacy...
                               </>
                             ) : (
-                              <>
-                                <Star className="w-4 h-4 mr-2" />
-                                Save This Trip
-                              </>
+                              'Save to Legacy Trips'
                             )}
                           </Button>
                         </div>
@@ -449,11 +611,95 @@ export default function MyTripsScreen() {
 
           {/* Tab 3: Saved Trips */}
           <TabsContent value="saved" className="mt-6">
+            {/* Editable Itineraries Section */}
+            <Card className="shadow-lg mb-6">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Edit className="w-6 h-6 mr-2 text-primary" />
+                  Editable Itineraries
+                  {savedItineraries && savedItineraries.length > 0 && (
+                    <Badge variant="secondary" className="ml-auto">{savedItineraries.length} itineraries</Badge>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {itinerariesLoading ? (
+                  <div className="text-center py-8">
+                    <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-primary" />
+                    <p className="text-lg font-medium text-gray-700">Loading your itineraries...</p>
+                  </div>
+                ) : savedItineraries.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                    <p className="text-lg font-medium text-gray-700 mb-2">No Saved Itineraries</p>
+                    <p className="text-sm text-gray-500">
+                      Save trip suggestions as editable itineraries to plan day-by-day
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid gap-4">
+                    {savedItineraries.map((itinerary) => (
+                      <div key={itinerary.id} className="border rounded-lg p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              {itinerary.title}
+                            </h3>
+                            <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
+                              <span>{itinerary.itemCount} items</span>
+                              <span>{itinerary.dayCount} days</span>
+                              {itinerary.source && (
+                                <Badge variant="outline" className="text-xs">
+                                  {itinerary.source}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => setSelectedTripForEditor(itinerary.id)}
+                              className="flex items-center"
+                            >
+                              <Edit className="w-3 h-3 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                if (confirm('Are you sure you want to delete this itinerary?')) {
+                                  deleteItineraryMutation.mutate(itinerary.id);
+                                }
+                              }}
+                              disabled={deleteItineraryMutation.isPending}
+                              className="flex items-center text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="w-3 h-3 mr-1" />
+                              Delete
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        <p className="text-sm text-gray-600">
+                          Created {new Date(itinerary.createdAt).toLocaleDateString()}
+                          {itinerary.updatedAt !== itinerary.createdAt && 
+                            ` • Updated ${new Date(itinerary.updatedAt).toLocaleDateString()}`
+                          }
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Legacy Saved Trips Section */}
             <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <MapPin className="w-6 h-6 mr-2 text-primary" />
-                  My Saved Trips
+                  Legacy Saved Trips
                   {savedTrips && Array.isArray(savedTrips) && savedTrips.length > 0 && (
                     <Badge variant="secondary" className="ml-auto">{savedTrips.length} trips</Badge>
                   )}
@@ -545,6 +791,87 @@ export default function MyTripsScreen() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Trip Editor Dialog */}
+      <Dialog 
+        open={!!selectedTripForEditor} 
+        onOpenChange={() => setSelectedTripForEditor(null)}
+      >
+        <DialogContent className="max-w-[95vw] h-[90vh] p-0 overflow-hidden">
+          <DialogHeader className="p-6 pb-2">
+            <DialogTitle>Trip Planner</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-auto">
+            {selectedTripForEditor && (
+              <TripEditor 
+                itineraryId={selectedTripForEditor} 
+                onClose={() => setSelectedTripForEditor(null)}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Merge Trip Dialog */}
+      <Dialog 
+        open={!!selectedTripForMerge} 
+        onOpenChange={() => setSelectedTripForMerge(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Merge with Existing Trip</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Select an existing itinerary to merge this suggestion into:
+            </p>
+            
+            {savedItineraries.length === 0 ? (
+              <div className="text-center py-4">
+                <p className="text-sm text-gray-500">
+                  No existing itineraries to merge with. Save your first trip to enable merging.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {savedItineraries.map((itinerary) => (
+                  <Button
+                    key={itinerary.id}
+                    variant="outline"
+                    className="w-full justify-start text-left h-auto p-3"
+                    onClick={() => {
+                      if (selectedTripForMerge) {
+                        mergeItineraryMutation.mutate({
+                          existingTripId: itinerary.id,
+                          suggestion: selectedTripForMerge
+                        });
+                      }
+                    }}
+                    disabled={mergeItineraryMutation.isPending}
+                  >
+                    <div>
+                      <div className="font-medium">{itinerary.title}</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {itinerary.itemCount} items • {itinerary.dayCount} days
+                      </div>
+                    </div>
+                  </Button>
+                ))}
+              </div>
+            )}
+            
+            <div className="flex gap-2 pt-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setSelectedTripForMerge(null)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
