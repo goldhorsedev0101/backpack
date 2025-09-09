@@ -44,6 +44,47 @@ async function startServer() {
     }
   });
 
+  // Database health check endpoint
+  app.get('/health/db', async (_req, res) => {
+    try {
+      const { getSupabaseAdmin } = await import('./supabase.js');
+      const { safeDbOperation } = await import('./db-error-handler.js');
+      const supabase = getSupabaseAdmin();
+      
+      const { data, error } = await safeDbOperation(
+        async () => {
+          // Test basic query
+          const result = await supabase.rpc('sql', { query: 'SELECT 1 as test' });
+          if (result.error) throw result.error;
+          return result.data;
+        },
+        'health-check'
+      );
+
+      if (error) {
+        res.status(503).json({
+          ok: false,
+          error: error.type,
+          message: error.userMessage,
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        res.json({
+          ok: true,
+          timestamp: new Date().toISOString(),
+          database: 'connected'
+        });
+      }
+    } catch (err) {
+      res.status(503).json({
+        ok: false,
+        error: 'unknown',
+        message: 'Database health check failed',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
   app.get('/ready', (_req, res) => {
     res.json({ 
       status: 'ready',

@@ -1,12 +1,12 @@
 /**
- * בדיקת בריאות לספקי אימות - ודא שיש רק Google (Supabase)
+ * Auth Providers Health Check - Ensure only Google (Supabase) is available
  */
 
 export function runAuthProvidersCheck() {
   console.log('🔍 Auth Providers Health Check Starting...');
   console.log('====================================');
 
-  // 1. בדיקות קבצים/קוד
+  // 1. File/code checks
   console.log('📋 Code Check:');
   const suspiciousPatterns = [
     'replit.com/auth', 
@@ -22,7 +22,7 @@ export function runAuthProvidersCheck() {
   console.log('  Suspicious patterns:', 'MANUAL GREP already verified clean ✅');
   console.log('  Replit OAuth code:', '❌ REMOVED (as requested)');
   
-  // 2. בדיקת משתני סביבה
+  // 2. Environment variables check
   console.log('🗝️ Environment Variables:');
   
   // Supabase (required)
@@ -40,7 +40,7 @@ export function runAuthProvidersCheck() {
   console.log('  REPLIT_CLIENT_ID: ❌ REMOVED (no longer needed)');
   console.log('  REPLIT_CLIENT_SECRET: ❌ REMOVED (no longer needed)');
 
-  // 3. בדיקת redirect URL
+  // 3. Redirect URL check
   console.log('🔗 Redirect Configuration:');
   
   const getRedirectBase = () => {
@@ -63,7 +63,7 @@ export function runAuthProvidersCheck() {
   console.log('  RedirectTo:', redirectTo);
   console.log('  Status:', redirectTo.includes('localhost') ? '⚠️ localhost (dev)' : '✅ production domain');
 
-  // 4. סיכום
+  // 4. Summary
   console.log('🎯 Provider Summary:');
   console.log('  Active Providers: Google OAuth (via Supabase) ✅');
   console.log('  Removed Providers: Replit OAuth ❌');
