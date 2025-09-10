@@ -1,0 +1,75 @@
+Title:
+BackpackBuddy — Wire DB to itineraries / itinerary_items & keep plan_json in sync (save/merge/edit)
+
+Goal:
+Use Supabase as the single source of truth, replace all legacy trips/trip_items references with itineraries/itinerary_items, make Save / Save & Open / Merge fully persistent from /my-trips, and guarantee plan_json is always non-null and synchronized with item changes.
+
+Do (don’t ask):
+
+Schema alignment & data access
+
+Replace every remaining reference to trips/trip_items with itineraries/itinerary_items across API routes and the data-access layer.
+
+Server routes (API) must use Supabase service-role key for writes; the client uses anon key only.
+
+Respect RLS: every new row in public.itineraries must include user_id = auth.user().id.
+
+/my-trips flows (Suggested → Saved)
+
+On the Suggested Trips cards add/ensure: Save, Save & Open, Merge actions.
+
+Persist to public.itineraries and public.itinerary_items with fields (align to existing columns): day_index, position, item_type, title, notes, ref_table, ref_id, start_time, end_time, source, source_ref.
+
+Use batched inserts/updates (no N roundtrips).
+
+Fetch items ordered by (day_index, position, created_at).
+
+Positions & synchronization
+
+After delete / merge / move (reorder): call resequence_itinerary_positions(itinerary_id) to keep position contiguous per day_index.
+
+After any save / merge / reorder / delete of itinerary_items, call refresh_itinerary_plan(itinerary_id) so itineraries.plan_json stays synchronized.
+
+plan_json (always non-null)
+
+All create/update routes must always send a non-null plan_json (use {} when empty).
+
+When saving a suggestion, build a minimal plan structure like:
+{ "days": [ { "day_index": 1, "items": [ … ] }, … ] }
+Each item includes: item_type, title, optional ref_table/ref_id, notes, start_time, end_time, and position.
+
+Add a guard: if plan_json is missing in the incoming payload, set it to {} before writing.
+
+Health & QA
+
+Keep /health/db returning { ok: true } via a minimal call to itineraries.
+
+Re-run the full “Save Suggested Trips” flow end-to-end and verify persistence, ordering, and plan synchronization.
+
+Error handling & performance
+
+Distinguish Network / Auth / RLS / Schema / Validation errors; log concise English messages per operation.
+
+Ensure large inserts/merges are batched; avoid unbounded selects (use limits/pagination where appropriate).
+
+Deliverables
+
+A short diff summary (files changed + one-liner per file).
+
+Screenshot 1: “Saved Trips” showing a newly saved itinerary.
+
+Screenshot 2: The Editor after “Save & Open”, reflecting correct day-by-day items and order.
+
+Confirmation that /health/db is green and the Save / Save & Open / Merge flows persist and reload correctly.
+
+Success criteria:
+
+No more "plan_json" NOT NULL errors; new/edited itineraries persist with non-null plan_json.
+
+After any item mutation, plan_json reflects the latest structure.
+
+/my-trips correctly saves, opens, merges, and reorders itineraries with contiguous positions per day.
+
+/health/db returns { ok: true }.
+
+All UI text/logs remain English-only.

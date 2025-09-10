@@ -160,6 +160,10 @@ async function startServer() {
       const { sql } = await import('drizzle-orm');
       
       console.log('Creating itinerary tables with new schema...');
+      console.log('Testing database connection first...');
+      
+      // Test connection first
+      await db.execute(sql`SELECT 1 as test`);
       
       // Create itineraries table with new schema
       await db.execute(sql`

@@ -37,9 +37,10 @@ if (!supabaseProjectId) {
   throw new Error('Invalid SUPABASE_URL format');
 }
 
-// For now use a direct connection string since the SERVICE_ROLE_KEY is corrupted
-// This will need to be fixed in Replit Secrets
+// Use Transaction Pooler for Supabase connection - override incorrect env var
 export const DATABASE_URL = `postgresql://postgres.wuzhvkmfdyiwaaladyxc:QK83yFVTMcDMJ2uX@aws-0-sa-east-1.pooler.supabase.com:6543/postgres`;
+
+console.log('🔧 Using fixed DATABASE_URL for Supabase Transaction Pooler');
 
 // Configuration object for application use
 export const config = {

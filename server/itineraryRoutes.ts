@@ -150,6 +150,12 @@ itineraryRouter.put('/api/itinerary-items/:id', async (req, res) => {
       });
     }
     
+    // After update, resequence positions and refresh plan
+    if (data) {
+      await itineraryService.resequenceItineraryPositions(data.itineraryId);
+      await itineraryService.refreshItineraryPlan(data.itineraryId);
+    }
+    
     res.json({ 
       success: true, 
       item: data,
@@ -167,6 +173,15 @@ itineraryRouter.delete('/api/itinerary-items/:id', async (req, res) => {
     const userId = req.query.userId as string || 'guest-user';
     const itemId = req.params.id;
     
+    // Get item info before deletion for position management
+    const itemResult = await itineraryService.getItineraryById(itemId, userId);
+    let itineraryId = '';
+    if (itemResult.data) {
+      // Find the item to get its itinerary ID
+      const item = itemResult.data.items.find(i => i.id === itemId);
+      if (item) itineraryId = item.itineraryId;
+    }
+    
     const { data, error } = await itineraryService.deleteItineraryItem(userId, itemId);
     
     if (error) {
@@ -175,6 +190,12 @@ itineraryRouter.delete('/api/itinerary-items/:id', async (req, res) => {
         error: error.type,
         message: error.userMessage 
       });
+    }
+    
+    // After deletion, resequence positions and refresh plan
+    if (itineraryId) {
+      await itineraryService.resequenceItineraryPositions(itineraryId);
+      await itineraryService.refreshItineraryPlan(itineraryId);
     }
     
     res.json({ 

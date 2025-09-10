@@ -592,23 +592,6 @@ export default function MyTripsScreen() {
                               Merge
                             </Button>
                           </div>
-                          
-                          <Button 
-                            onClick={() => saveTrip.mutate(suggestion)}
-                            disabled={saveTrip.isPending}
-                            variant="ghost"
-                            size="sm"
-                            className="w-full text-xs"
-                          >
-                            {saveTrip.isPending ? (
-                              <>
-                                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                                Saving to legacy...
-                              </>
-                            ) : (
-                              'Save to Legacy Trips'
-                            )}
-                          </Button>
                         </div>
                       </div>
                     ))}
