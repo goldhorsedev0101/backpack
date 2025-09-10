@@ -497,7 +497,7 @@ export const locationAncestors = pgTable("location_ancestors", {
 // Itineraries table - stores saved trips with editable items
 export const itineraries = pgTable("itineraries", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: uuid("user_id").notNull(), // Matches auth.users.id in Supabase
+  userId: text("user_id").notNull(), // String UUID to match Supabase auth.users.id
   title: text("title").notNull(),
   startDate: timestamp("start_date"),
   endDate: timestamp("end_date"),

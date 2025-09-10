@@ -47,39 +47,22 @@ async function startServer() {
   // Database health check endpoint
   app.get('/health/db', async (_req, res) => {
     try {
-      const { getSupabaseAdmin } = await import('./supabase.js');
-      const { safeDbOperation } = await import('./db-error-handler.js');
-      const supabase = getSupabaseAdmin();
+      const { db } = await import('./db.js');
+      const { sql } = await import('drizzle-orm');
       
-      const { data, error } = await safeDbOperation(
-        async () => {
-          // Test basic query
-          const result = await supabase.rpc('sql', { query: 'SELECT 1 as test' });
-          if (result.error) throw result.error;
-          return result.data;
-        },
-        'health-check'
-      );
-
-      if (error) {
-        res.status(503).json({
-          ok: false,
-          error: error.type,
-          message: error.userMessage,
-          timestamp: new Date().toISOString()
-        });
-      } else {
-        res.json({
-          ok: true,
-          timestamp: new Date().toISOString(),
-          database: 'connected'
-        });
-      }
+      // Test basic query with trips table (string comparison)
+      await db.execute(sql`SELECT 1 as test`);
+      
+      res.json({
+        ok: true,
+        timestamp: new Date().toISOString(),
+        database: 'connected'
+      });
     } catch (err) {
       res.status(503).json({
         ok: false,
-        error: 'unknown',
-        message: 'Database health check failed',
+        error: 'database',
+        message: 'Database connection failed',
         timestamp: new Date().toISOString()
       });
     }
@@ -239,6 +222,115 @@ async function startServer() {
   // Add itinerary routes
   const { default: itineraryRouter } = await import('./itineraryRoutes.js');
   app.use(itineraryRouter);
+
+  // Save Suggested Trip route - POST /api/trips/save-suggestion
+  app.post('/api/trips/save-suggestion', async (req: any, res) => {
+    try {
+      // Derive userId from authenticated session (never trust client)
+      const userId = req.user?.claims?.sub || req.user?.id || 'anonymous';
+      
+      if (!userId || userId === 'anonymous') {
+        return res.status(401).json({
+          error: 'auth',
+          message: 'Please sign in to save trips',
+          requiresAuth: true
+        });
+      }
+      
+      const suggestion = req.body.suggestion;
+      if (!suggestion) {
+        return res.status(400).json({
+          error: 'validation',
+          message: 'Trip suggestion data is required'
+        });
+      }
+
+      // Import required modules
+      const { db } = await import('./db.js');
+      const { trips } = await import('@shared/schema.js');
+      
+      // Save to public.trips table with user_id as string
+      const [newTrip] = await db
+        .insert(trips)
+        .values({
+          userId: userId,
+          title: `${suggestion.destination}, ${suggestion.country}`,
+          description: suggestion.description,
+          destinations: [suggestion.destination],
+          budget: suggestion.estimatedBudget?.high?.toString() || '1000',
+          travelStyle: Array.isArray(suggestion.travelStyle) ? suggestion.travelStyle.join(', ') : (suggestion.travelStyle || 'Adventure'),
+          isPublic: false
+        })
+        .returning();
+
+      if (!newTrip) {
+        throw new Error('Failed to create trip');
+      }
+
+      console.log(`✅ Trip saved to public.trips (user_id=${userId})`);
+      
+      res.json({
+        success: true,
+        trip: newTrip,
+        message: 'Saved to My Trips'
+      });
+      
+    } catch (error) {
+      console.error('Save suggestion error:', error);
+      
+      // Friendly error messages in English
+      let message = 'Could not save trip. Please try again.';
+      let errorType = 'database';
+      
+      if (error.message?.includes('does not exist')) {
+        message = 'Database setup incomplete. Please contact support.';
+        errorType = 'schema';
+      } else if (error.message?.includes('connection')) {
+        message = 'Database temporarily unavailable. Please try again.';
+        errorType = 'network';
+      }
+      
+      res.status(500).json({
+        error: errorType,
+        message,
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  });
+
+  // Get user trips with string comparison - GET /api/trips/my-trips  
+  app.get('/api/trips/my-trips', async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || req.user?.id || 'anonymous';
+      
+      if (!userId || userId === 'anonymous') {
+        return res.status(401).json({
+          error: 'auth',
+          message: 'Please sign in to view your trips'
+        });
+      }
+
+      const { db } = await import('./db.js');
+      const { trips } = await import('@shared/schema.js');
+      const { eq, desc } = await import('drizzle-orm');
+      
+      // Query public.trips by string equality: user_id == userId  
+      const userTrips = await db
+        .select()
+        .from(trips)
+        .where(eq(trips.userId, userId))
+        .orderBy(desc(trips.updatedAt));
+      
+      res.json(userTrips);
+      
+    } catch (error) {
+      console.error('Error fetching user trips:', error);
+      res.status(500).json({
+        error: 'database',
+        message: 'Failed to load your trips'
+      });
+    }
+  });
 
   // Setup Vite in development mode
   if (process.env.NODE_ENV === 'development') {

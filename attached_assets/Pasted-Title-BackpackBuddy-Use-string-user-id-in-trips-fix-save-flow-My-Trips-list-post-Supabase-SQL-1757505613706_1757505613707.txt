@@ -1,0 +1,93 @@
+Title: BackpackBuddy — Use string user_id in trips, fix save flow & My Trips list (post-Supabase SQL changes)
+
+Goal:
+Align all app code with DB changes where public.trips.user_id is TEXT (UUID string). Ensure the Save Trip button persists to public.trips and the itinerary appears instantly in My Trips. Keep the manual planner fully working on the same tables.
+
+Do (don’t ask):
+
+User ID handling (string everywhere)
+
+Treat user.id as a string across the app (types, DTOs, validators).
+
+In the save flow, set user_id directly from the authenticated session’s user.id (string).
+
+Do NOT accept user_id from client payloads.
+
+If route uses service-role, first verify the bearer token/session, derive userId from it, and ignore any client-sent user_id.
+
+Save Trip (Suggested → Saved)
+
+On the Suggested Trip card Save button, call a server route (e.g., POST /api/trips/save-suggestion) that:
+
+Requires an authenticated user; if not signed in, trigger Google sign-in then retry.
+
+Inserts into public.trips with fields:
+user_id (string), title, source='suggested', source_ref=<suggestion_id>, and non-null plan_json (use {} at minimum, or include { meta: { suggestion: <payload> }, days: [] }).
+
+If there are day/items in the suggestion, batch insert into public.itinerary_items (itinerary_id = new trip id) with: day_index (>=1), position, item_type, title, optional notes, ref_table/ref_id, start_time/end_time, source/source_ref.
+
+After item writes, call DB routines:
+resequence_trip_positions(trip_id) → keep contiguous positions per day.
+refresh_itinerary_plan(trip_id) → sync trips.plan_json.
+
+My Trips list (string comparison)
+
+The My Trips tab must query public.trips by string equality: filter user_id == user.id and order by updated_at DESC.
+
+After a successful save, refresh the list or do optimistic add; show toast: “Saved to My Trips”.
+
+Editor & manual planner (unchanged behavior, same tables)
+
+Opening a saved trip loads editor data ordered by (day_index, position, created_at).
+
+Manual creation remains on public.trips / public.itinerary_items with source='manual'.
+
+Reorder/move/delete items → server must call resequence + refresh plan (or rely on the DB triggers if already present).
+
+Auth, RLS, and service-role usage
+
+Client uses anon key with user session; server routes may use service-role but must enforce ownership (derive user_id from verified session and refuse if missing).
+
+Do not rely on client-sent user_id; always set it server-side from session.
+
+Keep /health/db green by performing a minimal read on trips.
+
+Type & schema alignment
+
+Update TypeScript types/interfaces so any userId/user_id is string (not a UUID type).
+
+Adjust any JOINS that compare to auth.users.id: if needed in SQL, use t.user_id::uuid = u.id::uuid only where you’re certain values are valid UUID strings. Otherwise avoid JOINs here.
+
+Plan JSON guarantees
+
+All create/update routes must guarantee plan_json is non-null (fallback {}), and incorporate the original suggestion under plan_json.meta.suggestion where applicable.
+
+After any items change, ensure plan_json reflects the latest state (via the refresh routine).
+
+Error handling & UX
+
+Distinguish and log Network/Auth/RLS/Schema/Validation errors with concise English messages.
+
+Show friendly toasts: “Saved to My Trips”, “Already saved — opening”, “Couldn’t save — please sign in”, etc.
+
+Deliverables
+
+Short diff summary: files changed + one-liner per change (e.g., “types: userId to string”, “routes: derive userId from session”, “queries: eq('user_id', user.id)”).
+
+Screenshot A: Save Trip → success toast.
+
+Screenshot B: My Trips list showing the new trip immediately.
+
+Screenshot C: Editor open for the saved trip.
+
+Acceptance criteria:
+
+Save Trip creates a row in public.trips with user_id as string, and the trip appears instantly under My Trips.
+
+Manual planner still creates/edits using the same tables.
+
+Reorder/delete persist and reflect after reload (positions contiguous; plan_json synced).
+
+/health/db returns { ok: true }.
+
+All UI text/logs remain English-only.
