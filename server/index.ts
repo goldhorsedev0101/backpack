@@ -226,16 +226,11 @@ async function startServer() {
   // Save Suggested Trip route - POST /api/trips/save-suggestion
   app.post('/api/trips/save-suggestion', async (req: any, res) => {
     try {
-      // Derive userId from authenticated session (never trust client)
-      const userId = req.user?.claims?.sub || req.user?.id || 'anonymous';
+      // Derive userId from authenticated session, fallback to guest mode
+      const userId = req.user?.claims?.sub || req.user?.id || 'guest-user';
       
-      if (!userId || userId === 'anonymous') {
-        return res.status(401).json({
-          error: 'auth',
-          message: 'Please sign in to save trips',
-          requiresAuth: true
-        });
-      }
+      // Allow guest users to save trips for demo purposes
+      console.log(`💾 Saving trip for user: ${userId}`);
       
       const suggestion = req.body.suggestion;
       if (!suggestion) {
@@ -301,14 +296,9 @@ async function startServer() {
   // Get user trips with string comparison - GET /api/trips/my-trips  
   app.get('/api/trips/my-trips', async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || req.user?.id || 'anonymous';
+      const userId = req.user?.claims?.sub || req.user?.id || 'guest-user';
       
-      if (!userId || userId === 'anonymous') {
-        return res.status(401).json({
-          error: 'auth',
-          message: 'Please sign in to view your trips'
-        });
-      }
+      console.log(`📋 Fetching trips for user: ${userId}`);
 
       const { db } = await import('./db.js');
       const { trips } = await import('@shared/schema.js');
