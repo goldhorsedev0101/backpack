@@ -126,7 +126,7 @@ async function startServer() {
 
   // Get port from configuration
   const { config } = await import('./config.js');
-  const PORT = config.server.port;
+  const PORT = Number(process.env.PORT) || config.server.port || 3000;
   const HOST = config.server.host;
   
   const server = createServer(app);
