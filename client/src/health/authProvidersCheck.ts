@@ -44,7 +44,8 @@ export function runAuthProvidersCheck() {
   console.log('🔗 Redirect Configuration:');
   
   const getRedirectBase = () => {
-    const appUrl = (import.meta as any).env?.VITE_APP_URL;
+    const appUrl = (import.meta as any).env?.VITE_PUBLIC_APP_URL || 
+                   (import.meta as any).env?.PUBLIC_APP_URL;
     if (appUrl) {
       const httpsBase = appUrl.replace('http://', 'https://');
       return httpsBase.endsWith('/') ? httpsBase.slice(0, -1) : httpsBase;
@@ -56,7 +57,7 @@ export function runAuthProvidersCheck() {
       return httpsBase.endsWith('/') ? httpsBase.slice(0, -1) : httpsBase;
     }
     
-    return 'https://localhost:5000';
+    return 'https://globemate.co.il';
   };
   
   const redirectTo = `${getRedirectBase()}/auth/callback`;

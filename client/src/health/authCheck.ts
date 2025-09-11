@@ -11,12 +11,13 @@ export async function runAuthHealthCheck() {
   // 1. בדיקת משתני סביבה
   const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || (import.meta as any).env?.SUPABASE_URL;
   const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || (import.meta as any).env?.SUPABASE_ANON_KEY;
-  const appUrl = (import.meta as any).env?.VITE_APP_URL;
+  const appUrl = (import.meta as any).env?.VITE_PUBLIC_APP_URL || 
+                 (import.meta as any).env?.PUBLIC_APP_URL;
 
   console.log('📋 Environment Variables:');
   console.log('  SUPABASE_URL:', supabaseUrl ? '✅ SET' : '❌ MISSING');
   console.log('  SUPABASE_ANON_KEY:', supabaseKey ? '✅ SET' : '❌ MISSING');
-  console.log('  VITE_APP_URL:', appUrl ? `✅ SET (${appUrl})` : '⚠️ MISSING (using window.location)');
+  console.log('  PUBLIC_APP_URL:', appUrl ? `✅ SET (${appUrl})` : '⚠️ MISSING (using window.location)');
 
   // 2. בדיקת Google OAuth Credentials (בהתאם לSupabase console)
   console.log('  GOOGLE_CLIENT_ID: (בSupabase console)');
