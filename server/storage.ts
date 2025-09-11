@@ -1387,6 +1387,8 @@ class MemStorage implements IStorage {
   private nextTripId = 1;
 
   async createTrip(trip: InsertTrip): Promise<Trip> {
+    console.log('🔍 Received trip data in MemStorage:', JSON.stringify(trip, null, 2));
+    
     const newTrip: Trip = {
       id: this.nextTripId++,
       userId: trip.userId,
@@ -1397,13 +1399,14 @@ class MemStorage implements IStorage {
       endDate: trip.endDate || null,
       budget: trip.budget || null,
       travelStyle: trip.travelStyle || null,
-      itinerary: trip.itinerary || null,
+      itinerary: trip.itinerary || null, // This should preserve the itinerary object
       isPublic: trip.isPublic ?? true,
       createdAt: new Date(),
       updatedAt: new Date()
     };
     this.trips.push(newTrip);
     console.log(`✅ Trip saved to memory (id=${newTrip.id}, user_id=${trip.userId})`);
+    console.log('🔍 Final saved trip:', JSON.stringify(newTrip, null, 2));
     return newTrip;
   }
 

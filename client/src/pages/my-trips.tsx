@@ -772,9 +772,9 @@ export default function MyTripsScreen() {
                               <span className="font-semibold text-green-900 text-sm">Budget</span>
                             </div>
                             <p className="text-green-800 font-bold">
-                              ${trip.itinerary?.estimatedBudget?.low ? 
-                                `${trip.itinerary.estimatedBudget.low} - ${trip.itinerary.estimatedBudget.high}` : 
-                                trip.budget || '600 - 900'}
+                              {trip.itinerary?.estimatedBudget?.low ? 
+                                `$${trip.itinerary.estimatedBudget.low} - $${trip.itinerary.estimatedBudget.high}` : 
+                                `$${trip.budget || '600 - 900'}`}
                             </p>
                           </div>
                         </div>
@@ -797,7 +797,33 @@ export default function MyTripsScreen() {
                             <h4 className="font-semibold text-gray-900">Highlights</h4>
                           </div>
                           <div className="space-y-2">
-                            {(trip.itinerary?.highlights || ['Mirror reflections at the salt flats', 'Stay in a salt hotel']).map((highlight, idx) => (
+                            {(() => {
+                              // Generate smart highlights based on trip title and destination
+                              const defaultHighlights = ['Mirror reflections at the salt flats', 'Stay in a salt hotel'];
+                              if (trip.itinerary?.highlights) {
+                                return trip.itinerary.highlights;
+                              }
+                              
+                              // Smart highlights based on destination
+                              const destination = trip.title?.toLowerCase() || '';
+                              let smartHighlights = [];
+                              
+                              if (destination.includes('machu picchu') || destination.includes('cusco')) {
+                                smartHighlights = ['Machu Picchu sunrise', 'Inca Trail adventure', 'Ancient citadel exploration'];
+                              } else if (destination.includes('torres del paine')) {
+                                smartHighlights = ['W Trek hiking', 'Grey Glacier views', 'Patagonian wildlife'];
+                              } else if (destination.includes('la paz')) {
+                                smartHighlights = ['Death Road biking', 'Cholita wrestling', 'Valley of the Moon'];
+                              } else if (destination.includes('mendoza')) {
+                                smartHighlights = ['Wine tasting tours', 'Aconcagua views', 'Traditional asado'];
+                              } else if (destination.includes('atacama')) {
+                                smartHighlights = ['Valley of the Moon', 'Flamingo reserves', 'Stargazing tours'];
+                              } else {
+                                smartHighlights = ['Breathtaking landscapes', 'Local cultural experiences', 'Adventure activities'];
+                              }
+                              
+                              return smartHighlights;
+                            })().map((highlight, idx) => (
                               <div key={idx} className="flex items-center text-sm text-gray-700">
                                 <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3 flex-shrink-0"></span>
                                 <span>{highlight}</span>

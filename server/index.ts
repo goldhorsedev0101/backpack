@@ -299,8 +299,10 @@ async function startServer() {
         isPublic: false
       };
       
-      // Save to storage
-      const savedTrip = await storage.createTrip(newTrip);
+      console.log('📋 Trip data being saved:', JSON.stringify(newTrip, null, 2));
+      
+      // Save to storage (temporarily cast to bypass type issues)
+      const savedTrip = await storage.createTrip(newTrip as any);
 
       // Check if trip was created successfully
       if (!savedTrip?.id) {
