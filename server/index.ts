@@ -286,6 +286,16 @@ async function startServer() {
         destinations: [suggestion.destination],
         budget: suggestion.estimatedBudget?.high?.toString() || '1000',
         travelStyle: Array.isArray(suggestion.travelStyle) ? suggestion.travelStyle.join(', ') : (suggestion.travelStyle || 'Adventure'),
+        // Add missing fields needed for new UI design
+        startDate: null, // Optional - can be added later by user
+        endDate: null, // Optional - can be added later by user  
+        itinerary: {
+          duration: suggestion.duration || '5-7 days',
+          bestTimeToVisit: suggestion.bestTimeToVisit || 'May to October',
+          highlights: suggestion.highlights || ['Mirror reflections at the salt flats', 'Stay in a salt hotel'],
+          estimatedBudget: suggestion.estimatedBudget || { low: 600, high: 900 },
+          travelStyle: suggestion.travelStyle || ['adventure', 'luxury', 'nature']
+        },
         isPublic: false
       };
       

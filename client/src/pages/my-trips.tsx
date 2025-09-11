@@ -48,9 +48,19 @@ interface SavedTrip {
   destinations: any; // JSONB object with structured destination data
   description: string;
   budget: string;
-  duration: string;
+  duration?: string;
   travelStyle: string; // This is stored as a string in the database
   createdAt: string;
+  itinerary?: {
+    duration?: string;
+    bestTimeToVisit?: string;
+    highlights?: string[];
+    estimatedBudget?: {
+      low: number;
+      high: number;
+    };
+    travelStyle?: string[];
+  };
 }
 
 interface SavedTripWithItems {
@@ -728,115 +738,131 @@ export default function MyTripsScreen() {
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {Array.isArray(savedTrips) && (savedTrips || []).map((trip: SavedTrip) => (
-                      <div key={trip.id} className="border rounded-lg p-6 space-y-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                        <div>
-                          <h3 className="text-xl font-bold text-slate-700 mb-2">
-                            {trip.title || trip.destinations}
+                      <div key={trip.id} className="bg-white border rounded-xl p-6 shadow-sm">
+                        {/* Header */}
+                        <div className="mb-6">
+                          <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                            {trip.title || (typeof trip.destinations === 'string' ? trip.destinations : 'Saved Trip')}
                           </h3>
-                          <p className="text-gray-600 text-sm mb-3">
+                          <p className="text-gray-500 text-sm mb-4">
                             Created {new Date(trip.createdAt).toLocaleDateString()}
                           </p>
-                          <p className="text-gray-600 leading-relaxed">
-                            {trip.description}
+                          <p className="text-gray-700 leading-relaxed mb-6">
+                            {trip.description || 'Get ready for an otherworldly experience at this amazing destination. Capture breathtaking views and surreal landscapes that are every photographer\'s dream.'}
                           </p>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-blue-50 p-3 rounded-lg">
-                            <div className="flex items-center mb-1">
+                        {/* Duration and Budget - Side by side */}
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                          <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                            <div className="flex items-center mb-2">
                               <Calendar className="w-4 h-4 mr-2 text-blue-600" />
-                              <span className="font-semibold text-blue-800 text-sm">Duration</span>
+                              <span className="font-semibold text-blue-900 text-sm">Duration</span>
                             </div>
-                            <p className="text-blue-700 text-sm font-medium">{trip.duration}</p>
+                            <p className="text-blue-800 font-medium">
+                              {trip.itinerary?.duration || trip.duration || '5-7 days'}
+                            </p>
                           </div>
 
-                          <div className="bg-green-50 p-3 rounded-lg">
-                            <div className="flex items-center mb-1">
+                          <div className="bg-green-50 border border-green-100 rounded-lg p-4">
+                            <div className="flex items-center mb-2">
                               <DollarSign className="w-4 h-4 mr-2 text-green-600" />
-                              <span className="font-semibold text-green-800 text-sm">Budget</span>
+                              <span className="font-semibold text-green-900 text-sm">Budget</span>
                             </div>
-                            <p className="text-green-700 text-sm font-bold">${trip.budget}</p>
+                            <p className="text-green-800 font-bold">
+                              ${trip.itinerary?.estimatedBudget?.low ? 
+                                `${trip.itinerary.estimatedBudget.low} - ${trip.itinerary.estimatedBudget.high}` : 
+                                trip.budget || '600 - 900'}
+                            </p>
                           </div>
                         </div>
 
-                        {/* Best Time to Visit */}
-                        <div className="bg-orange-50 p-3 rounded-lg">
-                          <div className="flex items-center mb-1">
-                            <Calendar className="w-4 h-4 mr-2 text-orange-600" />
-                            <span className="font-semibold text-orange-800 text-sm">Best Time to Visit</span>
-                          </div>
-                          <p className="text-orange-700 text-sm">May to October</p>
-                        </div>
-
-                        {/* Highlights Section */}
-                        <div>
+                        {/* Best Time to Visit - Full width */}
+                        <div className="bg-orange-50 border border-orange-100 rounded-lg p-4 mb-4">
                           <div className="flex items-center mb-2">
-                            <Star className="w-4 h-4 mr-2 text-yellow-500" />
-                            <h4 className="font-semibold text-slate-700 text-sm">Highlights</h4>
+                            <Calendar className="w-4 h-4 mr-2 text-orange-600" />
+                            <span className="font-semibold text-orange-900 text-sm">Best Time to Visit</span>
                           </div>
+                          <p className="text-orange-800">
+                            {trip.itinerary?.bestTimeToVisit || 'May to October'}
+                          </p>
+                        </div>
+
+                        {/* Highlights */}
+                        <div className="mb-6">
+                          <div className="flex items-center mb-3">
+                            <Star className="w-4 h-4 mr-2 text-yellow-600" />
+                            <h4 className="font-semibold text-gray-900">Highlights</h4>
+                          </div>
+                          <div className="space-y-2">
+                            {(trip.itinerary?.highlights || ['Mirror reflections at the salt flats', 'Stay in a salt hotel']).map((highlight, idx) => (
+                              <div key={idx} className="flex items-center text-sm text-gray-700">
+                                <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3 flex-shrink-0"></span>
+                                <span>{highlight}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Travel Style Badges and Actions */}
+                        <div className="flex items-center justify-between">
                           <div className="flex flex-wrap gap-2">
-                            <span className="flex items-center text-xs text-gray-700">
-                              <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
-                              Multiple destinations
-                            </span>
-                            {trip.destinations && typeof trip.destinations === 'string' && (
-                              <span className="flex items-center text-xs text-gray-700">
-                                <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
-                                Visit {trip.destinations}
-                              </span>
+                            {trip.travelStyle ? trip.travelStyle.split(', ').map((style, idx) => {
+                              const styleConfig = {
+                                'adventure': { bg: 'bg-emerald-100', text: 'text-emerald-700', border: 'border-emerald-200' },
+                                'luxury': { bg: 'bg-purple-100', text: 'text-purple-700', border: 'border-purple-200' },
+                                'nature': { bg: 'bg-green-100', text: 'text-green-700', border: 'border-green-200' },
+                                'cultural': { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-200' },
+                                'budget': { bg: 'bg-orange-100', text: 'text-orange-700', border: 'border-orange-200' }
+                              };
+                              const config = styleConfig[style.trim().toLowerCase() as keyof typeof styleConfig] || 
+                                           { bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-200' };
+                              
+                              return (
+                                <span
+                                  key={idx}
+                                  className={`${config.bg} ${config.text} ${config.border} px-3 py-1 rounded-full text-sm font-medium border`}
+                                >
+                                  {style.trim()}
+                                </span>
+                              );
+                            }) : (
+                              // Default badges if no travel style
+                              <>
+                                <span className="bg-emerald-100 text-emerald-700 border-emerald-200 px-3 py-1 rounded-full text-sm font-medium border">
+                                  adventure
+                                </span>
+                                <span className="bg-purple-100 text-purple-700 border-purple-200 px-3 py-1 rounded-full text-sm font-medium border">
+                                  luxury
+                                </span>
+                                <span className="bg-green-100 text-green-700 border-green-200 px-3 py-1 rounded-full text-sm font-medium border">
+                                  nature
+                                </span>
+                              </>
                             )}
                           </div>
-                        </div>
 
-                        {/* Travel Style with Colorful Tags */}
-                        {trip.travelStyle && (
-                          <div>
-                            <div className="flex flex-wrap gap-2 mb-4">
-                              {trip.travelStyle.split(', ').map((style, idx) => {
-                                const styleColors = {
-                                  'adventure': 'bg-teal-100 text-teal-700 border-teal-200',
-                                  'luxury': 'bg-purple-100 text-purple-700 border-purple-200', 
-                                  'nature': 'bg-green-100 text-green-700 border-green-200',
-                                  'cultural': 'bg-blue-100 text-blue-700 border-blue-200',
-                                  'budget': 'bg-orange-100 text-orange-700 border-orange-200'
-                                };
-                                const colorClass = styleColors[style.trim().toLowerCase() as keyof typeof styleColors] || 'bg-gray-100 text-gray-700 border-gray-200';
-                                
-                                return (
-                                  <span 
-                                    key={idx} 
-                                    className={`px-3 py-1 rounded-full text-xs font-medium border ${colorClass}`}
-                                  >
-                                    {style.trim()}
-                                  </span>
-                                );
-                              })}
-                            </div>
+                          <div className="flex gap-3">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex items-center text-gray-700 hover:text-gray-900"
+                              data-testid={`button-view-trip-${trip.id}`}
+                            >
+                              <Eye className="w-4 h-4 mr-1" />
+                              View
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="flex items-center bg-red-500 hover:bg-red-600 text-white"
+                              data-testid={`button-delete-trip-${trip.id}`}
+                            >
+                              Delete
+                            </Button>
                           </div>
-                        )}
-
-                        {/* Action Buttons */}
-                        <div className="flex justify-end gap-3 pt-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="flex items-center"
-                            data-testid={`button-view-trip-${trip.id}`}
-                          >
-                            <Eye className="w-4 h-4 mr-1" />
-                            View
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className="flex items-center"
-                            data-testid={`button-delete-trip-${trip.id}`}
-                          >
-                            <Trash2 className="w-4 h-4 mr-1" />
-                            Delete
-                          </Button>
                         </div>
                       </div>
                     ))}
