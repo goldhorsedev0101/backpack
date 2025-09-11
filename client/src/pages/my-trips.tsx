@@ -730,20 +730,28 @@ export default function MyTripsScreen() {
                 ) : (
                   <div className="space-y-4">
                     {Array.isArray(savedTrips) && (savedTrips || []).map((trip: SavedTrip) => (
-                      <div key={trip.id} className="border rounded-lg p-4 space-y-4">
+                      <div key={trip.id} className="border rounded-lg p-6 space-y-4 bg-white shadow-sm hover:shadow-md transition-shadow">
                         <div>
-                          <h3 className="text-xl font-bold text-slate-700 mb-1">
+                          <h3 className="text-xl font-bold text-slate-700 mb-2">
                             {trip.title || trip.destinations}
                           </h3>
-                          <p className="text-gray-600 text-sm">
-                            Saved on {new Date(trip.createdAt).toLocaleDateString()}
+                          <p className="text-gray-600 text-sm mb-3">
+                            Created {new Date(trip.createdAt).toLocaleDateString()}
                           </p>
-                          <p className="text-gray-600 leading-relaxed mt-2">
+                          <p className="text-gray-600 leading-relaxed">
                             {trip.description}
                           </p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
+                          <div className="bg-blue-50 p-3 rounded-lg">
+                            <div className="flex items-center mb-1">
+                              <Calendar className="w-4 h-4 mr-2 text-blue-600" />
+                              <span className="font-semibold text-blue-800 text-sm">Duration</span>
+                            </div>
+                            <p className="text-blue-700 text-sm font-medium">{trip.duration}</p>
+                          </div>
+
                           <div className="bg-green-50 p-3 rounded-lg">
                             <div className="flex items-center mb-1">
                               <DollarSign className="w-4 h-4 mr-2 text-green-600" />
@@ -751,44 +759,85 @@ export default function MyTripsScreen() {
                             </div>
                             <p className="text-green-700 text-sm font-bold">${trip.budget}</p>
                           </div>
+                        </div>
 
-                          <div className="bg-blue-50 p-3 rounded-lg">
-                            <div className="flex items-center mb-1">
-                              <Calendar className="w-4 h-4 mr-2 text-blue-600" />
-                              <span className="font-semibold text-blue-800 text-sm">Duration</span>
-                            </div>
-                            <p className="text-blue-700 text-sm">{trip.duration}</p>
+                        {/* Best Time to Visit */}
+                        <div className="bg-orange-50 p-3 rounded-lg">
+                          <div className="flex items-center mb-1">
+                            <Calendar className="w-4 h-4 mr-2 text-orange-600" />
+                            <span className="font-semibold text-orange-800 text-sm">Best Time to Visit</span>
+                          </div>
+                          <p className="text-orange-700 text-sm">May to October</p>
+                        </div>
+
+                        {/* Highlights Section */}
+                        <div>
+                          <div className="flex items-center mb-2">
+                            <Star className="w-4 h-4 mr-2 text-yellow-500" />
+                            <h4 className="font-semibold text-slate-700 text-sm">Highlights</h4>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <span className="flex items-center text-xs text-gray-700">
+                              <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
+                              Multiple destinations
+                            </span>
+                            {trip.destinations && typeof trip.destinations === 'string' && (
+                              <span className="flex items-center text-xs text-gray-700">
+                                <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
+                                Visit {trip.destinations}
+                              </span>
+                            )}
                           </div>
                         </div>
 
-                        {trip.destinations && (
+                        {/* Travel Style with Colorful Tags */}
+                        {trip.travelStyle && (
                           <div>
-                            <h4 className="font-semibold text-slate-700 mb-2 text-sm">Destination</h4>
-                            <div className="flex flex-wrap gap-2">
-                              <Badge variant="secondary" className="text-xs">
-                                <MapPin className="w-3 h-3 mr-1" />
-                                {Array.isArray(trip.destinations) 
-                                  ? trip.destinations.join(', ') 
-                                  : typeof trip.destinations === 'string'
-                                    ? trip.destinations
-                                    : 'Unknown destination'}
-                              </Badge>
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              {trip.travelStyle.split(', ').map((style, idx) => {
+                                const styleColors = {
+                                  'adventure': 'bg-teal-100 text-teal-700 border-teal-200',
+                                  'luxury': 'bg-purple-100 text-purple-700 border-purple-200', 
+                                  'nature': 'bg-green-100 text-green-700 border-green-200',
+                                  'cultural': 'bg-blue-100 text-blue-700 border-blue-200',
+                                  'budget': 'bg-orange-100 text-orange-700 border-orange-200'
+                                };
+                                const colorClass = styleColors[style.trim().toLowerCase() as keyof typeof styleColors] || 'bg-gray-100 text-gray-700 border-gray-200';
+                                
+                                return (
+                                  <span 
+                                    key={idx} 
+                                    className={`px-3 py-1 rounded-full text-xs font-medium border ${colorClass}`}
+                                  >
+                                    {style.trim()}
+                                  </span>
+                                );
+                              })}
                             </div>
                           </div>
                         )}
 
-                        {trip.travelStyle && (
-                          <div>
-                            <h4 className="font-semibold text-slate-700 mb-2 text-sm">Travel Style</h4>
-                            <div className="flex flex-wrap gap-2">
-                              {trip.travelStyle.split(', ').map((style, idx) => (
-                                <Badge key={idx} variant="outline" className="text-xs">
-                                  {style.trim()}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                        {/* Action Buttons */}
+                        <div className="flex justify-end gap-3 pt-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex items-center"
+                            data-testid={`button-view-trip-${trip.id}`}
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            View
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="flex items-center"
+                            data-testid={`button-delete-trip-${trip.id}`}
+                          >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            Delete
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
