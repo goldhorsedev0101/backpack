@@ -11,7 +11,7 @@ import { useLocation, Link } from "wouter";
 import { AuthModal } from "../components/auth/AuthModal.js";
 import { queryClient } from "../lib/queryClient.js";
 import { SOUTH_AMERICAN_COUNTRIES } from "../lib/constants.js";
-// import logo from "../assets/tripwise-logo.svg";
+// Logo removed - using text logo instead
 import { 
   Compass, 
   MapPin, 
@@ -39,6 +39,7 @@ import {
   LogOut
 } from "lucide-react";
 import { useTranslation } from 'react-i18next';
+import { LanguageToggle } from '../components/LanguageToggle.js';
 
 export default function Landing() {
   const { t } = useTranslation();
@@ -102,24 +103,25 @@ export default function Landing() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <img src={logo} alt="TripWise" className="h-8 sm:h-10" />
+                <div className="text-xl font-bold text-orange-600">TripWise</div>
               </div>
             </div>
             <div className="flex items-center space-x-2 nav-buttons">
+              <LanguageToggle />
               {user ? (
                 <>
-                  <span className="hidden sm:block text-slate-600 text-sm">Welcome!</span>
+                  <span className="hidden sm:block text-slate-600 text-sm">{t('landing.welcome')}</span>
                   <Button onClick={handleLogout} variant="outline" className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2">
                     <LogOut className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                    <span className="hidden sm:inline">Logout</span>
-                    <span className="sm:hidden">Out</span>
+                    <span className="hidden sm:inline">{t('landing.logout')}</span>
+                    <span className="sm:hidden">{t('landing.out')}</span>
                   </Button>
                 </>
               ) : (
                 <Button onClick={handleLogin} variant="outline" className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2">
                   <LogIn className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  <span className="hidden sm:inline">Login</span>
-                  <span className="sm:hidden">In</span>
+                  <span className="hidden sm:inline">{t('landing.login')}</span>
+                  <span className="sm:hidden">{t('landing.in')}</span>
                 </Button>
               )}
             </div>
@@ -132,24 +134,24 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center flex-center-mobile">
             <h1 className="text-2xl sm:text-4xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 animate-fade-in">
-              Plan Your Perfect<br className="hidden sm:block" />
+              {t('landing.hero_title_part1')}<br className="hidden sm:block" />
               <span className="sm:hidden"> </span>
-              <span className="text-accent">Adventure</span>
+              <span className="text-accent">{t('landing.hero_title_part2')}</span>
             </h1>
             <p className="text-base sm:text-lg lg:text-xl text-white opacity-90 mb-6 sm:mb-8 max-w-3xl mx-auto px-2">
-              AI-powered trip planning for backpackers. Get personalized itineraries, connect with fellow travelers, and explore South America like never before.
+              {t('landing.hero_subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center button-group">
               <Button asChild className="w-full sm:w-auto bg-white text-primary px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-gray-100">
                 <Link href="/my-trips">
                   <Bot className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                  Start Planning
+                  {t('landing.start_planning')}
                 </Link>
               </Button>
               <Button asChild variant="outline" className="w-full sm:w-auto border-2 border-white text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-white hover:text-primary">
                 <Link href="/explore">
                   <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                  Learn More
+                  {t('landing.learn_more')}
                 </Link>
               </Button>
             </div>
@@ -161,18 +163,18 @@ export default function Landing() {
       <section id="plan" className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-700 mb-4">AI Trip Builder</h2>
-            <p className="text-gray-600 text-lg">Tell us your preferences and let our AI create the perfect itinerary</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-700 mb-4">{t('landing.ai_trip_builder_title')}</h2>
+            <p className="text-gray-600 text-lg">{t('landing.ai_trip_builder_desc')}</p>
           </div>
           
           <Card className="shadow-lg">
             <CardContent className="p-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 <div>
-                  <Label className="block text-sm font-medium text-slate-700 mb-2">Where do you want to go?</Label>
+                  <Label className="block text-sm font-medium text-slate-700 mb-2">{t('landing.where_to_go')}</Label>
                   <Select onValueChange={(value) => setDestination(value)}>
                     <SelectTrigger className="w-full p-3">
-                      <SelectValue placeholder="Select a country" />
+                      <SelectValue placeholder={t('landing.select_country')} />
                     </SelectTrigger>
                     <SelectContent>
                       {SOUTH_AMERICAN_COUNTRIES.map((country) => (
@@ -184,21 +186,21 @@ export default function Landing() {
                   </Select>
                 </div>
                 <div>
-                  <Label className="block text-sm font-medium text-slate-700 mb-2">Trip Duration</Label>
+                  <Label className="block text-sm font-medium text-slate-700 mb-2">{t('landing.trip_duration')}</Label>
                   <Select>
                     <SelectTrigger className="w-full p-3">
-                      <SelectValue placeholder="Select duration" />
+                      <SelectValue placeholder={t('landing.select_duration')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1-2-weeks">1-2 weeks</SelectItem>
-                      <SelectItem value="2-4-weeks">2-4 weeks</SelectItem>
-                      <SelectItem value="1-2-months">1-2 months</SelectItem>
-                      <SelectItem value="3-months">3+ months</SelectItem>
+                      <SelectItem value="1-2-weeks">{t('landing.duration_1_2_weeks')}</SelectItem>
+                      <SelectItem value="2-4-weeks">{t('landing.duration_2_4_weeks')}</SelectItem>
+                      <SelectItem value="1-2-months">{t('landing.duration_1_2_months')}</SelectItem>
+                      <SelectItem value="3-months">{t('landing.duration_3_months')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label className="block text-sm font-medium text-slate-700 mb-2">Budget Range</Label>
+                  <Label className="block text-sm font-medium text-slate-700 mb-2">{t('landing.budget_range')}</Label>
                   <div className="px-4">
                     <Slider
                       value={budget}
@@ -216,13 +218,13 @@ export default function Landing() {
                   </div>
                 </div>
                 <div>
-                  <Label className="block text-sm font-medium text-slate-700 mb-2">Travel Style</Label>
+                  <Label className="block text-sm font-medium text-slate-700 mb-2">{t('landing.travel_style')}</Label>
                   <div className="grid grid-cols-2 gap-4">
                     {[
-                      { id: 'adventure', icon: Mountain, label: 'Adventure', description: 'Hiking, trekking, extreme sports' },
-                      { id: 'culture', icon: Camera, label: 'Culture', description: 'Museums, local traditions, history' },
-                      { id: 'food', icon: Utensils, label: 'Food', description: 'Local restaurants, cooking classes' },
-                      { id: 'nightlife', icon: GlassWater, label: 'Nightlife', description: 'Bars, clubs, social experiences' }
+                      { id: 'adventure', icon: Mountain, label: t('landing.adventure_style'), description: t('landing.adventure_desc') },
+                      { id: 'culture', icon: Camera, label: t('landing.culture_style'), description: t('landing.culture_desc') },
+                      { id: 'food', icon: Utensils, label: t('landing.food_style'), description: t('landing.food_desc') },
+                      { id: 'nightlife', icon: GlassWater, label: t('landing.nightlife_style'), description: t('landing.nightlife_desc') }
                     ].map(style => (
                       <div
                         key={style.id}
@@ -250,11 +252,11 @@ export default function Landing() {
                 <Button asChild className="bg-primary text-white px-8 py-4 rounded-xl font-semibold hover:bg-orange-600">
                   <Link href="/my-trips">
                     <Bot className="w-5 h-5 mr-2" />
-                    {user ? "Generate My Trip" : "Start Planning"}
+                    {user ? t('landing.generate_trip') : t('landing.start_planning')}
                   </Link>
                 </Button>
                 <p className="text-sm text-gray-500 mt-2">
-                  {user ? "Ready to plan your next adventure!" : "Sign in to start planning your adventure"}
+                  {user ? t('landing.ready_to_plan') : t('landing.sign_in_to_plan')}
                 </p>
               </div>
             </CardContent>
@@ -266,37 +268,37 @@ export default function Landing() {
       <section id="discover" className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-700 mb-3 sm:mb-4">Popular South American Routes</h2>
-            <p className="text-gray-600 text-base sm:text-lg px-2">Discover the most loved destinations by fellow backpackers</p>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-700 mb-3 sm:mb-4">{t('landing.popular_routes_title')}</h2>
+            <p className="text-gray-600 text-base sm:text-lg px-2">{t('landing.popular_routes_desc')}</p>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 card-grid">
             {[
               {
-                title: "Peru Explorer",
-                route: "Lima → Cusco → Machu Picchu → Arequipa",
-                duration: "2-3 weeks",
-                budget: "$1,200 - $2,000",
+                title: t('landing.peru_explorer'),
+                route: t('landing.route_lima_cusco'),
+                duration: t('landing.duration_2_3_weeks'),
+                budget: t('landing.budget_1200_2000'),
                 rating: 4.9,
                 reviews: 234,
                 travelers: 15,
                 image: "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=400&h=250&fit=crop"
               },
               {
-                title: "Colombian Coast",
-                route: "Bogotá → Medellín → Cartagena → Tayrona",
-                duration: "3-4 weeks",
-                budget: "$800 - $1,500",
+                title: t('landing.colombian_coast'),
+                route: t('landing.route_bogota_cartagena'),
+                duration: t('landing.duration_3_4_weeks'),
+                budget: t('landing.budget_800_1500'),
                 rating: 4.8,
                 reviews: 189,
                 travelers: 12,
                 image: "https://images.unsplash.com/photo-1551009175-8a68da93d5f9?w=400&h=250&fit=crop"
               },
               {
-                title: "Patagonia Trek",
-                route: "Santiago → Patagonia → Ushuaia → Buenos Aires",
-                duration: "4-6 weeks",
-                budget: "$1,500 - $2,800",
+                title: t('landing.patagonia_trek'),
+                route: t('landing.route_santiago_buenos_aires'),
+                duration: t('landing.duration_4_6_weeks'),
+                budget: t('landing.budget_1500_2800'),
                 rating: 4.7,
                 reviews: 156,
                 travelers: 8,
@@ -338,7 +340,7 @@ export default function Landing() {
                       )}
                     </div>
                     <Button asChild className="bg-primary text-white hover:bg-orange-600">
-                      <Link href="/my-trips">View Route</Link>
+                      <Link href="/my-trips">{t('landing.view_route')}</Link>
                     </Button>
                   </div>
                 </CardContent>
@@ -352,46 +354,46 @@ export default function Landing() {
       <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-700 mb-3 sm:mb-4">Everything You Need in One App</h2>
-            <p className="text-gray-600 text-base sm:text-lg px-2">Discover what makes TripWise the perfect travel companion</p>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-700 mb-3 sm:mb-4">{t('landing.features_title')}</h2>
+            <p className="text-gray-600 text-base sm:text-lg px-2">{t('landing.features_desc')}</p>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 card-grid">
             {[
               {
                 icon: Bot,
-                title: "AI Trip Planning",
-                description: "Get personalized itineraries in seconds based on your preferences, budget, and travel style.",
+                title: t('landing.ai_planning_feature'),
+                description: t('landing.ai_planning_desc'),
                 color: "bg-primary"
               },
               {
                 icon: Users,
-                title: "Traveler Community",
-                description: "Connect with like-minded backpackers, share experiences, and find travel companions.",
+                title: t('landing.community_feature'),
+                description: t('landing.community_desc'),
                 color: "bg-secondary"
               },
               {
                 icon: DollarSign,
-                title: "Smart Budgeting",
-                description: "Track expenses automatically and get AI-powered tips to optimize your travel budget.",
+                title: t('landing.budgeting_feature'),
+                description: t('landing.budgeting_desc'),
                 color: "bg-accent"
               },
               {
                 icon: Navigation,
-                title: "Interactive Maps",
-                description: "Visualize your route, find nearby attractions, and navigate with confidence.",
+                title: t('landing.maps_feature'),
+                description: t('landing.maps_desc'),
                 color: "bg-mint"
               },
               {
                 icon: Star,
-                title: "Real-time Reviews",
-                description: "Get the latest reviews and recommendations from travelers currently on the ground.",
+                title: t('landing.reviews_feature'),
+                description: t('landing.reviews_desc'),
                 color: "bg-primary"
               },
               {
                 icon: MessageCircle,
-                title: "Live Chat",
-                description: "Connect instantly with fellow travelers and get real-time advice and tips.",
+                title: t('landing.chat_feature'),
+                description: t('landing.chat_desc'),
                 color: "bg-secondary"
               }
             ].map((feature, index) => (
@@ -413,9 +415,9 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center mb-6">
-                <img src={logo} alt="TripWise" className="h-8 brightness-0 invert" />
+                <div className="text-lg font-bold text-orange-600">TripWise</div>
               </div>
-              <p className="text-gray-300 mb-4">Smart, social, and personalized trip planning for the modern backpacker.</p>
+              <p className="text-gray-300 mb-4">{t('landing.footer_tagline')}</p>
               <div className="flex space-x-4">
                 <Instagram className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
                 <Twitter className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
@@ -425,18 +427,18 @@ export default function Landing() {
             </div>
             
             <div>
-              <h3 className="text-lg font-semibold mb-4">Features</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('landing.features_nav')}</h3>
               <ul className="space-y-2 text-gray-300">
-                <li><Link href="/my-trips" className="hover:text-white">AI Trip Planning</Link></li>
-                <li><Link href="/budget-tracker" className="hover:text-white">Budget Tracking</Link></li>
-                <li><Link href="/community" className="hover:text-white">Community</Link></li>
-                <li><Link href="/community" className="hover:text-white">Reviews</Link></li>
-                <li><Link href="/community" className="hover:text-white">Live Chat</Link></li>
+                <li><Link href="/my-trips" className="hover:text-white">{t('landing.ai_trip_planning_nav')}</Link></li>
+                <li><Link href="/budget-tracker" className="hover:text-white">{t('landing.budget_tracking_nav')}</Link></li>
+                <li><Link href="/community" className="hover:text-white">{t('landing.community_nav')}</Link></li>
+                <li><Link href="/community" className="hover:text-white">{t('landing.reviews_nav')}</Link></li>
+                <li><Link href="/community" className="hover:text-white">{t('landing.live_chat_nav')}</Link></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="text-lg font-semibold mb-4">Destinations</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('landing.destinations_nav')}</h3>
               <ul className="space-y-2 text-gray-300">
                 <li><Link href="/explore?country=Peru" className="hover:text-white">Peru</Link></li>
                 <li><Link href="/explore?country=Colombia" className="hover:text-white">Colombia</Link></li>
@@ -447,19 +449,19 @@ export default function Landing() {
             </div>
             
             <div>
-              <h3 className="text-lg font-semibold mb-4">Support</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('landing.support_nav')}</h3>
               <ul className="space-y-2 text-gray-300">
-                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">Help Center</Button></li>
-                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">Contact Us</Button></li>
-                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">Privacy Policy</Button></li>
-                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">Terms of Service</Button></li>
-                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">About Us</Button></li>
+                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">{t('landing.help_center')}</Button></li>
+                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">{t('landing.contact_us')}</Button></li>
+                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">{t('landing.privacy_policy')}</Button></li>
+                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">{t('landing.terms_of_service')}</Button></li>
+                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">{t('landing.about_us')}</Button></li>
               </ul>
             </div>
           </div>
           
           <div className="border-t border-gray-600 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 TripWise. All rights reserved. | Made with ❤️ for backpackers everywhere</p>
+            <p>{t('landing.copyright')}</p>
           </div>
         </div>
       </footer>

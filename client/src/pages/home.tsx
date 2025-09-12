@@ -36,7 +36,7 @@ export default function Home() {
     queryKey: ["/api/reviews"]
   });
 
-  const welcomeMessage = "Welcome to TripWise!";
+  const welcomeMessage = t('home.welcome_title');
 
   return (
     <div className="bg-gray-50 pb-20 md:pb-0">
@@ -107,7 +107,7 @@ export default function Home() {
                     <Button asChild className="bg-primary hover:bg-orange-600">
                       <Link href="/my-trips">
                         <Plus className="w-4 h-4 mr-2" />
-                        Create Your First Trip
+                        {t('home.create_first_trip')}
                       </Link>
                     </Button>
                   </CardContent>
@@ -122,7 +122,7 @@ export default function Home() {
             <section>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-slate-700">{t('home.popular_routes')}</h2>
-                <Button variant="outline">View All</Button>
+                <Button variant="outline">{t('home.view_all')}</Button>
               </div>
               
               {tripsLoading ? (
@@ -154,16 +154,16 @@ export default function Home() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <TrendingUp className="w-5 h-5 mr-2 text-primary" />
-                  Your Stats
+                  {t('home.your_stats')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Trips Planned</span>
+                  <span className="text-gray-600">{t('home.trips_planned')}</span>
                   <Badge variant="secondary">{userTrips.length}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Countries Visited</span>
+                  <span className="text-gray-600">{t('home.countries_visited')}</span>
                   <Badge variant="secondary">
                     {new Set(userTrips.flatMap((trip: any) => 
                       trip.destinations?.map((d: any) => d.country) || []
@@ -171,7 +171,7 @@ export default function Home() {
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Reviews Written</span>
+                  <span className="text-gray-600">{t('home.reviews_written')}</span>
                   <Badge variant="secondary">
                     {reviews.filter((r: any) => r.userId === (user?.id || 'demo-user')).length}
                   </Badge>
@@ -184,7 +184,7 @@ export default function Home() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <MessageCircle className="w-5 h-5 mr-2 text-secondary" />
-                  Community Activity
+                  {t('home.community_activity')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -228,12 +228,12 @@ export default function Home() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-sm">No recent activity</p>
+                  <p className="text-gray-500 text-sm">{t('home.no_recent_activity')}</p>
                 )}
                 
                 <Button asChild variant="outline" size="sm" className="w-full mt-4">
                   <Link href="/community">
-                    View All Activity
+                    {t('home.view_all_activity')}
                   </Link>
                 </Button>
               </CardContent>
@@ -242,7 +242,7 @@ export default function Home() {
             {/* Quick Actions */}
             <Card>
               <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
+                <CardTitle>{t('home.quick_actions')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button asChild variant="outline" className="w-full justify-start">
@@ -254,13 +254,13 @@ export default function Home() {
                 <Button asChild variant="outline" className="w-full justify-start">
                   <Link href="/budget-tracker" className="block">
                     <DollarSign className="w-4 h-4 mr-2" />
-                    Track Expenses
+                    {t('home.track_expenses')}
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="w-full justify-start">
                   <Link href="/community" className="block">
                     <Users className="w-4 h-4 mr-2" />
-                    Find Travel Buddies
+                    {t('home.find_travel_buddies')}
                   </Link>
                 </Button>
               </CardContent>
