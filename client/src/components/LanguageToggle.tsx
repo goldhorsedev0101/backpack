@@ -13,14 +13,45 @@ export function LanguageToggle() {
     // Set HTML dir attribute based on language
     document.documentElement.dir = i18n.language === 'he' ? 'rtl' : 'ltr';
     document.documentElement.lang = i18n.language;
+    
+    // Update page titles to be localized
+    if (document.title.includes('TripWise')) {
+      const baseName = 'TripWise';
+      document.title = i18n.language === 'he' ? `${baseName} - מתכנן הטיולים` : `${baseName} - Travel Planner`;
+    }
   }, [i18n.language]);
 
-  const toggleLanguage = () => {
+  const toggleLanguage = async () => {
     const newLang = i18n.language === 'en' ? 'he' : 'en';
-    i18n.changeLanguage(newLang);
     
-    // Invalidate all localized queries to trigger refetch with new language
+    await i18n.changeLanguage(newLang);
+    
+    // Enhanced query invalidation to cover all locale-dependent queries
+    queryClient.invalidateQueries({
+      predicate: (query) => {
+        const key = query.queryKey;
+        if (!Array.isArray(key)) return false;
+        
+        // Invalidate queries with locale-dependent data
+        return key.some((segment) => 
+          typeof segment === 'string' && (
+            segment.includes('locale') ||
+            segment.includes('localized') ||
+            segment.includes('destinations') ||
+            segment.includes('attractions') ||
+            segment.includes('restaurants') ||
+            segment.includes('accommodations') ||
+            segment.includes('places') ||
+            segment.includes('community')
+          )
+        );
+      }
+    });
+    
+    // Also use the existing function for backwards compatibility
     invalidateLocalizedQueries(queryClient);
+    
+    console.log(`Language switched to ${newLang}, queries invalidated`);
   };
 
   return (
@@ -28,12 +59,12 @@ export function LanguageToggle() {
       variant="outline"
       size="sm"
       onClick={toggleLanguage}
-      className="flex items-center gap-2"
+      className="flex items-center gap-2 min-w-[70px]"
       data-testid="language-toggle"
     >
       <Globe className="w-4 h-4" />
-      <span className="text-sm">
-        {i18n.language === 'en' ? 'HE' : 'EN'}
+      <span className="text-sm font-medium">
+        {i18n.language === 'en' ? 'עב' : 'EN'}
       </span>
     </Button>
   );

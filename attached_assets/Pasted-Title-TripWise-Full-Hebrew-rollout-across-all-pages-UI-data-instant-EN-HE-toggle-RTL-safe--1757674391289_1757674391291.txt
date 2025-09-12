@@ -1,0 +1,124 @@
+Title: TripWise — Full Hebrew rollout across all pages (UI + data), instant EN/HE toggle, RTL-safe
+
+Goal:
+Make every page respect the language toggle (EN ⇄ HE) for both UI strings and data. Use our Supabase localized RPCs with fallback, keep the planner & My Trips behavior unchanged, and ensure RTL is visually correct.
+
+Do (don’t ask):
+
+Global i18n wiring
+
+Ensure i18n is initialized app-wide and language choice persists (localStorage).
+
+On language change, invalidate & refetch relevant queries. If using React Query: invalidate by a predicate that matches keys with 'locale' | 'localized'.
+
+Apply dir="rtl" for HE on <html> or the root layout; use CSS logical properties (margin-inline, padding-inline, inset-inline, text-align) and avoid hard-coded left/right.
+
+Replace data reads with localized RPCs
+
+Wherever we read base tables, replace with:
+
+get_destinations_localized(p_locale)
+
+get_attractions_localized(p_locale)
+
+get_restaurants_localized(p_locale)
+
+get_accommodations_localized(p_locale)
+
+Selector signature: getLocalized(entity, locale, params?) returning { id, name, description, ... }.
+
+Fallback is handled in SQL; the UI should never display null (use empty string if needed).
+
+Pages to upgrade (UI + data)
+
+/my-trips
+
+Lists/cards: use localized names where we show destination/POI labels.
+
+After Save/Merge/Open → list refetch uses current i18n.language.
+
+/trip/:id (Planner/Editor)
+
+When an item has ref_table/ref_id, hydrate display with the localized name from the appropriate RPC; otherwise fall back to the item’s title.
+
+Reordering/deleting still calls resequence + refresh; no logic change.
+
+/destinations (index/detail) → localized RPC + RTL-proof layouts.
+
+/attractions, /restaurants, /accommodations (lists/detail drawers) → localized RPC, show description only if non-empty.
+
+/achievements & /budget → all UI texts via i18n, numbers/dates via Intl by current locale.
+
+Auth pages/toasts → translate strings; keep behavior unchanged.
+
+Extract all hard-coded UI strings
+
+Run a project-wide scan; move strings into en/translation.json and he/translation.json.
+
+Naming pattern:
+
+nav.home, nav.myTrips, trip.save, trip.saveAndOpen, trip.merge,
+
+planner.day, planner.addItem,
+
+toasts.saved, toasts.alreadySaved, errors.network, errors.auth, etc.
+
+Make sure document.title is localized per page.
+
+Formatting & input
+
+Dates, numbers, currency: Intl.DateTimeFormat/NumberFormat with i18n.language.
+
+RTL inputs: caret alignment, placeholder mirroring, proper ellipsis.
+
+DnD: verify in RTL, fix drag handles/arrows if needed.
+
+Caching & refetch
+
+Query keys must include locale (e.g., ['destinations', locale]) so switching language triggers a fresh fetch.
+
+Implement a central onLanguageChanged handler that:
+
+sets dir,
+
+invalidates all queries with keys containing locale,
+
+refreshes visible pages.
+
+Do NOT change (keep as-is)
+
+Persistence model: trips / itinerary_items and plan_json remain language-agnostic.
+
+Save/Merge/Reorder logic unchanged; only display uses localized labels.
+
+Deliverables
+
+Diff summary (files changed + one-liner per file).
+
+Screenshots:
+
+EN vs HE on /my-trips (cards + header RTL).
+
+Planner open in HE with localized item labels.
+
+One list page (e.g., /accommodations) showing localized data.
+
+One-liner: “✅ All pages localized; instant toggle; RTL-safe; data uses Supabase RPCs with fallback.”
+
+Acceptance criteria:
+
+Switching EN⇄HE updates all pages immediately (no reload): nav, lists, detail drawers, planner, toasts, dialogs.
+
+Data labels are localized (HE preferred, fallback to EN), no null descriptions on screen.
+
+RTL visuals clean: alignment, icons/arrows, DnD, inputs.
+
+Planner continues to save/merge/reorder with no regressions.
+
+Known pitfalls to avoid:
+
+Don’t read base tables directly where RPC exists.
+
+Don’t compare left/right in CSS; use logical properties.
+
+Don’t mutate plan_json on language switch. Display-only hydration is fine.

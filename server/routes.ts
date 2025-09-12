@@ -189,6 +189,100 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Localized data endpoints for each entity type
+  app.get('/api/localized/destinations', async (req, res) => {
+    try {
+      const { locale = 'en', search, limit, offset, country, city, minRating } = req.query;
+      const results = await I18nService.getEntitiesWithTranslations(
+        'destinations',
+        locale as any,
+        search as string
+      );
+      
+      res.json({ success: true, data: results });
+    } catch (error) {
+      console.error('Error fetching localized destinations:', error);
+      res.status(500).json({ error: 'Failed to fetch destinations' });
+    }
+  });
+
+  app.get('/api/localized/attractions', async (req, res) => {
+    try {
+      const { locale = 'en', search, limit, offset, country, city, minRating } = req.query;
+      const results = await I18nService.getEntitiesWithTranslations(
+        'attractions',
+        locale as any,
+        search as string
+      );
+      
+      res.json({ success: true, data: results });
+    } catch (error) {
+      console.error('Error fetching localized attractions:', error);
+      res.status(500).json({ error: 'Failed to fetch attractions' });
+    }
+  });
+
+  app.get('/api/localized/restaurants', async (req, res) => {
+    try {
+      const { locale = 'en', search, limit, offset, country, city, minRating } = req.query;
+      const results = await I18nService.getEntitiesWithTranslations(
+        'restaurants',
+        locale as any,
+        search as string
+      );
+      
+      res.json({ success: true, data: results });
+    } catch (error) {
+      console.error('Error fetching localized restaurants:', error);
+      res.status(500).json({ error: 'Failed to fetch restaurants' });
+    }
+  });
+
+  app.get('/api/localized/accommodations', async (req, res) => {
+    try {
+      const { locale = 'en', search, limit, offset, country, city, minRating } = req.query;
+      const results = await I18nService.getEntitiesWithTranslations(
+        'accommodations',
+        locale as any,
+        search as string
+      );
+      
+      res.json({ success: true, data: results });
+    } catch (error) {
+      console.error('Error fetching localized accommodations:', error);
+      res.status(500).json({ error: 'Failed to fetch accommodations' });
+    }
+  });
+
+  // Get individual localized entity by ID
+  app.get('/api/localized/:entityType/:entityId', async (req, res) => {
+    try {
+      const { entityType, entityId } = req.params;
+      const { locale = 'en' } = req.query;
+      
+      if (!['destinations', 'accommodations', 'attractions', 'restaurants'].includes(entityType)) {
+        return res.status(400).json({ error: 'Invalid entity type' });
+      }
+      
+      const results = await I18nService.getEntitiesWithTranslations(
+        entityType as any,
+        locale as any,
+        undefined
+      );
+      
+      const entity = results.find(item => item.id === parseInt(entityId));
+      
+      if (!entity) {
+        return res.status(404).json({ error: 'Entity not found' });
+      }
+      
+      res.json({ success: true, data: entity });
+    } catch (error) {
+      console.error(`Error fetching localized ${req.params.entityType}:`, error);
+      res.status(500).json({ error: 'Failed to fetch entity' });
+    }
+  });
+
   app.get('/api/test-db', async (_req, res) => {
     try {
       const client = await pool.connect();
