@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -28,6 +29,7 @@ interface ChatSidebarProps {
 }
 
 export function ChatSidebar({ selectedRoom, onRoomSelect, onCreateRoom }: ChatSidebarProps) {
+  const { t } = useTranslation();
   const { data: rooms = [], isLoading, error, refetch } = useQuery({
     queryKey: ['/api/chat-rooms'],
     retry: false
@@ -37,7 +39,7 @@ export function ChatSidebar({ selectedRoom, onRoomSelect, onCreateRoom }: ChatSi
     try {
       return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
     } catch {
-      return 'Recently';
+      return t('community.chat_rooms.recently');
     }
   };
 
@@ -57,7 +59,7 @@ export function ChatSidebar({ selectedRoom, onRoomSelect, onCreateRoom }: ChatSi
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MessageCircle className="w-5 h-5" />
-            Chat Rooms
+            {t('community.chat_rooms.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -80,26 +82,26 @@ export function ChatSidebar({ selectedRoom, onRoomSelect, onCreateRoom }: ChatSi
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MessageCircle className="w-5 h-5" />
-            Chat Rooms
+            {t('community.chat_rooms.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
             <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
             <p className="text-gray-500 mb-4">
-              {error ? 'Unable to load chat rooms' : 'Chat rooms are being set up'}
+              {error ? t('community.chat_rooms.unable_to_load') : t('community.chat_rooms.being_setup')}
             </p>
             <div className="space-y-2">
               {error && (
                 <Button onClick={() => refetch()} variant="outline" size="sm">
                   <RefreshCw className="w-4 h-4 mr-2" />
-                  Retry
+                  {t('community.chat_rooms.retry')}
                 </Button>
               )}
               {onCreateRoom && (
                 <Button onClick={onCreateRoom} variant="outline" size="sm">
                   <Plus className="w-4 h-4 mr-2" />
-                  Create Room
+                  {t('community.chat_rooms.create_room')}
                 </Button>
               )}
             </div>
@@ -115,7 +117,7 @@ export function ChatSidebar({ selectedRoom, onRoomSelect, onCreateRoom }: ChatSi
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <MessageCircle className="w-5 h-5" />
-            Chat Rooms
+            {t('community.chat_rooms.title')}
           </CardTitle>
           {onCreateRoom && (
             <Button onClick={onCreateRoom} variant="outline" size="sm">
@@ -131,8 +133,8 @@ export function ChatSidebar({ selectedRoom, onRoomSelect, onCreateRoom }: ChatSi
             {rooms.length === 0 ? (
               <div className="text-center py-8">
                 <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-500 mb-4">No chat rooms yet</p>
-                <p className="text-sm text-gray-400 mb-4">Be the first to start a conversation! 👋</p>
+                <p className="text-gray-500 mb-4">{t('community.chat_rooms.no_rooms_yet')}</p>
+                <p className="text-sm text-gray-400 mb-4">{t('community.chat_rooms.be_first_to_start')}</p>
                 {onCreateRoom && (
                   <Button onClick={onCreateRoom} variant="outline" size="sm">
                     <Plus className="w-4 h-4 mr-2" />
@@ -163,10 +165,10 @@ export function ChatSidebar({ selectedRoom, onRoomSelect, onCreateRoom }: ChatSi
                           {room.name}
                         </h3>
                         {room.type === 'private' && (
-                          <Badge variant="outline" className="text-xs px-1">Private</Badge>
+                          <Badge variant="outline" className="text-xs px-1">{t('community.chat_rooms.private')}</Badge>
                         )}
                         {!room.isActive && (
-                          <Badge variant="secondary" className="text-xs">Inactive</Badge>
+                          <Badge variant="secondary" className="text-xs">{t('community.chat_rooms.inactive')}</Badge>
                         )}
                       </div>
                       

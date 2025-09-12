@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -45,6 +46,7 @@ interface TravelBuddyListProps {
 }
 
 export function TravelBuddyList({ onCreatePost }: TravelBuddyListProps) {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('all');
   const [selectedBudget, setSelectedBudget] = useState('all');
@@ -61,7 +63,7 @@ export function TravelBuddyList({ onCreatePost }: TravelBuddyListProps) {
       const end = format(new Date(endDate), 'MMM d, yyyy');
       return `${start} - ${end}`;
     } catch {
-      return 'Date TBD';
+      return t('community.travel_buddies.date_tbd');
     }
   };
 
@@ -69,7 +71,7 @@ export function TravelBuddyList({ onCreatePost }: TravelBuddyListProps) {
     try {
       return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
     } catch {
-      return 'Recently';
+      return t('community.travel_buddies.recently');
     }
   };
 
@@ -147,15 +149,15 @@ export function TravelBuddyList({ onCreatePost }: TravelBuddyListProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold mb-2">Find Travel Companions</h2>
+          <h2 className="text-xl font-semibold mb-2">{t('community.travel_buddies.title')}</h2>
           <p className="text-gray-600">
-            Connect with like-minded travelers planning similar adventures
+            {t('community.travel_buddies.description')}
           </p>
         </div>
         {onCreatePost && (
           <Button onClick={onCreatePost} className="gap-2">
             <Plus className="w-4 h-4" />
-            New Post
+            {t('community.travel_buddies.new_post')}
           </Button>
         )}
       </div>
@@ -165,7 +167,7 @@ export function TravelBuddyList({ onCreatePost }: TravelBuddyListProps) {
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           <Input
-            placeholder="Search destinations, activities, or trip details..."
+            placeholder={t('community.travel_buddies.search_placeholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -175,29 +177,29 @@ export function TravelBuddyList({ onCreatePost }: TravelBuddyListProps) {
         <div className="flex gap-2">
           <Select value={selectedCountry} onValueChange={setSelectedCountry}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="Country" />
+              <SelectValue placeholder={t('community.travel_buddies.country')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Countries</SelectItem>
-              <SelectItem value="peru">Peru</SelectItem>
-              <SelectItem value="colombia">Colombia</SelectItem>
-              <SelectItem value="bolivia">Bolivia</SelectItem>
-              <SelectItem value="chile">Chile</SelectItem>
-              <SelectItem value="argentina">Argentina</SelectItem>
-              <SelectItem value="brazil">Brazil</SelectItem>
-              <SelectItem value="ecuador">Ecuador</SelectItem>
+              <SelectItem value="all">{t('community.travel_buddies.all_countries')}</SelectItem>
+              <SelectItem value="peru">{t('countries.peru')}</SelectItem>
+              <SelectItem value="colombia">{t('countries.colombia')}</SelectItem>
+              <SelectItem value="bolivia">{t('countries.bolivia')}</SelectItem>
+              <SelectItem value="chile">{t('countries.chile')}</SelectItem>
+              <SelectItem value="argentina">{t('countries.argentina')}</SelectItem>
+              <SelectItem value="brazil">{t('countries.brazil')}</SelectItem>
+              <SelectItem value="ecuador">{t('countries.ecuador')}</SelectItem>
             </SelectContent>
           </Select>
 
           <Select value={selectedBudget} onValueChange={setSelectedBudget}>
             <SelectTrigger className="w-32">
-              <SelectValue placeholder="Budget" />
+              <SelectValue placeholder={t('community.travel_buddies.budget')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Budgets</SelectItem>
-              <SelectItem value="low">💰 Budget</SelectItem>
-              <SelectItem value="mid">💰💰 Mid-range</SelectItem>
-              <SelectItem value="high">💰💰💰 Luxury</SelectItem>
+              <SelectItem value="all">{t('community.travel_buddies.all_budgets')}</SelectItem>
+              <SelectItem value="low">{t('community.travel_buddies.budget_low')}</SelectItem>
+              <SelectItem value="mid">{t('community.travel_buddies.budget_mid')}</SelectItem>
+              <SelectItem value="high">{t('community.travel_buddies.budget_high')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -208,29 +210,29 @@ export function TravelBuddyList({ onCreatePost }: TravelBuddyListProps) {
         <div className="text-center py-12">
           <div className="text-6xl mb-4">🎒</div>
           <h3 className="text-lg font-medium text-gray-600 mb-2">
-            {error ? 'Unable to load travel buddy posts' : 'Travel buddy board is being set up'}
+            {error ? t('community.travel_buddies.unable_to_load') : t('community.travel_buddies.being_setup')}
           </h3>
           <p className="text-gray-500 mb-6">
-            {error ? 'Please check your connection and try again' : 'Posts will appear here once the database is ready'}
+            {error ? t('community.travel_buddies.check_connection') : t('community.travel_buddies.posts_will_appear')}
           </p>
           {onCreatePost && (
             <Button onClick={onCreatePost} variant="outline">
               <Plus className="w-4 h-4 mr-2" />
-              Create First Post
+              {t('community.travel_buddies.create_first_post')}
             </Button>
           )}
         </div>
       ) : filteredPosts.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">🔍</div>
-          <h3 className="text-lg font-medium text-gray-600 mb-2">No matching posts found</h3>
+          <h3 className="text-lg font-medium text-gray-600 mb-2">{t('community.travel_buddies.no_matching_posts')}</h3>
           <p className="text-gray-500 mb-6">
-            Try adjusting your search or filters, or create a new post to find travel companions
+            {t('community.travel_buddies.adjust_search')}
           </p>
           {onCreatePost && (
             <Button onClick={onCreatePost} variant="outline">
               <Plus className="w-4 h-4 mr-2" />
-              Create New Post
+              {t('community.travel_buddies.create_new_post')}
             </Button>
           )}
         </div>
@@ -275,11 +277,11 @@ export function TravelBuddyList({ onCreatePost }: TravelBuddyListProps) {
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Users className="w-4 h-4" />
-                    <span>{post.current_members}/{post.group_size} members</span>
+                    <span>{post.current_members}/{post.group_size} {t('community.travel_buddies.members')}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <Clock className="w-4 h-4" />
-                    <span>Posted {formatTimeAgo(post.created_at)}</span>
+                    <span>{t('community.travel_buddies.posted')} {formatTimeAgo(post.created_at)}</span>
                   </div>
                 </div>
 
@@ -309,7 +311,7 @@ export function TravelBuddyList({ onCreatePost }: TravelBuddyListProps) {
                 <div className="flex gap-2">
                   <Button className="flex-1" size="sm">
                     <MessageCircle className="w-4 h-4 mr-2" />
-                    Contact
+                    {t('community.travel_buddies.contact')}
                   </Button>
                   <Button variant="outline" size="sm">
                     <Heart className="w-4 h-4" />
@@ -319,7 +321,7 @@ export function TravelBuddyList({ onCreatePost }: TravelBuddyListProps) {
                 {/* Requirements */}
                 {post.requirements && (
                   <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
-                    <strong>Requirements:</strong> {post.requirements}
+                    <strong>{t('community.travel_buddies.requirements')}</strong> {post.requirements}
                   </div>
                 )}
               </CardContent>

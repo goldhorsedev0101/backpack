@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
@@ -38,6 +39,7 @@ const StarRating = ({ rating }: { rating: number }) => {
 };
 
 export default function Community() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('all');
   
@@ -85,10 +87,10 @@ export default function Community() {
     <div className="container mx-auto py-6 px-4">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          TripWise Community
+          {t('community.title')}
         </h1>
         <p className="text-gray-600">
-          Connect with fellow travelers, share experiences, and find travel companions
+          {t('community.description')}
         </p>
       </div>
 
@@ -97,7 +99,7 @@ export default function Community() {
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           <Input
-            placeholder="Search reviews, chat rooms, or destinations..."
+            placeholder={t('community.search_placeholder')}
             value={searchTerm}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -105,17 +107,17 @@ export default function Community() {
         </div>
         <Select value={selectedLocation} onValueChange={setSelectedLocation}>
           <SelectTrigger className="w-48">
-            <SelectValue placeholder="Filter by location" />
+            <SelectValue placeholder={t('community.filter_by_location')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Locations</SelectItem>
-            <SelectItem value="Peru">Peru</SelectItem>
-            <SelectItem value="Colombia">Colombia</SelectItem>
-            <SelectItem value="Bolivia">Bolivia</SelectItem>
-            <SelectItem value="Chile">Chile</SelectItem>
-            <SelectItem value="Argentina">Argentina</SelectItem>
-            <SelectItem value="Brazil">Brazil</SelectItem>
-            <SelectItem value="Ecuador">Ecuador</SelectItem>
+            <SelectItem value="all">{t('community.all_locations')}</SelectItem>
+            <SelectItem value="Peru">{t('countries.peru')}</SelectItem>
+            <SelectItem value="Colombia">{t('countries.colombia')}</SelectItem>
+            <SelectItem value="Bolivia">{t('countries.bolivia')}</SelectItem>
+            <SelectItem value="Chile">{t('countries.chile')}</SelectItem>
+            <SelectItem value="Argentina">{t('countries.argentina')}</SelectItem>
+            <SelectItem value="Brazil">{t('countries.brazil')}</SelectItem>
+            <SelectItem value="Ecuador">{t('countries.ecuador')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -124,16 +126,16 @@ export default function Community() {
         <div className="overflow-x-auto">
           <TabsList className="inline-flex w-auto min-w-full justify-evenly h-10">
             <TabsTrigger value="reviews" className="whitespace-nowrap">
-              Place Reviews
+              {t('community.tabs.reviews')}
             </TabsTrigger>
             <TabsTrigger value="chat" className="whitespace-nowrap">
-              Chat Rooms
+              {t('community.tabs.chat')}
             </TabsTrigger>
             <TabsTrigger value="dms" className="whitespace-nowrap">
-              Direct Messages
+              {t('community.tabs.direct_messages')}
             </TabsTrigger>
             <TabsTrigger value="buddies" className="whitespace-nowrap">
-              Travel Buddies
+              {t('community.tabs.travel_buddies')}
             </TabsTrigger>
           </TabsList>
         </div>
@@ -144,9 +146,9 @@ export default function Community() {
         
         <TabsContent value="old-reviews" className="mt-6 hidden">
           <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">Authentic Place Reviews</h2>
+            <h2 className="text-xl font-semibold mb-2">{t('community.reviews.authentic_title')}</h2>
             <p className="text-gray-600">
-              Real reviews from travelers who've been there, with detailed ratings and tips
+              {t('community.reviews.authentic_description')}
             </p>
           </div>
           
@@ -171,11 +173,10 @@ export default function Community() {
             <div className="text-center py-12">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-2xl mx-auto">
                 <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                  Setting up the database...
+                  {t('community.reviews.database_setup_title')}
                 </h3>
                 <p className="text-blue-700">
-                  The community features are being initialized. This happens when the database is first set up.
-                  Your data will appear here once the setup is complete.
+                  {t('community.reviews.database_setup_description')}
                 </p>
               </div>
             </div>
@@ -186,7 +187,7 @@ export default function Community() {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <CardTitle className="text-lg">{review.title || 'Review'}</CardTitle>
+                        <CardTitle className="text-lg">{review.title || t('community.reviews.default_title')}</CardTitle>
                         <CardDescription className="flex items-center gap-2 mt-1">
                           <MapPin className="w-4 h-4" />
                           {review.place_name || review.placeName} • {review.location}
@@ -194,7 +195,7 @@ export default function Community() {
                             {review.place_type || review.placeType}
                           </Badge>
                           {review.is_verified && (
-                            <Badge className="bg-green-100 text-green-800">Verified</Badge>
+                            <Badge className="bg-green-100 text-green-800">{t('community.reviews.verified')}</Badge>
                           )}
                         </CardDescription>
                       </div>
@@ -218,16 +219,16 @@ export default function Community() {
                     {/* Trip Details */}
                     <div className="text-sm text-gray-600">
                       {review.visited_date && (
-                        <p>Visited: {new Date(review.visited_date).toLocaleDateString()}</p>
+                        <p>{t('community.reviews.visited')}: {new Date(review.visited_date).toLocaleDateString()}</p>
                       )}
-                      {review.trip_duration && <p>Trip Duration: {review.trip_duration}</p>}
-                      {review.travel_style && <p>Travel Style: {review.travel_style}</p>}
+                      {review.trip_duration && <p>{t('community.reviews.trip_duration')}: {review.trip_duration}</p>}
+                      {review.travel_style && <p>{t('community.reviews.travel_style')}: {review.travel_style}</p>}
                     </div>
                   </CardContent>
                 </Card>
               )) : (
                 <div className="col-span-full text-center py-8">
-                  <p className="text-gray-500">No reviews found. Be the first to share your experience!</p>
+                  <p className="text-gray-500">{t('community.reviews.no_reviews')}</p>
                 </div>
               )}
             </div>
@@ -261,9 +262,9 @@ export default function Community() {
         
         <TabsContent value="dms" className="mt-6">
           <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">Direct Messages</h2>
+            <h2 className="text-xl font-semibold mb-2">{t('community.direct_messages.title')}</h2>
             <p className="text-gray-600">
-              Private conversations with fellow travelers
+              {t('community.direct_messages.description')}
             </p>
           </div>
           <div className="flex h-[600px] gap-4">
@@ -277,7 +278,7 @@ export default function Community() {
             <RoomView 
               roomId={selectedDMRoom}
               roomName={selectedDMUser ? `${selectedDMUser}` : undefined}
-              roomDescription={selectedDMUser ? `Direct message with ${selectedDMUser}` : undefined}
+              roomDescription={selectedDMUser ? t('community.direct_messages.with_user', { user: selectedDMUser }) : undefined}
               isPrivate={true}
               onNavigateToDM={(dmRoomId) => {
                 setSelectedDMRoom(dmRoomId);
@@ -324,6 +325,7 @@ function CreateRoomModal({
   onOpenChange: (open: boolean) => void; 
   onRoomCreated: (roomId: number, roomName: string, roomType?: string) => void;
 }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -344,7 +346,7 @@ function CreateRoomModal({
       const currentGuestName = roomData.guestName || storedGuestName;
       
       if (!currentGuestName) {
-        throw new Error('Guest name is required');
+        throw new Error(t('community.create_room.errors.guest_name_required'));
       }
 
       // Save guest name to localStorage
@@ -426,8 +428,8 @@ function CreateRoomModal({
       onRoomCreated(room.id, room.name, room.type);
       
       toast({
-        title: "Room Created",
-        description: `Successfully created "${room.name}"`,
+        title: t('community.create_room.success.title'),
+        description: t('community.create_room.success.description', { roomName: room.name }),
       });
     },
     onError: (error: any) => {
@@ -435,20 +437,20 @@ function CreateRoomModal({
       
       if (error.code === '42501' || error.message?.includes('permission') || error.message?.includes('policy')) {
         toast({
-          title: "Permission Denied",
-          description: "No permission to create rooms in current environment. Check docs/community-rls.md for DEV policy setup.",
+          title: t('community.create_room.errors.permission_denied'),
+          description: t('community.create_room.errors.permission_denied_description'),
           variant: "destructive",
         });
       } else if (error.code === '23505' || error.message?.includes('unique')) {
         toast({
-          title: "Room Name Taken",
-          description: "A room with this name already exists. Please choose a different name.",
+          title: t('community.create_room.errors.name_taken'),
+          description: t('community.create_room.errors.name_taken_description'),
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Failed to Create Room",
-          description: error.message || "An unexpected error occurred",
+          title: t('community.create_room.errors.failed'),
+          description: error.message || t('community.create_room.errors.unexpected'),
           variant: "destructive",
         });
       }
@@ -461,8 +463,8 @@ function CreateRoomModal({
     // Validation
     if (!formData.name.trim()) {
       toast({
-        title: "Room Name Required",
-        description: "Please enter a name for the room",
+        title: t('community.create_room.errors.name_required'),
+        description: t('community.create_room.errors.name_required_description'),
         variant: "destructive",
       });
       return;
@@ -470,8 +472,8 @@ function CreateRoomModal({
 
     if (formData.name.length < 2 || formData.name.length > 60) {
       toast({
-        title: "Invalid Room Name",
-        description: "Room name must be between 2-60 characters",
+        title: t('community.create_room.errors.invalid_name'),
+        description: t('community.create_room.errors.invalid_name_description'),
         variant: "destructive",
       });
       return;
@@ -479,8 +481,8 @@ function CreateRoomModal({
 
     if (formData.description.length > 200) {
       toast({
-        title: "Description Too Long",
-        description: "Description must be under 200 characters",
+        title: t('community.create_room.errors.description_too_long'),
+        description: t('community.create_room.errors.description_too_long_description'),
         variant: "destructive",
       });
       return;
@@ -491,8 +493,8 @@ function CreateRoomModal({
       const invitedGuests = formData.inviteGuests.trim();
       if (!invitedGuests) {
         toast({
-          title: "Participants Required",
-          description: "Private rooms must have at least one invited participant",
+          title: t('community.create_room.errors.participants_required'),
+          description: t('community.create_room.errors.participants_required_description'),
           variant: "destructive",
         });
         return;
@@ -502,8 +504,8 @@ function CreateRoomModal({
     const guestName = formData.guestName || storedGuestName;
     if (!guestName) {
       toast({
-        title: "Your Name Required",
-        description: "Please enter your name to create a room",
+        title: t('community.create_room.errors.your_name_required'),
+        description: t('community.create_room.errors.your_name_required_description'),
         variant: "destructive",
       });
       return;
@@ -516,41 +518,41 @@ function CreateRoomModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Create New Chat Room</DialogTitle>
+          <DialogTitle>{t('community.create_room.title')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="room-name">Room Name *</Label>
+            <Label htmlFor="room-name">{t('community.create_room.room_name')}</Label>
             <Input
               id="room-name"
-              placeholder="e.g., Peru Travel Planning"
+              placeholder={t('community.create_room.room_name_placeholder')}
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               maxLength={60}
               disabled={createRoomMutation.isPending}
             />
-            <p className="text-xs text-gray-500 mt-1">{formData.name.length}/60 characters</p>
+            <p className="text-xs text-gray-500 mt-1">{t('community.create_room.character_count', { current: formData.name.length, max: 60 })}</p>
           </div>
 
           <div>
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('community.create_room.description')}</Label>
             <Textarea
               id="description"
-              placeholder="Brief description of what this room is for..."
+              placeholder={t('community.create_room.description_placeholder')}
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               maxLength={200}
               disabled={createRoomMutation.isPending}
               rows={3}
             />
-            <p className="text-xs text-gray-500 mt-1">{formData.description.length}/200 characters</p>
+            <p className="text-xs text-gray-500 mt-1">{t('community.create_room.character_count', { current: formData.description.length, max: 200 })}</p>
           </div>
 
           <div>
-            <Label htmlFor="destination">Location/Country</Label>
+            <Label htmlFor="destination">{t('community.create_room.location')}</Label>
             <Input
               id="destination"
-              placeholder="e.g., Peru, Colombia, Chile"
+              placeholder={t('community.create_room.location_placeholder')}
               value={formData.destination}
               onChange={(e) => setFormData(prev => ({ ...prev, destination: e.target.value }))}
               disabled={createRoomMutation.isPending}
@@ -558,7 +560,7 @@ function CreateRoomModal({
           </div>
 
           <div>
-            <Label>Room Visibility</Label>
+            <Label>{t('community.create_room.visibility')}</Label>
             <RadioGroup
               value={formData.visibility}
               onValueChange={(value) => setFormData(prev => ({ ...prev, visibility: value }))}
@@ -567,37 +569,37 @@ function CreateRoomModal({
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="public" id="public" />
-                <Label htmlFor="public" className="cursor-pointer">Public - Anyone can join</Label>
+                <Label htmlFor="public" className="cursor-pointer">{t('community.create_room.public_label')}</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="private" id="private" />
-                <Label htmlFor="private" className="cursor-pointer">🔒 Private - Invite only</Label>
+                <Label htmlFor="private" className="cursor-pointer">{t('community.create_room.private_label')}</Label>
               </div>
             </RadioGroup>
           </div>
 
           {formData.visibility === 'private' && (
             <div>
-              <Label htmlFor="invite-guests">Invite Participants *</Label>
+              <Label htmlFor="invite-guests">{t('community.create_room.invite_participants')}</Label>
               <Input
                 id="invite-guests"
-                placeholder="Guest names separated by commas (e.g., Alice, Bob, Charlie)"
+                placeholder={t('community.create_room.invite_placeholder')}
                 value={formData.inviteGuests}
                 onChange={(e) => setFormData(prev => ({ ...prev, inviteGuests: e.target.value }))}
                 disabled={createRoomMutation.isPending}
               />
               <p className="text-xs text-gray-500 mt-1">
-                Enter guest names separated by commas. They will be added to the private room.
+                {t('community.create_room.invite_help')}
               </p>
             </div>
           )}
 
           {!storedGuestName && (
             <div>
-              <Label htmlFor="guest-name">Your Name *</Label>
+              <Label htmlFor="guest-name">{t('community.create_room.your_name')}</Label>
               <Input
                 id="guest-name"
-                placeholder="Enter your name"
+                placeholder={t('community.create_room.name_placeholder')}
                 value={formData.guestName}
                 onChange={(e) => setFormData(prev => ({ ...prev, guestName: e.target.value }))}
                 disabled={createRoomMutation.isPending}

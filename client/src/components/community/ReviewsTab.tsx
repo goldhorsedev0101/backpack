@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -23,6 +24,7 @@ import {
 } from '../../lib/reviewsApi';
 
 export function ReviewsTab() {
+  const { t } = useTranslation();
   const [filters, setFilters] = useState<ReviewFilters>({
     search: '',
     entityType: 'all',
@@ -132,8 +134,8 @@ export function ReviewsTab() {
     queryClient.invalidateQueries({ queryKey: ['place-reviews'] });
     setShowWriteModal(false);
     toast({
-      title: "Review Created",
-      description: "Your review has been published successfully!",
+      title: t('community.reviews.review_created'),
+      description: t('community.reviews.review_created_desc'),
     });
   };
 
@@ -141,16 +143,16 @@ export function ReviewsTab() {
     queryClient.invalidateQueries({ queryKey: ['place-reviews'] });
     setEditingReview(null);
     toast({
-      title: "Review Updated",
-      description: "Your review has been updated successfully!",
+      title: t('community.reviews.review_updated'),
+      description: t('community.reviews.review_updated_desc'),
     });
   };
 
   const handleReviewDeleted = () => {
     queryClient.invalidateQueries({ queryKey: ['place-reviews'] });
     toast({
-      title: "Review Deleted",
-      description: "Your review has been deleted.",
+      title: t('community.reviews.review_deleted'),
+      description: t('community.reviews.review_deleted_desc'),
     });
   };
 
@@ -166,13 +168,13 @@ export function ReviewsTab() {
         <CardContent className="p-8">
           <div className="text-center">
             <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Unable to Load Reviews</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('community.reviews.unable_to_load')}</h3>
             <p className="text-gray-500 mb-4">
-              {reviewsError instanceof Error ? reviewsError.message : 'Failed to fetch reviews'}
+              {reviewsError instanceof Error ? reviewsError.message : t('community.reviews.failed_to_fetch')}
             </p>
             <Button onClick={() => refetchReviews()} variant="outline">
               <RefreshCw className="w-4 h-4 mr-2" />
-              Try Again
+              {t('community.reviews.try_again')}
             </Button>
           </div>
         </CardContent>
@@ -188,11 +190,11 @@ export function ReviewsTab() {
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Star className="w-5 h-5" />
-              Place Reviews
+              {t('community.reviews.place_reviews')}
             </CardTitle>
             <Button onClick={() => setShowWriteModal(true)}>
               <Plus className="w-4 h-4 mr-2" />
-              Write a Review
+              {t('community.reviews.write_review')}
             </Button>
           </div>
         </CardHeader>
@@ -202,7 +204,7 @@ export function ReviewsTab() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
-                placeholder="Search reviews..."
+                placeholder={t('community.reviews.search_reviews')}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 className="pl-10"
@@ -215,14 +217,14 @@ export function ReviewsTab() {
               onValueChange={(value) => handleFilterChange('entityType', value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="All Types" />
+                <SelectValue placeholder={t('community.reviews.all_types')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="destinations">Destinations</SelectItem>
-                <SelectItem value="accommodations">Accommodations</SelectItem>
-                <SelectItem value="attractions">Attractions</SelectItem>
-                <SelectItem value="restaurants">Restaurants</SelectItem>
+                <SelectItem value="all">{t('community.reviews.all_types')}</SelectItem>
+                <SelectItem value="destinations">{t('community.reviews.destinations')}</SelectItem>
+                <SelectItem value="accommodations">{t('community.reviews.accommodations')}</SelectItem>
+                <SelectItem value="attractions">{t('community.reviews.attractions')}</SelectItem>
+                <SelectItem value="restaurants">{t('community.reviews.restaurants')}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -232,14 +234,14 @@ export function ReviewsTab() {
               onValueChange={(value) => handleFilterChange('minRating', parseInt(value))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Min Rating" />
+                <SelectValue placeholder={t('community.reviews.min_rating')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">1+ Stars</SelectItem>
-                <SelectItem value="2">2+ Stars</SelectItem>
-                <SelectItem value="3">3+ Stars</SelectItem>
-                <SelectItem value="4">4+ Stars</SelectItem>
-                <SelectItem value="5">5 Stars Only</SelectItem>
+                <SelectItem value="1">{t('community.reviews.stars_1_plus')}</SelectItem>
+                <SelectItem value="2">{t('community.reviews.stars_2_plus')}</SelectItem>
+                <SelectItem value="3">{t('community.reviews.stars_3_plus')}</SelectItem>
+                <SelectItem value="4">{t('community.reviews.stars_4_plus')}</SelectItem>
+                <SelectItem value="5">{t('community.reviews.stars_5_only')}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -249,13 +251,13 @@ export function ReviewsTab() {
               onValueChange={(value) => handleFilterChange('sortBy', value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Sort By" />
+                <SelectValue placeholder={t('community.reviews.sort_by')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="newest">Newest First</SelectItem>
-                <SelectItem value="top_rated">Top Rated</SelectItem>
-                <SelectItem value="lowest_rated">Lowest Rated</SelectItem>
-                <SelectItem value="most_helpful">Most Helpful</SelectItem>
+                <SelectItem value="newest">{t('community.reviews.newest_first')}</SelectItem>
+                <SelectItem value="top_rated">{t('community.reviews.top_rated')}</SelectItem>
+                <SelectItem value="lowest_rated">{t('community.reviews.lowest_rated')}</SelectItem>
+                <SelectItem value="most_helpful">{t('community.reviews.most_helpful')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -264,7 +266,7 @@ export function ReviewsTab() {
           <div className="flex flex-wrap gap-2 mt-4">
             {filters.search && (
               <Badge variant="secondary" className="flex items-center gap-1">
-                Search: {filters.search}
+                {t('community.reviews.search_label')} {filters.search}
                 <button 
                   onClick={() => {
                     setSearchInput('');
@@ -278,7 +280,7 @@ export function ReviewsTab() {
             )}
             {filters.entityType !== 'all' && (
               <Badge variant="secondary" className="flex items-center gap-1">
-                Type: {filters.entityType}
+                {t('community.reviews.type_label')} {filters.entityType}
                 <button 
                   onClick={() => handleFilterChange('entityType', 'all')}
                   className="ml-1 hover:text-red-600"
@@ -289,7 +291,7 @@ export function ReviewsTab() {
             )}
             {filters.minRating && filters.minRating > 1 && (
               <Badge variant="secondary" className="flex items-center gap-1">
-                {filters.minRating}+ Stars
+                {t('community.reviews.rating_label')} {filters.minRating}+
                 <button 
                   onClick={() => handleFilterChange('minRating', 1)}
                   className="ml-1 hover:text-red-600"
@@ -308,21 +310,21 @@ export function ReviewsTab() {
           {reviewsLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-              <span className="ml-2 text-gray-600">Loading reviews...</span>
+              <span className="ml-2 text-gray-600">{t('community.reviews.loading_reviews')}</span>
             </div>
           ) : enrichedReviews.length === 0 ? (
             <div className="text-center py-12">
               <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No Reviews Found</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('community.reviews.no_reviews_found')}</h3>
               <p className="text-gray-500 mb-4">
                 {filters.search || filters.entityType !== 'all' || (filters.minRating && filters.minRating > 1)
-                  ? 'Try adjusting your filters to see more reviews.'
-                  : 'Be the first to share your travel experience!'
+                  ? t('community.reviews.adjust_filters')
+                  : t('community.reviews.be_first_to_share')
                 }
               </p>
               <Button onClick={() => setShowWriteModal(true)} variant="outline">
                 <Plus className="w-4 h-4 mr-2" />
-                Write the First Review
+                {t('community.reviews.write_first_review')}
               </Button>
             </div>
           ) : (
@@ -349,9 +351,11 @@ export function ReviewsTab() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-600">
-                Showing {(filters.page || 0) * (filters.limit || 20) + 1} to{' '}
-                {Math.min(((filters.page || 0) + 1) * (filters.limit || 20), reviewsData.total)} of{' '}
-                {reviewsData.total} reviews
+                {t('community.reviews.showing_results', {
+                  start: (filters.page || 0) * (filters.limit || 20) + 1,
+                  end: Math.min(((filters.page || 0) + 1) * (filters.limit || 20), reviewsData.total),
+                  total: reviewsData.total
+                })}
               </div>
               <div className="flex items-center space-x-2">
                 <Button
@@ -360,10 +364,13 @@ export function ReviewsTab() {
                   onClick={() => handlePageChange((filters.page || 0) - 1)}
                   disabled={!filters.page || filters.page === 0}
                 >
-                  Previous
+                  {t('community.reviews.previous')}
                 </Button>
                 <span className="text-sm text-gray-600">
-                  Page {(filters.page || 0) + 1} of {reviewsData.totalPages}
+                  {t('community.reviews.page_info', {
+                    current: (filters.page || 0) + 1,
+                    total: reviewsData.totalPages
+                  })}
                 </span>
                 <Button
                   variant="outline"
@@ -371,7 +378,7 @@ export function ReviewsTab() {
                   onClick={() => handlePageChange((filters.page || 0) + 1)}
                   disabled={(filters.page || 0) >= reviewsData.totalPages - 1}
                 >
-                  Next
+                  {t('community.reviews.next')}
                 </Button>
               </div>
             </div>
