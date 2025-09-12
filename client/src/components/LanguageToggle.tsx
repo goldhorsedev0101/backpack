@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Button } from './ui/button';
+import { Button } from './ui/button.js';
 import { Globe } from 'lucide-react';
 import { useEffect } from 'react';
 

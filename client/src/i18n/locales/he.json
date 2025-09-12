@@ -12,6 +12,7 @@
   "auth": {
     "sign_in": "התחבר",
     "sign_out": "התנתק",
+    "create_account": "צור חשבון",
     "welcome_back": "ברוך הבא {{email}}",
     "goodbye": "להתראות!",
     "login_error": "שגיאה בהתחברות",

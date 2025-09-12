@@ -12,6 +12,7 @@
   "auth": {
     "sign_in": "Sign In",
     "sign_out": "Sign Out",
+    "create_account": "Create Account",
     "welcome_back": "Welcome back {{email}}",
     "goodbye": "Goodbye!",
     "login_error": "Login Error",

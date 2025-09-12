@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "../context/AuthContext.js";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { queryClient } from "@/lib/queryClient";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AuthModal } from "./auth/AuthModal.js";
+import { LanguageToggle } from "./LanguageToggle.js";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,24 +35,28 @@ import {
   Cloud,
 } from "lucide-react";
 
-const navigationItems = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/my-trips", label: "Plan Trip", icon: Calendar },
-  { href: "/explore", label: "Explore", icon: MapPin },
-  { href: "/weather", label: "Weather", icon: Cloud },
-  { href: "/community", label: "Community", icon: Users },
-  { href: "/achievements", label: "Achievements", icon: Trophy },
-  { href: "/budget-tracker", label: "Budget", icon: DollarSign },
-  { href: "/dashboard", label: "Database Dashboard", icon: Database },
+// Navigation items will be translated dynamically
+const getNavigationItems = (t: any) => [
+  { href: "/", label: t('navigation.home'), icon: Home },
+  { href: "/my-trips", label: t('navigation.my_trips'), icon: Calendar },
+  { href: "/explore", label: t('navigation.explore'), icon: MapPin },
+  { href: "/weather", label: t('navigation.weather'), icon: Cloud },
+  { href: "/community", label: t('navigation.community'), icon: Users },
+  { href: "/achievements", label: t('navigation.achievements'), icon: Trophy },
+  { href: "/budget-tracker", label: t('navigation.budget_tracker'), icon: DollarSign },
+  { href: "/dashboard", label: t('navigation.dashboard'), icon: Database },
 ];
 
 export default function Navigation() {
   const [location] = useLocation();
   const { user, signOut, isLoading } = useAuth();
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const { isVisible } = useScrollDirection();
+  
+  const navigationItems = getNavigationItems(t);
 
   const handleLogout = async () => {
     try {
@@ -200,11 +206,14 @@ export default function Navigation() {
     <>
       {/* Desktop Right Sidebar */}
       <aside className="fixed top-0 right-0 h-full w-64 bg-white shadow-2xl border-l border-gray-200 z-50 hidden md:flex flex-col">
-        {/* Sidebar Header with Logo */}
+        {/* Sidebar Header with Logo and Language Toggle */}
         <div className="p-6 border-b border-gray-200">
-          <Link href="/" className="flex items-center justify-center">
+          <Link href="/" className="flex items-center justify-center mb-4">
             <img src={logoCompact} alt="TripWise" className="h-10" />
           </Link>
+          <div className="flex justify-center">
+            <LanguageToggle />
+          </div>
         </div>
         
         {/* Navigation Items */}
@@ -254,7 +263,7 @@ export default function Navigation() {
                 className="w-full justify-start px-4 py-3 text-slate-700 border-gray-300 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
               >
                 <LogOut className="w-5 h-5 mr-3" />
-                {isLoading ? "Signing Out..." : "Sign Out"}
+                {isLoading ? t('common.loading') : t('auth.sign_out')}
               </Button>
             </>
           ) : (
@@ -265,7 +274,7 @@ export default function Navigation() {
                 disabled={isLoading}
               >
                 <User className="w-5 h-5 mr-2" />
-                Sign In
+                {t('auth.sign_in')}
               </Button>
               <Button
                 onClick={() => setAuthModalOpen(true)}
@@ -273,7 +282,7 @@ export default function Navigation() {
                 className="w-full"
                 disabled={isLoading}
               >
-                Create Account
+                {t('auth.create_account')}
               </Button>
             </div>
           )}

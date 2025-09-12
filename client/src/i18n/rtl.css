@@ -1,0 +1,129 @@
+/* RTL Support for Hebrew */
+[dir="rtl"] {
+  direction: rtl;
+}
+
+/* Navigation adjustments for RTL */
+[dir="rtl"] .fixed.right-0 {
+  right: auto;
+  left: 0;
+}
+
+[dir="rtl"] .md\\:pr-64 {
+  padding-right: 0;
+  padding-left: 16rem; /* 64 * 0.25rem */
+}
+
+/* Text alignment for RTL */
+[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+/* Margin and padding adjustments */
+[dir="rtl"] .mr-3 {
+  margin-right: 0;
+  margin-left: 0.75rem;
+}
+
+[dir="rtl"] .ml-3 {
+  margin-left: 0;
+  margin-right: 0.75rem;
+}
+
+[dir="rtl"] .mr-2 {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+[dir="rtl"] .ml-2 {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+[dir="rtl"] .mr-1 {
+  margin-right: 0;
+  margin-left: 0.25rem;
+}
+
+[dir="rtl"] .ml-1 {
+  margin-left: 0;
+  margin-right: 0.25rem;
+}
+
+/* Flex direction adjustments */
+[dir="rtl"] .justify-start {
+  justify-content: flex-end;
+}
+
+[dir="rtl"] .justify-end {
+  justify-content: flex-start;
+}
+
+/* Border adjustments */
+[dir="rtl"] .border-l {
+  border-left: none;
+  border-right: 1px solid;
+}
+
+[dir="rtl"] .border-r {
+  border-right: none;
+  border-left: 1px solid;
+}
+
+/* Positioning adjustments */
+[dir="rtl"] .left-0 {
+  left: auto;
+  right: 0;
+}
+
+[dir="rtl"] .right-0 {
+  right: auto;
+  left: 0;
+}
+
+/* Icon rotation for arrows in RTL */
+[dir="rtl"] .lucide-arrow-right {
+  transform: rotate(180deg);
+}
+
+[dir="rtl"] .lucide-arrow-left {
+  transform: rotate(180deg);
+}
+
+/* Shadow adjustments for RTL sidebar */
+[dir="rtl"] .shadow-2xl {
+  box-shadow: -25px 0 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Form input adjustments */
+[dir="rtl"] input[type="text"],
+[dir="rtl"] input[type="email"],
+[dir="rtl"] input[type="password"],
+[dir="rtl"] textarea,
+[dir="rtl"] select {
+  text-align: right;
+}
+
+/* Button text alignment */
+[dir="rtl"] .justify-start {
+  text-align: right;
+}
+
+/* Grid and layout adjustments */
+[dir="rtl"] .grid {
+  direction: rtl;
+}
+
+/* Dropdown menu positioning */
+[dir="rtl"] [data-radix-popper-content-wrapper] {
+  direction: rtl;
+}
+
+/* Tooltip adjustments */
+[dir="rtl"] [data-tooltip] {
+  direction: rtl;
+}

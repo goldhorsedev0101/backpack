@@ -6,6 +6,7 @@ import { Toaster } from "./components/ui/toaster.js";
 import { TooltipProvider } from "./components/ui/tooltip.js";
 import { AuthProvider } from "./context/AuthContext.js";
 import "./i18n";
+import "./i18n/rtl.css";
 import NotFound from "./pages/not-found.js";
 import Landing from "./pages/landing.js";
 import Home from "./pages/home.js";
