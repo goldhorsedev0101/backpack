@@ -38,13 +38,7 @@ import {
   Wallet
 } from "lucide-react";
 
-const expenseSchema = z.object({
-  tripId: z.number().min(1, "Please select a trip"),
-  category: z.string().min(1, "Category is required"),
-  amount: z.string().min(1, "Amount is required"),
-  description: z.string().min(1, "Description is required"),
-  location: z.string().optional(),
-});
+// Note: expenseSchema moved inside component to access t() function
 
 
 type ExpenseFormData = z.infer<typeof expenseSchema>;
@@ -57,6 +51,14 @@ export default function BudgetTracker() {
   const [activeTab, setActiveTab] = useState("overview");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const expenseSchema = z.object({
+    tripId: z.number().min(1, t('budget.validation.please_select_trip')),
+    category: z.string().min(1, t('budget.validation.category_required')),
+    amount: z.string().min(1, t('budget.validation.amount_required')),
+    description: z.string().min(1, t('budget.validation.description_required')),
+    location: z.string().optional(),
+  });
 
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(expenseSchema),
@@ -101,21 +103,21 @@ export default function BudgetTracker() {
       setShowExpenseForm(false);
       form.reset();
       toast({
-        title: "Success",
-        description: "Expense added successfully",
+        title: t('budget.success'),
+        description: t('budget.expense_added_successfully'),
       });
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
         toast({
-          title: "Authentication Required",
-          description: "Please log in to add expenses",
+          title: t('budget.authentication_required'),
+          description: t('budget.please_log_in_to_add_expenses'),
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Error",
-          description: "Failed to add expense",
+          title: t('common.error'),
+          description: t('budget.failed_to_add_expense'),
           variant: "destructive",
         });
       }
@@ -165,7 +167,7 @@ export default function BudgetTracker() {
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
             <Select value={selectedTrip?.toString() || "all"} onValueChange={(value) => setSelectedTrip(value === "all" ? null : parseInt(value))}>
               <SelectTrigger className="w-64">
-                <SelectValue placeholder="Select a trip" />
+                <SelectValue placeholder={t('budget.select_a_trip')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t('budget.all_expenses')}</SelectItem>
@@ -201,14 +203,14 @@ export default function BudgetTracker() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add New Expense</DialogTitle>
+                <DialogTitle>{t('budget.add_new_expense')}</DialogTitle>
               </DialogHeader>
               <form onSubmit={form.handleSubmit(handleSubmitExpense)} className="space-y-4">
                 <div>
-                  <Label htmlFor="tripId">Trip</Label>
+                  <Label htmlFor="tripId">{t('budget.trip')}</Label>
                   <Select onValueChange={(value) => form.setValue("tripId", parseInt(value))}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a trip" />
+                      <SelectValue placeholder={t('budget.select_a_trip')} />
                     </SelectTrigger>
                     <SelectContent>
                       {Array.isArray(userTrips) ? userTrips.map((trip: any) => (
@@ -224,10 +226,10 @@ export default function BudgetTracker() {
                 </div>
 
                 <div>
-                  <Label htmlFor="category">Category</Label>
+                  <Label htmlFor="category">{t('budget.category')}</Label>
                   <Select onValueChange={(value) => form.setValue("category", value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
+                      <SelectValue placeholder={t('budget.select_category')} />
                     </SelectTrigger>
                     <SelectContent>
                       {(EXPENSE_CATEGORIES || []).map((category) => {
@@ -249,12 +251,12 @@ export default function BudgetTracker() {
                 </div>
 
                 <div>
-                  <Label htmlFor="amount">Amount (USD)</Label>
+                  <Label htmlFor="amount">{t('budget.amount_usd')}</Label>
                   <Input 
                     id="amount"
                     type="number" 
                     step="0.01"
-                    placeholder="0.00"
+                    placeholder={t('budget.amount_placeholder')}
                     {...form.register("amount")} 
                   />
                   {form.formState.errors.amount && (
@@ -263,10 +265,10 @@ export default function BudgetTracker() {
                 </div>
 
                 <div>
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description">{t('budget.description')}</Label>
                   <Input 
                     id="description"
-                    placeholder="What did you spend on?"
+                    placeholder={t('budget.what_did_you_spend_on')}
                     {...form.register("description")} 
                   />
                   {form.formState.errors.description && (
@@ -275,20 +277,20 @@ export default function BudgetTracker() {
                 </div>
 
                 <div>
-                  <Label htmlFor="location">Location (Optional)</Label>
+                  <Label htmlFor="location">{t('budget.location_optional')}</Label>
                   <Input 
                     id="location"
-                    placeholder="Where did you spend this?"
+                    placeholder={t('budget.where_did_you_spend_this')}
                     {...form.register("location")} 
                   />
                 </div>
 
                 <div className="flex gap-2 pt-4">
                   <Button type="submit" disabled={addExpenseMutation.isPending} className="flex-1">
-                    {addExpenseMutation.isPending ? "Adding..." : "Add Expense"}
+                    {addExpenseMutation.isPending ? t('budget.adding') : t('budget.add_expense')}
                   </Button>
                   <Button type="button" variant="outline" onClick={() => setShowExpenseForm(false)}>
-                    Cancel
+                    {t('common.cancel')}
                   </Button>
                 </div>
               </form>
@@ -339,8 +341,8 @@ export default function BudgetTracker() {
                   <Card>
                     <CardContent className="text-center py-8">
                       <Target className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-600 mb-2">Select a Trip</h3>
-                      <p className="text-gray-500">Choose a trip to see your budget overview and expense breakdown.</p>
+                      <h3 className="text-lg font-medium text-gray-600 mb-2">{t('budget.select_a_trip')}</h3>
+                      <p className="text-gray-500">{t('budget.choose_trip_to_see_overview')}</p>
                     </CardContent>
                   </Card>
                 )}
@@ -386,7 +388,7 @@ export default function BudgetTracker() {
                           <span className={`text-sm ${
                             budgetUsed <= 80 ? 'text-green-600' : budgetUsed <= 100 ? 'text-orange-600' : 'text-red-600'
                           }`}>
-                            {budgetUsed.toFixed(1)}% of budget used
+                            {t('budget.budget_used_percentage', { percentage: budgetUsed.toFixed(1) })}
                           </span>
                         </div>
                       </>
@@ -399,7 +401,7 @@ export default function BudgetTracker() {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <PieChart className="w-5 h-5 mr-2 text-primary" />
-                      Categories
+                      {t('budget.categories')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -436,11 +438,11 @@ export default function BudgetTracker() {
                 <CardTitle className="flex items-center justify-between">
                   <span className="flex items-center">
                     <DollarSign className="w-5 h-5 mr-2 text-primary" />
-                    Recent Expenses
+                    {t('budget.recent_expenses')}
                   </span>
                   <Button variant="outline" size="sm">
                     <Download className="w-4 h-4 mr-2" />
-                    Export
+                    {t('budget.export')}
                   </Button>
                 </CardTitle>
               </CardHeader>
@@ -460,7 +462,7 @@ export default function BudgetTracker() {
                             <div>
                               <div className="font-medium">{expense.description}</div>
                               <div className="text-sm text-gray-600 flex items-center gap-2">
-                                <Badge variant="outline">{category?.label || 'Other'}</Badge>
+                                <Badge variant="outline">{category?.label || t('budget.other')}</Badge>
                                 {expense.location && (
                                   <>
                                     <MapPin className="w-3 h-3" />
@@ -482,8 +484,8 @@ export default function BudgetTracker() {
                 ) : (
                   <div className="text-center py-8">
                     <DollarSign className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-600 mb-2">No Expenses Found</h3>
-                    <p className="text-gray-500">Start adding expenses to track your spending.</p>
+                    <h3 className="text-lg font-medium text-gray-600 mb-2">{t('budget.no_expenses_found')}</h3>
+                    <p className="text-gray-500">{t('budget.start_adding_expenses')}</p>
                   </div>
                 )}
               </CardContent>
@@ -509,7 +511,7 @@ export default function BudgetTracker() {
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm text-gray-600">Total Trips</p>
+                          <p className="text-sm text-gray-600">{t('budget.total_trips')}</p>
                           <p className="text-2xl font-bold">{analytics?.trips?.total || 0}</p>
                         </div>
                         <MapPin className="w-8 h-8 text-blue-500" />
@@ -521,7 +523,7 @@ export default function BudgetTracker() {
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm text-gray-600">Countries Visited</p>
+                          <p className="text-sm text-gray-600">{t('budget.countries_visited')}</p>
                           <p className="text-2xl font-bold">{analytics?.trips?.countries || 0}</p>
                         </div>
                         <Target className="w-8 h-8 text-green-500" />
@@ -533,7 +535,7 @@ export default function BudgetTracker() {
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm text-gray-600">Total Spent</p>
+                          <p className="text-sm text-gray-600">{t('budget.total_spent')}</p>
                           <p className="text-2xl font-bold">${analytics?.expenses?.total?.toFixed(2) || '0.00'}</p>
                         </div>
                         <DollarSign className="w-8 h-8 text-orange-500" />

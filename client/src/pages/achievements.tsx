@@ -51,9 +51,9 @@ const getPointsToNextLevel = (totalPoints: number) => {
   return thresholds[level] - totalPoints;
 };
 
-const getLevelName = (level: number) => {
-  const names = ["Beginner", "Explorer", "Wanderer", "Travel Expert", "Globetrotter"];
-  return names[level - 1] || "Globetrotter";
+const getLevelName = (level: number, t: any) => {
+  const names = [t('achievements.levels.beginner'), t('achievements.levels.explorer'), t('achievements.levels.wanderer'), t('achievements.levels.travel_expert'), t('achievements.levels.globetrotter')];
+  return names[level - 1] || t('achievements.levels.globetrotter');
 };
 
 export default function Achievements() {
@@ -149,8 +149,8 @@ export default function Achievements() {
   const showMissionProgressToast = (result: any) => {
     if (!result) {
       toast({
-        title: "Error saving progress",
-        description: "Please try again",
+        title: t('achievements.error_saving_progress'),
+        description: t('achievements.please_try_again'),
         variant: "destructive",
       });
       return;
@@ -158,8 +158,8 @@ export default function Achievements() {
 
     if (result.already_credited) {
       toast({
-        title: "Already credited for this period",
-        description: "You've already completed this mission for the current period",
+        title: t('achievements.already_credited_for_period'),
+        description: t('achievements.already_completed_mission'),
         variant: "default",
         className: "border-gray-300 bg-gray-50 text-gray-900",
       });
@@ -169,7 +169,7 @@ export default function Achievements() {
     if (result.completed) {
       // Mission completion toast
       toast({
-        title: "✅ Mission complete",
+        title: t('achievements.mission_complete'),
         description: `${result.mission_name} (+${result.awarded_points} pts)`,
         variant: "default",
         className: "border-green-300 bg-green-50 text-green-900",
@@ -177,7 +177,7 @@ export default function Achievements() {
     } else {
       // Progress increment toast
       toast({
-        title: "Progress saved",
+        title: t('achievements.progress_saved'),
         description: `${result.mission_name} — ${result.current_progress} / ${result.target_progress}${result.awarded_points > 0 ? ` (+${result.awarded_points} pts)` : ''}`,
         variant: "default",
         className: "border-blue-300 bg-blue-50 text-blue-900",
@@ -200,8 +200,8 @@ export default function Achievements() {
     },
     onError: (error) => {
       toast({
-        title: "Check-in Error",
-        description: "Error saving progress, please try again",
+        title: t('achievements.checkin_error'),
+        description: t('achievements.error_saving_progress_try_again'),
         variant: "destructive",
       });
     },
@@ -224,8 +224,8 @@ export default function Achievements() {
     },
     onError: () => {
       toast({
-        title: "Error saving progress",
-        description: "Please try again",
+        title: t('achievements.error_saving_progress'),
+        description: t('achievements.please_try_again'),
         variant: "destructive",
       });
     },
@@ -247,8 +247,8 @@ export default function Achievements() {
     },
     onError: () => {
       toast({
-        title: "Error saving progress",
-        description: "Please try again",
+        title: t('achievements.error_saving_progress'),
+        description: t('achievements.please_try_again'),
         variant: "destructive",
       });
     },
@@ -269,8 +269,8 @@ export default function Achievements() {
     },
     onError: () => {
       toast({
-        title: "Error saving progress",
-        description: "Please try again",
+        title: t('achievements.error_saving_progress'),
+        description: t('achievements.please_try_again'),
         variant: "destructive",
       });
     },
@@ -307,7 +307,7 @@ export default function Achievements() {
   const totalPoints = (pointsSummary as any)?.totalPoints || 0;
   const currentLevel = calculateLevel(totalPoints);
   const pointsToNext = getPointsToNextLevel(totalPoints);
-  const levelName = getLevelName(currentLevel);
+  const levelName = getLevelName(currentLevel, t);
 
   // Mock mission progress for demo (in real app, this would come from user_mission_progress table)
   const mockMissionProgress = {
@@ -349,10 +349,10 @@ export default function Achievements() {
                   className="flex items-center gap-2 whitespace-nowrap"
                 >
                   <Calendar className="w-4 h-4" />
-                  {dailyCheckInMutation.isPending ? "Checking in..." : 
+                  {dailyCheckInMutation.isPending ? t('achievements.checking_in') : 
                     dailyCheckinValue ? 
-                      `${dailyCheckinValue.label} (+${dailyCheckinValue.points} pts)` :
-                      `Daily Check-in (+${POINT_VALUES.DAILY_CHECKIN} pts)`
+                      t('achievements.daily_checkin_with_points', { label: dailyCheckinValue.label, points: dailyCheckinValue.points }) :
+                      t('achievements.daily_checkin_default', { points: POINT_VALUES.DAILY_CHECKIN })
                   }
                 </Button>
                 
@@ -364,10 +364,10 @@ export default function Achievements() {
                   aria-label="Track review writing progress"
                 >
                   <MessageSquare className="w-4 h-4" />
-                  {awardReviewPointsMutation.isPending ? "Tracking..." : 
+                  {awardReviewPointsMutation.isPending ? t('achievements.tracking') : 
                     reviewValue ? 
-                      `${reviewValue.label} (+${reviewValue.points} pts)` :
-                      `Write Review (+${POINT_VALUES.WRITE_REVIEW} pts)`
+                      t('achievements.review_with_points', { label: reviewValue.label, points: reviewValue.points }) :
+                      t('achievements.write_review_default', { points: POINT_VALUES.WRITE_REVIEW })
                   }
                 </Button>
                 
@@ -379,10 +379,10 @@ export default function Achievements() {
                   aria-label="Track photo upload progress"
                 >
                   <Camera className="w-4 h-4" />
-                  {awardPhotoPointsMutation.isPending ? "Tracking..." : 
+                  {awardPhotoPointsMutation.isPending ? t('achievements.tracking') : 
                     photoValue ? 
-                      `${photoValue.label} (+${photoValue.points} pts)` :
-                      `Upload Photo (+${POINT_VALUES.UPLOAD_PHOTO} pts)`
+                      t('achievements.photo_with_points', { label: photoValue.label, points: photoValue.points }) :
+                      t('achievements.upload_photo_default', { points: POINT_VALUES.UPLOAD_PHOTO })
                   }
                 </Button>
                 
@@ -394,10 +394,10 @@ export default function Achievements() {
                   aria-label="Track itinerary sharing progress"
                 >
                   <MapPin className="w-4 h-4" />
-                  {awardItineraryPointsMutation.isPending ? "Tracking..." : 
+                  {awardItineraryPointsMutation.isPending ? t('achievements.tracking') : 
                     itineraryValue ? 
-                      `${itineraryValue.label} (+${itineraryValue.points} pts)` :
-                      `Share Itinerary (+${POINT_VALUES.SHARE_ITINERARY} pts)`
+                      t('achievements.itinerary_with_points', { label: itineraryValue.label, points: itineraryValue.points }) :
+                      t('achievements.share_itinerary_default', { points: POINT_VALUES.SHARE_ITINERARY })
                   }
                 </Button>
               </div>
@@ -433,8 +433,8 @@ export default function Achievements() {
                       <div className="text-3xl font-bold text-orange-900">{totalPoints.toLocaleString()} pts</div>
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm text-orange-700">
-                          <span>Level {currentLevel} - {levelName}</span>
-                          <span>{pointsToNext > 0 ? `${pointsToNext} to next` : 'Max Level!'}</span>
+                          <span>{t('achievements.level_with_name', { level: currentLevel, name: levelName })}</span>
+                          <span>{pointsToNext > 0 ? t('achievements.points_to_next', { points: pointsToNext }) : t('achievements.max_level')}</span>
                         </div>
                         {pointsToNext > 0 && (
                           <Progress 
@@ -459,7 +459,7 @@ export default function Achievements() {
                     <div className="text-3xl font-bold text-blue-900 mb-2">
                       {unlockedBadgesCount || 0}
                     </div>
-                    <p className="text-blue-700 text-sm">Achievements completed</p>
+                    <p className="text-blue-700 text-sm">{t('achievements.achievements_completed')}</p>
                   </CardContent>
                 </Card>
 
@@ -473,7 +473,7 @@ export default function Achievements() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold text-purple-900 mb-2">#1</div>
-                    <p className="text-purple-700 text-sm">This month</p>
+                    <p className="text-purple-700 text-sm">{t('achievements.this_month')}</p>
                   </CardContent>
                 </Card>
               </div>
@@ -483,7 +483,7 @@ export default function Achievements() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-green-500" />
-                    Recent Activity
+                    {t('achievements.recent_activity')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -491,7 +491,7 @@ export default function Achievements() {
                     <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="font-semibold text-green-900">Points This Week</h4>
+                          <h4 className="font-semibold text-green-900">{t('achievements.points_this_week')}</h4>
                           <p className="text-2xl font-bold text-green-700">
                             {weeklyPoints > 0 ? `+${weeklyPoints}` : weeklyPoints || 0}
                           </p>
@@ -502,7 +502,7 @@ export default function Achievements() {
                     <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="font-semibold text-blue-900">Badges Unlocked</h4>
+                          <h4 className="font-semibold text-blue-900">{t('achievements.badges_unlocked')}</h4>
                           <p className="text-2xl font-bold text-blue-700">{unlockedBadgesCount || 0}</p>
                         </div>
                         <Medal className="w-8 h-8 text-blue-500" />
@@ -520,9 +520,9 @@ export default function Achievements() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-orange-500" />
-                    Daily Missions
+                    {t('achievements.daily_missions')}
                   </CardTitle>
-                  <CardDescription>Reset every day at midnight</CardDescription>
+                  <CardDescription>{t('achievements.reset_daily')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -534,13 +534,13 @@ export default function Achievements() {
                             <Calendar className="w-5 h-5 text-orange-700" />
                           </div>
                           <div>
-                            <h4 className="font-semibold text-gray-900">Daily Check-in</h4>
-                            <p className="text-sm text-gray-600">Visit the app and check in for the day</p>
+                            <h4 className="font-semibold text-gray-900">{t('achievements.daily_checkin')}</h4>
+                            <p className="text-sm text-gray-600">{t('achievements.daily_checkin_description')}</p>
                           </div>
                         </div>
                         <div className="text-right">
                           <div className="text-lg font-bold text-orange-600">+5</div>
-                          <div className="text-sm text-gray-500">points</div>
+                          <div className="text-sm text-gray-500">{t('achievements.points')}</div>
                         </div>
                       </div>
                     </div>
@@ -560,7 +560,7 @@ export default function Achievements() {
                           </div>
                           <div className="text-right">
                             <div className="text-lg font-bold text-orange-600">+{mission.pointsReward}</div>
-                            <div className="text-sm text-gray-500">points</div>
+                            <div className="text-sm text-gray-500">{t('achievements.points')}</div>
                           </div>
                         </div>
                       </div>
@@ -594,14 +594,14 @@ export default function Achievements() {
                             </div>
                             <div className="text-right">
                               <div className="text-lg font-bold text-blue-600">+100</div>
-                              <div className="text-sm text-gray-500">points</div>
+                              <div className="text-sm text-gray-500">{t('achievements.points')}</div>
                             </div>
                           </div>
                           
                           {/* Progress Bar */}
                           <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                              <span className="text-blue-700">Progress</span>
+                              <span className="text-blue-700">{t('achievements.progress')}</span>
                               <span className="text-blue-900 font-semibold">
                                 {mockMissionProgress['write-3-reviews'].current} / {mockMissionProgress['write-3-reviews'].max}
                               </span>
@@ -612,7 +612,7 @@ export default function Achievements() {
                             />
                             <div className="text-xs text-blue-600">
                               {mockMissionProgress['write-3-reviews'].current >= mockMissionProgress['write-3-reviews'].max 
-                                ? "✅ Completed!" 
+                                ? t('achievements.completed') 
                                 : `${mockMissionProgress['write-3-reviews'].max - mockMissionProgress['write-3-reviews'].current} more reviews needed`
                               }
                             </div>
@@ -630,19 +630,19 @@ export default function Achievements() {
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-2">
                             <div>
-                              <h4 className="font-semibold text-gray-900">Upload 10 Photos</h4>
-                              <p className="text-sm text-gray-600">Share amazing travel photos</p>
+                              <h4 className="font-semibold text-gray-900">{t('achievements.upload_10_photos')}</h4>
+                              <p className="text-sm text-gray-600">{t('achievements.share_amazing_photos')}</p>
                             </div>
                             <div className="text-right">
                               <div className="text-lg font-bold text-purple-600">+75</div>
-                              <div className="text-sm text-gray-500">points</div>
+                              <div className="text-sm text-gray-500">{t('achievements.points')}</div>
                             </div>
                           </div>
                           
                           {/* Progress Bar */}
                           <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                              <span className="text-purple-700">Progress</span>
+                              <span className="text-purple-700">{t('achievements.progress')}</span>
                               <span className="text-purple-900 font-semibold">
                                 {mockMissionProgress['upload-10-photos'].current} / {mockMissionProgress['upload-10-photos'].max}
                               </span>
@@ -653,7 +653,7 @@ export default function Achievements() {
                             />
                             <div className="text-xs text-purple-600">
                               {mockMissionProgress['upload-10-photos'].current >= mockMissionProgress['upload-10-photos'].max 
-                                ? "✅ Completed!" 
+                                ? t('achievements.completed') 
                                 : `${mockMissionProgress['upload-10-photos'].max - mockMissionProgress['upload-10-photos'].current} more photos needed`
                               }
                             </div>
@@ -671,19 +671,19 @@ export default function Achievements() {
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-2">
                             <div>
-                              <h4 className="font-semibold text-gray-900">Share 5 Itineraries</h4>
-                              <p className="text-sm text-gray-600">Help others plan their trips</p>
+                              <h4 className="font-semibold text-gray-900">{t('achievements.share_5_itineraries')}</h4>
+                              <p className="text-sm text-gray-600">{t('achievements.help_others_plan')}</p>
                             </div>
                             <div className="text-right">
                               <div className="text-lg font-bold text-green-600">+150</div>
-                              <div className="text-sm text-gray-500">points</div>
+                              <div className="text-sm text-gray-500">{t('achievements.points')}</div>
                             </div>
                           </div>
                           
                           {/* Progress Bar */}
                           <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                              <span className="text-green-700">Progress</span>
+                              <span className="text-green-700">{t('achievements.progress')}</span>
                               <span className="text-green-900 font-semibold">
                                 {mockMissionProgress['share-itinerary'].current} / {mockMissionProgress['share-itinerary'].max}
                               </span>
@@ -694,7 +694,7 @@ export default function Achievements() {
                             />
                             <div className="text-xs text-green-600">
                               {mockMissionProgress['share-itinerary'].current >= mockMissionProgress['share-itinerary'].max 
-                                ? "✅ Completed!" 
+                                ? t('achievements.completed') 
                                 : `${mockMissionProgress['share-itinerary'].max - mockMissionProgress['share-itinerary'].current} more shares needed`
                               }
                             </div>
@@ -718,7 +718,7 @@ export default function Achievements() {
                           </div>
                           <div className="text-right">
                             <div className="text-lg font-bold text-blue-600">+{mission.pointsReward}</div>
-                            <div className="text-sm text-gray-500">points</div>
+                            <div className="text-sm text-gray-500">{t('achievements.points')}</div>
                           </div>
                         </div>
                       </div>
@@ -736,7 +736,7 @@ export default function Achievements() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <MapPin className="w-5 h-5 text-green-500" />
-                      Travel Badges
+                      {t('achievements.travel_badges')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -754,8 +754,8 @@ export default function Achievements() {
                     <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
                       <Target className="w-5 h-5 text-gray-600" />
                       <div className="flex-1">
-                        <div className="font-semibold text-gray-900">First Trip</div>
-                        <div className="text-sm text-gray-700">Plan your first trip</div>
+                        <div className="font-semibold text-gray-900">{t('achievements.first_trip')}</div>
+                        <div className="text-sm text-gray-700">{t('achievements.plan_first_trip')}</div>
                       </div>
                     </div>
                   </CardContent>
@@ -766,15 +766,15 @@ export default function Achievements() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <Users className="w-5 h-5 text-blue-500" />
-                      Social Badges
+                      {t('achievements.social_badges')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
                       <Target className="w-5 h-5 text-gray-600" />
                       <div className="flex-1">
-                        <div className="font-semibold text-gray-900">Helpful Reviewer</div>
-                        <div className="text-sm text-gray-700">Write 5 helpful reviews</div>
+                        <div className="font-semibold text-gray-900">{t('achievements.helpful_reviewer')}</div>
+                        <div className="text-sm text-gray-700">{t('achievements.write_5_helpful_reviews')}</div>
                       </div>
                     </div>
                   </CardContent>
@@ -788,9 +788,9 @@ export default function Achievements() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-orange-500" />
-                    Top Travelers (Last 30 Days)
+                    {t('achievements.top_travelers_30_days')}
                   </CardTitle>
-                  <CardDescription>See how you rank among other travelers</CardDescription>
+                  <CardDescription>{t('achievements.see_how_you_rank')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -814,7 +814,7 @@ export default function Achievements() {
                           <div className="font-semibold text-gray-900">
                             {entry.user?.firstName && entry.user?.lastName 
                               ? `${entry.user.firstName} ${entry.user.lastName}`
-                              : entry.user?.email?.split('@')[0] || 'Anonymous User'
+                              : entry.user?.email?.split('@')[0] || t('achievements.anonymous_user')
                             }
                           </div>
                           <div className="text-sm text-gray-600">Level {calculateLevel(entry.totalPoints)} • {getLevelName(calculateLevel(entry.totalPoints))}</div>
@@ -822,7 +822,7 @@ export default function Achievements() {
                         
                         <div className="text-right">
                           <div className="text-lg font-bold text-gray-900">{entry.totalPoints.toLocaleString()}</div>
-                          <div className="text-sm text-gray-500">points</div>
+                          <div className="text-sm text-gray-500">{t('achievements.points')}</div>
                         </div>
                       </div>
                     )) || []}
@@ -831,7 +831,7 @@ export default function Achievements() {
                     {!(leaderboard as any)?.length && (
                       <div className="text-center py-8 text-gray-500">
                         <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                        <p>No leaderboard data available yet</p>
+                        <p>{t('achievements.no_leaderboard_data')}</p>
                       </div>
                     )}
                   </div>
@@ -845,9 +845,9 @@ export default function Achievements() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-blue-500" />
-                    Points History
+                    {t('achievements.points_history')}
                   </CardTitle>
-                  <CardDescription>Your recent point-earning activities</CardDescription>
+                  <CardDescription>{t('achievements.recent_point_activities')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -875,8 +875,8 @@ export default function Achievements() {
                     {!(pointsHistory as any)?.length && (
                       <div className="text-center py-8 text-gray-500">
                         <Clock className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                        <p>No activity history yet</p>
-                        <p className="text-sm">Start earning points to see your history!</p>
+                        <p>{t('achievements.no_activity_history')}</p>
+                        <p className="text-sm">{t('achievements.start_earning_to_see_history')}</p>
                       </div>
                     )}
                   </div>

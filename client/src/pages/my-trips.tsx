@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -99,6 +100,7 @@ const interests = [
 ];
 
 export default function MyTripsScreen() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("generate");
   const [formData, setFormData] = useState<TripFormData>({
@@ -142,15 +144,15 @@ export default function MyTripsScreen() {
       setSuggestions(data.suggestions || []);
       setActiveTab("suggestions");
       toast({
-        title: "Trip Suggestions Generated!",
-        description: `Found ${data.suggestions?.length || 0} amazing suggestions for your trip.`,
+        title: t('trips.trip_suggestions_generated'),
+        description: t('trips.found_suggestions_count', { count: data.suggestions?.length || 0 }),
       });
     },
     onError: (error) => {
       console.error('Generate trip error:', error);
       toast({
-        title: "Generation Error",
-        description: "Failed to generate trip suggestions. Please try again.",
+        title: t('trips.generation_error'),
+        description: t('trips.failed_to_generate_suggestions'),
         variant: "destructive"
       });
     }
@@ -170,9 +172,9 @@ export default function MyTripsScreen() {
         const errorData = await response.json();
         if (errorData.requiresAuth) {
           // TODO: Trigger Google sign-in, then retry
-          throw new Error('Please sign in to save trips');
+          throw new Error(t('trips.please_sign_in_to_save'));
         }
-        throw new Error(errorData.message || 'Failed to save trip');
+        throw new Error(errorData.message || t('trips.failed_to_save_trip'));
       }
       
       return response.json();
@@ -184,25 +186,25 @@ export default function MyTripsScreen() {
       queryClient.invalidateQueries({ queryKey: ['/api/itineraries'] });
       
       toast({
-        title: "Saved to My Trips",
-        description: "Your trip suggestion has been saved successfully.",
+        title: t('trips.saved_to_my_trips'),
+        description: t('trips.trip_saved_successfully'),
       });
     },
     onError: (error: any) => {
       console.error('Save trip error:', error);
       
-      // Friendly English error messages
-      let errorMessage = "Could not save trip. Please try again.";
+      // Localized error messages
+      let errorMessage = t('trips.could_not_save_trip');
       if (error?.message?.includes('sign in')) {
-        errorMessage = "Please sign in to save trips";
+        errorMessage = t('trips.please_sign_in_to_save');
       } else if (error?.message?.includes('Database setup incomplete')) {
-        errorMessage = "Database setup incomplete. Please contact support.";
+        errorMessage = t('trips.database_setup_incomplete');
       } else if (error?.message?.includes('Database temporarily unavailable')) {
-        errorMessage = "Database temporarily unavailable. Please try again.";
+        errorMessage = t('trips.database_temporarily_unavailable');
       }
       
       toast({
-        title: "Error",
+        title: t('common.error'),
         description: errorMessage,
         variant: "destructive"
       });
@@ -225,15 +227,15 @@ export default function MyTripsScreen() {
       queryClient.invalidateQueries({ queryKey: ['/api/itineraries'] });
       setSelectedTripForMerge(null);
       toast({
-        title: "Trip Merged!",
-        description: "The suggestion has been added to your existing trip.",
+        title: t('trips.trip_merged'),
+        description: t('trips.suggestion_added_to_trip'),
       });
     },
     onError: (error) => {
       console.error('Merge itinerary error:', error);
       toast({
-        title: "Merge Error",
-        description: "Failed to merge trip. Please try again.",
+        title: t('trips.merge_error'),
+        description: t('trips.failed_to_merge_trip'),
         variant: "destructive"
       });
     }
@@ -250,15 +252,15 @@ export default function MyTripsScreen() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/itineraries'] });
       toast({
-        title: "Trip Deleted",
-        description: "The trip has been removed from your itineraries.",
+        title: t('trips.trip_deleted'),
+        description: t('trips.trip_removed_from_itineraries'),
       });
     },
     onError: (error) => {
       console.error('Delete itinerary error:', error);
       toast({
-        title: "Delete Error",
-        description: "Failed to delete trip. Please try again.",
+        title: t('trips.delete_error'),
+        description: t('trips.failed_to_delete_trip'),
         variant: "destructive"
       });
     }
@@ -286,15 +288,15 @@ export default function MyTripsScreen() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/my-trips/guest'] });
       toast({
-        title: "Trip Saved!",
-        description: "Your trip has been saved to My Trips.",
+        title: t('trips.trip_saved'),
+        description: t('trips.trip_saved_to_my_trips'),
       });
     },
     onError: (error) => {
       console.error('Save trip error:', error);
       toast({
-        title: "Save Error",
-        description: "Failed to save trip. Please try again.",
+        title: t('trips.save_error'),
+        description: t('trips.failed_to_save_trip'),
         variant: "destructive"
       });
     }
@@ -305,8 +307,8 @@ export default function MyTripsScreen() {
     
     if (!formData.destination || !formData.duration || formData.travelStyle.length === 0) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in destination, duration, and select at least one travel style.",
+        title: t('trips.missing_information'),
+        description: t('trips.please_fill_required_fields'),
         variant: "destructive"
       });
       return;
@@ -337,8 +339,8 @@ export default function MyTripsScreen() {
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-8">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-700 mb-4">AI Trip Builder</h1>
-          <p className="text-lg text-gray-600">Tell us your preferences and let our AI create the perfect itinerary</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-700 mb-4">{t('trips.ai_trip_builder')}</h1>
+          <p className="text-lg text-gray-600">{t('trips.ai_trip_builder_subtitle')}</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -346,15 +348,15 @@ export default function MyTripsScreen() {
             <TabsList className="inline-flex w-auto min-w-full justify-evenly h-10">
               <TabsTrigger value="generate" className="whitespace-nowrap">
                 <Users className="w-4 h-4 mr-2" />
-                Preferences
+                {t('trips.preferences')}
               </TabsTrigger>
               <TabsTrigger value="suggestions" className="whitespace-nowrap">
                 <Star className="w-4 h-4 mr-2" />
-                Suggestions
+                {t('trips.suggestions')}
               </TabsTrigger>
               <TabsTrigger value="saved" className="whitespace-nowrap">
                 <MapPin className="w-4 h-4 mr-2" />
-                My Trips
+                {t('trips.my_trips')}
               </TabsTrigger>
             </TabsList>
           </div>
@@ -368,11 +370,11 @@ export default function MyTripsScreen() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="destination" className="text-sm font-medium text-slate-700">
-                          Where do you want to go?
+                          {t('trips.where_do_you_want_to_go')}
                         </Label>
                         <Select value={formData.destination} onValueChange={(value: string) => setFormData(prev => ({ ...prev, destination: value }))}>
                           <SelectTrigger className="w-full p-3 h-12">
-                            <SelectValue placeholder="Select destination" />
+                            <SelectValue placeholder={t('trips.select_destination')} />
                           </SelectTrigger>
                           <SelectContent>
                             {SOUTH_AMERICAN_COUNTRIES.map((destination: string) => (
@@ -386,17 +388,17 @@ export default function MyTripsScreen() {
 
                       <div className="space-y-2">
                         <Label htmlFor="duration" className="text-sm font-medium text-slate-700">
-                          Trip Duration
+                          {t('trips.trip_duration')}
                         </Label>
                         <Select value={formData.duration} onValueChange={(value: string) => setFormData(prev => ({ ...prev, duration: value }))}>
                           <SelectTrigger className="w-full p-3 h-12">
-                            <SelectValue placeholder="Select duration" />
+                            <SelectValue placeholder={t('trips.select_duration')} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="1-2 weeks">1-2 weeks</SelectItem>
-                            <SelectItem value="2-4 weeks">2-4 weeks</SelectItem>
-                            <SelectItem value="1-2 months">1-2 months</SelectItem>
-                            <SelectItem value="3+ months">3+ months</SelectItem>
+                            <SelectItem value="1-2 weeks">{t('trips.duration_1_2_weeks')}</SelectItem>
+                            <SelectItem value="2-4 weeks">{t('trips.duration_2_4_weeks')}</SelectItem>
+                            <SelectItem value="1-2 months">{t('trips.duration_1_2_months')}</SelectItem>
+                            <SelectItem value="3+ months">{t('trips.duration_3_months')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -404,7 +406,7 @@ export default function MyTripsScreen() {
 
                     <div className="space-y-4">
                       <Label className="text-sm font-medium text-slate-700">
-                        Budget Range
+                        {t('trips.budget_range')}
                       </Label>
                       <div className="px-4">
                         <div className="flex items-center space-x-4 mb-4">
@@ -430,14 +432,14 @@ export default function MyTripsScreen() {
 
                     <div className="space-y-4">
                       <Label className="text-sm font-medium text-slate-700">
-                        Travel Style
+                        {t('trips.travel_style')}
                       </Label>
                       <div className="grid grid-cols-2 gap-4">
                         {[
-                          { name: 'Adventure', icon: Mountain, description: 'Hiking, trekking, extreme sports' },
-                          { name: 'Cultural', icon: Camera, description: 'Museums, local traditions, history' },
-                          { name: 'Food & Cuisine', icon: Utensils, description: 'Local restaurants, cooking classes' },
-                          { name: 'Nightlife', icon: Users, description: 'Bars, clubs, social experiences' }
+                          { name: t('trips.style_adventure'), icon: Mountain, description: t('trips.style_adventure_desc') },
+                          { name: t('trips.style_cultural'), icon: Camera, description: t('trips.style_cultural_desc') },
+                          { name: t('trips.style_food_cuisine'), icon: Utensils, description: t('trips.style_food_desc') },
+                          { name: t('trips.style_nightlife'), icon: Users, description: t('trips.style_nightlife_desc') }
                         ].map((style) => (
                           <div
                             key={style.name}
