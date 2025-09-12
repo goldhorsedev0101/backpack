@@ -1,0 +1,86 @@
+{
+  "navigation": {
+    "home": "בית",
+    "my_trips": "הטיולים שלי",
+    "community": "קהילה",
+    "budget_tracker": "מעקב תקציב",
+    "achievements": "הישגים",
+    "explore": "גלה",
+    "weather": "מזג אויר",
+    "dashboard": "לוח בקרה"
+  },
+  "auth": {
+    "sign_in": "התחבר",
+    "sign_out": "התנתק",
+    "welcome_back": "ברוך הבא {{email}}",
+    "goodbye": "להתראות!",
+    "login_error": "שגיאה בהתחברות",
+    "try_again_later": "נסה שוב מאוחר יותר",
+    "signed_in_successfully": "התחברת בהצלחה!",
+    "signed_out_successfully": "התנתקת בהצלחה"
+  },
+  "common": {
+    "close": "סגור",
+    "cancel": "ביטול",
+    "save": "שמור",
+    "delete": "מחק",
+    "edit": "ערוך",
+    "add": "הוסף",
+    "submit": "שלח",
+    "loading": "טוען...",
+    "error": "שגיאה",
+    "success": "הצלחה",
+    "back": "חזור",
+    "next": "הבא",
+    "search": "חיפוש",
+    "filter": "סינון",
+    "sort": "מיון"
+  },
+  "trips": {
+    "my_trips": "הטיולים שלי",
+    "create_trip": "צור טיול חדש",
+    "trip_name": "שם הטיול",
+    "destination": "יעד",
+    "start_date": "תאריך התחלה",
+    "end_date": "תאריך סיום",
+    "participants": "משתתפים",
+    "budget": "תקציב",
+    "no_trips": "אין טיולים עדיין",
+    "create_first_trip": "צור את הטיול הראשון שלך כדי להתחיל"
+  },
+  "community": {
+    "title": "קהילה",
+    "no_reviews": "אין ביקורות זמינות",
+    "loading_reviews": "טוען ביקורות...",
+    "error_loading": "שגיאה בטעינת נתוני הקהילה"
+  },
+  "budget": {
+    "title": "מעקב תקציב",
+    "total_spent": "סה\"כ הוצאות",
+    "remaining": "נותר",
+    "add_expense": "הוסף הוצאה",
+    "category": "קטגוריה",
+    "amount": "סכום",
+    "description": "תיאור"
+  },
+  "weather": {
+    "title": "מזג אויר",
+    "current_weather": "מזג אויר נוכחי",
+    "forecast": "תחזית",
+    "temperature": "טמפרטורה",
+    "humidity": "לחות",
+    "wind_speed": "מהירות רוח"
+  },
+  "achievements": {
+    "title": "הישגים",
+    "your_achievements": "ההישגים שלך",
+    "points": "נקודות",
+    "level": "רמה",
+    "progress": "התקדמות"
+  },
+  "language": {
+    "english": "English",
+    "hebrew": "עברית",
+    "switch_language": "החלף שפה"
+  }
+}

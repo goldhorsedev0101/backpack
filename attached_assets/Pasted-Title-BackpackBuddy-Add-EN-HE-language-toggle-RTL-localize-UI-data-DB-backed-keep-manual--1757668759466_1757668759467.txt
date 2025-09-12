@@ -1,0 +1,68 @@
+Title: BackpackBuddy — Add EN/HE language toggle (RTL), localize UI & data (DB-backed), keep manual planner intact
+
+Goal:
+Add a fast Language toggle (English ⇄ Hebrew) that switches all UI labels (i18n) and loads localized data from Supabase with fallback (EN→HE). Hebrew must render RTL. My Trips save/merge/editor continue to work on the same tables.
+
+Do (don’t ask):
+
+UI i18n & toggle
+
+Integrate i18n (e.g., react-i18next) with two resources: en and he.
+
+Add a Language button in the global header: EN | HE. Persist choice to localStorage and default from browser locale.
+
+When language is he, set dir="rtl" on <html> or a top-level wrapper and flip layout safely (no visual breaks).
+
+Move all hardcoded UI strings to translation files. All new texts in English & Hebrew.
+
+Dates/Numbers
+
+Use locale-aware formatting (Day.js/Intl) — pick locale by current i18n language.
+
+Verify planner’s date/time pickers show Hebrew weekdays/months when HE.
+
+Data localization (read path)
+
+Prefer translation tables (below) via Supabase: when fetching destinations / attractions / restaurants / accommodations:
+
+Try to fetch the requested locale (e.g., he);
+
+If not found, fallback to English;
+
+Never break UI if translation is missing.
+
+Provide selectors in the data-access layer: getDestinations(locale), getAttractions(locale), etc., implementing the fallback.
+
+Plan JSON / My Trips
+
+plan_json remains language-agnostic for structure, but store display fields optionally per-locale inside plan_json.meta (if needed), without breaking existing saves.
+
+Saving/Merging/Reordering behavior remains unchanged.
+
+RTL polish
+
+Ensure grid/list layouts, icons, and arrows are mirrored where appropriate when dir="rtl".
+
+Verify drag & drop still works correctly in RTL.
+
+Deliverables
+
+Code changes with a diff summary (files touched + purpose).
+
+Two screenshots:
+
+EN UI (header + /my-trips)
+
+HE UI (header + /my-trips, RTL)
+
+Short note explaining how locale is persisted and how data fallback works.
+
+Acceptance:
+
+Clicking Language switches the whole app instantly (UI strings + data labels).
+
+Hebrew renders RTL cleanly; no broken layouts.
+
+Data shows in Hebrew where available, otherwise English, with no errors.
+
+My Trips save/merge/editor keep working unchanged.

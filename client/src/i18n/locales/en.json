@@ -1,0 +1,86 @@
+{
+  "navigation": {
+    "home": "Home",
+    "my_trips": "My Trips",
+    "community": "Community",
+    "budget_tracker": "Budget Tracker",
+    "achievements": "Achievements",
+    "explore": "Explore",
+    "weather": "Weather",
+    "dashboard": "Dashboard"
+  },
+  "auth": {
+    "sign_in": "Sign In",
+    "sign_out": "Sign Out",
+    "welcome_back": "Welcome back {{email}}",
+    "goodbye": "Goodbye!",
+    "login_error": "Login Error",
+    "try_again_later": "Please try again later",
+    "signed_in_successfully": "Signed in successfully!",
+    "signed_out_successfully": "Signed out successfully"
+  },
+  "common": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "submit": "Submit",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort"
+  },
+  "trips": {
+    "my_trips": "My Trips",
+    "create_trip": "Create New Trip",
+    "trip_name": "Trip Name",
+    "destination": "Destination",
+    "start_date": "Start Date",
+    "end_date": "End Date",
+    "participants": "Participants",
+    "budget": "Budget",
+    "no_trips": "No trips yet",
+    "create_first_trip": "Create your first trip to get started"
+  },
+  "community": {
+    "title": "Community",
+    "no_reviews": "No reviews available",
+    "loading_reviews": "Loading reviews...",
+    "error_loading": "Error loading community data"
+  },
+  "budget": {
+    "title": "Budget Tracker",
+    "total_spent": "Total Spent",
+    "remaining": "Remaining",
+    "add_expense": "Add Expense",
+    "category": "Category",
+    "amount": "Amount",
+    "description": "Description"
+  },
+  "weather": {
+    "title": "Weather",
+    "current_weather": "Current Weather",
+    "forecast": "Forecast",
+    "temperature": "Temperature",
+    "humidity": "Humidity",
+    "wind_speed": "Wind Speed"
+  },
+  "achievements": {
+    "title": "Achievements",
+    "your_achievements": "Your Achievements",
+    "points": "Points",
+    "level": "Level",
+    "progress": "Progress"
+  },
+  "language": {
+    "english": "English",
+    "hebrew": "עברית",
+    "switch_language": "Switch Language"
+  }
+}
