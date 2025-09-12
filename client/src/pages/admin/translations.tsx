@@ -55,21 +55,34 @@ export default function AdminTranslations() {
     []
   );
 
-  // Fetch translation data
+  // Fetch translation data with proper session-based authentication
   const { data: translationsData, isLoading, error } = useQuery({
     queryKey: ['admin', 'translations', selectedEntity, selectedLocale, searchQuery],
     queryFn: () => apiRequest(`/api/admin/translations/${selectedEntity}?locale=${selectedLocale}&search=${searchQuery}`, {
-      headers: { 'x-user-email': 'admin@tripwise.com' } // Temporary admin authentication
+      credentials: 'include', // Include session cookies
     }),
     enabled: true,
+    retry: (failureCount, error: any) => {
+      // Don't retry on authentication errors
+      if (error?.status === 401 || error?.status === 403) {
+        return false;
+      }
+      return failureCount < 3;
+    },
   });
 
   // Fetch translation statistics
   const { data: statsData } = useQuery({
     queryKey: ['admin', 'translation-stats', selectedLocale],
     queryFn: () => apiRequest(`/api/admin/translations/stats/${selectedLocale}`, {
-      headers: { 'x-user-email': 'admin@tripwise.com' }
+      credentials: 'include',
     }),
+    retry: (failureCount, error: any) => {
+      if (error?.status === 401 || error?.status === 403) {
+        return false;
+      }
+      return failureCount < 3;
+    },
   });
 
   // Save translation mutation
@@ -83,7 +96,7 @@ export default function AdminTranslations() {
     }) => {
       return apiRequest(`/api/admin/translations/${entityType}/${entityId}`, {
         method: 'POST',
-        headers: { 'x-user-email': 'admin@tripwise.com' },
+        credentials: 'include',
         body: JSON.stringify({ locale, name, description }),
       });
     },
@@ -180,13 +193,31 @@ export default function AdminTranslations() {
   };
 
   if (error) {
+    const isAuthError = (error as any)?.status === 401 || (error as any)?.status === 403;
+    
     return (
       <div className="container mx-auto p-6">
         <Card className="border-red-200">
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 text-red-600">
               <AlertCircle className="w-5 h-5" />
-              <span>{t('errors.error_occurred')}: {error.message}</span>
+              <div>
+                <p className="font-medium">
+                  {isAuthError ? 'Access Denied' : 'Error Loading Admin Interface'}
+                </p>
+                <p className="text-sm mt-1">
+                  {isAuthError 
+                    ? 'You need admin privileges to access this page. Please log in with an admin account.'
+                    : `${error.message || 'An unexpected error occurred while loading the admin interface.'}`
+                  }
+                </p>
+                {isAuthError && (
+                  <div className="mt-3 text-xs text-gray-600">
+                    <p>Authorized admin emails: admin@tripwise.com, support@tripwise.com</p>
+                    <p>Note: This requires a valid user session.</p>
+                  </div>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>

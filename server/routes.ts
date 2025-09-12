@@ -68,8 +68,24 @@ export async function registerRoutes(app: Express): Promise<void> {
 
   // Database test endpoint
   // Import admin middleware
-  const { requireAdmin } = await import('./lib/adminAuth.js');
+  const { requireAdmin, createDevAdminSession } = await import('./lib/adminAuth.js');
   const { I18nService } = await import('./lib/i18nService.js');
+
+  // Development-only route to create admin session for testing
+  if (process.env.NODE_ENV !== 'production') {
+    app.post('/api/dev/create-admin-session', (req, res) => {
+      try {
+        createDevAdminSession(req, req.body.email);
+        res.json({ 
+          success: true, 
+          message: 'Admin session created for development',
+          email: req.body.email || 'admin@tripwise.com'
+        });
+      } catch (error) {
+        res.status(500).json({ error: 'Failed to create admin session' });
+      }
+    });
+  }
 
   // Admin translation routes
   app.get('/api/admin/translations/:entityType', requireAdmin, async (req, res) => {
