@@ -98,6 +98,20 @@
     "hebrew": "עברית",
     "switch_language": "החלף שפה"
   },
+  "planner": {
+    "day": "יום",
+    "add_item": "הוסף פריט",
+    "edit_item": "ערוך פריט",
+    "delete_item": "מחק פריט",
+    "save_changes": "שמור שינויים",
+    "reorder_items": "סדר מחדש פריטים",
+    "no_items": "אין פריטים מתוכננים להיום הזה",
+    "add_first_item": "הוסף את הפעילות הראשונה שלך",
+    "time_range": "טווח זמן",
+    "notes": "הערות",
+    "location": "מיקום",
+    "activity_type": "סוג פעילות"
+  },
   "errors": {
     "something_went_wrong": "משהו השתבש",
     "reload_page": "טען דף מחדש",
