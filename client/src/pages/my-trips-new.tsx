@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { useLocalizedFormatting } from "@/hooks/useLanguageSwitch";
+import { useLocalizedDestinations } from "@/lib/localizedData";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,16 +51,22 @@ import {
   Trash2
 } from "lucide-react";
 
-// Form schema
-const tripFormSchema = z.object({
-  destination: z.string().min(1, "Destination is required"),
-  travelStyle: z.array(z.string()).min(1, "Select at least one travel style"),
-  budget: z.number().min(100, "Budget must be at least $100"),
-  duration: z.string().min(1, "Duration is required"),
-  interests: z.array(z.string()).min(1, "Select at least one interest"),
+// Create form schema function that uses translations
+const createTripFormSchema = (t: any) => z.object({
+  destination: z.string().min(1, t('trips.select_destination')),
+  travelStyle: z.array(z.string()).min(1, t('trips.select_travel_style')),
+  budget: z.number().min(100, t('trips.budget_required')),
+  duration: z.string().min(1, t('trips.select_duration')),
+  interests: z.array(z.string()).min(1, t('trips.select_interests')),
 });
 
-type TripFormData = z.infer<typeof tripFormSchema>;
+type TripFormData = {
+  destination: string;
+  travelStyle: string[];
+  budget: number;
+  duration: string;
+  interests: string[];
+};
 
 // Interfaces
 interface RealPlace {
@@ -104,38 +113,49 @@ interface SavedTrip {
   createdAt: string;
 }
 
-// Constants
-const DURATIONS = [
-  { value: "1-2 weeks", label: "1-2 weeks" },
-  { value: "2-4 weeks", label: "2-4 weeks" },
-  { value: "1-2 months", label: "1-2 months" },
-  { value: "3+ months", label: "3+ months" },
-];
-
-const TRAVEL_STYLES = [
-  { id: 'adventure', icon: Mountain, label: 'Adventure', description: 'Hiking, trekking, extreme sports' },
-  { id: 'cultural', icon: Camera, label: 'Cultural', description: 'Museums, history, local traditions' },
-  { id: 'budget', icon: DollarSign, label: 'Budget', description: 'Backpacking, hostels, local transport' },
-  { id: 'luxury', icon: Sparkles, label: 'Luxury', description: 'Premium accommodations, fine dining' },
-  { id: 'nature', icon: Mountain, label: 'Nature', description: 'Wildlife, national parks, eco-tours' },
-  { id: 'food', icon: Utensils, label: 'Food', description: 'Local cuisine, food tours, cooking classes' },
-  { id: 'nightlife', icon: GlassWater, label: 'Nightlife', description: 'Bars, clubs, social events' },
-  { id: 'relaxation', icon: Clock, label: 'Relaxation', description: 'Beaches, wellness, slow travel' }
-];
-
-const INTERESTS = [
-  'History & Culture', 'Adventure Sports', 'Nature & Wildlife', 'Food & Cuisine', 
-  'Nightlife & Entertainment', 'Photography', 'Architecture', 'Local Markets',
-  'Beaches & Coastlines', 'Mountains & Hiking', 'Art & Museums', 'Music & Festivals',
-  'Shopping', 'Wellness & Relaxation', 'Language Learning', 'Volunteering'
-];
-
 export default function MyTripsNew() {
+  const { t } = useTranslation();
+  const { formatCurrency, formatDate } = useLocalizedFormatting();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isAuthenticated, user, signInWithGoogle } = useAuth();
   const [activeTab, setActiveTab] = useState("preferences");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  // Set localized page title
+  useEffect(() => {
+    document.title = `${t('trips.my_trips')} - TripWise`;
+  }, [t]);
+
+  // Localized constants - defined inside component to access t()
+  const DURATIONS = [
+    { value: "1-2 weeks", label: t('trips.duration_1_2_weeks') },
+    { value: "2-4 weeks", label: t('trips.duration_2_4_weeks') },
+    { value: "1-2 months", label: t('trips.duration_1_2_months') },
+    { value: "3+ months", label: t('trips.duration_3_months') },
+  ];
+
+  const TRAVEL_STYLES = [
+    { id: 'adventure', icon: Mountain, label: t('trips.adventure'), description: t('trips.adventure_desc') },
+    { id: 'cultural', icon: Camera, label: t('trips.cultural'), description: t('trips.cultural_desc') },
+    { id: 'budget', icon: DollarSign, label: t('trips.budget_travel'), description: t('trips.budget_desc') },
+    { id: 'luxury', icon: Sparkles, label: t('trips.luxury'), description: t('trips.luxury_desc') },
+    { id: 'nature', icon: Mountain, label: t('trips.nature'), description: t('trips.nature_desc') },
+    { id: 'food', icon: Utensils, label: t('trips.food'), description: t('trips.food_desc') },
+    { id: 'nightlife', icon: GlassWater, label: t('trips.nightlife'), description: t('trips.nightlife_desc') },
+    { id: 'relaxation', icon: Clock, label: t('trips.relaxation'), description: t('trips.relaxation_desc') }
+  ];
+
+  const INTERESTS = [
+    t('trips.interests_list.history_culture'), t('trips.interests_list.adventure_sports'), 
+    t('trips.interests_list.nature_wildlife'), t('trips.interests_list.food_cuisine'), 
+    t('trips.interests_list.nightlife_entertainment'), t('trips.interests_list.photography'), 
+    t('trips.interests_list.architecture'), t('trips.interests_list.local_markets'),
+    t('trips.interests_list.beaches_coastlines'), t('trips.interests_list.mountains_hiking'), 
+    t('trips.interests_list.art_museums'), t('trips.interests_list.music_festivals'),
+    t('trips.interests_list.shopping'), t('trips.interests_list.wellness_relaxation'), 
+    t('trips.interests_list.language_learning'), t('trips.interests_list.volunteering')
+  ];
   
   // Form state
   const [budget, setBudget] = useState([1000]);
@@ -148,8 +168,9 @@ export default function MyTripsNew() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratingItinerary, setIsGeneratingItinerary] = useState(false);
 
+  // Create form with dynamic schema that uses current translations
   const form = useForm<TripFormData>({
-    resolver: zodResolver(tripFormSchema),
+    resolver: zodResolver(createTripFormSchema(t)),
     defaultValues: {
       destination: "",
       travelStyle: [],
@@ -208,14 +229,14 @@ export default function MyTripsNew() {
           setActiveTab("suggestions");
         }, 100);
         toast({
-          title: "AI Suggestions Generated!",
-          description: `Generated ${data.length} personalized trip suggestions`,
+          title: t('trips.ai_suggestions_generated'),
+          description: t('trips.suggestions_count', { count: data.length }),
         });
       } else {
         console.error('Invalid data received:', data);
         toast({
-          title: "Error",
-          description: "Invalid response format from server",
+          title: t('common.error'),
+          description: t('trips.invalid_response_format'),
           variant: "destructive",
         });
       }
@@ -224,8 +245,8 @@ export default function MyTripsNew() {
       console.error('Error generating AI suggestions:', error);
       setIsGenerating(false);
       toast({
-        title: "Error", 
-        description: error?.message || "Failed to generate trip suggestions. Please try again.",
+        title: t('common.error'), 
+        description: error?.message || t('trips.error_generating'),
         variant: "destructive",
       });
     },
@@ -237,20 +258,20 @@ export default function MyTripsNew() {
       
       // Validate data before sending
       if (!formData.destination) {
-        throw new Error("Please select a destination first");
+        throw new Error(t('trips.please_select_destination_first'));
       }
       
       if (selectedInterests.length === 0) {
-        throw new Error("Please select at least one interest");
+        throw new Error(t('trips.please_select_interest'));
       }
       
       if (selectedStyles.length === 0) {
-        throw new Error("Please select at least one travel style");
+        throw new Error(t('trips.please_select_travel_style_one'));
       }
       
       const requestData = {
         destination: formData.destination,
-        duration: formData.duration || "1 week",
+        duration: formData.duration || t('trips.1_week_default'),
         interests: selectedInterests,
         travelStyle: selectedStyles,
         budget: budget[0] || 1000,
@@ -277,15 +298,15 @@ export default function MyTripsNew() {
       setItinerary(data);
       setActiveTab("itinerary");
       toast({
-        title: "Itinerary Generated!",
-        description: `Created ${data.length}-day detailed itinerary`,
+        title: t('trips.itinerary_generated'),
+        description: t('trips.itinerary_generated_desc', { count: data.length }),
       });
     },
     onError: (error) => {
       console.error('Error generating itinerary:', error);
       toast({
-        title: "Error",
-        description: error?.message || "Failed to generate itinerary. Please try again.",
+        title: t('common.error'),
+        description: error?.message || t('trips.error_generating_itinerary'),
         variant: "destructive",
       });
     },
@@ -313,8 +334,8 @@ export default function MyTripsNew() {
     },
     onSuccess: () => {
       toast({
-        title: "Trip Saved!",
-        description: "Trip suggestion saved to My Trips",
+        title: t('trips.trip_saved'),
+        description: t('trips.trip_saved_desc'),
       });
       // Refresh saved trips
       queryClient.invalidateQueries({ queryKey: ['/api/trips/user'] });
@@ -322,8 +343,8 @@ export default function MyTripsNew() {
     onError: (error) => {
       console.error('Error saving trip:', error);
       toast({
-        title: "Error",
-        description: "Failed to save trip. Please try again.",
+        title: t('common.error'),
+        description: t('trips.error_saving_trip'),
         variant: "destructive",
       });
     },
@@ -333,21 +354,21 @@ export default function MyTripsNew() {
   const saveItineraryMutation = useMutation({
     mutationFn: async () => {
       if (!isAuthenticated || !user) {
-        throw new Error("Please sign in to save your itinerary");
+        throw new Error(t('trips.sign_in_required_save'));
       }
       
       if (itinerary.length === 0) {
-        throw new Error("No itinerary to save");
+        throw new Error(t('trips.no_itinerary_to_save'));
       }
       
-      const mainDestination = itinerary[0]?.location || "Unknown";
+      const mainDestination = itinerary[0]?.location || t('common.unknown');
       const totalCost = itinerary.reduce((sum, day) => sum + day.estimatedCost, 0);
       
       const { data, error } = await supabase
         .from('itineraries')
         .insert({
           user_id: user.id,
-          title: `${mainDestination} Itinerary - ${new Date().toLocaleDateString()}`,
+          title: `${mainDestination} Itinerary - ${formatDate(new Date())}`,
           plan_json: {
             mainDestination,
             totalDays: itinerary.length,
@@ -374,18 +395,18 @@ export default function MyTripsNew() {
     },
     onSuccess: () => {
       toast({
-        title: "האיטינררי נשמר בהצלחה!",
-        description: "האיטינררי המפורט שלך נשמר ב-My Itineraries",
+        title: t('trips.itinerary_saved'),
+        description: t('trips.itinerary_saved_desc'),
       });
       queryClient.invalidateQueries({ queryKey: ['my-itineraries'] });
     },
     onError: (error) => {
       console.error('Error saving itinerary:', error);
       toast({
-        title: "שגיאה",
-        description: error.message === "Please sign in to save your itinerary" 
-          ? "שמירה דורשת התחברות" 
-          : "שמירה נכשלה, נסה שוב",
+        title: t('common.error'),
+        description: error.message === t('trips.sign_in_required_save')
+          ? t('trips.sign_in_required_save') 
+          : t('trips.save_failed'),
         variant: "destructive",
       });
     },
@@ -415,8 +436,8 @@ export default function MyTripsNew() {
           interestsLength: selectedInterests.length
         });
         toast({
-          title: "Missing Information",
-          description: "Please fill in destination, travel styles, and interests",
+          title: t('trips.missing_info'),
+          description: t('trips.missing_info_desc'),
           variant: "destructive",
         });
         return;
@@ -445,8 +466,8 @@ export default function MyTripsNew() {
       console.error('Error in handleGenerateAITrips:', error);
       setIsGenerating(false);
       toast({
-        title: "Error",
-        description: "Failed to generate trip suggestions. Please try again.",
+        title: t('common.error'),
+        description: t('trips.error_generating'),
         variant: "destructive",
       });
     }
@@ -520,8 +541,8 @@ export default function MyTripsNew() {
     } catch (error) {
       console.error('Error generating itinerary for suggestion:', error);
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to generate itinerary",
+        title: t('common.error'),
+        description: error instanceof Error ? error.message : t('trips.error_generating_itinerary'),
         variant: "destructive",
       });
     } finally {
@@ -589,7 +610,7 @@ export default function MyTripsNew() {
   const deleteItineraryMutation = useMutation({
     mutationFn: async (id: string) => {
       if (!isAuthenticated || !user) {
-        throw new Error("Authentication required");
+        throw new Error(t('auth.sign_in_required'));
       }
       
       const { error } = await supabase
@@ -629,9 +650,9 @@ export default function MyTripsNew() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto">
             <TabsList className="inline-flex w-auto min-w-full justify-evenly h-10">
-              <TabsTrigger value="preferences" className="flex items-center whitespace-nowrap">
+              <TabsTrigger value="preferences" className="flex items-center whitespace-nowrap" data-testid="tab-preferences">
                 <Bot className="w-4 h-4 mr-2" />
-                Preferences
+                {t('trips.preferences')}
               </TabsTrigger>
               <TabsTrigger value="suggestions" className="flex items-center whitespace-nowrap">
                 <Sparkles className="w-4 h-4 mr-2" />
@@ -675,7 +696,7 @@ export default function MyTripsNew() {
                     console.log('Destination set to:', value);
                   }}>
                     <SelectTrigger className="w-full p-3">
-                      <SelectValue placeholder="Select destination" />
+                      <SelectValue placeholder={t('trips.select_destination')} />
                     </SelectTrigger>
                     <SelectContent>
                       {SOUTH_AMERICAN_COUNTRIES.map((country) => (
@@ -830,7 +851,7 @@ export default function MyTripsNew() {
                     <Sparkles className="w-16 h-16 mx-auto mb-4 text-gray-400" />
                     <p className="text-lg font-medium text-gray-700 mb-2">No suggestions generated yet</p>
                     <p className="text-sm text-gray-500 mb-4">
-                      Set your preferences and click "Generate AI Trip Suggestions" to get started
+                      {t('trips.create_suggestions_first')}
                     </p>
                     <p className="text-xs text-gray-400 mb-4">
                       Debug: isGenerating={String(isGenerating)}, suggestions length={aiSuggestions.length}
@@ -1167,7 +1188,7 @@ export default function MyTripsNew() {
                                   </Link>
                                 </CardTitle>
                                 <p className="text-sm text-gray-500 mt-1">
-                                  נוצר ב-{new Date(itinerary.created_at).toLocaleDateString('he-IL')}
+                                  {t('common.created')} {formatDate(new Date(itinerary.created_at))}
                                 </p>
                               </div>
                               <div className="flex items-center space-x-2">
@@ -1275,7 +1296,7 @@ export default function MyTripsNew() {
                             <div>
                               <CardTitle className="text-lg">{trip.title}</CardTitle>
                               <p className="text-sm text-gray-500 mt-1">
-                                Created {new Date(trip.createdAt).toLocaleDateString()}
+                                {t('common.created')} {formatDate(new Date(trip.createdAt))}
                               </p>
                             </div>
                             <div className="flex flex-col items-end space-y-1">

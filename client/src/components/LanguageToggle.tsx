@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { Button } from './ui/button.js';
+import { Button } from './ui/button';
 import { Globe } from 'lucide-react';
 import { useEffect } from 'react';
-import { invalidateLocalizedQueries } from '../lib/localizedData.js';
+import { invalidateLocalizedQueries } from '../lib/localizedData';
 
 export function LanguageToggle() {
   const { i18n, t } = useTranslation();
