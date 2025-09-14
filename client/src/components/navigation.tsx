@@ -151,7 +151,34 @@ export default function Navigation() {
                         {isLoading ? t('common.loading') : t('auth.sign_out')}
                       </button>
                     </>
-                  ) : null}
+                  ) : (
+                    <div className="space-y-2">
+                      <Button
+                        onClick={() => {
+                          setAuthModalOpen(true);
+                          setMobileMenuOpen(false);
+                        }}
+                        className="w-full"
+                        disabled={isLoading}
+                        data-testid="button-sign-in"
+                      >
+                        <User className="w-5 h-5 mr-2" />
+                        {t('auth.sign_in')}
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setAuthModalOpen(true);
+                          setMobileMenuOpen(false);
+                        }}
+                        variant="outline"
+                        className="w-full"
+                        disabled={isLoading}
+                        data-testid="button-create-account"
+                      >
+                        {t('auth.create_account')}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
