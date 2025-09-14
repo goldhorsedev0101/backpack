@@ -179,7 +179,7 @@ export default function Landing() {
                     <SelectContent>
                       {SOUTH_AMERICAN_COUNTRIES.map((country) => (
                         <SelectItem key={country} value={country}>
-                          {country}
+                          {t(`trips.countries.${country}`) || country}
                         </SelectItem>
                       ))}
                     </SelectContent>

@@ -706,7 +706,7 @@ export default function MyTripsNew() {
                     <SelectContent>
                       {SOUTH_AMERICAN_COUNTRIES.map((country) => (
                         <SelectItem key={country} value={country}>
-                          {country}
+                          {t(`trips.countries.${country}`) || country}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -854,7 +854,7 @@ export default function MyTripsNew() {
                 {aiSuggestions.length === 0 && !isGenerating && (
                   <div className="text-center py-8">
                     <Sparkles className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <p className="text-lg font-medium text-gray-700 mb-2">No suggestions generated yet</p>
+                    <p className="text-lg font-medium text-gray-700 mb-2">{t('trips.no_suggestions_generated')}</p>
                     <p className="text-sm text-gray-500 mb-4">
                       {t('trips.create_suggestions_first')}
                     </p>
@@ -863,7 +863,7 @@ export default function MyTripsNew() {
                     </p>
                     <Button onClick={() => setActiveTab("preferences")} variant="outline">
                       <Bot className="w-4 h-4 mr-2" />
-                      Go to Preferences
+                      {t('trips.go_to_preferences')}
                     </Button>
                   </div>
                 )}
