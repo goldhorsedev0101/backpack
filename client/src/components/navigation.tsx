@@ -88,12 +88,38 @@ export default function Navigation() {
                 <div className="text-lg font-bold text-orange-600">TripWise</div>
               </Link>
               
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2">
                 <LanguageToggle />
+                {user ? (
+                  <Button
+                    onClick={handleLogout}
+                    variant="outline"
+                    size="sm"
+                    disabled={isLoading}
+                    className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white whitespace-nowrap"
+                    data-testid="button-sign-out-top"
+                  >
+                    <LogOut className="w-4 h-4 mr-1" />
+                    <span className="text-xs">{t('auth.sign_out')}</span>
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => setAuthModalOpen(true)}
+                    variant="outline" 
+                    size="sm"
+                    disabled={isLoading}
+                    className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white whitespace-nowrap"
+                    data-testid="button-sign-in-top"
+                  >
+                    <User className="w-4 h-4 mr-1" />
+                    <span className="text-xs">{t('auth.sign_in')}</span>
+                  </Button>
+                )}
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  data-testid="button-mobile-menu"
                 >
                   {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </Button>
