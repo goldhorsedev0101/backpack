@@ -39,6 +39,18 @@
   padding-left: 16rem; /* 64 * 0.25rem */
 }
 
+/* Ensure sidebar moves to left in RTL */
+[dir="rtl"] aside.fixed.right-0 {
+  right: auto;
+  left: 0;
+}
+
+/* Adjust main content padding for RTL sidebar */
+[dir="rtl"] main.md\\:pr-64 {
+  padding-right: 0;
+  padding-left: 16rem;
+}
+
 /* Enhanced text alignment for RTL */
 [dir="rtl"] .text-left {
   text-align: right;
@@ -46,6 +58,34 @@
 
 [dir="rtl"] .text-right {
   text-align: left;
+}
+
+/* Default text alignment for RTL */
+[dir="rtl"] p,
+[dir="rtl"] div,
+[dir="rtl"] span,
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6 {
+  text-align: right;
+}
+
+/* Keep centered elements centered */
+[dir="rtl"] .text-center,
+[dir="rtl"] .flex.justify-center,
+[dir="rtl"] .flex.items-center.justify-center {
+  text-align: center;
+  justify-content: center;
+}
+
+/* Specific adjustments for card content */
+[dir="rtl"] .card-content,
+[dir="rtl"] .card-description,
+[dir="rtl"] .card-title {
+  text-align: right;
 }
 
 /* Margin and padding adjustments */
@@ -151,4 +191,73 @@
 /* Tooltip adjustments */
 [dir="rtl"] [data-tooltip] {
   direction: rtl;
+}
+
+/* Mobile navigation adjustments */
+[dir="rtl"] .sticky.top-0 {
+  direction: rtl;
+}
+
+/* Card and content adjustments */
+[dir="rtl"] .card,
+[dir="rtl"] .bg-white {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Button content alignment */
+[dir="rtl"] button,
+[dir="rtl"] .btn {
+  direction: rtl;
+}
+
+/* Flex container adjustments */
+[dir="rtl"] .flex.justify-start {
+  justify-content: flex-end;
+}
+
+[dir="rtl"] .flex.justify-end {
+  justify-content: flex-start;
+}
+
+/* Specific mobile navigation fixes */
+[dir="rtl"] .md\\:hidden .flex.justify-between {
+  direction: rtl;
+}
+
+/* Tab navigation adjustments */
+[dir="rtl"] .tabs-list,
+[dir="rtl"] .tabs-content {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Bottom navigation adjustments */
+[dir="rtl"] .fixed.bottom-0 {
+  direction: rtl;
+}
+
+/* General content direction */
+[dir="rtl"] .max-w-7xl,
+[dir="rtl"] .container {
+  direction: rtl;
+}
+
+/* Input and form elements */
+[dir="rtl"] .form-control,
+[dir="rtl"] .input {
+  text-align: right;
+}
+
+/* List and menu items */
+[dir="rtl"] ul,
+[dir="rtl"] ol,
+[dir="rtl"] li {
+  text-align: right;
+}
+
+/* Navigation links */
+[dir="rtl"] .nav-link,
+[dir="rtl"] a {
+  text-align: right;
 }
