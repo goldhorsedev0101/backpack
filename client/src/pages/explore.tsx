@@ -103,7 +103,7 @@ interface DetailModalState {
 }
 
 export default function ExplorePage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("all");
   const [weatherFilter, setWeatherFilter] = useState("all");
