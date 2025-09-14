@@ -89,21 +89,32 @@
 
 /* Specific adjustments for card content */
 [dir="rtl"] .card-content,
-[dir="rtl"] .card-description,
-[dir="rtl"] .card-title {
+[dir="rtl"] .card-description {
   text-align: right;
-  justify-content: flex-end;
 }
 
-/* Flex-based headings alignment for RTL */
+/* Card title flex alignment for RTL - most important fix */
+[dir="rtl"] .card-title {
+  justify-content: flex-end !important;
+  text-align: right;
+  direction: rtl;
+}
+
+/* All heading flex containers for RTL */
 [dir="rtl"] h1.flex,
 [dir="rtl"] h2.flex,
 [dir="rtl"] h3.flex,
 [dir="rtl"] h4.flex,
 [dir="rtl"] h5.flex,
 [dir="rtl"] h6.flex {
-  justify-content: flex-end;
+  justify-content: flex-end !important;
   text-align: right;
+  direction: rtl;
+}
+
+/* Any element with flex and items-center (common pattern for card titles) */
+[dir="rtl"] .flex.items-center:not(.justify-center):not(.justify-between) {
+  justify-content: flex-end !important;
 }
 
 /* Margin and padding adjustments */
