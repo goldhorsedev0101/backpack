@@ -93,71 +93,64 @@
   text-align: right;
 }
 
-@layer utilities {
-  /* RTL FIXES TARGETING ACTUAL SHADCN DOM STRUCTURE */
+/* CRITICAL RTL FIXES - SUPER SPECIFIC TO OVERRIDE EVERYTHING */
 
-  /* Force text alignment flips with !important to beat Tailwind utilities */
-  [dir="rtl"] .text-left {
-    text-align: right !important;
-  }
+/* Global text direction and alignment */
+[dir="rtl"] {
+  text-align: right;
+}
 
-  [dir="rtl"] .text-right {
-    text-align: left !important;
-  }
+/* FORCE ALL HEADINGS TO ALIGN RIGHT */
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6 {
+  text-align: right !important;
+  justify-content: flex-end !important;
+  direction: rtl !important;
+}
 
-  /* All headings in cards */
-  [dir="rtl"] .card h1,
-  [dir="rtl"] .card h2,
-  [dir="rtl"] .card h3,
-  [dir="rtl"] .card h4,
-  [dir="rtl"] .card h5,
-  [dir="rtl"] .card h6 {
-    text-align: right !important;
-    direction: rtl !important;
-  }
+/* FORCE ALL FLEX CONTAINERS TO ALIGN RIGHT */
+[dir="rtl"] .flex.items-center:not(.justify-center):not(.justify-between) {
+  justify-content: flex-end !important;
+  direction: rtl !important;
+}
 
-  /* Shadcn CardHeader structure - targets p-6 flex containers */
-  [dir="rtl"] .card .p-6.flex {
-    justify-content: flex-end !important;
-    align-items: center !important;
-  }
+/* SUPER SPECIFIC FOR CARD TITLES */
+[dir="rtl"] h3.flex.items-center {
+  justify-content: flex-end !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
 
-  /* Card content flex containers */
-  [dir="rtl"] .card .flex.items-center {
-    justify-content: flex-end !important;
-    direction: rtl !important;
-  }
+/* TARGET THE EXACT MY-TRIPS CARD STRUCTURE */
+[dir="rtl"] .card h3.text-2xl {
+  text-align: right !important;
+  direction: rtl !important;
+  justify-content: flex-end !important;
+}
 
-  /* Keep specific layouts intact */
-  [dir="rtl"] .card .flex.justify-between {
-    justify-content: space-between !important;
-    flex-direction: row-reverse;
-  }
+/* CATCH-ALL FOR ANY REMAINING FLEX TITLES */
+[dir="rtl"] [class*="flex"][class*="items-center"] {
+  justify-content: flex-end !important;
+  direction: rtl !important;
+}
 
-  [dir="rtl"] .card .flex.justify-center {
-    justify-content: center !important;
-  }
+/* TEXT ALIGNMENT OVERRIDES */
+[dir="rtl"] .text-left {
+  text-align: right !important;
+}
 
-  /* Global heading alignment */
-  [dir="rtl"] h1,
-  [dir="rtl"] h2,
-  [dir="rtl"] h3,
-  [dir="rtl"] h4,
-  [dir="rtl"] h5,
-  [dir="rtl"] h6 {
-    text-align: right !important;
-    direction: rtl !important;
-  }
+[dir="rtl"] .text-right {
+  text-align: left !important;
+}
 
-  /* Flex heading containers */
-  [dir="rtl"] h1.flex,
-  [dir="rtl"] h2.flex,
-  [dir="rtl"] h3.flex,
-  [dir="rtl"] h4.flex,
-  [dir="rtl"] h5.flex,
-  [dir="rtl"] h6.flex {
-    justify-content: flex-end !important;
-  }
+/* Keep centered elements centered */
+[dir="rtl"] .text-center,
+[dir="rtl"] .flex.justify-center,
+[dir="rtl"] .flex.justify-between {
+  justify-content: center !important;
+}
+
+[dir="rtl"] .flex.justify-between {
+  justify-content: space-between !important;
 }
 
 /* Margin and padding adjustments */

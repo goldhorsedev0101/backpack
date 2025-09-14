@@ -682,8 +682,8 @@ export default function MyTripsNew() {
           <TabsContent value="preferences" className="mt-6">
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Bot className="w-6 h-6 mr-2 text-primary" />
+                <CardTitle className={`flex items-center ${i18n.language === 'he' ? 'justify-end text-right' : ''}`}>
+                  <Bot className={`w-6 h-6 text-primary ${i18n.language === 'he' ? 'ml-2 mr-0' : 'mr-2'}`} />
                   {t('trips.trip_preferences')}
                 </CardTitle>
                 <CardDescription>
@@ -834,8 +834,8 @@ export default function MyTripsNew() {
           <TabsContent value="suggestions" className="mt-6">
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Sparkles className="w-6 h-6 mr-2 text-primary" />
+                <CardTitle className={`flex items-center ${i18n.language === 'he' ? 'justify-end text-right' : ''}`}>
+                  <Sparkles className={`w-6 h-6 text-primary ${i18n.language === 'he' ? 'ml-2 mr-0' : 'mr-2'}`} />
                   {t('trips.ai_trip_suggestions')}
                 </CardTitle>
                 <CardDescription>
@@ -1001,8 +1001,8 @@ export default function MyTripsNew() {
           <TabsContent value="itinerary" className="mt-6">
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Route className="w-6 h-6 mr-2 text-primary" />
+                <CardTitle className={`flex items-center ${i18n.language === 'he' ? 'justify-end text-right' : ''}`}>
+                  <Route className={`w-6 h-6 text-primary ${i18n.language === 'he' ? 'ml-2 mr-0' : 'mr-2'}`} />
                   {t('trips.daily_itinerary')}
                 </CardTitle>
                 <CardDescription>
@@ -1130,8 +1130,8 @@ export default function MyTripsNew() {
           <TabsContent value="my-itineraries" className="mt-6">
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Save className="w-6 h-6 mr-2 text-primary" />
+                <CardTitle className={`flex items-center ${i18n.language === 'he' ? 'justify-end text-right' : ''}`}>
+                  <Save className={`w-6 h-6 text-primary ${i18n.language === 'he' ? 'ml-2 mr-0' : 'mr-2'}`} />
                   {t('trips.my_saved_itineraries')}
                 </CardTitle>
                 <CardDescription>
@@ -1258,8 +1258,8 @@ export default function MyTripsNew() {
           <TabsContent value="saved" className="mt-6">
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <FolderOpen className="w-6 h-6 mr-2 text-primary" />
+                <CardTitle className={`flex items-center ${i18n.language === 'he' ? 'justify-end text-right' : ''}`}>
+                  <FolderOpen className={`w-6 h-6 text-primary ${i18n.language === 'he' ? 'ml-2 mr-0' : 'mr-2'}`} />
                   {t('trips.my_saved_trips')}
                 </CardTitle>
                 <CardDescription>
