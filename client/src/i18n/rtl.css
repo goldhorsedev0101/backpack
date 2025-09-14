@@ -73,6 +73,12 @@
   text-align: right;
 }
 
+/* Ensure heading flex containers align to the right in RTL */
+[dir="rtl"] .card-header .flex.items-center,
+[dir="rtl"] .card-title.flex.items-center {
+  justify-content: flex-end;
+}
+
 /* Keep centered elements centered */
 [dir="rtl"] .text-center,
 [dir="rtl"] .flex.justify-center,
@@ -85,6 +91,18 @@
 [dir="rtl"] .card-content,
 [dir="rtl"] .card-description,
 [dir="rtl"] .card-title {
+  text-align: right;
+  justify-content: flex-end;
+}
+
+/* Flex-based headings alignment for RTL */
+[dir="rtl"] h1.flex,
+[dir="rtl"] h2.flex,
+[dir="rtl"] h3.flex,
+[dir="rtl"] h4.flex,
+[dir="rtl"] h5.flex,
+[dir="rtl"] h6.flex {
+  justify-content: flex-end;
   text-align: right;
 }
 
