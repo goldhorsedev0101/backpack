@@ -16,6 +16,7 @@ import DestinationWeather from "@/components/DestinationWeather";
 import { BestTimeInfo } from "@/components/BestTimeInfo";
 import { resolveCityCountry, type BaseEntity, type DestinationMini } from "@/utils/locationResolve";
 import { weatherClient, type WeatherData } from "@/utils/weatherUtils";
+import { useLocalizedPlaceNames } from "@/hooks/useLocalization";
 
 // Updated types to match actual Supabase schema
 interface Destination {
@@ -104,6 +105,7 @@ interface DetailModalState {
 
 export default function ExplorePage() {
   const { t, i18n } = useTranslation();
+  const { getPlaceName } = useLocalizedPlaceNames();
   
   // Hebrew weather condition translations
   const getWeatherTranslation = (condition: string): string => {
@@ -764,7 +766,7 @@ export default function ExplorePage() {
                       
                       <CardTitle className="flex items-center gap-2 mb-2">
                         <MapPin className="w-4 h-4 text-blue-600" />
-                        <span className="text-lg">{destination.name}</span>
+                        <span className="text-lg">{getPlaceName(destination.name, destination.id, 'destinations')}</span>
                       </CardTitle>
                       
                       <div className="space-y-2">
@@ -849,7 +851,7 @@ export default function ExplorePage() {
                     <CardContent className="p-4">
                       {renderPhoto(accommodation.id.toString(), accommodation.name)}
                       
-                      <CardTitle className="text-lg mb-2">{accommodation.name}</CardTitle>
+                      <CardTitle className="text-lg mb-2">{getPlaceName(accommodation.name, accommodation.id, 'accommodations')}</CardTitle>
                       
                       {locationSubtitle && (
                         <p className="text-sm text-muted-foreground mb-3">{locationSubtitle}</p>
@@ -929,7 +931,7 @@ export default function ExplorePage() {
                     <CardContent className="p-4">
                       {renderPhoto(attraction.id.toString(), attraction.name)}
                       
-                      <CardTitle className="text-lg mb-2">{attraction.name}</CardTitle>
+                      <CardTitle className="text-lg mb-2">{getPlaceName(attraction.name, attraction.id, 'attractions')}</CardTitle>
                       
                       {locationSubtitle && (
                         <p className="text-sm text-muted-foreground mb-3">{locationSubtitle}</p>
@@ -1001,7 +1003,7 @@ export default function ExplorePage() {
                     <CardContent className="p-4">
                       {renderPhoto(restaurant.id.toString(), restaurant.name)}
                       
-                      <CardTitle className="text-lg mb-2">{restaurant.name}</CardTitle>
+                      <CardTitle className="text-lg mb-2">{getPlaceName(restaurant.name, restaurant.id, 'restaurants')}</CardTitle>
                       
                       {locationSubtitle && (
                         <p className="text-sm text-muted-foreground mb-3">{locationSubtitle}</p>
@@ -1062,7 +1064,7 @@ export default function ExplorePage() {
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2 text-xl">
                   <MapPin className="w-5 h-5 text-blue-600" />
-                  {detailModal.item.name}
+                  {getPlaceName(detailModal.item.name, detailModal.item.id, detailModal.type as any)}
                 </DialogTitle>
               </DialogHeader>
               
@@ -1074,7 +1076,7 @@ export default function ExplorePage() {
                       <div key={photo.entity_id || idx} className="relative group">
                         <img
                           src={photo.thumbnail_url || photo.url}
-                          alt={`${detailModal.item.name} ${idx + 1}`}
+                          alt={`${getPlaceName(detailModal.item.name, detailModal.item.id, detailModal.type as any)} ${idx + 1}`}
                           className="w-full h-32 object-cover rounded-lg cursor-pointer transition-transform group-hover:scale-105"
                           onClick={() => window.open(photo.url, '_blank')}
                         />
