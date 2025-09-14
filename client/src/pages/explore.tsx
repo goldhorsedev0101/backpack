@@ -104,6 +104,30 @@ interface DetailModalState {
 
 export default function ExplorePage() {
   const { t, i18n } = useTranslation();
+  
+  // Hebrew weather condition translations
+  const getWeatherTranslation = (condition: string): string => {
+    if (i18n.language !== 'he') return condition;
+    
+    const translations: { [key: string]: string } = {
+      'clear sky': 'שמיים בהירים',
+      'few clouds': 'עננים ספורים',
+      'scattered clouds': 'עננים מפוזרים',
+      'broken clouds': 'עננים שבורים',
+      'overcast clouds': 'מעונן לחלוטין',
+      'light rain': 'גשם קל',
+      'moderate rain': 'גשם מתון',
+      'heavy rain': 'גשם כבד',
+      'thunderstorm': 'רעמים',
+      'snow': 'שלג',
+      'mist': 'ערפל',
+      'fog': 'ערפל כבד',
+      'partly cloudy': 'מעונן חלקית',
+      'sunny': 'שטוף שמש'
+    };
+    
+    return translations[condition.toLowerCase()] || condition;
+  };
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("all");
   const [weatherFilter, setWeatherFilter] = useState("all");
@@ -592,14 +616,14 @@ export default function ExplorePage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-lg">{weather.icon}</span>
-            <span className="font-semibold text-lg">{weather.temperature}°</span>
+            <span className="font-semibold text-lg">{weather.temperature}°C</span>
             <div className="text-xs text-muted-foreground">
-              <div>H: {weather.tempMax}° / L: {weather.tempMin}°</div>
+              <div>H: {weather.tempMax}°C / L: {weather.tempMin}°C</div>
             </div>
           </div>
           
           <div className={`text-xs text-muted-foreground capitalize ${i18n.language === 'he' ? 'text-right' : ''}`}>
-            {i18n.language === 'he' ? t(`weather.conditions.${weather.condition}`, weather.condition) : weather.condition}
+            {getWeatherTranslation(weather.condition)}
           </div>
         </div>
         
@@ -607,16 +631,16 @@ export default function ExplorePage() {
         <Tooltip>
           <TooltipTrigger asChild>
             <div className={`mt-1 text-xs text-muted-foreground cursor-help ${i18n.language === 'he' ? 'text-right' : ''}`}>
-              {t('weather.updated')} {formatTime()}
+              {i18n.language === 'he' ? 'עודכן:' : 'Updated:'} {formatTime()}
             </div>
           </TooltipTrigger>
           <TooltipContent side="top" className="max-w-48">
             <div className="space-y-1 text-xs">
-              <div><strong>{t('weather.feels_like')}:</strong> {weather.feelsLike}°C</div>
-              <div><strong>{t('weather.humidity')}:</strong> {weather.humidity}%</div>
-              <div><strong>{t('weather.wind')}:</strong> {weather.windSpeed} km/h</div>
+              <div><strong>{i18n.language === 'he' ? 'מרגיש כמו' : 'Feels like'}:</strong> {weather.feelsLike}°C</div>
+              <div><strong>{i18n.language === 'he' ? 'לחות' : 'Humidity'}:</strong> {weather.humidity}%</div>
+              <div><strong>{i18n.language === 'he' ? 'רוח' : 'Wind'}:</strong> {weather.windSpeed} km/h</div>
               {weather.precipitation > 0 && (
-                <div><strong>{t('weather.precipitation')}:</strong> {weather.precipitation}mm</div>
+                <div><strong>{i18n.language === 'he' ? 'משקעים' : 'Precipitation'}:</strong> {weather.precipitation}mm</div>
               )}
               <div className="text-xs text-muted-foreground pt-1">
                 Weather data from OpenWeather
@@ -758,7 +782,7 @@ export default function ExplorePage() {
                           </div>
                           <Button size="sm" variant="outline" className="text-xs">
                             <Eye className="w-3 h-3 mr-1" />
-                            {t('weather.more_details')}
+                            {i18n.language === 'he' ? 'פרטים נוספים' : 'More Details'}
                           </Button>
                         </div>
                       </div>
@@ -854,7 +878,7 @@ export default function ExplorePage() {
                           </div>
                           <Button size="sm" variant="outline" className="text-xs">
                             <Eye className="w-3 h-3 mr-1" />
-                            {t('weather.more_details')}
+                            {i18n.language === 'he' ? 'פרטים נוספים' : 'More Details'}
                           </Button>
                         </div>
                       </div>
@@ -926,7 +950,7 @@ export default function ExplorePage() {
                         <div className="flex items-center justify-end pt-2">
                           <Button size="sm" variant="outline" className="text-xs">
                             <Eye className="w-3 h-3 mr-1" />
-                            {t('weather.more_details')}
+                            {i18n.language === 'he' ? 'פרטים נוספים' : 'More Details'}
                           </Button>
                         </div>
                       </div>
@@ -1007,7 +1031,7 @@ export default function ExplorePage() {
                         <div className="flex items-center justify-end pt-2">
                           <Button size="sm" variant="outline" className="text-xs">
                             <Eye className="w-3 h-3 mr-1" />
-                            {t('weather.more_details')}
+                            {i18n.language === 'he' ? 'פרטים נוספים' : 'More Details'}
                           </Button>
                         </div>
                       </div>
