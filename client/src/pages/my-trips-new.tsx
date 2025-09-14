@@ -693,7 +693,7 @@ export default function MyTripsNew() {
               <CardContent className="space-y-6">
                 {/* Destination */}
                 <div>
-                  <Label htmlFor="destination" className="text-sm font-medium text-slate-700 mb-2 block">
+                  <Label htmlFor="destination" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
                     {t('trips.destination')}
                   </Label>
                   <Select onValueChange={(value) => {
@@ -715,7 +715,7 @@ export default function MyTripsNew() {
 
                 {/* Duration */}
                 <div>
-                  <Label htmlFor="duration" className="text-sm font-medium text-slate-700 mb-2 block">
+                  <Label htmlFor="duration" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
                     {t('trips.trip_duration')}
                   </Label>
                   <Select onValueChange={(value) => {
@@ -737,7 +737,7 @@ export default function MyTripsNew() {
 
                 {/* Budget */}
                 <div>
-                  <Label className="text-sm font-medium text-slate-700 mb-2 block">
+                  <Label className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
                     {t('trips.budget_range')}
                   </Label>
                   <div className="px-4">
@@ -762,8 +762,8 @@ export default function MyTripsNew() {
 
                 {/* Travel Style */}
                 <div>
-                  <Label className="text-sm font-medium text-slate-700 mb-2 block">
-                    Travel Style <span className="text-xs text-gray-500">(select multiple)</span>
+                  <Label className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                    {t('trips.travel_style')} <span className="text-xs text-gray-500">({t('trips.select_multiple')})</span>
                   </Label>
                   <div className="grid grid-cols-2 gap-4">
                     {TRAVEL_STYLES.map((style) => (
@@ -790,7 +790,7 @@ export default function MyTripsNew() {
 
                 {/* Interests */}
                 <div>
-                  <Label className="text-sm font-medium text-slate-700 mb-2 block">
+                  <Label className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
 {t('trips.interests')} <span className="text-xs text-gray-500">({t('trips.select_multiple')})</span>
                   </Label>
                   <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
