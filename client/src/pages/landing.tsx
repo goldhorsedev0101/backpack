@@ -11,7 +11,7 @@ import { useLocation, Link } from "wouter";
 import { AuthModal } from "../components/auth/AuthModal.js";
 import { queryClient } from "../lib/queryClient.js";
 import { SOUTH_AMERICAN_COUNTRIES } from "../lib/constants.js";
-import globeMateLogo from "@assets/generated_images/GlobeMate_travel_logo_design_16e72d83.png";
+import globeMateLogo from "../assets/globemate-logo.png";
 import { 
   Compass, 
   MapPin, 

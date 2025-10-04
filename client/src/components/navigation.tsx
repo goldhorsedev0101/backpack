@@ -16,7 +16,7 @@ import {
 } from "./ui/dropdown-menu.js";
 import { useIsMobile } from "../hooks/use-mobile.js";
 import { useScrollDirection } from "../hooks/useScrollDirection.js";
-import globeMateLogo from "@assets/generated_images/GlobeMate_travel_logo_design_16e72d83.png";
+import globeMateLogo from "../assets/globemate-logo.png";
 import { 
   Compass, 
   Home, 
