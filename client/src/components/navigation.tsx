@@ -93,34 +93,32 @@ export default function Navigation() {
                   <Button
                     onClick={handleLogout}
                     variant="outline"
-                    size="sm"
+                    className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white whitespace-nowrap min-h-[44px] min-w-[44px] h-auto px-3 py-2"
                     disabled={isLoading}
-                    className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white whitespace-nowrap"
                     data-testid="button-sign-out-top"
                   >
-                    <LogOut className="w-4 h-4 mr-1" />
-                    <span className="text-xs">{t('auth.sign_out')}</span>
+                    <LogOut className="w-6 h-6 mr-1" />
+                    <span className="text-sm">{t('auth.sign_out')}</span>
                   </Button>
                 ) : (
                   <Button
                     onClick={() => setAuthModalOpen(true)}
                     variant="outline" 
-                    size="sm"
+                    className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white whitespace-nowrap min-h-[44px] min-w-[44px] h-auto px-3 py-2"
                     disabled={isLoading}
-                    className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white whitespace-nowrap"
                     data-testid="button-sign-in-top"
                   >
-                    <User className="w-4 h-4 mr-1" />
-                    <span className="text-xs">{t('auth.sign_in')}</span>
+                    <User className="w-6 h-6 mr-1" />
+                    <span className="text-sm">{t('auth.sign_in')}</span>
                   </Button>
                 )}
                 <Button
                   variant="ghost"
-                  size="sm"
+                  className="min-h-[48px] min-w-[48px] h-auto p-2"
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                   data-testid="button-mobile-menu"
                 >
-                  {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                  {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                 </Button>
               </div>
             </div>
@@ -142,7 +140,7 @@ export default function Navigation() {
                     asChild
                     variant="ghost"
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`w-full flex items-center px-3 py-2 rounded-lg text-left justify-start ${
+                    className={`w-full flex items-center px-3 py-3 min-h-[48px] rounded-lg text-left justify-start ${
                       location === item.href
                         ? "bg-primary text-white"
                         : "text-slate-600 hover:bg-gray-100"
@@ -151,8 +149,8 @@ export default function Navigation() {
                     <Link href={item.href}>
                       {item.icon ? (
                         <>
-                          <span className="mr-3"><item.icon className="w-5 h-5" /></span>
-                          <span className="text-sm font-medium">{item.label}</span>
+                          <span className="mr-3"><item.icon className="w-6 h-6" /></span>
+                          <span className="text-base font-medium">{item.label}</span>
                         </>
                       ) : item.label}
                     </Link>
@@ -176,10 +174,10 @@ export default function Navigation() {
                       <button
                         onClick={handleLogout}
                         disabled={isLoading}
-                        className="w-full flex items-center px-3 py-2 text-slate-600 hover:bg-gray-100 rounded-lg disabled:opacity-50"
+                        className="w-full flex items-center px-3 py-3 min-h-[48px] text-slate-600 hover:bg-gray-100 rounded-lg disabled:opacity-50"
                       >
-                        <LogOut className="w-5 h-5 mr-3" />
-                        {isLoading ? t('common.loading') : t('auth.sign_out')}
+                        <LogOut className="w-6 h-6 mr-3" />
+                        <span className="text-base">{isLoading ? t('common.loading') : t('auth.sign_out')}</span>
                       </button>
                     </>
                   ) : (
@@ -189,12 +187,12 @@ export default function Navigation() {
                           setAuthModalOpen(true);
                           setMobileMenuOpen(false);
                         }}
-                        className="w-full"
+                        className="w-full min-h-[48px] h-auto py-3"
                         disabled={isLoading}
                         data-testid="button-sign-in"
                       >
-                        <User className="w-5 h-5 mr-2" />
-                        {t('auth.sign_in')}
+                        <User className="w-6 h-6 mr-2" />
+                        <span className="text-base">{t('auth.sign_in')}</span>
                       </Button>
                       <Button
                         onClick={() => {
@@ -202,11 +200,11 @@ export default function Navigation() {
                           setMobileMenuOpen(false);
                         }}
                         variant="outline"
-                        className="w-full"
+                        className="w-full min-h-[48px] h-auto py-3"
                         disabled={isLoading}
                         data-testid="button-create-account"
                       >
-                        {t('auth.create_account')}
+                        <span className="text-base">{t('auth.create_account')}</span>
                       </Button>
                     </div>
                   )}
@@ -231,7 +229,7 @@ export default function Navigation() {
                 key={item.href}
                 asChild
                 variant="ghost"
-                className={`flex flex-col items-center py-2 px-2 rounded-lg transition-colors min-w-[60px] h-auto ${
+                className={`flex flex-col items-center py-2 px-2 rounded-lg transition-colors min-w-[60px] min-h-[52px] h-auto ${
                   location === item.href
                     ? "text-primary bg-primary/10"
                     : "text-gray-600 hover:text-primary hover:bg-gray-50"
@@ -240,8 +238,8 @@ export default function Navigation() {
                 <Link href={item.href}>
                   {item.icon ? (
                     <>
-                      <span className="mb-1"><item.icon className="w-5 h-5" /></span>
-                      <span className="text-xs font-medium truncate">{item.label}</span>
+                      <span className="mb-1"><item.icon className="w-6 h-6" /></span>
+                      <span className="text-xs font-medium truncate max-w-[60px]">{item.label}</span>
                     </>
                   ) : item.label}
                 </Link>
