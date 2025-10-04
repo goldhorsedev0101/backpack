@@ -1,7 +1,15 @@
-# GlobeMate - South American Travel Platform
+# GlobeMate - Global Travel Platform
 
 ## Overview
-GlobeMate is a full-stack web application designed for South American travel planning and community building. Its core purpose is to provide an AI-powered platform for trip recommendations, itinerary generation, expense tracking, and real-time communication among travelers. The project aims to be a comprehensive resource for exploring South America, combining advanced AI capabilities with robust social features to simplify travel logistics and foster a vibrant travel community.
+GlobeMate is a full-stack web application designed for global travel planning and community building. Its core purpose is to provide an AI-powered platform for trip recommendations, itinerary generation, expense tracking, and real-time communication among travelers. The project aims to be a comprehensive resource for exploring destinations worldwide, combining advanced AI capabilities with robust social features to simplify travel logistics and foster a vibrant travel community.
+
+### Global Expansion (Oct 2025)
+- **Geographic Coverage**: Expanded from South America-only to worldwide destinations covering 70+ countries across all continents
+- **Country Constants**: Maintained SOUTH_AMERICAN_COUNTRIES as literal tuple for backward compatibility, added WORLD_COUNTRIES for global coverage
+- **Multilingual Support**: Complete bilingual support (Hebrew/English) for all 70+ countries with instant language toggle
+- **Destination Data**: Expanded from 7 South American countries to 18 countries with detailed climate and travel timing data (South America, Europe, Asia, Oceania, North America)
+- **Services Updated**: Weather Service, Travel Timing Service, and Python Collector now support global destinations
+- **Type Safety**: Preserved literal tuple types for SOUTH_AMERICAN_COUNTRIES to maintain existing type contracts
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
