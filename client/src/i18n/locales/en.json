@@ -267,7 +267,14 @@
       "South America": "South America",
       "Oceania": "Oceania",
       "Africa": "Africa",
-      "Caribbean": "Caribbean"
+      "Caribbean": "Caribbean",
+      "europe": "Europe",
+      "asia": "Asia",
+      "north_america": "North America",
+      "south_america": "South America",
+      "oceania": "Oceania",
+      "africa": "Africa",
+      "caribbean": "Caribbean"
     },
     "countries": {
       "Argentina": "Argentina",

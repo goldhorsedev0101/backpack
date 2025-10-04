@@ -310,7 +310,14 @@
       "South America": "דרום אמריקה",
       "Oceania": "אוקיאניה",
       "Africa": "אפריקה",
-      "Caribbean": "הקריביים"
+      "Caribbean": "הקריביים",
+      "europe": "אירופה",
+      "asia": "אסיה",
+      "north_america": "צפון אמריקה",
+      "south_america": "דרום אמריקה",
+      "oceania": "אוקיאניה",
+      "africa": "אפריקה",
+      "caribbean": "הקריביים"
     },
     "adventure": "הרפתקה",
     "cultural": "תרבותי",
