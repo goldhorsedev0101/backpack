@@ -133,11 +133,18 @@ const getContinentSeasonalInfo = (continent: Continent, t: any) => {
 };
 
 export default function WeatherPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { getPlaceName } = useLocalizedPlaceNames();
   const [selectedContinent, setSelectedContinent] = useState<Continent | ''>('');
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
+
+  const getCityName = (cityName: string) => {
+    if (i18n.language === 'he') {
+      return t(`cities.${cityName}`, cityName);
+    }
+    return cityName;
+  };
   
   const WORLD_DESTINATIONS = getWorldDestinations();
   
@@ -265,7 +272,7 @@ export default function WeatherPage() {
                     <SelectContent>
                       {availableCities.map((city: string) => (
                         <SelectItem key={city} value={city}>
-                          {city}
+                          {getCityName(city)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -288,8 +295,8 @@ export default function WeatherPage() {
                       data-testid={`quick-city-${dest.name}`}
                     >
                       <MapPin className="w-4 h-4" />
-                      <span className="text-sm font-medium">{dest.name}</span>
-                      <span className="text-xs text-gray-500">{dest.country}</span>
+                      <span className="text-sm font-medium">{getCityName(dest.name)}</span>
+                      <span className="text-xs text-gray-500">{getPlaceName(dest.country, dest.country, 'destinations')}</span>
                     </Button>
                   ))}
                 </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -72,6 +73,7 @@ interface WeatherWidgetProps {
 
 export function WeatherWidget({ destination, country = 'Peru', showRecommendations = true }: WeatherWidgetProps) {
   const [activeTab, setActiveTab] = useState('current');
+  const { t } = useTranslation();
 
   const { data: weatherData, isLoading: weatherLoading, error: weatherError } = useQuery<WeatherData>({
     queryKey: ['/api/weather', destination, country],
@@ -119,11 +121,11 @@ export function WeatherWidget({ destination, country = 'Peru', showRecommendatio
 
   const getConditionText = (condition: string) => {
     switch (condition) {
-      case 'excellent': return 'Perfect Travel Weather';
-      case 'good': return 'Great Travel Conditions';
-      case 'fair': return 'Decent Travel Weather';
-      case 'poor': return 'Challenging Conditions';
-      default: return 'Weather Conditions';
+      case 'excellent': return t('weather.perfect_travel_weather');
+      case 'good': return t('weather.great_travel_conditions');
+      case 'fair': return t('weather.decent_travel_weather');
+      case 'poor': return t('weather.challenging_conditions');
+      default: return t('weather.great_travel_conditions');
     }
   };
 
@@ -173,16 +175,16 @@ export function WeatherWidget({ destination, country = 'Peru', showRecommendatio
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <MapPin className="w-5 h-5" />
-          {destination} Weather & Travel Guide
+          {destination} {t('weather.weather_travel_guide')}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <div className="overflow-x-auto">
             <TabsList className="inline-flex w-auto min-w-full justify-start h-10">
-              <TabsTrigger value="current" className="whitespace-nowrap">Current Weather</TabsTrigger>
-              <TabsTrigger value="forecast" className="whitespace-nowrap">5-Day Forecast</TabsTrigger>
-              {showRecommendations && <TabsTrigger value="recommendations" className="whitespace-nowrap">Travel Tips</TabsTrigger>}
+              <TabsTrigger value="current" className="whitespace-nowrap">{t('weather.current_weather_tab')}</TabsTrigger>
+              <TabsTrigger value="forecast" className="whitespace-nowrap">{t('weather.forecast_tab')}</TabsTrigger>
+              {showRecommendations && <TabsTrigger value="recommendations" className="whitespace-nowrap">{t('weather.travel_tips_tab')}</TabsTrigger>}
             </TabsList>
           </div>
 
@@ -202,14 +204,14 @@ export function WeatherWidget({ destination, country = 'Peru', showRecommendatio
                   <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
                     <Droplets className="w-5 h-5 text-blue-500" />
                     <div>
-                      <p className="text-sm text-gray-600">Humidity</p>
+                      <p className="text-sm text-gray-600">{t('weather.humidity')}</p>
                       <p className="font-semibold">{weatherData.humidity}%</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
                     <Wind className="w-5 h-5 text-gray-500" />
                     <div>
-                      <p className="text-sm text-gray-600">Wind Speed</p>
+                      <p className="text-sm text-gray-600">{t('weather.wind')}</p>
                       <p className="font-semibold">{weatherData.windSpeed} km/h</p>
                     </div>
                   </div>
@@ -262,7 +264,7 @@ export function WeatherWidget({ destination, country = 'Peru', showRecommendatio
                     <div className="space-y-2">
                       <h4 className="font-semibold flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-green-500" />
-                        Best Travel Months
+                        {t('weather.best_travel_months')}
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {recommendations.bestMonths.map((month, index) => (
@@ -276,7 +278,7 @@ export function WeatherWidget({ destination, country = 'Peru', showRecommendatio
                     <div className="space-y-2">
                       <h4 className="font-semibold flex items-center gap-2">
                         <AlertTriangle className="w-4 h-4 text-red-500" />
-                        Months to Avoid
+                        {t('weather.months_to_avoid')}
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {recommendations.avoidMonths.map((month, index) => (
@@ -293,7 +295,7 @@ export function WeatherWidget({ destination, country = 'Peru', showRecommendatio
                     <div className="space-y-2">
                       <h4 className="font-semibold flex items-center gap-2">
                         <Heart className="w-4 h-4 text-blue-500" />
-                        Recommended Activities
+                        {t('weather.recommended_activities')}
                       </h4>
                       <ul className="text-sm space-y-1">
                         {recommendations.activities.recommended.map((activity, index) => (
@@ -308,7 +310,7 @@ export function WeatherWidget({ destination, country = 'Peru', showRecommendatio
                     <div className="space-y-2">
                       <h4 className="font-semibold flex items-center gap-2">
                         <Backpack className="w-4 h-4 text-purple-500" />
-                        Packing Tips
+                        {t('weather.packing_tips')}
                       </h4>
                       <ul className="text-sm space-y-1">
                         {recommendations.packingTips.map((tip, index) => (
@@ -326,7 +328,7 @@ export function WeatherWidget({ destination, country = 'Peru', showRecommendatio
                     <Alert>
                       <AlertTriangle className="w-4 h-4" />
                       <AlertDescription>
-                        <strong>Health & Safety:</strong> {recommendations.healthWarnings.join(', ')}
+                        <strong>{t('weather.health_safety')}:</strong> {recommendations.healthWarnings.join(', ')}
                       </AlertDescription>
                     </Alert>
                   )}
