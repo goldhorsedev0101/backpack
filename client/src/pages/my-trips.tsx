@@ -374,7 +374,15 @@ export default function MyTripsScreen() {
       return;
     }
     
-    generateTripMutation.mutate(formData);
+    // If a specific city is selected, use it instead of the country
+    const effectiveDestination = formData.specificCity 
+      ? `${formData.specificCity}, ${formData.destination}`
+      : formData.destination;
+    
+    generateTripMutation.mutate({
+      ...formData,
+      destination: effectiveDestination
+    });
   };
 
   const handleStyleChange = (style: string, checked: boolean) => {
