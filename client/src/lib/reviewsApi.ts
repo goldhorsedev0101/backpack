@@ -39,17 +39,17 @@ export interface EntityPair {
 
 // Get unique guest token for voting
 export function getGuestToken(): string {
-  let token = localStorage.getItem('tripwise_guest_vote_token');
+  let token = localStorage.getItem('globemate_guest_vote_token');
   if (!token) {
     token = crypto.randomUUID();
-    localStorage.setItem('tripwise_guest_vote_token', token);
+    localStorage.setItem('globemate_guest_vote_token', token);
   }
   return token;
 }
 
 // Get current guest name
 export function getGuestName(): string {
-  return localStorage.getItem('tripwise_guest_name') || '';
+  return localStorage.getItem('globemate_guest_name') || '';
 }
 
 // List reviews with filters and pagination

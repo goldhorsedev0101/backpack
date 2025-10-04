@@ -16,7 +16,7 @@ import {
 } from "./ui/dropdown-menu.js";
 import { useIsMobile } from "../hooks/use-mobile.js";
 import { useScrollDirection } from "../hooks/useScrollDirection.js";
-// import logoCompact from "../assets/tripwise-logo-compact.svg";
+// import logoCompact from "../assets/globemate-logo-compact.svg";
 import { 
   Compass, 
   Home, 
