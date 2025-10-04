@@ -107,3 +107,4 @@ Preferred communication style: Simple, everyday language.
 - **Query Hardening**: Updated all database queries to use proper count options instead of selecting count columns, added pagination safety, and implemented comprehensive health checks
 - **Health Monitoring**: Added /health/db endpoint and smoke test suite with 5 comprehensive tests validating schema alignment, field mappings, and query safety
 - **UI Language Standardization**: Converted all interface text from Hebrew to English for consistent user experience
+- **Logo Enhancement (Oct 2025)**: Increased logo sizes across all UI locations for better visibility - mobile navigation (56x56px), desktop sidebar (96x96px), landing page footer (64x64px). Removed "GlobeMate" text labels next to logos for cleaner, more visual-focused branding
