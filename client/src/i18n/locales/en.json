@@ -69,7 +69,8 @@
     "sort": "Sort",
     "created": "Created",
     "unknown": "Unknown",
-    "description": "Description"
+    "description": "Description",
+    "language": "Language"
   },
   "places": {
     "and_more_places": "and {{count}} more {{count, plural, one {place} other {places}}}...",

@@ -89,7 +89,6 @@ export default function Navigation() {
               </Link>
               
               <div className="flex items-center gap-2">
-                <LanguageToggle />
                 {user ? (
                   <Button
                     onClick={handleLogout}
@@ -131,6 +130,12 @@ export default function Navigation() {
           {mobileMenuOpen && (
             <div className="absolute top-16 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
               <div className="px-4 py-4 space-y-4">
+                {/* Language Toggle in Mobile Menu */}
+                <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+                  <span className="text-sm font-medium text-gray-700">{t('common.language')}</span>
+                  <LanguageToggle />
+                </div>
+                
                 {navigationItems.map((item) => (
                   <Button
                     key={item.href}

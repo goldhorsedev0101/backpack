@@ -72,7 +72,8 @@
     "unknown": "לא ידוע",
     "view": "צפה",
     "view_all": "צפה בהכל",
-    "description": "תיאור"
+    "description": "תיאור",
+    "language": "שפה"
   },
   "places": {
     "and_more_places": "ועוד {{count}} {{count, plural, one {מקום נוסף} other {מקומות נוספים}}}...",
