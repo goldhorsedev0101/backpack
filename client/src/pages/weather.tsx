@@ -7,73 +7,114 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import { Search, MapPin, Calendar, Thermometer, Info } from 'lucide-react';
-import { SOUTH_AMERICAN_COUNTRIES } from "@/lib/constants";
+import { CONTINENTS, getCountriesByContinent, getContinentByCountry, type Continent } from "@/lib/constants";
 import { useLocalizedPlaceNames } from "@/hooks/useLocalization";
 
-const getSouthAmericanDestinations = (t: any) => [
-  { name: 'Lima', country: 'Peru', description: t('weather.destinations.lima_desc') },
-  { name: 'Cusco', country: 'Peru', description: t('weather.destinations.cusco_desc') },
-  { name: 'Bogota', country: 'Colombia', description: t('weather.destinations.bogota_desc') },
-  { name: 'Cartagena', country: 'Colombia', description: t('weather.destinations.cartagena_desc') },
-  { name: 'Buenos Aires', country: 'Argentina', description: t('weather.destinations.buenos_aires_desc') },
-  { name: 'Mendoza', country: 'Argentina', description: t('weather.destinations.mendoza_desc') },
-  { name: 'Rio de Janeiro', country: 'Brazil', description: t('weather.destinations.rio_desc') },
-  { name: 'Sao Paulo', country: 'Brazil', description: t('weather.destinations.sao_paulo_desc') },
-  { name: 'Santiago', country: 'Chile', description: t('weather.destinations.santiago_desc') },
-  { name: 'Valparaiso', country: 'Chile', description: t('weather.destinations.valparaiso_desc') },
-  { name: 'La Paz', country: 'Bolivia', description: t('weather.destinations.la_paz_desc') },
-  { name: 'Uyuni', country: 'Bolivia', description: t('weather.destinations.uyuni_desc') },
-  { name: 'Quito', country: 'Ecuador', description: t('weather.destinations.quito_desc') },
-  { name: 'Montevideo', country: 'Uruguay', description: t('weather.destinations.montevideo_desc') },
-  { name: 'Asuncion', country: 'Paraguay', description: t('weather.destinations.asuncion_desc') }
-];
-
-const getTravelSeasons = (t: any) => [
-  {
-    season: t('weather.seasons.dry_season'),
-    description: t('weather.seasons.dry_season_desc'),
-    destinations: ['Cusco', 'Quito', 'La Paz', 'Uyuni'],
-    color: 'bg-yellow-100 text-yellow-800'
-  },
-  {
-    season: t('weather.seasons.summer_season'),
-    description: t('weather.seasons.summer_season_desc'),
-    destinations: ['Rio de Janeiro', 'Buenos Aires', 'Santiago', 'Montevideo'],
-    color: 'bg-orange-100 text-orange-800'
-  },
-  {
-    season: t('weather.seasons.year_round'),
-    description: t('weather.seasons.year_round_desc'),
-    destinations: ['Lima', 'Bogota', 'Cartagena', 'Quito'],
-    color: 'bg-green-100 text-green-800'
-  }
-];
+const getWorldDestinations = () => ({
+  // Europe
+  'France': ['Paris', 'Lyon', 'Nice', 'Marseille', 'Bordeaux'],
+  'Italy': ['Rome', 'Venice', 'Florence', 'Milan', 'Naples'],
+  'Spain': ['Barcelona', 'Madrid', 'Seville', 'Valencia', 'Granada'],
+  'Germany': ['Berlin', 'Munich', 'Hamburg', 'Frankfurt', 'Cologne'],
+  'United Kingdom': ['London', 'Edinburgh', 'Manchester', 'Liverpool', 'Oxford'],
+  'Greece': ['Athens', 'Santorini', 'Mykonos', 'Crete', 'Rhodes'],
+  'Portugal': ['Lisbon', 'Porto', 'Faro', 'Madeira', 'Azores'],
+  'Netherlands': ['Amsterdam', 'Rotterdam', 'The Hague', 'Utrecht', 'Eindhoven'],
+  'Switzerland': ['Zurich', 'Geneva', 'Bern', 'Lucerne', 'Interlaken'],
+  'Austria': ['Vienna', 'Salzburg', 'Innsbruck', 'Graz', 'Hallstatt'],
+  
+  // Asia
+  'Japan': ['Tokyo', 'Kyoto', 'Osaka', 'Hiroshima', 'Nara'],
+  'Thailand': ['Bangkok', 'Phuket', 'Chiang Mai', 'Pattaya', 'Krabi'],
+  'China': ['Beijing', 'Shanghai', 'Hong Kong', 'Guangzhou', 'Chengdu'],
+  'South Korea': ['Seoul', 'Busan', 'Jeju', 'Incheon', 'Gyeongju'],
+  'India': ['Delhi', 'Mumbai', 'Jaipur', 'Agra', 'Goa'],
+  'Indonesia': ['Bali', 'Jakarta', 'Yogyakarta', 'Lombok', 'Sumatra'],
+  'Vietnam': ['Hanoi', 'Ho Chi Minh City', 'Ha Long Bay', 'Hoi An', 'Da Nang'],
+  'Singapore': ['Singapore City', 'Sentosa', 'Marina Bay', 'Orchard Road', 'Clarke Quay'],
+  'Malaysia': ['Kuala Lumpur', 'Penang', 'Langkawi', 'Malacca', 'Kota Kinabalu'],
+  'UAE': ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah'],
+  
+  // North America
+  'United States': ['New York', 'Los Angeles', 'Miami', 'Las Vegas', 'San Francisco'],
+  'Canada': ['Toronto', 'Vancouver', 'Montreal', 'Quebec City', 'Calgary'],
+  'Mexico': ['Cancun', 'Mexico City', 'Playa del Carmen', 'Puerto Vallarta', 'Cabo San Lucas'],
+  
+  // South America
+  'Peru': ['Lima', 'Cusco', 'Machu Picchu', 'Arequipa', 'Iquitos'],
+  'Colombia': ['Bogota', 'Cartagena', 'Medellin', 'Cali', 'Santa Marta'],
+  'Argentina': ['Buenos Aires', 'Mendoza', 'Bariloche', 'Salta', 'Cordoba'],
+  'Brazil': ['Rio de Janeiro', 'Sao Paulo', 'Salvador', 'Brasilia', 'Florianopolis'],
+  'Chile': ['Santiago', 'Valparaiso', 'Valdivia', 'Puerto Varas', 'Punta Arenas'],
+  'Bolivia': ['La Paz', 'Uyuni', 'Sucre', 'Potosi', 'Copacabana'],
+  'Ecuador': ['Quito', 'Guayaquil', 'Cuenca', 'Galapagos', 'Montanita'],
+  'Uruguay': ['Montevideo', 'Punta del Este', 'Colonia', 'Salto', 'Piriapolis'],
+  'Paraguay': ['Asuncion', 'Ciudad del Este', 'Encarnacion', 'San Bernardino', 'Villarrica'],
+  
+  // Oceania
+  'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Gold Coast'],
+  'New Zealand': ['Auckland', 'Wellington', 'Queenstown', 'Christchurch', 'Rotorua'],
+  
+  // Africa
+  'Egypt': ['Cairo', 'Luxor', 'Aswan', 'Alexandria', 'Hurghada'],
+  'Morocco': ['Marrakech', 'Casablanca', 'Fes', 'Rabat', 'Tangier'],
+  'South Africa': ['Cape Town', 'Johannesburg', 'Durban', 'Pretoria', 'Port Elizabeth'],
+  'Kenya': ['Nairobi', 'Mombasa', 'Masai Mara', 'Nakuru', 'Kisumu'],
+  'Tanzania': ['Dar es Salaam', 'Zanzibar', 'Arusha', 'Serengeti', 'Kilimanjaro'],
+  
+  // Caribbean
+  'Jamaica': ['Kingston', 'Montego Bay', 'Ocho Rios', 'Negril', 'Port Antonio'],
+  'Cuba': ['Havana', 'Varadero', 'Santiago de Cuba', 'Trinidad', 'Vinales'],
+  'Dominican Republic': ['Santo Domingo', 'Punta Cana', 'Puerto Plata', 'La Romana', 'Samana'],
+  'Bahamas': ['Nassau', 'Paradise Island', 'Freeport', 'Exuma', 'Grand Bahama']
+});
 
 export default function WeatherPage() {
   const { t } = useTranslation();
   const { getPlaceName } = useLocalizedPlaceNames();
-  const [selectedDestination, setSelectedDestination] = useState('');
+  const [selectedContinent, setSelectedContinent] = useState<Continent | ''>('');
   const [selectedCountry, setSelectedCountry] = useState('');
-  const [customDestination, setCustomDestination] = useState('');
-  const [showCustom, setShowCustom] = useState(false);
+  const [selectedCity, setSelectedCity] = useState('');
   
-  const SOUTH_AMERICAN_DESTINATIONS = getSouthAmericanDestinations(t);
-  const TRAVEL_SEASONS = getTravelSeasons(t);
+  const WORLD_DESTINATIONS = getWorldDestinations();
+  
+  // Get available countries for selected continent
+  const availableCountries = selectedContinent 
+    ? getCountriesByContinent(selectedContinent).filter(country => WORLD_DESTINATIONS[country as keyof typeof WORLD_DESTINATIONS])
+    : [];
+  
+  // Get available cities for selected country
+  const availableCities = selectedCountry 
+    ? (WORLD_DESTINATIONS[selectedCountry as keyof typeof WORLD_DESTINATIONS] || [])
+    : [];
 
-  const handleDestinationSelect = (destination: string) => {
-    const dest = SOUTH_AMERICAN_DESTINATIONS.find(d => d.name === destination);
-    if (dest) {
-      setSelectedDestination(destination);
-      setSelectedCountry(dest.country);
-      setShowCustom(false);
-    }
+  // Get popular cities from selected continent (for quick select)
+  const popularCities = selectedContinent
+    ? availableCountries.slice(0, 3).flatMap(country => 
+        (WORLD_DESTINATIONS[country as keyof typeof WORLD_DESTINATIONS] || []).slice(0, 2).map(city => ({
+          name: city,
+          country
+        }))
+      )
+    : [];
+
+  const handleContinentChange = (continent: string) => {
+    setSelectedContinent(continent as Continent);
+    setSelectedCountry('');
+    setSelectedCity('');
   };
 
-  const handleCustomSearch = () => {
-    if (customDestination.trim()) {
-      setSelectedDestination(customDestination.trim());
-      setSelectedCountry('Peru'); // Default country
-      setShowCustom(true);
+  const handleCountryChange = (country: string) => {
+    setSelectedCountry(country);
+    setSelectedCity('');
+  };
+
+  const handleCitySelect = (city: string, country: string) => {
+    setSelectedCity(city);
+    setSelectedCountry(country);
+    const detectedContinent = getContinentByCountry(country);
+    if (detectedContinent && !selectedContinent) {
+      setSelectedContinent(detectedContinent);
     }
   };
 
@@ -97,162 +138,107 @@ export default function WeatherPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Quick Select Popular Destinations */}
-            <div className="space-y-3">
-              <h3 className="font-semibold text-gray-700">{t('weather.popular_destinations')}</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                {SOUTH_AMERICAN_DESTINATIONS.slice(0, 10).map((dest) => (
-                  <Button
-                    key={dest.name}
-                    variant={selectedDestination === dest.name ? "default" : "outline"}
-                    className="h-auto p-3 flex flex-col items-center gap-1"
-                    onClick={() => handleDestinationSelect(dest.name)}
+            {/* Continent, Country, City Selection */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Continent Selector */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    {t('trips.select_continent')}
+                  </label>
+                  <Select value={selectedContinent} onValueChange={handleContinentChange}>
+                    <SelectTrigger data-testid="select-continent">
+                      <SelectValue placeholder={t('trips.select_continent')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CONTINENTS.map((continent) => (
+                        <SelectItem key={continent} value={continent}>
+                          {t(`trips.continents.${continent.toLowerCase().replace(/ /g, '_')}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Country Selector */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    {t('trips.select_country')}
+                  </label>
+                  <Select 
+                    value={selectedCountry} 
+                    onValueChange={handleCountryChange}
+                    disabled={!selectedContinent}
                   >
-                    <MapPin className="w-4 h-4" />
-                    <span className="text-sm font-medium">{getPlaceName(dest.name, dest.name, 'destinations')}</span>
-                    <span className="text-xs text-gray-500">{getPlaceName(dest.country, dest.country, 'destinations')}</span>
-                  </Button>
-                ))}
+                    <SelectTrigger data-testid="select-country">
+                      <SelectValue placeholder={t('trips.select_country')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableCountries.map((country) => (
+                        <SelectItem key={country} value={country}>
+                          {getPlaceName(country, country, 'destinations')}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* City Selector */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    {t('weather.select_city')}
+                  </label>
+                  <Select 
+                    value={selectedCity} 
+                    onValueChange={(city) => handleCitySelect(city, selectedCountry)}
+                    disabled={!selectedCountry}
+                  >
+                    <SelectTrigger data-testid="select-city">
+                      <SelectValue placeholder={t('weather.select_city')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableCities.map((city) => (
+                        <SelectItem key={city} value={city}>
+                          {city}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
-            {/* Custom Search */}
-            <div className="space-y-3">
-              <h3 className="font-semibold text-gray-700">{t('weather.search_custom_destination')}</h3>
-              <div className="flex gap-2">
-                <Input
-                  placeholder={t('weather.search_placeholder')}
-                  value={customDestination}
-                  onChange={(e) => setCustomDestination(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleCustomSearch()}
-                />
-                <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder={t('weather.select_country')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SOUTH_AMERICAN_COUNTRIES.map((country) => (
-                      <SelectItem key={country} value={country}>
-                        {getPlaceName(country, country, 'destinations')}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button onClick={handleCustomSearch}>
-                  <Search className="w-4 h-4 mr-2" />
-                  {t('common.search')}
-                </Button>
+            {/* Quick Select Popular Cities (if continent selected) */}
+            {popularCities.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="font-semibold text-gray-700">{t('weather.popular_cities')}</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                  {popularCities.map((dest) => (
+                    <Button
+                      key={`${dest.name}-${dest.country}`}
+                      variant={selectedCity === dest.name ? "default" : "outline"}
+                      className="h-auto p-3 flex flex-col items-center gap-1"
+                      onClick={() => handleCitySelect(dest.name, dest.country)}
+                    >
+                      <MapPin className="w-4 h-4" />
+                      <span className="text-sm font-medium">{dest.name}</span>
+                      <span className="text-xs text-gray-500">{dest.country}</span>
+                    </Button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Weather Widget */}
-        {selectedDestination && (
+        {selectedCity && selectedCountry && (
           <WeatherWidget
-            destination={selectedDestination}
+            destination={selectedCity}
             country={selectedCountry}
             showRecommendations={true}
           />
         )}
-
-        {/* Travel Seasons Guide */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
-              {t('weather.travel_seasons_title')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {TRAVEL_SEASONS.map((season, index) => (
-                <div key={index} className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Badge className={season.color}>{season.season}</Badge>
-                  </div>
-                  <p className="text-sm text-gray-600">{season.description}</p>
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-sm">{t('weather.best_destinations')}:</h4>
-                    <div className="flex flex-wrap gap-1">
-                      {season.destinations.map((dest, i) => (
-                        <span key={i} className="text-xs bg-gray-100 px-2 py-1 rounded">
-                          {getPlaceName(dest, dest, 'destinations')}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Climate Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Thermometer className="w-5 h-5" />
-              {t('weather.climate_zones_title')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="space-y-2 p-4 bg-blue-50 rounded-lg">
-                <h4 className="font-semibold text-blue-800">{t('weather.climate_zones.coastal_desert')}</h4>
-                <p className="text-sm text-blue-700">{getPlaceName('Lima', 'Lima', 'destinations')}, {getPlaceName('Ica', 'Ica', 'destinations')}</p>
-                <p className="text-xs text-blue-600">{t('weather.climate_zones.coastal_desert_desc')}</p>
-              </div>
-              <div className="space-y-2 p-4 bg-green-50 rounded-lg">
-                <h4 className="font-semibold text-green-800">{t('weather.climate_zones.tropical')}</h4>
-                <p className="text-sm text-green-700">אמזונס, {getPlaceName('Cartagena', 'Cartagena', 'destinations')}</p>
-                <p className="text-xs text-green-600">{t('weather.climate_zones.tropical_desc')}</p>
-              </div>
-              <div className="space-y-2 p-4 bg-purple-50 rounded-lg">
-                <h4 className="font-semibold text-purple-800">{t('weather.climate_zones.highland')}</h4>
-                <p className="text-sm text-purple-700">{getPlaceName('Cusco', 'Cusco', 'destinations')}, {getPlaceName('Quito', 'Quito', 'destinations')}, {getPlaceName('La Paz', 'La Paz', 'destinations')}</p>
-                <p className="text-xs text-purple-600">{t('weather.climate_zones.highland_desc')}</p>
-              </div>
-              <div className="space-y-2 p-4 bg-orange-50 rounded-lg">
-                <h4 className="font-semibold text-orange-800">{t('weather.climate_zones.temperate')}</h4>
-                <p className="text-sm text-orange-700">{getPlaceName('Buenos Aires', 'Buenos Aires', 'destinations')}, {getPlaceName('Santiago', 'Santiago', 'destinations')}</p>
-                <p className="text-xs text-orange-600">{t('weather.climate_zones.temperate_desc')}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Travel Tips */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Info className="w-5 h-5" />
-              {t('weather.travel_tips_title')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <h4 className="font-semibold">{t('weather.tips.altitude_considerations')}</h4>
-                <ul className="text-sm space-y-1 text-gray-600">
-                  <li>• {t('weather.tips.cusco_altitude')}</li>
-                  <li>• {t('weather.tips.la_paz_altitude')}</li>
-                  <li>• {t('weather.tips.quito_altitude')}</li>
-                  <li>• {t('weather.tips.uyuni_altitude')}</li>
-                </ul>
-              </div>
-              <div className="space-y-3">
-                <h4 className="font-semibold">{t('weather.tips.seasonal_variations')}</h4>
-                <ul className="text-sm space-y-1 text-gray-600">
-                  <li>• {t('weather.tips.southern_hemisphere')}</li>
-                  <li>• {t('weather.tips.equatorial_regions')}</li>
-                  <li>• {t('weather.tips.patagonia')}</li>
-                  <li>• {t('weather.tips.amazon')}</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

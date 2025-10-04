@@ -88,8 +88,12 @@
     "travel_seasons_title": "Travel Seasons", 
     "choose_destination": "Choose Destination",
     "popular_destinations": "Popular Destinations",
+    "popular_cities": "Popular Cities",
     "search_custom_destination": "Search Custom Destination",
     "select_country": "Select Country",
+    "select_city": "Select City",
+    "page_title": "Weather & Climate",
+    "page_subtitle": "Check real-time weather and climate information for destinations worldwide",
     "best_destinations": "Best Destinations",
     "climate_zones": {
       "coastal_desert": "Coastal Desert",
