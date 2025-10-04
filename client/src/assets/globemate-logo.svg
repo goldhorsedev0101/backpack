@@ -35,10 +35,10 @@
   
   <!-- Company name -->
   <text x="70" y="25" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="url(#textGradient)">
-    Trip
+    Globe
   </text>
   <text x="70" y="45" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="url(#textGradient)">
-    Wise
+    Mate
   </text>
   
   <!-- Tagline -->
