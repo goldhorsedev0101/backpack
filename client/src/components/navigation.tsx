@@ -229,7 +229,7 @@ export default function Navigation() {
                 key={item.href}
                 asChild
                 variant="ghost"
-                className={`flex flex-col items-center py-2 px-2 rounded-lg transition-colors min-w-[60px] min-h-[52px] h-auto ${
+                className={`flex flex-col items-center py-2 px-1 rounded-lg transition-colors min-w-[60px] min-h-[52px] h-auto ${
                   location === item.href
                     ? "text-primary bg-primary/10"
                     : "text-gray-600 hover:text-primary hover:bg-gray-50"
@@ -239,7 +239,7 @@ export default function Navigation() {
                   {item.icon ? (
                     <>
                       <span className="mb-1"><item.icon className="w-6 h-6" /></span>
-                      <span className="text-xs font-medium truncate max-w-[60px]">{item.label}</span>
+                      <span className="text-[10px] font-medium text-center leading-tight w-full break-words hyphens-auto max-w-[70px]">{item.label}</span>
                     </>
                   ) : item.label}
                 </Link>
