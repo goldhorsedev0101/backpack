@@ -10,7 +10,7 @@ import { useAuth } from "../context/AuthContext.js";
 import { useLocation, Link } from "wouter";
 import { AuthModal } from "../components/auth/AuthModal.js";
 import { queryClient } from "../lib/queryClient.js";
-import { WORLD_COUNTRIES } from "../lib/constants.js";
+import { CONTINENTS, CONTINENT_COUNTRY_MAP, getCountriesByContinent, type Continent } from "../lib/constants.js";
 import globeMateLogo from "../assets/globemate-logo.png";
 import { 
   Compass, 
@@ -44,6 +44,7 @@ export default function Landing() {
   const { t } = useTranslation();
   const [budget, setBudget] = useState([2500]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+  const [selectedContinent, setSelectedContinent] = useState<Continent | "">("");
   const [destination, setDestination] = useState<string>("");
   const { user, signOut } = useAuth();
   const [, setLocation] = useLocation();
@@ -71,6 +72,25 @@ export default function Landing() {
         : [...prev, style]
     );
   };
+
+  const handleContinentChange = (continent: string) => {
+    setSelectedContinent(continent as Continent);
+    setDestination(""); // Reset destination when continent changes
+  };
+
+  const availableCountries = selectedContinent 
+    ? getCountriesByContinent(selectedContinent)
+    : [];
+
+  // Auto-detect continent from existing destination (for backward compatibility)
+  useEffect(() => {
+    if (destination && !selectedContinent) {
+      const detectedContinent = getContinentByCountry(destination);
+      if (detectedContinent) {
+        setSelectedContinent(detectedContinent);
+      }
+    }
+  }, [destination, selectedContinent]);
 
   const handleLogin = () => {
     setAuthModalOpen(true);
@@ -139,13 +159,32 @@ export default function Landing() {
             <CardContent className="p-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 <div>
-                  <Label className="block text-sm font-medium text-slate-700 mb-2">{t('landing.where_to_go')}</Label>
-                  <Select onValueChange={(value) => setDestination(value)}>
-                    <SelectTrigger className="w-full p-3">
-                      <SelectValue placeholder={t('landing.select_country')} />
+                  <Label className="block text-sm font-medium text-slate-700 mb-2">{t('trips.select_continent')}</Label>
+                  <Select onValueChange={handleContinentChange} value={selectedContinent}>
+                    <SelectTrigger className="w-full p-3" data-testid="select-continent">
+                      <SelectValue placeholder={t('trips.select_continent')} />
                     </SelectTrigger>
                     <SelectContent>
-                      {WORLD_COUNTRIES.map((country) => (
+                      {CONTINENTS.map((continent) => (
+                        <SelectItem key={continent} value={continent}>
+                          {t(`trips.continents.${continent}`) || continent}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="block text-sm font-medium text-slate-700 mb-2">{t('trips.select_country')}</Label>
+                  <Select 
+                    onValueChange={(value) => setDestination(value)} 
+                    value={destination}
+                    disabled={!selectedContinent}
+                  >
+                    <SelectTrigger className="w-full p-3" data-testid="select-country">
+                      <SelectValue placeholder={selectedContinent ? t('trips.select_country') : t('trips.select_continent')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableCountries.map((country) => (
                         <SelectItem key={country} value={country}>
                           {t(`trips.countries.${country}`) || country}
                         </SelectItem>

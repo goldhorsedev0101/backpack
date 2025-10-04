@@ -24,7 +24,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 // import { RealPlaceLinks } from "@/components/RealPlaceLinks";
-import { SOUTH_AMERICAN_COUNTRIES } from "@/lib/constants";
+import { CONTINENTS, CONTINENT_COUNTRY_MAP, getCountriesByContinent, getContinentByCountry, type Continent } from "@/lib/constants";
 import { 
   Bot, 
   MapPin, 
@@ -161,6 +161,7 @@ export default function MyTripsNew() {
   const [budget, setBudget] = useState([1000]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [selectedContinent, setSelectedContinent] = useState<Continent | "">("");
   
   // Results state
   const [aiSuggestions, setAiSuggestions] = useState<TripSuggestion[]>([]);
@@ -196,6 +197,28 @@ export default function MyTripsNew() {
     setSelectedInterests(newInterests);
     form.setValue('interests', newInterests);
   };
+
+  const handleContinentChange = (continent: string) => {
+    setSelectedContinent(continent as Continent);
+    form.setValue('destination', ""); // Reset destination when continent changes
+  };
+
+  const availableCountries = selectedContinent 
+    ? getCountriesByContinent(selectedContinent)
+    : [];
+
+  // Auto-detect continent from existing destination (for backward compatibility)
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'destination' && value.destination && !selectedContinent) {
+        const detectedContinent = getContinentByCountry(value.destination);
+        if (detectedContinent) {
+          setSelectedContinent(detectedContinent);
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form, selectedContinent]);
 
   // API calls
   const generateAISuggestionsMutation = useMutation({
@@ -691,20 +714,43 @@ export default function MyTripsNew() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Destination */}
+                {/* Continent Selection */}
                 <div>
-                  <Label htmlFor="destination" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
-                    {t('trips.destination')}
+                  <Label htmlFor="continent" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                    {t('trips.select_continent')}
                   </Label>
-                  <Select onValueChange={(value) => {
-                    form.setValue('destination', value);
-                    console.log('Destination set to:', value);
-                  }}>
-                    <SelectTrigger className="w-full p-3">
-                      <SelectValue placeholder={t('trips.select_destination')} />
+                  <Select onValueChange={handleContinentChange} value={selectedContinent}>
+                    <SelectTrigger className="w-full p-3" data-testid="select-continent">
+                      <SelectValue placeholder={t('trips.select_continent')} />
                     </SelectTrigger>
                     <SelectContent>
-                      {SOUTH_AMERICAN_COUNTRIES.map((country) => (
+                      {CONTINENTS.map((continent) => (
+                        <SelectItem key={continent} value={continent}>
+                          {t(`trips.continents.${continent}`) || continent}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Country Selection (Dependent on Continent) */}
+                <div>
+                  <Label htmlFor="destination" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                    {t('trips.select_country')}
+                  </Label>
+                  <Select 
+                    onValueChange={(value) => {
+                      form.setValue('destination', value);
+                      console.log('Destination set to:', value);
+                    }}
+                    value={form.watch('destination')}
+                    disabled={!selectedContinent}
+                  >
+                    <SelectTrigger className="w-full p-3" data-testid="select-country">
+                      <SelectValue placeholder={selectedContinent ? t('trips.select_country') : t('trips.select_continent')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableCountries.map((country) => (
                         <SelectItem key={country} value={country}>
                           {t(`trips.countries.${country}`) || country}
                         </SelectItem>

@@ -301,6 +301,17 @@
     "highlights": "דגשים",
     "no_suggestions": "אין הצעות עדיין",
     "create_suggestions_first": "צור הצעות בינה מלאכותית כדי לראות המלצות טיול אישיות",
+    "select_continent": "בחר יבשת",
+    "select_country": "בחר מדינה",
+    "continents": {
+      "Europe": "אירופה",
+      "Asia": "אסיה",
+      "North America": "צפון אמריקה",
+      "South America": "דרום אמריקה",
+      "Oceania": "אוקיאניה",
+      "Africa": "אפריקה",
+      "Caribbean": "הקריביים"
+    },
     "adventure": "הרפתקה",
     "cultural": "תרבותי",
     "budget_travel": "תקציבי",

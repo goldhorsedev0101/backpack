@@ -254,6 +254,17 @@
     "highlights": "Highlights",
     "no_suggestions": "No suggestions yet",
     "create_suggestions_first": "Generate AI suggestions to see personalized trip recommendations",
+    "select_continent": "Select continent",
+    "select_country": "Select country",
+    "continents": {
+      "Europe": "Europe",
+      "Asia": "Asia",
+      "North America": "North America",
+      "South America": "South America",
+      "Oceania": "Oceania",
+      "Africa": "Africa",
+      "Caribbean": "Caribbean"
+    },
     "countries": {
       "Argentina": "Argentina",
       "Bolivia": "Bolivia", 
