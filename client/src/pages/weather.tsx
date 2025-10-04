@@ -298,6 +298,15 @@ export default function WeatherPage() {
           </CardContent>
         </Card>
 
+        {/* Weather Widget - Shows first when city is selected */}
+        {selectedCity && selectedCountry && (
+          <WeatherWidget
+            destination={selectedCity}
+            country={selectedCountry}
+            showRecommendations={true}
+          />
+        )}
+
         {/* Seasonal Info (if continent selected) */}
         {selectedContinent && seasonalInfo && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -389,15 +398,6 @@ export default function WeatherPage() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Weather Widget */}
-        {selectedCity && selectedCountry && (
-          <WeatherWidget
-            destination={selectedCity}
-            country={selectedCountry}
-            showRecommendations={true}
-          />
-        )}
       </div>
     </div>
   );
