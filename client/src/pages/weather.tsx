@@ -353,44 +353,42 @@ export default function WeatherPage() {
           </div>
         )}
 
-        {/* General Travel Tips (if no continent selected) */}
-        {!selectedContinent && (
-          <Card className="bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-200">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Info className="w-5 h-5 text-blue-600" />
-                {t('weather.general_tips_title')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex items-start gap-3 p-4 bg-white rounded-lg">
-                  <Plane className="w-6 h-6 text-blue-600 mt-1" />
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">{t('weather.tip_1_title')}</h4>
-                    <p className="text-sm text-gray-600">{t('weather.tip_1_desc')}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3 p-4 bg-white rounded-lg">
-                  <Thermometer className="w-6 h-6 text-orange-600 mt-1" />
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">{t('weather.tip_2_title')}</h4>
-                    <p className="text-sm text-gray-600">{t('weather.tip_2_desc')}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3 p-4 bg-white rounded-lg">
-                  <CloudRain className="w-6 h-6 text-gray-600 mt-1" />
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">{t('weather.tip_3_title')}</h4>
-                    <p className="text-sm text-gray-600">{t('weather.tip_3_desc')}</p>
-                  </div>
+        {/* General Travel Tips - Always shown */}
+        <Card className="bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Info className="w-5 h-5 text-blue-600" />
+              {t('weather.general_tips_title')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex items-start gap-3 p-4 bg-white rounded-lg">
+                <Plane className="w-6 h-6 text-blue-600 mt-1" />
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-1">{t('weather.tip_1_title')}</h4>
+                  <p className="text-sm text-gray-600">{t('weather.tip_1_desc')}</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        )}
+              
+              <div className="flex items-start gap-3 p-4 bg-white rounded-lg">
+                <Thermometer className="w-6 h-6 text-orange-600 mt-1" />
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-1">{t('weather.tip_2_title')}</h4>
+                  <p className="text-sm text-gray-600">{t('weather.tip_2_desc')}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3 p-4 bg-white rounded-lg">
+                <CloudRain className="w-6 h-6 text-gray-600 mt-1" />
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-1">{t('weather.tip_3_title')}</h4>
+                  <p className="text-sm text-gray-600">{t('weather.tip_3_desc')}</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Weather Widget */}
         {selectedCity && selectedCountry && (
