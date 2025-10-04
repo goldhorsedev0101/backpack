@@ -334,6 +334,7 @@
   },
   "community": {
     "title": "Community",
+    "room_number": "Room {{number}}",
     "no_reviews": "No reviews available",
     "loading_reviews": "Loading reviews...",
     "error_loading": "Error loading community data",
@@ -419,6 +420,28 @@
       "cycling": "Cycling",
       "kayaking": "Kayaking",
       "camping": "Camping"
+    },
+    "create_room": {
+      "title": "Create New Chat Room",
+      "room_name": "Room Name *",
+      "room_name_placeholder": "e.g., Planning trip to Peru",
+      "character_count": "{{current}}/{{max}} characters",
+      "description": "Description",
+      "description_placeholder": "Brief description of this room's purpose...",
+      "location": "Location/Country",
+      "location_placeholder": "e.g., Peru, Colombia, Chile",
+      "visibility": "Room Visibility",
+      "public_label": "Public - Anyone can join",
+      "private_label": "🔒 Private - Invite only",
+      "invite_participants": "Invite Participants *",
+      "invite_placeholder": "Comma-separated guest names (e.g., Alice, Bob, Charlie)",
+      "invite_help": "Enter guest names separated by commas. They will be added to the private room.",
+      "your_name": "Your Name *",
+      "creating_as": "Creating as",
+      "inviting": "Inviting",
+      "creating": "Creating...",
+      "create_button": "Create Room",
+      "name_placeholder": "Enter your name"
     }
   },
   "budget": {

@@ -302,6 +302,7 @@
   "community": {
     "title": "קהילת TripWise",
     "description": "התחברו לחברי נסיעה, שתפו חוויות ומצאו בני לוויה לטיול",
+    "room_number": "חדר {{number}}",
     "search_placeholder": "חיפוש ביקורות, חדרי צ'אט או יעדים...",
     "filter_by_location": "סינון לפי מיקום",
     "all_locations": "כל המיקומים",
@@ -509,6 +510,10 @@
       "invite_placeholder": "שמות אורחים מופרדים בפסיקים (לדוגמה, אליס, בוב, צ'רלי)",
       "invite_help": "הזינו שמות אורחים מופרדים בפסיקים. הם יתווספו לחדר הפרטי.",
       "your_name": "השם שלכם *",
+      "creating_as": "יוצר בשם",
+      "inviting": "מזמין",
+      "creating": "יוצר...",
+      "create_button": "צור חדר",
       "name_placeholder": "הזינו את השם שלכם",
       "success": {
         "title": "חדר נוצר",

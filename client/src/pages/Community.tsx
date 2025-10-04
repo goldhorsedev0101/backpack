@@ -241,7 +241,7 @@ export default function Community() {
               selectedRoom={selectedRoom}
               onRoomSelect={(roomId, roomName, roomDescription, roomType) => {
                 setSelectedRoom(roomId);
-                setSelectedRoomName(roomName || `Room ${roomId}`);
+                setSelectedRoomName(roomName || t('community.room_number', { number: roomId }));
                 setSelectedRoomDescription(roomDescription || '');
                 setSelectedRoomIsPrivate(roomType === 'private');
               }}
@@ -609,10 +609,10 @@ function CreateRoomModal({
 
           {storedGuestName && (
             <div className="text-sm text-gray-600 p-3 bg-gray-50 rounded">
-              Creating as: <strong>{storedGuestName}</strong>
+              {t('community.create_room.creating_as')}: <strong>{storedGuestName}</strong>
               {formData.visibility === 'private' && formData.inviteGuests && (
                 <div className="mt-1 text-xs">
-                  Inviting: {formData.inviteGuests.split(',').map(name => name.trim()).filter(Boolean).join(', ')}
+                  {t('community.create_room.inviting')}: {formData.inviteGuests.split(',').map(name => name.trim()).filter(Boolean).join(', ')}
                 </div>
               )}
             </div>
@@ -627,10 +627,10 @@ function CreateRoomModal({
               {createRoomMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Creating...
+                  {t('community.create_room.creating')}
                 </>
               ) : (
-                'Create Room'
+                t('community.create_room.create_button')
               )}
             </Button>
             <Button 
@@ -639,7 +639,7 @@ function CreateRoomModal({
               onClick={() => onOpenChange(false)}
               disabled={createRoomMutation.isPending}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
           </div>
         </form>
