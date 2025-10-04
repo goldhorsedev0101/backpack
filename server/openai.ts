@@ -65,7 +65,7 @@ export interface ConversationalResponse {
   nextActions?: string[];
 }
 
-// Generate personalized travel suggestions for South America based on user preferences
+// Generate personalized travel suggestions worldwide based on user preferences
 export async function generateTravelSuggestions(
   preferences: {
     travelStyle?: string[];
@@ -89,12 +89,12 @@ export async function generateTravelSuggestions(
     const budgetStr = preferences.budget ? `$${preferences.budget}` : 'Flexible';
     const durationStr = preferences.duration || 'Flexible';
     const interestsStr = preferences.interests?.join(', ') || 'General exploration';
-    const countriesStr = preferences.preferredCountries?.join(', ') || 'Any South American country';
+    const countriesStr = preferences.preferredCountries?.join(', ') || 'Any country worldwide';
 
     const isHebrew = preferences.language === 'he';
     
     const prompt = `You are GlobeMate – a smart, friendly, and social travel planner built for Gen Z and solo travelers.  
-Your mission is to help travelers discover personalized, exciting, and budget-conscious trips across South America.
+Your mission is to help travelers discover personalized, exciting, and budget-conscious trips across the world.
 
 ${isHebrew ? 'IMPORTANT: Respond in Hebrew. All text fields (destination, country, description, bestTimeToVisit, highlights) must be in Hebrew.' : ''}
 
@@ -141,7 +141,7 @@ Return ONLY a JSON object with this exact structure:
       messages: [
         {
           role: "system",
-          content: `You are GlobeMate, a smart and friendly travel planner for Gen Z and solo travelers exploring South America. Provide exciting, personalized trip suggestions in JSON format. Be authentic, inspiring, and speak like a travel buddy, not a formal guide.${preferences.language === 'he' ? ' Respond in Hebrew - all descriptions, highlights, and text must be in Hebrew.' : ''}`
+          content: `You are GlobeMate, a smart and friendly travel planner for Gen Z and solo travelers exploring the world. Provide exciting, personalized trip suggestions in JSON format. Be authentic, inspiring, and speak like a travel buddy, not a formal guide.${preferences.language === 'he' ? ' Respond in Hebrew - all descriptions, highlights, and text must be in Hebrew.' : ''}`
         },
         {
           role: "user",
@@ -204,7 +204,7 @@ Include daily activities, estimated costs, and practical tips. Focus on authenti
       messages: [
         {
           role: "system",
-          content: "You are a local South American travel guide. Create detailed day-by-day itineraries in JSON format: [{day, location, activities: [], estimatedCost, tips: []}]"
+          content: "You are an experienced world travel guide. Create detailed day-by-day itineraries in JSON format: [{day, location, activities: [], estimatedCost, tips: []}]"
         },
         {
           role: "user",
@@ -252,14 +252,14 @@ ${Object.entries(expenseBreakdown).map(([category, amount]) => `${category}: $${
 Recent Expenses:
 ${expenses.slice(-10).map(e => `${e.category}: $${e.amount} - ${e.description}`).join('\n')}
 
-Provide budget optimization recommendations for South American travel, focusing on practical savings opportunities.`;
+Provide budget optimization recommendations for global travel, focusing on practical savings opportunities.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "You are a budget travel expert for South America. Analyze spending patterns and provide practical optimization suggestions in JSON format: [{category, currentSpending, recommendedBudget, tips: [], potentialSavings}]"
+          content: "You are a budget travel expert. Analyze spending patterns and provide practical optimization suggestions in JSON format: [{category, currentSpending, recommendedBudget, tips: [], potentialSavings}]"
         },
         {
           role: "user",
@@ -369,7 +369,7 @@ Style:
 - Be energetic, positive, and clear.
 - Ask one question at a time to avoid overwhelming the user.
 
-Focus on South American travel experiences.${contextInfo}`
+Focus on worldwide travel experiences.${contextInfo}`
         },
         {
           role: "user",
@@ -415,7 +415,7 @@ export async function generateConversationalSuggestions(
     
     const prompt = `You are GlobeMate – a smart, friendly, and social travel planner built for Gen Z and solo travelers.
 
-Based on this conversation, generate 3 exciting, personalized trip suggestions for South America:
+Based on this conversation, generate 3 exciting, personalized trip suggestions worldwide:
 
 Conversation:
 ${conversationText}
@@ -424,7 +424,7 @@ IMPORTANT: Do not suggest these previously mentioned destinations: ${previousDes
 
 Generate 3 trip suggestions in JSON format. Each suggestion should include:
 - destination: city or region
-- country: South American country  
+- country: any country worldwide
 - description: 2–3 engaging sentences
 - bestTimeToVisit: e.g., "April to June"
 - estimatedBudget: {low, high} in USD
@@ -455,7 +455,7 @@ Return ONLY a JSON object with this exact structure:
       messages: [
         {
           role: "system",
-          content: "You are GlobeMate, a smart and friendly travel planner for Gen Z and solo travelers exploring South America. Generate exciting, personalized trip suggestions in JSON format. Be authentic, inspiring, and speak like a travel buddy."
+          content: "You are GlobeMate, a smart and friendly travel planner for Gen Z and solo travelers exploring the world. Generate exciting, personalized trip suggestions in JSON format. Be authentic, inspiring, and speak like a travel buddy."
         },
         {
           role: "user",
