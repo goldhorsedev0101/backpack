@@ -73,7 +73,7 @@ interface WeatherWidgetProps {
 
 export function WeatherWidget({ destination, country = 'Peru', showRecommendations = true }: WeatherWidgetProps) {
   const [activeTab, setActiveTab] = useState('current');
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const { data: weatherData, isLoading: weatherLoading, error: weatherError } = useQuery<WeatherData>({
     queryKey: ['/api/weather', destination, country],
@@ -135,7 +135,7 @@ export function WeatherWidget({ destination, country = 'Peru', showRecommendatio
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Thermometer className="w-5 h-5" />
-            Weather Information
+            {t('weather.weather_information')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -155,14 +155,14 @@ export function WeatherWidget({ destination, country = 'Peru', showRecommendatio
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-red-500" />
-            Weather Information
+            {t('weather.weather_information')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Alert>
             <AlertTriangle className="w-4 h-4" />
             <AlertDescription>
-              Weather data is currently unavailable. Please check back later or verify the destination name.
+              {t('weather.weather_unavailable')}
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -226,13 +226,13 @@ export function WeatherWidget({ destination, country = 'Peru', showRecommendatio
                 {weatherData.forecast.map((day, index) => (
                   <div key={index} className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
                     <p className="text-sm font-medium text-gray-600">
-                      {index === 0 ? 'Today' : new Date(day.date).toLocaleDateString('en', { weekday: 'short' })}
+                      {index === 0 ? t('weather.today') : new Date(day.date).toLocaleDateString(i18n.language, { weekday: 'short' })}
                     </p>
                     {getWeatherIcon(day.condition)}
                     <div className="text-center mt-2">
                       <p className="font-semibold">{day.tempMax}°/{day.tempMin}°</p>
                       <p className="text-xs text-gray-500 capitalize">{day.condition}</p>
-                      <p className="text-xs text-blue-600">{day.precipitationChance}% rain</p>
+                      <p className="text-xs text-blue-600">{day.precipitationChance}% {t('weather.rain')}</p>
                     </div>
                   </div>
                 ))}
@@ -337,7 +337,7 @@ export function WeatherWidget({ destination, country = 'Peru', showRecommendatio
                 <Alert>
                   <Info className="w-4 h-4" />
                   <AlertDescription>
-                    Travel recommendations are currently unavailable for this destination.
+                    {t('weather.recommendations_unavailable')}
                   </AlertDescription>
                 </Alert>
               )}

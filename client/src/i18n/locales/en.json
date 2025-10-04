@@ -89,7 +89,12 @@
     "health_safety": "Health & Safety",
     "uv_index": "UV Index",
     "visibility": "Visibility",
-    "pressure": "Pressure"
+    "pressure": "Pressure",
+    "today": "Today",
+    "rain": "rain",
+    "weather_information": "Weather Information",
+    "weather_unavailable": "Weather data is currently unavailable. Please check back later or verify the destination name.",
+    "recommendations_unavailable": "Travel recommendations are currently unavailable for this destination."
   },
   "navigation": {
     "home": "Home",
