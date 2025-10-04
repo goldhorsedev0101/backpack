@@ -62,11 +62,63 @@ const createTripFormSchema = (t: any) => z.object({
 
 type TripFormData = {
   destination: string;
+  specificCity: string;
   travelStyle: string[];
   budget: number;
   duration: string;
   interests: string[];
 };
+
+const getWorldDestinations = () => ({
+  // Europe
+  'France': ['Paris', 'Lyon', 'Nice', 'Marseille', 'Bordeaux'],
+  'Italy': ['Rome', 'Venice', 'Florence', 'Milan', 'Naples'],
+  'Spain': ['Barcelona', 'Madrid', 'Seville', 'Valencia', 'Granada'],
+  'Germany': ['Berlin', 'Munich', 'Hamburg', 'Frankfurt', 'Cologne'],
+  'United Kingdom': ['London', 'Edinburgh', 'Manchester', 'Liverpool', 'Oxford'],
+  'Greece': ['Athens', 'Santorini', 'Mykonos', 'Crete', 'Rhodes'],
+  'Portugal': ['Lisbon', 'Porto', 'Faro', 'Madeira', 'Azores'],
+  'Netherlands': ['Amsterdam', 'Rotterdam', 'The Hague', 'Utrecht', 'Eindhoven'],
+  'Switzerland': ['Zurich', 'Geneva', 'Bern', 'Lucerne', 'Interlaken'],
+  'Austria': ['Vienna', 'Salzburg', 'Innsbruck', 'Graz', 'Hallstatt'],
+  
+  // Asia
+  'Japan': ['Tokyo', 'Kyoto', 'Osaka', 'Hiroshima', 'Nara'],
+  'Thailand': ['Bangkok', 'Phuket', 'Chiang Mai', 'Pattaya', 'Krabi'],
+  'China': ['Beijing', 'Shanghai', 'Hong Kong', 'Guangzhou', 'Chengdu'],
+  'South Korea': ['Seoul', 'Busan', 'Jeju', 'Incheon', 'Gyeongju'],
+  'India': ['Delhi', 'Mumbai', 'Jaipur', 'Agra', 'Goa'],
+  'Indonesia': ['Bali', 'Jakarta', 'Yogyakarta', 'Lombok', 'Sumatra'],
+  'Vietnam': ['Hanoi', 'Ho Chi Minh City', 'Ha Long Bay', 'Hoi An', 'Da Nang'],
+  'Singapore': ['Singapore City', 'Sentosa', 'Marina Bay', 'Orchard Road', 'Clarke Quay'],
+  'Malaysia': ['Kuala Lumpur', 'Penang', 'Langkawi', 'Malacca', 'Kota Kinabalu'],
+  
+  // North America
+  'United States': ['New York', 'Los Angeles', 'Miami', 'Las Vegas', 'San Francisco'],
+  'Canada': ['Toronto', 'Vancouver', 'Montreal', 'Quebec City', 'Calgary'],
+  'Mexico': ['Cancun', 'Mexico City', 'Playa del Carmen', 'Puerto Vallarta', 'Cabo San Lucas'],
+  
+  // South America
+  'Peru': ['Lima', 'Cusco', 'Machu Picchu', 'Arequipa', 'Iquitos'],
+  'Colombia': ['Bogota', 'Cartagena', 'Medellin', 'Cali', 'Santa Marta'],
+  'Argentina': ['Buenos Aires', 'Mendoza', 'Bariloche', 'Salta', 'Cordoba'],
+  'Brazil': ['Rio de Janeiro', 'Sao Paulo', 'Salvador', 'Brasilia', 'Florianopolis'],
+  'Chile': ['Santiago', 'Valparaiso', 'Valdivia', 'Puerto Varas', 'Punta Arenas'],
+  'Bolivia': ['La Paz', 'Uyuni', 'Sucre', 'Potosi', 'Copacabana'],
+  'Ecuador': ['Quito', 'Guayaquil', 'Cuenca', 'Galapagos', 'Montanita'],
+  'Uruguay': ['Montevideo', 'Punta del Este', 'Colonia', 'Salto', 'Piriapolis'],
+  'Paraguay': ['Asuncion', 'Ciudad del Este', 'Encarnacion', 'San Bernardino', 'Villarrica'],
+  
+  // Oceania
+  'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Gold Coast'],
+  'New Zealand': ['Auckland', 'Wellington', 'Queenstown', 'Christchurch', 'Rotorua'],
+  
+  // Africa
+  'Egypt': ['Cairo', 'Luxor', 'Aswan', 'Alexandria', 'Hurghada'],
+  'Morocco': ['Marrakech', 'Casablanca', 'Fes', 'Rabat', 'Tangier'],
+  'South Africa': ['Cape Town', 'Johannesburg', 'Durban', 'Pretoria', 'Port Elizabeth'],
+  'Kenya': ['Nairobi', 'Mombasa', 'Masai Mara', 'Nakuru', 'Kisumu']
+});
 
 // Interfaces
 interface RealPlace {
@@ -162,6 +214,10 @@ export default function MyTripsNew() {
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [selectedContinent, setSelectedContinent] = useState<Continent | "">("");
+  const [specificCity, setSpecificCity] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState("");
+  
+  const WORLD_DESTINATIONS = getWorldDestinations();
   
   // Results state
   const [aiSuggestions, setAiSuggestions] = useState<TripSuggestion[]>([]);
@@ -174,6 +230,7 @@ export default function MyTripsNew() {
     resolver: zodResolver(createTripFormSchema(t)),
     defaultValues: {
       destination: "",
+      specificCity: "",
       travelStyle: [],
       budget: 1000,
       duration: "",
@@ -205,6 +262,11 @@ export default function MyTripsNew() {
 
   const availableCountries = selectedContinent 
     ? getCountriesByContinent(selectedContinent)
+    : [];
+  
+  // Get available cities for selected country
+  const availableCities = selectedCountry 
+    ? (WORLD_DESTINATIONS[selectedCountry as keyof typeof WORLD_DESTINATIONS] || [])
     : [];
 
   // Auto-detect continent from existing destination (for backward compatibility)
@@ -470,8 +532,14 @@ export default function MyTripsNew() {
         return;
       }
 
+      // If a specific city is selected, use it instead of the country
+      const effectiveDestination = formData.specificCity && formData.specificCity !== "ANY"
+        ? `${formData.specificCity}, ${formData.destination}`
+        : formData.destination;
+
       const data: TripFormData = {
         ...formData,
+        destination: effectiveDestination,
         travelStyle: selectedStyles,
         interests: selectedInterests,
         budget: budget[0],
@@ -741,6 +809,9 @@ export default function MyTripsNew() {
                   <Select 
                     onValueChange={(value) => {
                       form.setValue('destination', value);
+                      form.setValue('specificCity', ""); // Reset city when country changes
+                      setSpecificCity("");
+                      setSelectedCountry(value);
                       console.log('Destination set to:', value);
                     }}
                     value={form.watch('destination')}
@@ -753,6 +824,34 @@ export default function MyTripsNew() {
                       {availableCountries.map((country) => (
                         <SelectItem key={country} value={country}>
                           {t(`trips.countries.${country}`) || country}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* City Selection (Dependent on Country) */}
+                <div>
+                  <Label htmlFor="specificCity" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                    {t('trips.select_specific_city')}
+                  </Label>
+                  <Select 
+                    onValueChange={(value) => {
+                      form.setValue('specificCity', value);
+                      setSpecificCity(value);
+                      console.log('Selected city:', value);
+                    }}
+                    value={specificCity}
+                    disabled={!selectedCountry || availableCities.length === 0}
+                  >
+                    <SelectTrigger className="w-full p-3" data-testid="select-city">
+                      <SelectValue placeholder={selectedCountry ? t('trips.choose_city') : t('trips.select_country_first')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ANY">{t('trips.any_city_in_country')}</SelectItem>
+                      {availableCities.map((city: string) => (
+                        <SelectItem key={city} value={city}>
+                          {city}
                         </SelectItem>
                       ))}
                     </SelectContent>
