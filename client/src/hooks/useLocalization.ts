@@ -56,9 +56,46 @@ export function getLocalizedName(
   return translation?.translatedName || originalName;
 }
 
-// Built-in Hebrew translations for common South American places
+// Built-in Hebrew translations for places worldwide
 const PLACE_TRANSLATIONS: Record<string, string> = {
-  // Countries
+  // World Countries
+  'France': 'צרפת',
+  'Italy': 'איטליה',
+  'Spain': 'ספרד',
+  'United Kingdom': 'בריטניה',
+  'Germany': 'גרמניה',
+  'Greece': 'יוון',
+  'Portugal': 'פורטוגל',
+  'Netherlands': 'הולנד',
+  'Switzerland': 'שוויץ',
+  'Austria': 'אוסטריה',
+  'Japan': 'יפן',
+  'Thailand': 'תאילנד',
+  'China': 'סין',
+  'South Korea': 'דרום קוריאה',
+  'India': 'הודו',
+  'Indonesia': 'אינדונזיה',
+  'Vietnam': 'וייטנאם',
+  'Singapore': 'סינגפור',
+  'Malaysia': 'מלזיה',
+  'UAE': 'איחוד האמירויות',
+  'Turkey': 'טורקיה',
+  'United States': 'ארצות הברית',
+  'Canada': 'קנדה',
+  'Mexico': 'מקסיקו',
+  'Australia': 'אוסטרליה',
+  'New Zealand': 'ניו זילנד',
+  'Egypt': 'מצרים',
+  'Morocco': 'מרוקו',
+  'South Africa': 'דרום אפריקה',
+  'Kenya': 'קניה',
+  'Tanzania': 'טנזניה',
+  'Jamaica': 'ג\'מייקה',
+  'Cuba': 'קובה',
+  'Dominican Republic': 'הרפובליקה הדומיניקנית',
+  'Bahamas': 'איי בהאמה',
+  
+  // South American Countries
   'Peru': 'פרו',
   'Bolivia': 'בוליביה', 
   'Colombia': 'קולומביה',
