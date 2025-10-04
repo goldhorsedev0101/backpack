@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Launcher script for TripWise Collector
+Launcher script for GlobeMate Collector
 """
 import os
 import sys

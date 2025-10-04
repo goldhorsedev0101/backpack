@@ -19,7 +19,7 @@ if not GOOGLE_PLACES_KEY:
     sys.exit(1)
 
 # Database setup
-DB_URL = "sqlite:///tripwise.db"
+DB_URL = "sqlite:///globemate.db"
 engine = create_engine(DB_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
 Base = declarative_base()

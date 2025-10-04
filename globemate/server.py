@@ -26,7 +26,7 @@ if not BROWSER_KEY:
     raise RuntimeError("חסר BROWSER_KEY ב-Secrets")
 
 # ==== FastAPI ====
-app = FastAPI(title="TripWise Collector")
+app = FastAPI(title="GlobeMate Collector")
 
 app.add_middleware(
     CORSMiddleware,
@@ -41,7 +41,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # ==== DB (SQLite מקומי ב-Replit) ====
-DB_URL = os.getenv("DATABASE_URL", "sqlite:///tripwise.db")
+DB_URL = os.getenv("DATABASE_URL", "sqlite:///globemate.db")
 engine = create_engine(
     DB_URL, connect_args={"check_same_thread": False} if DB_URL.startswith("sqlite") else {}
 )

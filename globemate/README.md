@@ -1,4 +1,4 @@
-# TripWise Collector
+# GlobeMate Collector
 
 אפליקציית Python לאיסוף מידע מקומות מ-Google Places API
 
@@ -26,7 +26,7 @@ pip install fastapi uvicorn requests jinja2 python-multipart
 
 ### 3. הפעלה
 ```bash
-cd tripwise
+cd globemate
 PYTHONPATH=/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages python3 server.py
 ```
 
@@ -45,7 +45,7 @@ PYTHONPATH=/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages pytho
 
 ## מבנה הפרויקט
 ```
-tripwise/
+globemate/
 ├── server.py          # שרת FastAPI ראשי
 ├── requirements.txt   # תלות Python
 ├── templates/

@@ -379,11 +379,11 @@ async function startServer() {
     });
   }
 
-  server.listen(Number(process.env.PORT) || 3000, '0.0.0.0', () => {
+  server.listen(Number(process.env.PORT) || 5000, '0.0.0.0', () => {
     console.log('listening');
-    console.log(`[server] BackpackBuddy listening on http://0.0.0.0:${process.env.PORT || 3000}`);
+    console.log(`[server] GlobeMate listening on http://0.0.0.0:${process.env.PORT || 5000}`);
     console.log(`[server] Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`[server] Health check: http://0.0.0.0:${process.env.PORT || 3000}/health`);
+    console.log(`[server] Health check: http://0.0.0.0:${process.env.PORT || 5000}/health`);
   });
   
   // Graceful shutdown
