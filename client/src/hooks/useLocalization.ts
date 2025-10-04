@@ -111,8 +111,10 @@ const PLACE_TRANSLATIONS: Record<string, string> = {
   'Uyuni': 'אויוני',
 
   // Colombia
+  'Bogota': 'בוגוטה',
   'Bogotá': 'בוגוטה',
   'Medellín': 'מדיין',
+  'Medellin': 'מדיין',
   'Cartagena': 'קרטחנה',
   'Cali': 'קאלי',
   'Barranquilla': 'ברנקיה',
@@ -132,10 +134,13 @@ const PLACE_TRANSLATIONS: Record<string, string> = {
 
   // Chile
   'Santiago': 'סנטיאגו',
+  'Valparaiso': 'ולפאראיסו',
   'Valparaíso': 'ולפאראיסו',
   'Concepción': 'קונססיון',
+  'Concepcion': 'קונססיון',
   'Antofagasta': 'אנטופגסטה',
   'Viña del Mar': 'ביניה דל מאר',
+  'Vina del Mar': 'ביניה דל מאר',
   'Temuco': 'טמוקו',
   'Iquique': 'איקיקה',
   'Rancagua': 'רנקגואה',
@@ -145,9 +150,11 @@ const PLACE_TRANSLATIONS: Record<string, string> = {
   'Punta Arenas': 'פונטה ארנס',
 
   // Brazil
+  'Sao Paulo': 'סאו פאולו',
   'São Paulo': 'סאו פאולו',
   'Rio de Janeiro': 'ריו דה זאניירו',
   'Brasília': 'ברזיליה',
+  'Brasilia': 'ברזיליה',
   'Salvador': 'סלוודור',
   'Fortaleza': 'פורטלזה',
   'Belo Horizonte': 'בלו הוריזונטה',
@@ -155,8 +162,10 @@ const PLACE_TRANSLATIONS: Record<string, string> = {
   'Curitiba': 'קוריטיבה',
   'Recife': 'רסיפה',
   'Belém': 'בלם',
+  'Belem': 'בלם',
   'Porto Alegre': 'פורטו אלגרה',
   'Goiânia': 'גויאניה',
+  'Goiania': 'גויאניה',
 
   // Ecuador
   'Quito': 'קיטו',
