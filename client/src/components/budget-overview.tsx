@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { EXPENSE_CATEGORIES } from "@/lib/expense-categories";
 import { useIntlFormatters } from "@/lib/intlFormatters";
+import { useTranslation } from "react-i18next";
 import { 
   DollarSign, 
   TrendingUp, 
@@ -34,6 +35,7 @@ export default function BudgetOverview({
   expenses = [], 
   currency = "USD" 
 }: BudgetOverviewProps) {
+  const { t } = useTranslation();
   const { formatCurrency, formatNumber, formatShortDate } = useIntlFormatters();
   const budgetUsed = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
   const remaining = totalBudget - totalSpent;
@@ -52,9 +54,9 @@ export default function BudgetOverview({
     .slice(0, 5);
 
   const getBudgetStatus = () => {
-    if (budgetUsed <= 80) return { color: 'text-green-600', icon: CheckCircle, text: 'On Track' };
-    if (budgetUsed <= 100) return { color: 'text-orange-600', icon: AlertTriangle, text: 'Close to Limit' };
-    return { color: 'text-red-600', icon: AlertTriangle, text: 'Over Budget' };
+    if (budgetUsed <= 80) return { color: 'text-green-600', icon: CheckCircle, text: t('budget.on_track') };
+    if (budgetUsed <= 100) return { color: 'text-orange-600', icon: AlertTriangle, text: t('budget.close_to_limit') };
+    return { color: 'text-red-600', icon: AlertTriangle, text: t('budget.over_budget') };
   };
 
   const status = getBudgetStatus();
@@ -68,7 +70,7 @@ export default function BudgetOverview({
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center">
               <Target className="w-5 h-5 mr-2 text-primary" />
-              Budget Overview
+              {t('budget.budget_overview')}
             </span>
             <Badge variant={budgetUsed <= 80 ? "default" : budgetUsed <= 100 ? "secondary" : "destructive"}>
               <StatusIcon className="w-3 h-3 mr-1" />
@@ -81,7 +83,7 @@ export default function BudgetOverview({
           {totalBudget > 0 && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Budget Progress</span>
+                <span className="text-sm text-gray-600">{t('budget.budget_progress')}</span>
                 <span className="text-sm font-medium">{budgetUsed.toFixed(1)}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
@@ -104,7 +106,7 @@ export default function BudgetOverview({
               <div className="text-2xl font-bold text-gray-800">
                 {formatCurrency(totalSpent, currency)}
               </div>
-              <div className="text-sm text-gray-600">Total Spent</div>
+              <div className="text-sm text-gray-600">{t('budget.total_spent')}</div>
             </div>
 
             {totalBudget > 0 && (
@@ -116,7 +118,7 @@ export default function BudgetOverview({
                   <div className="text-2xl font-bold text-gray-800">
                     {formatCurrency(totalBudget, currency)}
                   </div>
-                  <div className="text-sm text-gray-600">Budget</div>
+                  <div className="text-sm text-gray-600">{t('budget.budget')}</div>
                 </div>
 
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
@@ -131,7 +133,7 @@ export default function BudgetOverview({
                     {formatCurrency(Math.abs(remaining), currency)}
                   </div>
                   <div className="text-sm text-gray-600">
-                    {remaining >= 0 ? 'Remaining' : 'Over Budget'}
+                    {remaining >= 0 ? t('budget.remaining') : t('budget.over_budget')}
                   </div>
                 </div>
               </>
@@ -146,7 +148,7 @@ export default function BudgetOverview({
           <CardHeader>
             <CardTitle className="flex items-center">
               <PieChart className="w-5 h-5 mr-2 text-primary" />
-              Spending by Category
+              {t('budget.spending_by_category')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -162,7 +164,7 @@ export default function BudgetOverview({
                         <div className={`p-2 rounded-lg ${category.color} mr-3`}>
                           <CategoryIcon className="w-4 h-4 text-white" />
                         </div>
-                        <span className="font-medium">{category.label}</span>
+                        <span className="font-medium">{t(category.labelKey)}</span>
                       </div>
                       <div className="text-right">
                         <div className="font-semibold">{formatCurrency(category.total, currency)}</div>
@@ -189,7 +191,7 @@ export default function BudgetOverview({
           <CardHeader>
             <CardTitle className="flex items-center">
               <TrendingUp className="w-5 h-5 mr-2 text-primary" />
-              Recent Expenses
+              {t('budget.recent_expenses')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -208,7 +210,7 @@ export default function BudgetOverview({
                         <div>
                           <div className="font-medium">{expense.description}</div>
                           <div className="text-sm text-gray-600">
-                            {category?.label || 'Other'} • {formatShortDate(expense.date)}
+                            {category?.label || t('budget.other')} • {formatShortDate(expense.date)}
                           </div>
                         </div>
                       </div>
@@ -230,8 +232,8 @@ export default function BudgetOverview({
         <Card>
           <CardContent className="text-center py-8">
             <PieChart className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-600 mb-2">No Expenses Yet</h3>
-            <p className="text-gray-500">Start adding expenses to see your budget overview.</p>
+            <h3 className="text-lg font-medium text-gray-600 mb-2">{t('budget.no_expenses_yet')}</h3>
+            <p className="text-gray-500">{t('budget.start_adding_expenses_to_see_overview')}</p>
           </CardContent>
         </Card>
       )}

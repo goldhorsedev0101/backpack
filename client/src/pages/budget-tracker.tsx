@@ -187,7 +187,7 @@ export default function BudgetTracker() {
                 <SelectItem value="all">{t('budget.all_categories')}</SelectItem>
                 {(EXPENSE_CATEGORIES || []).map((category) => (
                   <SelectItem key={category.id} value={category.id}>
-                    {category.label}
+                    {t(category.labelKey)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -238,7 +238,7 @@ export default function BudgetTracker() {
                           <SelectItem key={category.id} value={category.id}>
                             <div className="flex items-center">
                               <IconComponent className="w-4 h-4 mr-2" />
-                              {category.label}
+                              {t(category.labelKey)}
                             </div>
                           </SelectItem>
                         );
@@ -416,7 +416,7 @@ export default function BudgetTracker() {
                               <div className={`p-2 rounded-lg ${category.color} mr-3`}>
                                 <IconComponent className="w-4 h-4 text-white" />
                               </div>
-                              <span className="font-medium">{category.label}</span>
+                              <span className="font-medium">{t(category.labelKey)}</span>
                             </div>
                             <span className="font-semibold">${category.total.toFixed(2)}</span>
                           </div>
