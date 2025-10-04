@@ -1,4 +1,4 @@
-# TripWise Community Components Guide
+# GlobeMate Community Components Guide
 
 ## Component Architecture Overview
 

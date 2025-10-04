@@ -46,7 +46,7 @@ export function SidebarDMs({ selectedRoom, onRoomSelect, onNewDM }: SidebarDMsPr
   // Get guest name from localStorage
   const [guestName, setGuestName] = useState('');
   useEffect(() => {
-    const storedGuestName = localStorage.getItem('tripwise_guest_name') || '';
+    const storedGuestName = localStorage.getItem('globemate_guest_name') || '';
     setGuestName(storedGuestName);
   }, []);
 
@@ -61,7 +61,7 @@ export function SidebarDMs({ selectedRoom, onRoomSelect, onNewDM }: SidebarDMsPr
   // Create DM mutation
   const createDMMutation = useMutation({
     mutationFn: async (partnerName: string) => {
-      const currentGuestName = localStorage.getItem('tripwise_guest_name') || t('chat.guest');
+      const currentGuestName = localStorage.getItem('globemate_guest_name') || t('chat.guest');
       return apiRequest('/api/dm-rooms', {
         method: 'POST',
         body: JSON.stringify({
@@ -100,7 +100,7 @@ export function SidebarDMs({ selectedRoom, onRoomSelect, onNewDM }: SidebarDMsPr
     }
 
     // Check if guest name is set
-    const currentGuestName = localStorage.getItem('tripwise_guest_name');
+    const currentGuestName = localStorage.getItem('globemate_guest_name');
     if (!currentGuestName || !currentGuestName.trim()) {
       toast({
         title: t('chat.your_name_required'),

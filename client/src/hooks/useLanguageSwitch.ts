@@ -16,7 +16,7 @@ export function useLanguageSwitch() {
     document.documentElement.lang = i18n.language;
     
     // Update document title if page has specific title
-    if (document.title && !document.title.includes('TripWise')) {
+    if (document.title && !document.title.includes('GlobeMate')) {
       // Let individual pages handle title updates
     }
   }, [i18n.language]);

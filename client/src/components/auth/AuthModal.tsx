@@ -46,7 +46,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
       <DialogContent className="sm:max-w-md" dir="rtl">
         <DialogHeader className="text-center">
           <DialogTitle className="text-2xl font-bold">
-            ברוך הבא ל-TripWise
+            ברוך הבא ל-GlobeMate
           </DialogTitle>
           <DialogDescription className="text-center">
             התחבר כדי לתכנן את המסע הבא שלך בדרום אמריקה

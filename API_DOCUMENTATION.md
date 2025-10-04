@@ -1,4 +1,4 @@
-# TripWise Community API Documentation
+# GlobeMate Community API Documentation
 
 ## Chat Rooms API
 

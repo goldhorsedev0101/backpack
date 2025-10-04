@@ -1,6 +1,6 @@
-# TripWise Community Setup Guide
+# GlobeMate Community Setup Guide
 
-This guide will walk you through setting up TripWise's comprehensive community features including chat rooms, direct messages, file attachments, and travel buddy matching.
+This guide will walk you through setting up GlobeMate's comprehensive community features including chat rooms, direct messages, file attachments, and travel buddy matching.
 
 ## 🚀 Quick Start
 

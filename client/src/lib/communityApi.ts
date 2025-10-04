@@ -178,17 +178,17 @@ export const realtimeApi = {
 export const guestUtils = {
   // Get guest name from localStorage
   getGuestName: (): string => {
-    return localStorage.getItem('tripwise_guest_name') || '';
+    return localStorage.getItem('globemate_guest_name') || '';
   },
   
   // Set guest name in localStorage
   setGuestName: (name: string): void => {
-    localStorage.setItem('tripwise_guest_name', name.trim());
+    localStorage.setItem('globemate_guest_name', name.trim());
   },
   
   // Clear guest data
   clearGuestData: (): void => {
-    localStorage.removeItem('tripwise_guest_name');
+    localStorage.removeItem('globemate_guest_name');
   },
   
   // Check if user is authenticated (placeholder)

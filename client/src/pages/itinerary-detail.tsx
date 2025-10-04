@@ -265,7 +265,7 @@ export default function ItineraryDetail() {
     let icsContent = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//TripWise//Itinerary//EN',
+      'PRODID:-//GlobeMate//Itinerary//EN',
       'CALSCALE:GREGORIAN',
     ];
 
@@ -282,7 +282,7 @@ export default function ItineraryDetail() {
 
         icsContent.push(
           'BEGIN:VEVENT',
-          `UID:${day.day}-${index}-${Date.now()}@tripwise.com`,
+          `UID:${day.day}-${index}-${Date.now()}@globemate.com`,
           `DTSTART:${startTime.toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
           `DTEND:${endTime.toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
           `SUMMARY:${activity}`,

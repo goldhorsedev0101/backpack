@@ -213,7 +213,7 @@ export default function AdminTranslations() {
                 </p>
                 {isAuthError && (
                   <div className="mt-3 text-xs text-gray-600">
-                    <p>Authorized admin emails: admin@tripwise.com, support@tripwise.com</p>
+                    <p>Authorized admin emails: admin@globemate.com, support@globemate.com</p>
                     <p>Note: This requires a valid user session.</p>
                   </div>
                 )}

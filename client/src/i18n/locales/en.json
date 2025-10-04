@@ -359,7 +359,7 @@
     "could_not_generate_itinerary": "Could not generate itinerary. Please try again."
   },
   "community": {
-    "title": "TripWise Community",
+    "title": "GlobeMate Community",
     "description": "Connect with fellow travelers, share experiences, and find travel companions for your trip",
     "room_number": "Room {{number}}",
     "search_placeholder": "Search reviews, chat rooms or destinations...",
@@ -930,7 +930,7 @@
     "budget_range": "Budget Range"
   },
   "home": {
-    "welcome_title": "Welcome to TripWise!",
+    "welcome_title": "Welcome to GlobeMate!",
     "welcome_message": "Ready for your next South American adventure?",
     "popular_routes": "Popular Routes",
     "ai_trip_planning": "AI Trip Planning",
@@ -1040,7 +1040,7 @@
     "patagonia_trek": "Patagonia Trek",
     "view_route": "View Route",
     "features_title": "Everything You Need in One App",
-    "features_desc": "Discover what makes TripWise the perfect travel companion",
+    "features_desc": "Discover what makes GlobeMate the perfect travel companion",
     "ai_planning_feature": "AI Trip Planning",
     "ai_planning_desc": "Get personalized itineraries in seconds based on your preferences, budget, and travel style.",
     "community_feature": "Traveler Community",
@@ -1067,7 +1067,7 @@
     "privacy_policy": "Privacy Policy",
     "terms_of_service": "Terms of Service",
     "about_us": "About Us",
-    "copyright": "© 2024 TripWise. All rights reserved. | Made with ❤️ for backpackers everywhere",
+    "copyright": "© 2024 GlobeMate. All rights reserved. | Made with ❤️ for backpackers everywhere",
     "route_lima_cusco": "Lima → Cusco → Machu Picchu → Arequipa",
     "route_bogota_cartagena": "Bogotá → Medellín → Cartagena → Tayrona",
     "route_santiago_buenos_aires": "Santiago → Patagonia → Ushuaia → Buenos Aires",

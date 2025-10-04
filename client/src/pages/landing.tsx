@@ -383,7 +383,7 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center mb-6">
-                <div className="text-lg font-bold text-orange-600">TripWise</div>
+                <div className="text-lg font-bold text-orange-600">GlobeMate</div>
               </div>
               <p className="text-gray-300 mb-4">{t('landing.footer_tagline')}</p>
               <div className="flex space-x-4">

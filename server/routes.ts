@@ -79,7 +79,7 @@ export async function registerRoutes(app: Express): Promise<void> {
         res.json({ 
           success: true, 
           message: 'Admin session created for development',
-          email: req.body.email || 'admin@tripwise.com'
+          email: req.body.email || 'admin@globemate.com'
         });
       } catch (error) {
         res.status(500).json({ error: 'Failed to create admin session' });
@@ -2762,7 +2762,7 @@ export async function registerRoutes(app: Express): Promise<void> {
       };
 
       res.setHeader('Content-Type', 'application/json');
-      res.setHeader('Content-Disposition', `attachment; filename="tripwise-data-${userId}-${Date.now()}.json"`);
+      res.setHeader('Content-Disposition', `attachment; filename="globemate-data-${userId}-${Date.now()}.json"`);
       res.json(exportData);
     } catch (error) {
       console.error("Error exporting user data:", error);
@@ -3000,9 +3000,9 @@ export async function registerRoutes(app: Express): Promise<void> {
   // API Documentation Endpoint
   app.get('/api/docs', async (req, res) => {
     const apiDocs = {
-      title: "TripWise API Documentation",
+      title: "GlobeMate API Documentation",
       version: "1.0.0",
-      description: "Complete API reference for the TripWise South American travel platform",
+      description: "Complete API reference for the GlobeMate South American travel platform",
       endpoints: {
         authentication: {
           "GET /api/auth/user": "Get authenticated user details",

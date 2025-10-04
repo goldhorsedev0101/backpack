@@ -1,6 +1,6 @@
-# Community RLS Policies - TripWise Chat System
+# Community RLS Policies - GlobeMate Chat System
 
-This document outlines the Row Level Security (RLS) policies for the TripWise community chat system featuring public/private rooms, direct messages, and guest mode support with participant invitations.
+This document outlines the Row Level Security (RLS) policies for the GlobeMate community chat system featuring public/private rooms, direct messages, and guest mode support with participant invitations.
 
 ## ⚠️ Important: DEV vs PROD
 

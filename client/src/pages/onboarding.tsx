@@ -141,7 +141,7 @@ export default function Onboarding() {
               <div className="flex justify-center mb-4">
                 <Heart className="h-12 w-12 text-blue-600" />
               </div>
-              <CardTitle className="text-2xl">Welcome to TripWise!</CardTitle>
+              <CardTitle className="text-2xl">Welcome to GlobeMate!</CardTitle>
               <CardDescription>
                 Let's personalize your South American adventure. What interests you most?
               </CardDescription>

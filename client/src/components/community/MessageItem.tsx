@@ -89,7 +89,7 @@ export function MessageItem({ message, onNavigateToDM }: MessageItemProps) {
   // Invite to DM mutation
   const inviteToDMMutation = useMutation({
     mutationFn: async () => {
-      const currentGuestName = localStorage.getItem('tripwise_guest_name') || '';
+      const currentGuestName = localStorage.getItem('globemate_guest_name') || '';
       const targetAuthor = message.author_name || message.user_id || 'Unknown';
       
       if (!currentGuestName) {

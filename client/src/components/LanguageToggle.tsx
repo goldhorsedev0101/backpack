@@ -15,8 +15,8 @@ export function LanguageToggle() {
     document.documentElement.lang = i18n.language;
     
     // Update page titles to be localized
-    if (document.title.includes('TripWise')) {
-      const baseName = 'TripWise';
+    if (document.title.includes('GlobeMate')) {
+      const baseName = 'GlobeMate';
       document.title = i18n.language === 'he' ? `${baseName} - מתכנן הטיולים` : `${baseName} - Travel Planner`;
     }
   }, [i18n.language]);

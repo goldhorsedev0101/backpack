@@ -338,7 +338,7 @@ function CreateRoomModal({
   const queryClient = useQueryClient();
 
   // Get guest name from localStorage
-  const storedGuestName = localStorage.getItem('tripwise_guest_name') || '';
+  const storedGuestName = localStorage.getItem('globemate_guest_name') || '';
 
   // Create room mutation
   const createRoomMutation = useMutation({
@@ -350,7 +350,7 @@ function CreateRoomModal({
       }
 
       // Save guest name to localStorage
-      localStorage.setItem('tripwise_guest_name', currentGuestName);
+      localStorage.setItem('globemate_guest_name', currentGuestName);
 
       const isPrivate = roomData.visibility === 'private';
       

@@ -1,4 +1,4 @@
-# Row Level Security (RLS) Policies for TripWise DMs and Attachments
+# Row Level Security (RLS) Policies for GlobeMate DMs and Attachments
 
 This document outlines the Row Level Security policies needed for the Direct Messages and File Attachments feature in Supabase.
 
@@ -184,7 +184,7 @@ CREATE POLICY "Users can delete their own attachments" ON storage.objects
 ## Implementation Notes
 
 ### Guest Mode Support
-Since TripWise supports guest mode (users without authentication), the current implementation uses `author_name` instead of `user_id` for identifying message senders. The RLS policies above assume authenticated users, but the application layer handles guest users separately.
+Since GlobeMate supports guest mode (users without authentication), the current implementation uses `author_name` instead of `user_id` for identifying message senders. The RLS policies above assume authenticated users, but the application layer handles guest users separately.
 
 ### Room Types
 - `public` - Open chat rooms visible to all users

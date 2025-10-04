@@ -9,7 +9,7 @@ import * as path from 'path';
 export async function syncCollectorData() {
   try {
     // Check if collector database exists
-    const collectorDbPath = path.join('tripwise', 'tripwise.db');
+    const collectorDbPath = path.join('globemate', 'globemate.db');
     if (!fs.existsSync(collectorDbPath)) {
       console.log('No collector database found');
       return;

@@ -34,7 +34,7 @@ interface CollectorReview {
 }
 
 /**
- * Import data from TripWise Collector SQLite database to main PostgreSQL database
+ * Import data from GlobeMate Collector SQLite database to main PostgreSQL database
  */
 export async function importCollectorData() {
   const DATABASE_URL = process.env.DATABASE_URL;
@@ -47,7 +47,7 @@ export async function importCollectorData() {
   const db = drizzle(client);
 
   // Connect to collector SQLite database
-  const collectorDb = new Database('tripwise/tripwise.db');
+  const collectorDb = new Database('globemate/globemate.db');
   
   try {
     // Get all places from collector

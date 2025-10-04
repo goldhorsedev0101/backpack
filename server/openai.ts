@@ -93,7 +93,7 @@ export async function generateTravelSuggestions(
 
     const isHebrew = preferences.language === 'he';
     
-    const prompt = `You are TripWise – a smart, friendly, and social travel planner built for Gen Z and solo travelers.  
+    const prompt = `You are GlobeMate – a smart, friendly, and social travel planner built for Gen Z and solo travelers.  
 Your mission is to help travelers discover personalized, exciting, and budget-conscious trips across South America.
 
 ${isHebrew ? 'IMPORTANT: Respond in Hebrew. All text fields (destination, country, description, bestTimeToVisit, highlights) must be in Hebrew.' : ''}
@@ -141,7 +141,7 @@ Return ONLY a JSON object with this exact structure:
       messages: [
         {
           role: "system",
-          content: `You are TripWise, a smart and friendly travel planner for Gen Z and solo travelers exploring South America. Provide exciting, personalized trip suggestions in JSON format. Be authentic, inspiring, and speak like a travel buddy, not a formal guide.${preferences.language === 'he' ? ' Respond in Hebrew - all descriptions, highlights, and text must be in Hebrew.' : ''}`
+          content: `You are GlobeMate, a smart and friendly travel planner for Gen Z and solo travelers exploring South America. Provide exciting, personalized trip suggestions in JSON format. Be authentic, inspiring, and speak like a travel buddy, not a formal guide.${preferences.language === 'he' ? ' Respond in Hebrew - all descriptions, highlights, and text must be in Hebrew.' : ''}`
         },
         {
           role: "user",
@@ -348,7 +348,7 @@ ${chatText}
       messages: [
         {
           role: "system",
-          content: `You are TripWise – a smart, friendly, and social travel planner built for Gen Z and solo travelers.
+          content: `You are GlobeMate – a smart, friendly, and social travel planner built for Gen Z and solo travelers.
 
 Your role is to:
 1. Provide personalized travel suggestions based on the user's preferences.
@@ -413,7 +413,7 @@ export async function generateConversationalSuggestions(
     const conversationText = chatHistory.map(h => `${h.role}: ${h.content}`).join('\n');
     const previousDestinations = previousSuggestions.map(s => `${s.destination}, ${s.country}`).join('; ');
     
-    const prompt = `You are TripWise – a smart, friendly, and social travel planner built for Gen Z and solo travelers.
+    const prompt = `You are GlobeMate – a smart, friendly, and social travel planner built for Gen Z and solo travelers.
 
 Based on this conversation, generate 3 exciting, personalized trip suggestions for South America:
 
@@ -455,7 +455,7 @@ Return ONLY a JSON object with this exact structure:
       messages: [
         {
           role: "system",
-          content: "You are TripWise, a smart and friendly travel planner for Gen Z and solo travelers exploring South America. Generate exciting, personalized trip suggestions in JSON format. Be authentic, inspiring, and speak like a travel buddy."
+          content: "You are GlobeMate, a smart and friendly travel planner for Gen Z and solo travelers exploring South America. Generate exciting, personalized trip suggestions in JSON format. Be authentic, inspiring, and speak like a travel buddy."
         },
         {
           role: "user",

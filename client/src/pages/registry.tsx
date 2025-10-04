@@ -82,7 +82,7 @@ export default function Registry() {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: "Registration Complete!",
-        description: "Welcome to TripWise! Let's start planning your South American adventure.",
+        description: "Welcome to GlobeMate! Let's start planning your South American adventure.",
       });
       setLocation("/");
     },
@@ -111,7 +111,7 @@ export default function Registry() {
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <MapPin className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold text-blue-600">TripWise</span>
+            <span className="text-2xl font-bold text-blue-600">GlobeMate</span>
           </div>
           <CardTitle className="text-3xl font-bold">Complete Your Profile</CardTitle>
           <CardDescription className="text-lg">

@@ -136,7 +136,7 @@ export function WriteReviewModal({ open, onOpenChange, onReviewCreated }: WriteR
     }
 
     // Save guest name to localStorage
-    localStorage.setItem('tripwise_guest_name', formData.guestName.trim());
+    localStorage.setItem('globemate_guest_name', formData.guestName.trim());
 
     // Submit review
     createMutation.mutate({

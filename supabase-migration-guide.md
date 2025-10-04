@@ -117,7 +117,7 @@ CREATE TABLE review_votes (
 ```sql
 -- משתמש לדוגמה
 INSERT INTO users (id, email, first_name, last_name) VALUES
-('sample-user-1', 'demo@tripwise.com', 'Demo', 'User');
+('sample-user-1', 'demo@globemate.com', 'Demo', 'User');
 
 -- ביקורות לדוגמה
 INSERT INTO place_reviews (user_id, place_id, place_name, place_type, location, overall_rating, ratings, title, comment, tags, visited_date, trip_duration, travel_style, helpful_count, is_verified) VALUES

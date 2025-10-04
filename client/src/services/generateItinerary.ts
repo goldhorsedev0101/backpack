@@ -25,7 +25,7 @@ export interface ItineraryRequest {
 export async function generateItinerary(request: ItineraryRequest): Promise<ItineraryDay[]> {
   const { destination, duration, interests, travelStyle, budget } = request;
   
-  const prompt = `You are TripWise – an AI travel planner helping solo travelers build day-by-day itineraries.
+  const prompt = `You are GlobeMate – an AI travel planner helping solo travelers build day-by-day itineraries.
 
 Using the user's preferences:
 - Destination: ${destination}
@@ -58,7 +58,7 @@ Return the itinerary as a JSON array, like this:
       messages: [
         {
           role: "system", 
-          content: "You are TripWise, an expert South American travel planner. Always respond with valid JSON only."
+          content: "You are GlobeMate, an expert South American travel planner. Always respond with valid JSON only."
         },
         {
           role: "user",

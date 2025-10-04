@@ -64,13 +64,13 @@ export function RoomView({ roomId, roomName, roomDescription, isPrivate, onNavig
 
   // Get guest name from localStorage
   useEffect(() => {
-    const storedGuestName = localStorage.getItem('tripwise_guest_name') || '';
+    const storedGuestName = localStorage.getItem('globemate_guest_name') || '';
     setGuestName(storedGuestName);
   }, []);
 
   // Save guest name to localStorage
   const saveGuestName = (name: string) => {
-    localStorage.setItem('tripwise_guest_name', name);
+    localStorage.setItem('globemate_guest_name', name);
     setGuestName(name);
   };
 

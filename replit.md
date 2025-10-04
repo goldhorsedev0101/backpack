@@ -1,7 +1,7 @@
-# TripWise - South American Travel Platform
+# GlobeMate - South American Travel Platform
 
 ## Overview
-TripWise is a full-stack web application designed for South American travel planning and community building. Its core purpose is to provide an AI-powered platform for trip recommendations, itinerary generation, expense tracking, and real-time communication among travelers. The project aims to be a comprehensive resource for exploring South America, combining advanced AI capabilities with robust social features to simplify travel logistics and foster a vibrant travel community.
+GlobeMate is a full-stack web application designed for South American travel planning and community building. Its core purpose is to provide an AI-powered platform for trip recommendations, itinerary generation, expense tracking, and real-time communication among travelers. The project aims to be a comprehensive resource for exploring South America, combining advanced AI capabilities with robust social features to simplify travel logistics and foster a vibrant travel community.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -23,10 +23,10 @@ Preferred communication style: Simple, everyday language.
 - **Session Management**: Express sessions with PostgreSQL store
 - **Real-time Communication**: WebSocket support
 
-### Python Microservice (TripWise Collector)
+### Python Microservice (GlobeMate Collector)
 - **Framework**: FastAPI with Python 3.11
 - **Purpose**: Google Places API data collection and processing
-- **Location**: `/tripwise/` directory
+- **Location**: `/globemate/` directory
 - **Features**: Interactive Google Maps, place search, data export
 - **APIs**: Google Places API integration, place details retrieval
 

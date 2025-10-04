@@ -42,7 +42,7 @@ export async function generateItinerary(request: ItineraryRequest): Promise<Itin
   
   const isHebrew = language === 'he';
   
-  const prompt = `You are TripWise – an AI travel planner helping solo travelers build day-by-day itineraries.
+  const prompt = `You are GlobeMate – an AI travel planner helping solo travelers build day-by-day itineraries.
 
 ${isHebrew ? 'IMPORTANT: Respond in Hebrew. All text fields (location, activities, tips) must be in Hebrew.' : ''}
 
@@ -80,7 +80,7 @@ Return the itinerary as a JSON object with an itinerary array, like this:
       messages: [
         {
           role: "system", 
-          content: `You are TripWise, an expert South American travel planner. Always respond with valid JSON only.${isHebrew ? ' Respond in Hebrew - all location, activities, and tips must be in Hebrew.' : ''}`
+          content: `You are GlobeMate, an expert South American travel planner. Always respond with valid JSON only.${isHebrew ? ' Respond in Hebrew - all location, activities, and tips must be in Hebrew.' : ''}`
         },
         {
           role: "user",

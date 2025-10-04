@@ -85,7 +85,7 @@ export default function Navigation() {
           <div className="px-4">
             <div className="flex justify-between items-center h-16">
               <Link href="/" className="flex items-center">
-                <div className="text-lg font-bold text-orange-600">TripWise</div>
+                <div className="text-lg font-bold text-orange-600">GlobeMate</div>
               </Link>
               
               <div className="flex items-center gap-2">
@@ -265,7 +265,7 @@ export default function Navigation() {
         {/* Sidebar Header with Logo and Language Toggle */}
         <div className="p-6 border-b border-gray-200">
           <Link href="/" className="flex items-center justify-center mb-4">
-            <div className="text-xl font-bold text-orange-600">TripWise</div>
+            <div className="text-xl font-bold text-orange-600">GlobeMate</div>
           </Link>
           <div className="flex justify-center">
             <LanguageToggle />

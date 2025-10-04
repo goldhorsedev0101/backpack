@@ -84,7 +84,7 @@
     "view_on_maps": "צפה במפות"
   },
   "home": {
-    "welcome_title": "ברוכים הבאים ל-TripWise",
+    "welcome_title": "ברוכים הבאים ל-GlobeMate",
     "welcome_message": "הפלטפורמה המובילה לתכנון טיולים בדרום אמריקה",
     "new_trip": "טיול חדש",
     "create_first_trip": "צור את הטיול הראשון שלך",
@@ -317,7 +317,7 @@
     "you_have_count_itineraries": "יש לך {{count}} {{count, plural, one {מסלול שמור} other {מסלולים שמורים}}"
   },
   "community": {
-    "title": "קהילת TripWise",
+    "title": "קהילת GlobeMate",
     "description": "התחברו לחברי נסיעה, שתפו חוויות ומצאו שותף לדרך לטיול",
     "room_number": "חדר {{number}}",
     "search_placeholder": "חיפוש ביקורות, חדרי צ'אט או יעדים...",
@@ -893,7 +893,7 @@
     "budget_range": "טווח תקציב"
   },
   "home": {
-    "welcome_title": "ברוכים הבאים ל-TripWise!",
+    "welcome_title": "ברוכים הבאים ל-GlobeMate!",
     "welcome_message": "מוכנים להרפתקה הבאה בדרום אמריקה?",
     "popular_routes": "מסלולים פופולריים",
     "ai_trip_planning": "תכנון מסע חכם",
@@ -1016,7 +1016,7 @@
     "patagonia_trek": "טרק פטגוניה",
     "view_route": "הצגת מסלול",
     "features_title": "כל מה שאתם צריכים באפליקציה אחת",
-    "features_desc": "גלו מה עושה את TripWise לשותף הנסיעה המושלם",
+    "features_desc": "גלו מה עושה את GlobeMate לשותף הנסיעה המושלם",
     "ai_planning_feature": "תכנון מסע בינה מלאכותית",
     "ai_planning_desc": "קבלו מסלולים מותאמים אישית תוך שניות בהתבסס על העדפותיכם, התקציב וסגנון הנסיעה.",
     "community_feature": "קהילת נוסעים",
@@ -1043,7 +1043,7 @@
     "privacy_policy": "מדיניות פרטיות",
     "terms_of_service": "תנאי שימוש",
     "about_us": "אודותינו",
-    "copyright": "© 2024 TripWise. כל הזכויות שמורות. | נוצר באהבה לתרמילאים בכל מקום",
+    "copyright": "© 2024 GlobeMate. כל הזכויות שמורות. | נוצר באהבה לתרמילאים בכל מקום",
     "route_lima_cusco": "לימה ← קוסקו ← מאצ'ו פיצ'ו ← ארקיפה",
     "route_bogota_cartagena": "בוגוטה ← מדיין ← קרטחנה ← טיירונה",
     "route_santiago_buenos_aires": "סנטיאגו ← פטגוניה ← אושואיה ← בואנוס איירס",

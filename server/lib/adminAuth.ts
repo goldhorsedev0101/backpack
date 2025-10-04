@@ -9,8 +9,8 @@ const getAdminEmails = (): string[] => {
   
   // Fallback for development - should be configured via environment in production
   return [
-    'admin@tripwise.com',
-    'support@tripwise.com',
+    'admin@globemate.com',
+    'support@globemate.com',
   ];
 };
 
@@ -97,7 +97,7 @@ export function createDevAdminSession(req: any, adminEmail?: string) {
     throw new Error('Development admin session not allowed in production');
   }
   
-  const email = adminEmail || 'admin@tripwise.com';
+  const email = adminEmail || 'admin@globemate.com';
   req.session = {
     user: {
       id: email.split('@')[0],

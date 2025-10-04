@@ -124,7 +124,7 @@ export default function MyTripsNew() {
 
   // Set localized page title
   useEffect(() => {
-    document.title = `${t('trips.my_trips')} - TripWise`;
+    document.title = `${t('trips.my_trips')} - GlobeMate`;
   }, [t]);
 
   // Localized constants - defined inside component to access t()

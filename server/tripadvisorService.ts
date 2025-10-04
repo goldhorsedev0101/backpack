@@ -150,7 +150,7 @@ export class TripAdvisorService {
       const response = await fetch(url.toString(), {
         headers: {
           'Accept': 'application/json',
-          'User-Agent': 'TripWise/1.0'
+          'User-Agent': 'GlobeMate/1.0'
         }
       });
 

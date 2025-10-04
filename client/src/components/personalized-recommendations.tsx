@@ -36,7 +36,7 @@ export default function PersonalizedRecommendations({ className }: PersonalizedR
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Compass className="h-5 w-5 text-blue-600" />
-            Welcome to TripWise!
+            Welcome to GlobeMate!
           </CardTitle>
           <CardDescription>
             Complete your profile to get personalized South American travel recommendations.

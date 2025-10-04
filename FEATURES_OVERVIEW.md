@@ -1,4 +1,4 @@
-# TripWise Community Features Overview
+# GlobeMate Community Features Overview
 
 ## Chat Rooms Feature
 

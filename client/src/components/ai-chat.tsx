@@ -65,7 +65,7 @@ export default function AiChat({ className }: AiChatProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: "Hi! I'm TripWise – your smart travel assistant for South American adventures! 🌎\n\nJust tell me what you're thinking (even incomplete ideas like 'I want to go to Peru') and I'll help you build the perfect trip by asking the right questions about budget, timing, and what you love to do!\n\nTry one of the prompts below or just start chatting:",
+      content: "Hi! I'm GlobeMate – your smart travel assistant for South American adventures! 🌎\n\nJust tell me what you're thinking (even incomplete ideas like 'I want to go to Peru') and I'll help you build the perfect trip by asking the right questions about budget, timing, and what you love to do!\n\nTry one of the prompts below or just start chatting:",
       sender: 'ai',
       timestamp: new Date()
     }
@@ -248,7 +248,7 @@ export default function AiChat({ className }: AiChatProps) {
           <div className="p-2 bg-primary/10 rounded-lg">
             <Bot className="w-5 h-5 text-primary" />
           </div>
-          <span>TripWise AI Assistant</span>
+          <span>GlobeMate AI Assistant</span>
           <Badge variant="secondary" className="ml-auto">
             <Sparkles className="w-3 h-3 mr-1" />
             AI-Powered

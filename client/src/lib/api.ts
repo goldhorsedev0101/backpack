@@ -1,4 +1,4 @@
-// API client for TripWise application
+// API client for GlobeMate application
 import { queryClient } from './queryClient';
 
 export interface TableData {
