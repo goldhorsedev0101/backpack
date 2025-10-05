@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { useLocalizedFormatting } from "@/hooks/useLanguageSwitch";
 import { useLocalizedDestinations } from "@/lib/localizedData";
+import { useLocalization } from "@/hooks/useLocalization";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -168,6 +169,7 @@ interface SavedTrip {
 export default function MyTripsNew() {
   const { t, i18n } = useTranslation();
   const { formatCurrency, formatDate } = useLocalizedFormatting();
+  const { translateCity, translateCountry } = useLocalization();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isAuthenticated, user, signInWithGoogle } = useAuth();
@@ -816,6 +818,7 @@ export default function MyTripsNew() {
                     }}
                     value={form.watch('destination')}
                     disabled={!selectedContinent}
+                    key={`country-${i18n.language}`}
                   >
                     <SelectTrigger className="w-full p-3" data-testid="select-country">
                       <SelectValue placeholder={selectedContinent ? t('trips.select_country') : t('trips.select_continent')} />
@@ -843,6 +846,7 @@ export default function MyTripsNew() {
                     }}
                     value={specificCity}
                     disabled={!selectedCountry || availableCities.length === 0}
+                    key={`city-${i18n.language}-${selectedCountry}`}
                   >
                     <SelectTrigger className="w-full p-3" data-testid="select-city">
                       <SelectValue placeholder={selectedCountry ? t('trips.choose_city') : t('trips.select_country_first')} />
@@ -851,7 +855,7 @@ export default function MyTripsNew() {
                       <SelectItem value="ANY">{t('trips.any_city_in_country')}</SelectItem>
                       {availableCities.map((city: string) => (
                         <SelectItem key={city} value={city}>
-                          {city}
+                          {translateCity(city)}
                         </SelectItem>
                       ))}
                     </SelectContent>
