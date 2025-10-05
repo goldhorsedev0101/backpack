@@ -1044,7 +1044,7 @@ export default function MyTripsNew() {
                       <div key={index} className="border rounded-lg p-4 space-y-4">
                         <div>
                           <h3 className="text-xl font-bold text-slate-700 mb-1">
-                            {suggestion.destination}, {suggestion.country}
+                            {translateCity(suggestion.destination)}, {translateCountry(suggestion.country)}
                           </h3>
                           <p className="text-gray-600 leading-relaxed">
                             {suggestion.description}
@@ -1227,7 +1227,7 @@ export default function MyTripsNew() {
                         <CardHeader className="pb-3">
                           <CardTitle className="flex items-center text-lg">
                             <Calendar className="w-5 h-5 mr-2 text-primary" />
-{t('trips.day')} {day.day} – {day.location}
+{t('trips.day')} {day.day} – {translateCity(day.location)}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
