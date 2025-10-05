@@ -73,6 +73,7 @@ export async function generateTravelSuggestions(
     duration?: string;
     interests?: string[];
     preferredCountries?: string[];
+    specificCity?: string;
     language?: string;
   }
 ): Promise<TripSuggestion[]> {
@@ -90,40 +91,50 @@ export async function generateTravelSuggestions(
     const durationStr = preferences.duration || 'Flexible';
     const interestsStr = preferences.interests?.join(', ') || 'General exploration';
     const countriesStr = preferences.preferredCountries?.join(', ') || 'Any country worldwide';
+    const specificCity = preferences.specificCity;
 
     const isHebrew = preferences.language === 'he';
     
     console.log('Countries string for OpenAI prompt:', countriesStr);
+    console.log('Specific city for OpenAI prompt:', specificCity);
+    
+    // Build the location constraint based on whether a specific city was provided
+    const locationConstraint = specificCity 
+      ? `CRITICAL: The user has selected a SPECIFIC CITY: ${specificCity} in ${countriesStr}
+You MUST provide 3 trip suggestions ONLY for ${specificCity} specifically. All suggestions must be about ${specificCity}, not other cities in ${countriesStr}.`
+      : `CRITICAL: The user has selected these specific countries: ${countriesStr}
+You MUST provide trip suggestions ONLY for destinations within these countries. Do NOT suggest destinations in other countries.`;
     
     const prompt = `You are GlobeMate – a smart, friendly, and social travel planner built for Gen Z and solo travelers.  
 Your mission is to help travelers discover personalized, exciting, and budget-conscious trips across the world.
 
 ${isHebrew ? 'IMPORTANT: Respond in Hebrew. All text fields (destination, country, description, bestTimeToVisit, highlights) must be in Hebrew.' : ''}
 
-CRITICAL: The user has selected these specific countries: ${countriesStr}
-You MUST provide trip suggestions ONLY for destinations within these countries. Do NOT suggest destinations in other countries.
+${locationConstraint}
 
 Using the following preferences:
 - Travel Style: ${travelStylesStr}
 - Budget: ${budgetStr}
 - Duration: ${durationStr}
 - Interests: ${interestsStr}
-- Target Countries (REQUIRED): ${countriesStr}
+${specificCity ? `- Specific City (REQUIRED): ${specificCity}` : `- Target Countries (REQUIRED): ${countriesStr}`}
 
 Provide 3 trip suggestions in a JSON format.  
 Each suggestion should feel exciting and tailored, not generic.
 
 For each suggestion, include:
-- destination (city or region name)
+- destination (${specificCity ? `must be ${specificCity}` : 'city or region name'})
 - country
 - description: 2–3 sentence overview (inspiring and clear)
 - bestTimeToVisit: e.g., "April to June"
 - estimatedBudget: {low, high} in USD
-- highlights: 3–5 key attractions or activities
+- highlights: 3–5 key attractions or activities ${specificCity ? `specifically in ${specificCity}` : ''}
 - travelStyle: relevant styles (e.g., adventure, culture, relax)
 - duration: how long to stay (e.g., "7–10 days")
 
-Make sure the suggestions are diverse — different vibes, locations and experiences. Speak like a local travel buddy, not a formal guide.
+${specificCity ? `IMPORTANT: All 3 suggestions must be about ${specificCity}. Provide different aspects, neighborhoods, or themes of ${specificCity}, but the destination field must always be ${specificCity}.` : 'Make sure the suggestions are diverse — different vibes, locations and experiences.'}
+
+Speak like a local travel buddy, not a formal guide.
 
 Return ONLY a JSON object with this exact structure:
 {

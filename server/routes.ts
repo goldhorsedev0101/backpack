@@ -1420,8 +1420,20 @@ export async function registerRoutes(app: Express): Promise<void> {
         });
       }
 
+      // Parse destination to separate city and country if provided as "City, Country"
+      let specificCity: string | undefined;
+      let country: string;
+      
+      if (destination && typeof destination === 'string' && destination.includes(',')) {
+        const parts = destination.split(',').map(part => part.trim());
+        specificCity = parts[0]; // e.g., "Rome"
+        country = parts[1]; // e.g., "Italy"
+      } else {
+        country = destination;
+      }
+
       console.log("Generating travel suggestions with data:", {
-        destination, travelStyle, budget, duration, interests, preferredCountries
+        specificCity, country, travelStyle, budget, duration, interests, preferredCountries
       });
 
       const suggestions = await generateTravelSuggestions({
@@ -1429,7 +1441,8 @@ export async function registerRoutes(app: Express): Promise<void> {
         budget,
         duration,
         interests,
-        preferredCountries: Array.isArray(destination) ? destination : [destination],
+        preferredCountries: Array.isArray(destination) ? destination : [country],
+        specificCity,
         language: finalLanguage
       });
       
