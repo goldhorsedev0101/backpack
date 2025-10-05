@@ -357,8 +357,13 @@ export default function MyTripsNew() {
         throw new Error(t('trips.please_select_travel_style_one'));
       }
       
+      // If a specific city is selected, use it instead of the country
+      const effectiveDestination = formData.specificCity && formData.specificCity !== "ANY"
+        ? `${formData.specificCity}, ${formData.destination}`
+        : formData.destination;
+
       const requestData = {
-        destination: formData.destination,
+        destination: effectiveDestination,
         duration: formData.duration || t('trips.1_week_default'),
         interests: selectedInterests,
         travelStyle: selectedStyles,
