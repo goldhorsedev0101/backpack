@@ -105,7 +105,7 @@ export default function DestinationDetail() {
             <div className="flex items-center gap-4 mb-4">
               <span className="text-8xl">{destination.flag}</span>
               <div>
-                <h1 className="text-5xl font-bold mb-2">{destination.name}</h1>
+                <h1 className="text-5xl font-bold mb-2">{t(`destinations.cities.${slug}`)}</h1>
                 <p className="text-xl opacity-90">
                   {t(`trips.countries.${destination.country}`) || destination.country} • {t(`trips.continents.${destination.continent}`)}
                 </p>
@@ -142,7 +142,7 @@ export default function DestinationDetail() {
                 <CardTitle>{t("destinations.detail.overview")}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700">{destination.description}</p>
+                <p className="text-gray-700">{t(`destinations.city_descriptions.${slug}`)}</p>
               </CardContent>
             </Card>
 

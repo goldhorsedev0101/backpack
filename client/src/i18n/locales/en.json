@@ -1280,6 +1280,34 @@
       "response_time": "Response Time",
       "cache_hit": "Cache",
       "provider": "Provider"
+    },
+    "cities": {
+      "paris": "Paris",
+      "tokyo": "Tokyo",
+      "barcelona": "Barcelona",
+      "bali": "Bali",
+      "newyork": "New York",
+      "rome": "Rome",
+      "dubai": "Dubai",
+      "sydney": "Sydney",
+      "capetown": "Cape Town",
+      "rio": "Rio de Janeiro",
+      "puntacana": "Punta Cana",
+      "reykjavik": "Reykjavik"
+    },
+    "city_descriptions": {
+      "paris": "The City of Light offers iconic landmarks, world-class art, and exquisite cuisine",
+      "tokyo": "A fascinating blend of ancient tradition and cutting-edge modernity",
+      "barcelona": "Stunning architecture, beautiful beaches, and vibrant culture",
+      "bali": "Tropical paradise with stunning beaches, temples, and rice terraces",
+      "newyork": "The city that never sleeps, iconic skyline and diverse culture",
+      "rome": "The Eternal City filled with ancient history and Renaissance art",
+      "dubai": "Futuristic city with luxury shopping and modern architecture",
+      "sydney": "Harbor city known for the Opera House and beautiful beaches",
+      "capetown": "Stunning landscapes, Table Mountain, and vibrant culture",
+      "rio": "Iconic beaches, Christ the Redeemer, and Carnival celebrations",
+      "puntacana": "Paradise beaches and all-inclusive resorts",
+      "reykjavik": "Gateway to natural wonders like Northern Lights and hot springs"
     }
   }
 }
