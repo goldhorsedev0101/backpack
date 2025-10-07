@@ -57,6 +57,7 @@ export default function DestinationGallery({
       ...(image.query && { query: image.query }),
       ...(maxwidth && { maxwidth: maxwidth.toString() }),
       lang: i18n.language,
+      ...(internalApiKey && { key: internalApiKey }),
     });
 
     return `/api/media/proxy?${params}`;

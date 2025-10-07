@@ -4240,12 +4240,12 @@ export async function registerRoutes(app: Express): Promise<void> {
   // Media Proxy API
   app.get('/api/media/proxy', async (req, res) => {
     try {
-      const internalKey = req.headers['x-globemate-key'];
+      const internalKey = req.headers['x-globemate-key'] || req.query.key;
       if (internalKey !== process.env.INTERNAL_API_KEY) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      const { source, ref, id, url, query, maxwidth, maxheight, lang, ...otherParams } = req.query;
+      const { source, ref, id, url, query, maxwidth, maxheight, lang, key, ...otherParams } = req.query;
       
       if (!source) {
         return res.status(400).json({ error: 'source parameter is required' });
