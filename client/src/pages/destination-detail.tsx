@@ -55,10 +55,24 @@ export default function DestinationDetail() {
   const { data: attractions, isLoading: attractionsLoading } = useQuery<Attraction[]>({
     queryKey: ["/api/places/search", destination.name],
     queryFn: async () => {
-      const response = await fetch(`/api/places/search?query=${encodeURIComponent(destination.name)}&limit=6`);
+      // Search for tourist attractions instead of the city itself
+      const searchQuery = `tourist attractions in ${destination.name}`;
+      const response = await fetch(`/api/places/search?query=${encodeURIComponent(searchQuery)}&type=tourist_attraction`);
       if (!response.ok) throw new Error('Failed to fetch attractions');
       const data = await response.json();
-      return data.results || [];
+      // Filter to show only actual attractions (not the city itself)
+      const filtered = (data.results || [])
+        .filter((place: Attraction) => 
+          !place.types.includes('locality') && 
+          !place.types.includes('political') &&
+          (place.types.includes('tourist_attraction') || 
+           place.types.includes('point_of_interest') ||
+           place.types.includes('museum') ||
+           place.types.includes('art_gallery') ||
+           place.types.includes('park'))
+        )
+        .slice(0, 3);
+      return filtered;
     },
     enabled: !!destination.name && featureFlags?.googlePlaces === true,
   });
