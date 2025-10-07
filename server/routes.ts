@@ -3225,6 +3225,62 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Destinations Hub Feature Flags (must be before :locationId route)
+  app.get('/api/destinations/feature-flags', (_req, res) => {
+    try {
+      const featureFlags = {
+        googlePlaces: !!process.env.GOOGLE_PLACES_API_KEY,
+        openWeather: !!process.env.OPENWEATHER_API_KEY,
+        geoNames: !!process.env.GEONAMES_USERNAME,
+        tripAdvisor: !!process.env.TRIPADVISOR_API_KEY,
+        tbo: !!process.env.TBO_API_KEY,
+      };
+      res.json(featureFlags);
+    } catch (error) {
+      console.error('Error fetching feature flags:', error);
+      res.status(500).json({ error: 'Failed to fetch feature flags' });
+    }
+  });
+
+  // Weather service route (must be before :locationId route)
+  app.get('/api/destinations/weather', async (req, res) => {
+    try {
+      const { lat, lon, lang, units } = req.query;
+      
+      if (!lat || !lon) {
+        return res.status(400).json({ error: 'lat and lon parameters required' });
+      }
+      
+      // Import and use destinations weather service
+      const { weatherService } = await import('./services/destinations/weatherService.js');
+      const weather = await weatherService.getByLatLng(
+        Number(lat),
+        Number(lon),
+        {
+          lang: (lang as string) || 'en',
+          units: (units as 'metric' | 'imperial') || 'metric'
+        }
+      );
+      
+      res.json(weather);
+    } catch (error: any) {
+      console.error('Error fetching weather:', error);
+      
+      if (error.message?.includes('not enabled')) {
+        return res.status(503).json({ 
+          error: 'Weather service not available',
+          message: error.message,
+          provider: 'openweather'
+        });
+      }
+      
+      res.status(500).json({ 
+        error: 'Failed to fetch weather',
+        message: error.message 
+      });
+    }
+  });
+
   app.get('/api/destinations/:locationId', async (req, res) => {
     try {
       const { locationId } = req.params;
@@ -4178,62 +4234,6 @@ export async function registerRoutes(app: Express): Promise<void> {
     } catch (error) {
       console.error("Error getting points history:", error);
       res.status(500).json({ message: "Failed to get points history" });
-    }
-  });
-
-  // Destinations Hub Feature Flags
-  app.get('/api/destinations/feature-flags', (_req, res) => {
-    try {
-      const featureFlags = {
-        googlePlaces: !!process.env.GOOGLE_PLACES_API_KEY,
-        openWeather: !!process.env.OPENWEATHER_API_KEY,
-        geoNames: !!process.env.GEONAMES_USERNAME,
-        tripAdvisor: !!process.env.TRIPADVISOR_API_KEY,
-        tbo: !!process.env.TBO_API_KEY,
-      };
-      res.json(featureFlags);
-    } catch (error) {
-      console.error('Error fetching feature flags:', error);
-      res.status(500).json({ error: 'Failed to fetch feature flags' });
-    }
-  });
-
-  // Weather service route
-  app.get('/api/destinations/weather', async (req, res) => {
-    try {
-      const { lat, lon, lang, units } = req.query;
-      
-      if (!lat || !lon) {
-        return res.status(400).json({ error: 'lat and lon parameters required' });
-      }
-      
-      // Import and use destinations weather service
-      const { weatherService } = await import('./services/destinations/weatherService.js');
-      const weather = await weatherService.getByLatLng(
-        Number(lat),
-        Number(lon),
-        {
-          lang: (lang as string) || 'en',
-          units: (units as 'metric' | 'imperial') || 'metric'
-        }
-      );
-      
-      res.json(weather);
-    } catch (error: any) {
-      console.error('Error fetching weather:', error);
-      
-      if (error.message?.includes('not enabled')) {
-        return res.status(503).json({ 
-          error: 'Weather service not available',
-          message: error.message,
-          provider: 'openweather'
-        });
-      }
-      
-      res.status(500).json({ 
-        error: 'Failed to fetch weather',
-        message: error.message 
-      });
     }
   });
 
