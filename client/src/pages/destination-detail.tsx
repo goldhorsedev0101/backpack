@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import DestinationGallery from "@/components/DestinationGallery";
 
 interface Attraction {
   place_id: string;
@@ -157,6 +158,30 @@ export default function DestinationDetail() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-700">{t(`destinations.city_descriptions.${slug}`)}</p>
+              </CardContent>
+            </Card>
+
+            {/* Photo Gallery */}
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("destination.detail.gallery.title")}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <DestinationGallery
+                  destinationName={destination.name}
+                  heroImages={[
+                    { source: 'unsplash', query: `${destination.name} cityscape`, alt: destination.name },
+                    { source: 'pexels', query: destination.name, alt: `${destination.name} view` }
+                  ]}
+                  poiImages={
+                    attractions?.slice(0, 3).map((attr) => ({
+                      source: 'google',
+                      ref: (attr as any).photos?.[0]?.photo_reference || '',
+                      alt: attr.name
+                    })).filter(img => img.ref) || []
+                  }
+                  isLoading={attractionsLoading}
+                />
               </CardContent>
             </Card>
 
