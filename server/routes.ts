@@ -4181,4 +4181,49 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Destinations Hub Feature Flags
+  app.get('/api/destinations/feature-flags', (_req, res) => {
+    try {
+      const featureFlags = {
+        googlePlaces: process.env.ENABLE_GOOGLE_PLACES === 'true',
+        openWeather: process.env.ENABLE_OPENWEATHER === 'true',
+        geoNames: process.env.ENABLE_GEONAMES === 'true',
+        tripAdvisor: process.env.ENABLE_TRIPADVISOR === 'true',
+        tbo: process.env.ENABLE_TBO === 'true',
+      };
+      res.json(featureFlags);
+    } catch (error) {
+      console.error('Error fetching feature flags:', error);
+      res.status(500).json({ error: 'Failed to fetch feature flags' });
+    }
+  });
+
+  // Weather service route
+  app.get('/api/destinations/weather', async (req, res) => {
+    try {
+      const { lat, lon } = req.query;
+      
+      if (!lat || !lon) {
+        return res.status(400).json({ error: 'lat and lon parameters required' });
+      }
+      
+      // Check if weather provider is enabled
+      if (process.env.ENABLE_OPENWEATHER !== 'true') {
+        return res.status(503).json({ 
+          error: 'Weather service not available',
+          message: 'OpenWeather API is not enabled' 
+        });
+      }
+      
+      // Import and use weather service
+      const { weatherService: weatherSvc } = await import('./services/weatherService.js');
+      const weather = await weatherSvc.getCurrentWeather(Number(lat), Number(lon));
+      
+      res.json(weather);
+    } catch (error) {
+      console.error('Error fetching weather:', error);
+      res.status(500).json({ error: 'Failed to fetch weather' });
+    }
+  });
+
 }
