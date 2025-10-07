@@ -27,6 +27,7 @@ import Dashboard from "./pages/dashboard.js";
 import AdminTranslations from "./pages/admin/translations.js";
 import DestinationsHub from "./pages/destinations-hub.js";
 import DestinationDetail from "./pages/destination-detail.js";
+import IntegrationsDemoDestinations from "./pages/integrations-demo-destinations.js";
 import Navigation from "./components/navigation.js";
 import { ErrorBoundary } from "./components/error-boundary.js";
 
@@ -57,6 +58,7 @@ function Router() {
           <Route path="/admin/translations" component={AdminTranslations} />
           <Route path="/destinations" component={DestinationsHub} />
           <Route path="/destinations/:slug" component={DestinationDetail} />
+          <Route path="/integrations-demo/destinations" component={IntegrationsDemoDestinations} />
           <Route path="/auth/callback" component={Callback} />
           <Route component={NotFound} />
         </Switch>
