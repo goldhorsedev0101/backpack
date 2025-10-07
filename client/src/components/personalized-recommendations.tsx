@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Heart, Clock, DollarSign, Users, Compass } from "lucide-react";
 import { useLocation } from "wouter";
+import { useTranslation } from 'react-i18next';
 
 interface PersonalizedRecommendationsProps {
   className?: string;
@@ -11,6 +12,7 @@ interface PersonalizedRecommendationsProps {
 
 export default function PersonalizedRecommendations({ className }: PersonalizedRecommendationsProps) {
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
   
   const { data: preferences, isLoading } = useQuery({
     queryKey: ['/api/user/preferences'],
@@ -191,10 +193,10 @@ export default function PersonalizedRecommendations({ className }: PersonalizedR
     <div className={className}>
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          Personalized for You
+          {t('recommendations.personalized_for_you')}
         </h2>
         <p className="text-gray-600 dark:text-gray-400">
-          Based on your interests: {preferences.interests?.slice(0, 3).join(", ")}
+          {t('recommendations.based_on_interests')}: {preferences.interests?.slice(0, 3).join(", ")}
         </p>
       </div>
 
@@ -221,7 +223,7 @@ export default function PersonalizedRecommendations({ className }: PersonalizedR
               </div>
               
               <div className="space-y-2">
-                <p className="font-medium text-sm">Recommended Activities:</p>
+                <p className="font-medium text-sm">{t('recommendations.recommended_activities')}:</p>
                 <div className="flex flex-wrap gap-2">
                   {destination.activities.map((activity, i) => (
                     <Badge key={i} variant="secondary" className="text-xs">
@@ -236,7 +238,7 @@ export default function PersonalizedRecommendations({ className }: PersonalizedR
                 className="w-full"
                 size="sm"
               >
-                Plan This Trip
+                {t('recommendations.plan_trip')}
               </Button>
             </CardContent>
           </Card>

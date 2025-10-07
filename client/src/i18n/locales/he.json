@@ -389,6 +389,12 @@
     "unknown_source": "מקור לא ידוע",
     "view_on_maps": "צפה במפות"
   },
+  "recommendations": {
+    "personalized_for_you": "מותאם במיוחד בשבילך",
+    "based_on_interests": "מבוסס על התחומים המעניינים אותך",
+    "recommended_activities": "פעילויות מומלצות",
+    "plan_trip": "תכנן טיול זה"
+  },
   "home": {
     "welcome_title": "ברוכים הבאים ל-GlobeMate!",
     "welcome_message": "מוכנים להרפתקה הבאה ברחבי העולם?",

@@ -245,6 +245,12 @@
     "unknown_source": "Unknown source",
     "view_on_maps": "View on maps"
   },
+  "recommendations": {
+    "personalized_for_you": "Personalized for You",
+    "based_on_interests": "Based on your interests",
+    "recommended_activities": "Recommended Activities",
+    "plan_trip": "Plan This Trip"
+  },
   "chat": {
     "direct_messages": "Direct Messages",
     "no_conversations_yet": "No conversations yet",
