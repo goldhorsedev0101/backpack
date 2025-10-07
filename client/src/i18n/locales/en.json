@@ -1193,6 +1193,13 @@
     "hub_title": "Destinations Hub",
     "hub_subtitle": "Discover amazing travel destinations from around the world",
     "search_placeholder": "Search for a country or city...",
+    "all_continents": "All Continents",
+    "all_countries": "All Countries",
+    "all_types": "All Types",
+    "all_seasons": "All Seasons",
+    "select_country": "Select Country",
+    "destination": "destination",
+    "destinations_count": "destinations",
     "filters": {
       "title": "Filter Destinations",
       "region": "Continent/Region",

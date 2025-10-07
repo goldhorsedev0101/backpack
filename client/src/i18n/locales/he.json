@@ -1331,6 +1331,13 @@
     "hub_title": "מרכז יעדים",
     "hub_subtitle": "גלו יעדי נסיעה מרתקים מכל רחבי העולם",
     "search_placeholder": "חפשו מדינה או עיר...",
+    "all_continents": "כל היבשות",
+    "all_countries": "כל המדינות",
+    "all_types": "כל הסוגים",
+    "all_seasons": "כל העונות",
+    "select_country": "בחר מדינה",
+    "destination": "יעד",
+    "destinations_count": "יעדים",
     "filters": {
       "title": "סינון יעדים",
       "region": "יבשת/אזור",

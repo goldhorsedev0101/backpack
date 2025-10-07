@@ -171,7 +171,7 @@ export default function DestinationsHub() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">{t("trips.all_continents")}</SelectItem>
+                      <SelectItem value="all">{t("destinations.all_continents")}</SelectItem>
                       {CONTINENTS.map((continent) => (
                         <SelectItem key={continent} value={continent}>
                           {t(`trips.continents.${continent}`)}
@@ -186,10 +186,10 @@ export default function DestinationsHub() {
                   <label className="text-sm font-medium mb-2 block">{t("destinations.filters.country")}</label>
                   <Select value={selectedCountry} onValueChange={setSelectedCountry} disabled={selectedContinent === "all"}>
                     <SelectTrigger data-testid="select-country-filter">
-                      <SelectValue placeholder={t("trips.select_country")} />
+                      <SelectValue placeholder={t("destinations.select_country")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">{t("trips.all_countries")}</SelectItem>
+                      <SelectItem value="all">{t("destinations.all_countries")}</SelectItem>
                       {availableCountries.map((country) => (
                         <SelectItem key={country} value={country}>
                           {t(`trips.countries.${country}`) || country}
@@ -209,7 +209,7 @@ export default function DestinationsHub() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="all">{t("destinations.all_types")}</SelectItem>
                       <SelectItem value="city">{t("destinations.types.city")}</SelectItem>
                       <SelectItem value="beach">{t("destinations.types.beach")}</SelectItem>
                       <SelectItem value="nature">{t("destinations.types.nature")}</SelectItem>
@@ -227,7 +227,7 @@ export default function DestinationsHub() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Seasons</SelectItem>
+                      <SelectItem value="all">{t("destinations.all_seasons")}</SelectItem>
                       <SelectItem value="spring">{t("destinations.seasons.spring")}</SelectItem>
                       <SelectItem value="summer">{t("destinations.seasons.summer")}</SelectItem>
                       <SelectItem value="autumn">{t("destinations.seasons.autumn")}</SelectItem>
@@ -244,7 +244,7 @@ export default function DestinationsHub() {
             {/* Sort Bar */}
             <div className="flex items-center justify-between mb-6">
               <p className="text-gray-600">
-                {filteredDestinations.length} {filteredDestinations.length === 1 ? "destination" : "destinations"}
+                {filteredDestinations.length} {filteredDestinations.length === 1 ? t("destinations.destination") : t("destinations.destinations_count")}
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">{t("destinations.sort.label")}:</span>
