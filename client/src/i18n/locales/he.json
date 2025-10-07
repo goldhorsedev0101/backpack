@@ -1398,7 +1398,15 @@
       "flights": "טיסות",
       "packages": "חבילות",
       "view_on_map": "הצג במפה",
-      "get_directions": "קבל הוראות הגעה"
+      "get_directions": "קבל הוראות הגעה",
+      "feels_like": "מרגיש כמו",
+      "humidity": "לחות",
+      "wind": "רוח",
+      "pressure": "לחץ אוויר",
+      "visibility": "ראות",
+      "loading_weather": "טוען מזג אוויר...",
+      "weather_unavailable": "נתוני מזג אוויר יהיו זמינים בקרוב",
+      "no_location": "נתוני מיקום אינם זמינים למזג אוויר"
     },
     "states": {
       "loading": "טוען...",

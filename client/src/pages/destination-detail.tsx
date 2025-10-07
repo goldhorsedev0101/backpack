@@ -22,6 +22,7 @@ export default function DestinationDetail() {
   const { slug } = useParams();
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "he";
+  const [units, setUnits] = useState<'metric' | 'imperial'>('metric');
 
   // Mock destination data (in real app, fetch from API)
   const destination = {
@@ -58,23 +59,16 @@ export default function DestinationDetail() {
 
   // Fetch weather data
   const { data: weatherData, isLoading: weatherLoading } = useQuery({
-    queryKey: ["/api/destinations/weather", { lat: destination.lat, lon: destination.lon }],
+    queryKey: ["/api/destinations/weather", destination.lat, destination.lon, units, i18n.language],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/destinations/weather?lat=${destination.lat}&lon=${destination.lon}&units=${units}&lang=${i18n.language}`
+      );
+      if (!response.ok) throw new Error('Failed to fetch weather');
+      return response.json();
+    },
     enabled: !!destination.lat && !!destination.lon && featureFlags?.openWeather === true,
   });
-
-  // Default weather data for display
-  const displayWeather = weatherData || {
-    temperature: 22,
-    description: "Partly cloudy",
-    humidity: 65,
-    wind_speed: 12,
-  };
-
-  const forecastData = [
-    { day: "Today", high: 24, low: 18, icon: "☀️" },
-    { day: "Tomorrow", high: 23, low: 17, icon: "🌤️" },
-    { day: "Day 3", high: 25, low: 19, icon: "☁️" },
-  ];
 
   // Provider status (default to false when flags not loaded)
   const providers = {
@@ -213,62 +207,124 @@ export default function DestinationDetail() {
                     <Cloud className="h-5 w-5" />
                     {t("destinations.detail.weather")}
                   </CardTitle>
-                  {providers.weather ? (
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                      {t("destinations.states.live_badge")}
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-                      {t("destinations.states.soon_badge")}
-                    </Badge>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {providers.weather && weatherData && (
+                      <div className="flex items-center gap-1 text-xs bg-gray-100 rounded-full p-1">
+                        <button
+                          onClick={() => setUnits('metric')}
+                          className={`px-2 py-1 rounded-full transition ${
+                            units === 'metric' ? 'bg-white shadow-sm' : 'text-gray-500'
+                          }`}
+                          data-testid="button-celsius"
+                        >
+                          °C
+                        </button>
+                        <button
+                          onClick={() => setUnits('imperial')}
+                          className={`px-2 py-1 rounded-full transition ${
+                            units === 'imperial' ? 'bg-white shadow-sm' : 'text-gray-500'
+                          }`}
+                          data-testid="button-fahrenheit"
+                        >
+                          °F
+                        </button>
+                      </div>
+                    )}
+                    {providers.weather ? (
+                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                        {t("destinations.states.live_badge")}
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                        {t("destinations.states.soon_badge")}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
                 {weatherLoading ? (
                   <div className="text-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin mx-auto text-gray-400" />
-                    <p className="text-sm text-gray-500 mt-2">Loading weather...</p>
+                    <p className="text-sm text-gray-500 mt-2">{t("destinations.detail.loading_weather")}</p>
                   </div>
                 ) : !providers.weather ? (
                   <div className="text-center py-12">
                     <Cloud className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                     <p className="text-gray-500 font-medium">{t("destinations.states.soon_badge")}</p>
-                    <p className="text-sm text-gray-400 mt-1">Weather data will be available soon</p>
+                    <p className="text-sm text-gray-400 mt-1">{t("destinations.detail.weather_unavailable")}</p>
                   </div>
-                ) : (
+                ) : !destination.lat || !destination.lon ? (
+                  <div className="text-center py-12">
+                    <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                    <p className="text-gray-500 font-medium">{t("destinations.detail.no_location")}</p>
+                  </div>
+                ) : weatherData ? (
                   <>
                     <div className="flex items-center gap-6 mb-6">
-                      <div className="text-5xl">☀️</div>
+                      <div className="text-5xl">
+                        <img 
+                          src={`https://openweathermap.org/img/wn/${weatherData.current.icon}@2x.png`}
+                          alt={weatherData.current.description}
+                          className="w-20 h-20"
+                        />
+                      </div>
                       <div>
-                        <div className="text-4xl font-bold">{displayWeather.temperature}°C</div>
-                        <p className="text-gray-600">{displayWeather.description}</p>
+                        <div className="text-4xl font-bold">
+                          {weatherData.current.temp}°{units === 'metric' ? 'C' : 'F'}
+                        </div>
+                        <p className="text-gray-600 capitalize">{weatherData.current.description}</p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          {t("destinations.detail.feels_like")} {weatherData.current.feelsLike}°
+                        </p>
                       </div>
                       <div className="flex-1 grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <p className="text-gray-500">Humidity</p>
-                          <p className="font-medium">{displayWeather.humidity}%</p>
+                          <p className="text-gray-500">{t("destinations.detail.humidity")}</p>
+                          <p className="font-medium">{weatherData.current.humidity}%</p>
                         </div>
                         <div>
-                          <p className="text-gray-500">Wind</p>
-                          <p className="font-medium">{displayWeather.wind_speed} km/h</p>
+                          <p className="text-gray-500">{t("destinations.detail.wind")}</p>
+                          <p className="font-medium">
+                            {weatherData.current.windSpeed} {units === 'metric' ? 'm/s' : 'mph'}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">{t("destinations.detail.pressure")}</p>
+                          <p className="font-medium">{weatherData.current.pressure} hPa</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">{t("destinations.detail.visibility")}</p>
+                          <p className="font-medium">{(weatherData.current.visibility / 1000).toFixed(1)} km</p>
                         </div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-3">
-                      {forecastData.map((day, idx) => (
-                        <div key={idx} className="text-center p-3 bg-gray-50 rounded-lg">
-                          <p className="text-sm text-gray-500 mb-2">{day.day}</p>
-                          <div className="text-2xl mb-2">{day.icon}</div>
-                          <p className="text-sm">
-                            <span className="font-medium">{day.high}°</span>
-                            <span className="text-gray-400"> / {day.low}°</span>
-                          </p>
-                        </div>
-                      ))}
+                    <div className="border-t pt-4">
+                      <h4 className="font-medium mb-3">{t("destinations.detail.forecast")}</h4>
+                      <div className="grid grid-cols-5 gap-2">
+                        {weatherData.forecast.map((day: any, idx: number) => (
+                          <div key={idx} className="text-center p-3 bg-gray-50 rounded-lg">
+                            <p className="text-xs text-gray-500 mb-2">
+                              {new Date(day.dt * 1000).toLocaleDateString(i18n.language, { weekday: 'short' })}
+                            </p>
+                            <img 
+                              src={`https://openweathermap.org/img/wn/${day.icon}.png`}
+                              alt={day.description}
+                              className="w-10 h-10 mx-auto"
+                            />
+                            <p className="text-sm mt-1">
+                              <span className="font-medium">{day.tempMax}°</span>
+                              <span className="text-gray-400"> / {day.tempMin}°</span>
+                            </p>
+                            {day.pop > 0 && (
+                              <p className="text-xs text-blue-600 mt-1">💧 {day.pop}%</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </>
-                )}
+                ) : null}
               </CardContent>
             </Card>
           </div>

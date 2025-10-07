@@ -1260,7 +1260,15 @@
       "flights": "Flights",
       "packages": "Packages",
       "view_on_map": "View on Map",
-      "get_directions": "Get Directions"
+      "get_directions": "Get Directions",
+      "feels_like": "Feels like",
+      "humidity": "Humidity",
+      "wind": "Wind",
+      "pressure": "Pressure",
+      "visibility": "Visibility",
+      "loading_weather": "Loading weather...",
+      "weather_unavailable": "Weather data will be available soon",
+      "no_location": "Location data not available for weather"
     },
     "states": {
       "loading": "Loading...",
