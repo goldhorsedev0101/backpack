@@ -4237,4 +4237,66 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Media Proxy API
+  app.get('/api/media/proxy', async (req, res) => {
+    try {
+      const internalKey = req.headers['x-globemate-key'];
+      if (internalKey !== process.env.INTERNAL_API_KEY) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const { source, ref, id, url, query, maxwidth, maxheight, lang, ...otherParams } = req.query;
+      
+      if (!source) {
+        return res.status(400).json({ error: 'source parameter is required' });
+      }
+
+      const { mediaProxyService } = await import('./integrations/media/mediaProxyService.js');
+
+      const params: any = {
+        source,
+        ...(ref && { ref }),
+        ...(id && { id }),
+        ...(url && { url }),
+        ...(query && { query }),
+        ...(maxwidth && { maxwidth: parseInt(maxwidth as string) }),
+        ...(maxheight && { maxheight: parseInt(maxheight as string) }),
+        ...(lang && { lang }),
+        ...otherParams
+      };
+
+      const result = await mediaProxyService.fetchImage(params);
+
+      const ttl = result.cacheHit ? 3600 : 7200;
+      res.setHeader('Cache-Control', `public, max-age=${ttl}, stale-while-revalidate=86400`);
+      res.setHeader('Content-Type', result.contentType);
+      res.setHeader('X-Attribution', JSON.stringify(result.attribution));
+      res.setHeader('X-Cache-Hit', result.cacheHit.toString());
+      res.setHeader('X-Latency-Ms', result.latencyMs.toString());
+
+      console.log(`[Media Proxy] ${source} - ${result.cacheHit ? 'HIT' : 'MISS'} - ${result.latencyMs}ms`);
+
+      res.send(result.buffer);
+    } catch (error: any) {
+      console.error('Media proxy error:', error);
+      res.status(500).json({ error: 'Failed to fetch image', message: error.message });
+    }
+  });
+
+  // Media proxy status
+  app.get('/api/media/status', async (req, res) => {
+    try {
+      const { mediaProxyService } = await import('./integrations/media/mediaProxyService.js');
+      const { mediaCache } = await import('./integrations/media/cache/mediaCache.js');
+      
+      res.json({
+        enabledProviders: mediaProxyService.getEnabledProviders(),
+        cacheStats: mediaCache.getStats(),
+      });
+    } catch (error: any) {
+      console.error('Media status error:', error);
+      res.status(500).json({ error: 'Failed to get status' });
+    }
+  });
+
 }

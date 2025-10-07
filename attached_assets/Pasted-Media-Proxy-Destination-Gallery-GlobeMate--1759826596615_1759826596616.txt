@@ -1,0 +1,176 @@
+Media Proxy + Destination Gallery (ללא קוד)
+
+בצע את המשימות הבאות בפרויקט GlobeMate. אל תציג קוד בתשובה — רק תיישם בקבצים.
+
+מטרות
+
+ליצור /api/media/proxy אחיד שמביא תמונות ממקורות שונים (Google, TripAdvisor, Unsplash, Pexels, Wikimedia, TBO) ללא חשיפת מפתחות.
+
+להוסיף גלריית תמונות ל־/destinations/:slug עם ייחוס, קאשינג, ו־i18n/RTL.
+
+להוסיף דף דמו פנימי לבדיקות.
+
+1) Endpoint: /api/media/proxy
+
+צור מודול src/integrations/media/ עם מתאמים (adapters) לפי ספק:
+
+googlePlacesPhoto(ref, {maxWidth|maxHeight, lang})
+
+tripAdvisorPhoto(url)
+
+unsplashPhoto(id|query)
+
+pexelsPhoto(id|query)
+
+wikimediaPhoto(file|url)
+
+tboPhoto(url|id)
+
+הפרמטר source קובע את המתאם:
+
+source=google|tripadvisor|unsplash|pexels|wikimedia|tbo
+
+פרמטרים משותפים:
+
+ref / id / url (לפי מקור), maxwidth/maxheight, lang.
+
+החזר תמונה בינארית (stream) עם כותרות מתאימות:
+
+Cache-Control: לפי מקור (ראו “קאשינג” בהמשך)
+
+Content-Type: לפי התמונה שהתקבלה
+
+החזר Header ייחוס JSON ב־X-Attribution (stringified) עם:
+{ provider, attributionText, attributionUrl, license }
+
+אבטחה: חובת כותרת x-globemate-key התואמת ל־INTERNAL_API_KEY. אחרת 401.
+
+Rate limit בסיסי לכל source כדי למנוע חריגה ממכסה.
+
+Google Places Photos (חשוב):
+
+קליטה בשרת: photoreference=ref → קריאה ל־Places Photos.
+
+חובה להעביר ללקוח גם ייחוסים מ־html_attributions בתוך X-Attribution.
+
+אל לשמור קבוע; מותר קאש זמני.
+
+2) קאשינג (שרת)
+
+הגדר TTLs:
+
+google, tripadvisor, tbo: 1–6 שעות (ברירת מחדל 2 שעות).
+
+unsplash, pexels, wikimedia: 24–72 שעות (ברירת מחדל 48 שעות).
+
+יישם stale-while-revalidate: אם יש קאש פג תוקף, החזר אותו מיידית וסמן רענון ברקע.
+
+מפתח קאש: media:<source>:<hash-of-params>.
+
+לוגים: provider, latencyMs, cacheHit, status.
+
+3) ENV / Secrets
+
+הוסף ל־Replit Secrets (לפי מקורות פעילים אצלך):
+
+INTERNAL_API_KEY=
+GOOGLE_MAPS_API_KEY=
+TRIPADVISOR_RAPIDAPI_KEY=
+TRIPADVISOR_RAPIDAPI_HOST=
+UNSPLASH_ACCESS_KEY=
+PEXELS_API_KEY=
+MEDIA_DEFAULT_TTL_SHORT=7200
+MEDIA_DEFAULT_TTL_LONG=172800
+ENABLE_MEDIA_GOOGLE=true
+ENABLE_MEDIA_TRIPADVISOR=true
+ENABLE_MEDIA_UNSPLASH=true
+ENABLE_MEDIA_PEXELS=true
+ENABLE_MEDIA_WIKIMEDIA=true
+ENABLE_MEDIA_TBO=true
+
+4) גלריית תמונות ב־/destinations/:slug
+
+הוסף קומפוננטה “DestinationGallery” המציגה:
+
+Hero (1–3 תמונות מובילות) — ברירת מחדל: Unsplash/Wikimedia לפי שם יעד/מדינה; אם אין, נסה Google עם ref ראשון זמין.
+
+POIs Gallery (רצועה/גריד) — תמונות מ־Google Places של אטרקציות מובילות סביב היעד (יש כבר /api/places/nearby).
+
+כל תמונה תיטען דרך /api/media/proxy בלבד.
+
+הצג ייחוס בפינה תחתונה (tooltip/overlay) מתוך X-Attribution שנקלט ב־fetch:
+
+טקסט קצר + קישור (אם יש) + רישיון (אם קיים).
+
+תמיכה ב־i18n/RTL:
+
+כותרות: destination.gallery.title, destination.gallery.hero, destination.gallery.attractions.
+
+כפתורי ניווט: next, prev, open, close.
+
+מצבים: Skeleton בזמן טעינה; Empty state כשאין תמונות; Error state ייעודי (כולל ספק).
+
+5) שילוב עם Google Places (קיים)
+
+בעמוד היעד, בעת טעינת “Top Attractions”, שלוף photo_referenceים.
+
+עבור כל photo_reference:
+
+תציג דרך:
+/api/media/proxy?source=google&ref=<PHOTO_REF>&maxwidth=1200&lang=<he|en>
+
+דופן כרטיס/תמונה: אפשרות “פתח בתצוגה מלאה” (Lightbox).
+
+6) נגישות וביצועים
+
+טען תמונות ב־lazy loading; srcset/מידות תגובתיות.
+
+Aspect-ratio קבוע לגלריה למניעת קפיצות Layout.
+
+Alt text: שם היעד/האטרקציה (מתורגם אם יש).
+
+מנע בקשות כפולות – memoization לפי (source+params).
+
+7) דף דמו פנימי — /integrations-demo/media
+
+טופס עם בחירת מקור (google|tripadvisor|unsplash|pexels|wikimedia|tbo) ושדות רלוונטיים (ref|id|url|maxwidth|lang).
+
+כפתור “Fetch Image” שמציג:
+
+תצוגת התמונה (דרך ה־proxy).
+
+JSON של X-Attribution + זמני תגובה ו־cacheHit.
+
+קישורים מהירים:
+
+Google + ref מתוך דוגמת תל אביב
+
+Unsplash: query=Barcelona skyline
+
+Wikimedia: file=Sydney_Opera_House_-_Dec_2008.jpg
+
+8) קבלה (Acceptance)
+
+/api/media/proxy מחזיר תמונה תקינה לכל מקור מופעל + Header X-Attribution.
+
+דרישת x-globemate-key פועלת — ללא מפתח: 401.
+
+ב־/destinations/:slug מוצגת גלריה: Hero + POIs; עם ייחוס גלוי.
+
+קאשינג עובד: קריאה שנייה קצרה יותר + cacheHit=true בלוג.
+
+מצבי Skeleton/Empty/Error מוצגים לפי צורך.
+
+RTL/i18n תקין.
+
+9) תיעוד קצר
+
+הוסף docs/media-proxy.md עם:
+
+פירוט פרמטרים לכל מקור
+
+דוגמאות URLs (ללא מפתחות)
+
+מדיניות קאשינג וייחוס
+
+מגבלות רישוי (Google/TripAdvisor/TBO/CC)
