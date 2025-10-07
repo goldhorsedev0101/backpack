@@ -1268,7 +1268,20 @@
       "visibility": "Visibility",
       "loading_weather": "Loading weather...",
       "weather_unavailable": "Weather data will be available soon",
-      "no_location": "Location data not available for weather"
+      "no_location": "Location data not available for weather",
+      "gallery": {
+        "title": "Photo Gallery",
+        "hero": "Hero Images",
+        "attractions": "Attractions",
+        "noImages": "No images available",
+        "fullView": "Full View",
+        "viewSource": "View Source",
+        "next": "Next",
+        "prev": "Previous",
+        "close": "Close",
+        "loading": "Loading images...",
+        "error": "Error loading images"
+      }
     },
     "states": {
       "loading": "Loading...",
