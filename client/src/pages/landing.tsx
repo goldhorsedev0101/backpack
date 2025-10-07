@@ -447,11 +447,11 @@ export default function Landing() {
             <div>
               <h3 className="text-lg font-semibold mb-4">{t('landing.destinations_nav')}</h3>
               <ul className="space-y-2 text-gray-300">
-                <li><Link href="/explore?country=Peru" className="hover:text-white">Peru</Link></li>
-                <li><Link href="/explore?country=Colombia" className="hover:text-white">Colombia</Link></li>
-                <li><Link href="/explore?country=Bolivia" className="hover:text-white">Bolivia</Link></li>
-                <li><Link href="/explore?country=Chile" className="hover:text-white">Chile</Link></li>
-                <li><Link href="/explore?country=Argentina" className="hover:text-white">Argentina</Link></li>
+                <li><Link href="/explore?country=Japan" className="hover:text-white">Japan</Link></li>
+                <li><Link href="/explore?country=France" className="hover:text-white">France</Link></li>
+                <li><Link href="/explore?country=Thailand" className="hover:text-white">Thailand</Link></li>
+                <li><Link href="/explore?country=Italy" className="hover:text-white">Italy</Link></li>
+                <li><Link href="/explore?country=Australia" className="hover:text-white">Australia</Link></li>
               </ul>
             </div>
             
