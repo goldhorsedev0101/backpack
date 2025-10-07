@@ -39,7 +39,7 @@ export default function PersonalizedRecommendations({ className }: PersonalizedR
             Welcome to GlobeMate!
           </CardTitle>
           <CardDescription>
-            Complete your profile to get personalized South American travel recommendations.
+            Complete your profile to get personalized travel recommendations from around the world.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -58,6 +58,91 @@ export default function PersonalizedRecommendations({ className }: PersonalizedR
     const userStyle = preferences.travelStyles || [];
 
     const destinations = [
+      // Europe
+      {
+        name: "Paris, France",
+        match: userInterests.includes("History & Culture") || userInterests.includes("Food & Cuisine"),
+        reason: "Art, culture, and world-class cuisine",
+        budget: userBudget === 'budget' ? '$1200-1800' : '$1800-3000',
+        duration: "5-7 days",
+        activities: ["Eiffel Tower visit", "Louvre Museum", "French cuisine tasting"],
+        icon: "🗼"
+      },
+      {
+        name: "Santorini, Greece",
+        match: userInterests.includes("Beach & Water Sports") || userInterests.includes("Photography"),
+        reason: "Stunning sunsets + island paradise",
+        budget: userBudget === 'budget' ? '$1000-1500' : '$1500-2500',
+        duration: "5-7 days",
+        activities: ["Sunset in Oia", "Beach hopping", "Wine tasting"],
+        icon: "🌅"
+      },
+      {
+        name: "Rome, Italy",
+        match: userInterests.includes("History & Culture") || userInterests.includes("Food & Cuisine"),
+        reason: "Ancient history + Italian cuisine",
+        budget: userBudget === 'budget' ? '$900-1400' : '$1400-2200',
+        duration: "5-7 days",
+        activities: ["Colosseum tour", "Vatican museums", "Pasta making class"],
+        icon: "🏛️"
+      },
+      // Asia
+      {
+        name: "Tokyo, Japan",
+        match: userInterests.includes("History & Culture") || userInterests.includes("Food & Cuisine"),
+        reason: "Modern tech + traditional culture",
+        budget: userBudget === 'budget' ? '$1200-1800' : '$1800-3000',
+        duration: "7-10 days",
+        activities: ["Temples & shrines", "Sushi experience", "Mount Fuji trip"],
+        icon: "🗾"
+      },
+      {
+        name: "Bali, Indonesia",
+        match: userInterests.includes("Beach & Water Sports") || userInterests.includes("Wellness & Spa"),
+        reason: "Tropical paradise + spiritual retreat",
+        budget: userBudget === 'budget' ? '$600-1000' : '$1000-1800',
+        duration: "7-10 days",
+        activities: ["Beach relaxation", "Temple visits", "Yoga & wellness"],
+        icon: "🏝️"
+      },
+      {
+        name: "Dubai, UAE",
+        match: userInterests.includes("Luxury & Shopping") || userInterests.includes("Adventure Sports"),
+        reason: "Luxury + desert adventures",
+        budget: userBudget === 'budget' ? '$1000-1500' : '$1800-3500',
+        duration: "5-7 days",
+        activities: ["Desert safari", "Burj Khalifa", "Luxury shopping"],
+        icon: "🏙️"
+      },
+      // Africa
+      {
+        name: "Marrakech, Morocco",
+        match: userInterests.includes("History & Culture") || userInterests.includes("Food & Cuisine"),
+        reason: "Exotic markets + desert culture",
+        budget: userBudget === 'budget' ? '$600-1000' : '$1000-1600',
+        duration: "5-7 days",
+        activities: ["Medina exploration", "Sahara desert trip", "Moroccan cuisine"],
+        icon: "🕌"
+      },
+      {
+        name: "Cape Town, South Africa",
+        match: userInterests.includes("Nature & Wildlife") || userInterests.includes("Adventure Sports"),
+        reason: "Mountains, beaches + wildlife",
+        budget: userBudget === 'budget' ? '$800-1200' : '$1200-2000',
+        duration: "7-10 days",
+        activities: ["Table Mountain hike", "Safari tour", "Cape Winelands"],
+        icon: "🦁"
+      },
+      // Americas
+      {
+        name: "New York, USA",
+        match: userInterests.includes("Music & Nightlife") || userInterests.includes("History & Culture"),
+        reason: "The city that never sleeps",
+        budget: userBudget === 'budget' ? '$1500-2000' : '$2000-3500',
+        duration: "5-7 days",
+        activities: ["Broadway shows", "Museums", "Central Park"],
+        icon: "🗽"
+      },
       {
         name: "Machu Picchu, Peru",
         match: userInterests.includes("History & Culture") || userInterests.includes("Adventure Sports"),
@@ -68,31 +153,32 @@ export default function PersonalizedRecommendations({ className }: PersonalizedR
         icon: "🏔️"
       },
       {
-        name: "Cartagena, Colombia",
-        match: userInterests.includes("History & Culture") || userInterests.includes("Music & Nightlife"),
-        reason: "Colonial architecture + vibrant nightlife",
-        budget: userBudget === 'budget' ? '$600-1000' : '$1000-1500',
+        name: "Cancun, Mexico",
+        match: userInterests.includes("Beach & Water Sports") || userInterests.includes("Party & Nightlife"),
+        reason: "Caribbean beaches + vibrant nightlife",
+        budget: userBudget === 'budget' ? '$800-1200' : '$1200-2000',
         duration: "5-7 days",
-        activities: ["Old city walking tour", "Salsa dancing", "Caribbean beaches"],
-        icon: "🏰"
+        activities: ["Beach relaxation", "Mayan ruins", "Water sports"],
+        icon: "🏖️"
+      },
+      // Oceania
+      {
+        name: "Sydney, Australia",
+        match: userInterests.includes("Beach & Water Sports") || userInterests.includes("History & Culture"),
+        reason: "Iconic landmarks + beach culture",
+        budget: userBudget === 'budget' ? '$1500-2000' : '$2000-3500',
+        duration: "7-10 days",
+        activities: ["Opera House tour", "Bondi Beach", "Harbour Bridge climb"],
+        icon: "🦘"
       },
       {
-        name: "Salar de Uyuni, Bolivia",
-        match: userInterests.includes("Photography") || userInterests.includes("Nature & Wildlife"),
-        reason: "World's largest salt flat + stargazing",
-        budget: userBudget === 'budget' ? '$400-800' : '$800-1200',
-        duration: "3-5 days",
-        activities: ["Salt flat tours", "Flamingo watching", "Stargazing"],
-        icon: "✨"
-      },
-      {
-        name: "Patagonia, Chile/Argentina",
+        name: "Queenstown, New Zealand",
         match: userInterests.includes("Adventure Sports") || userInterests.includes("Nature & Wildlife"),
-        reason: "Epic hiking + glacier viewing",
-        budget: userBudget === 'budget' ? '$1000-1500' : '$1500-2500',
-        duration: "10-14 days",
-        activities: ["Torres del Paine", "Glacier trekking", "Wildlife spotting"],
-        icon: "🏔️"
+        reason: "Adventure capital of the world",
+        budget: userBudget === 'budget' ? '$1200-1800' : '$1800-3000',
+        duration: "7-10 days",
+        activities: ["Bungee jumping", "Milford Sound", "Skiing"],
+        icon: "⛷️"
       }
     ];
 
