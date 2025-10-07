@@ -30,6 +30,16 @@ const getWorldDestinations = () => ({
   'Netherlands': ['Amsterdam', 'Rotterdam', 'The Hague', 'Utrecht', 'Eindhoven'],
   'Switzerland': ['Zurich', 'Geneva', 'Bern', 'Lucerne', 'Interlaken'],
   'Austria': ['Vienna', 'Salzburg', 'Innsbruck', 'Graz', 'Hallstatt'],
+  'Czech Republic': ['Prague', 'Brno', 'Cesky Krumlov', 'Karlovy Vary', 'Olomouc'],
+  'Poland': ['Warsaw', 'Krakow', 'Gdansk', 'Wroclaw', 'Poznan'],
+  'Ireland': ['Dublin', 'Cork', 'Galway', 'Killarney', 'Belfast'],
+  'Croatia': ['Dubrovnik', 'Split', 'Zagreb', 'Hvar', 'Pula'],
+  'Iceland': ['Reykjavik', 'Akureyri', 'Vik', 'Hofn', 'Blue Lagoon'],
+  'Norway': ['Oslo', 'Bergen', 'Tromso', 'Stavanger', 'Trondheim'],
+  'Sweden': ['Stockholm', 'Gothenburg', 'Malmo', 'Uppsala', 'Kiruna'],
+  'Denmark': ['Copenhagen', 'Aarhus', 'Odense', 'Aalborg', 'Roskilde'],
+  'Belgium': ['Brussels', 'Bruges', 'Antwerp', 'Ghent', 'Leuven'],
+  'Hungary': ['Budapest', 'Debrecen', 'Szeged', 'Pecs', 'Eger'],
   
   // Asia
   'Japan': ['Tokyo', 'Kyoto', 'Osaka', 'Hiroshima', 'Nara'],
@@ -41,11 +51,22 @@ const getWorldDestinations = () => ({
   'Vietnam': ['Hanoi', 'Ho Chi Minh City', 'Ha Long Bay', 'Hoi An', 'Da Nang'],
   'Singapore': ['Singapore City', 'Sentosa', 'Marina Bay', 'Orchard Road', 'Clarke Quay'],
   'Malaysia': ['Kuala Lumpur', 'Penang', 'Langkawi', 'Malacca', 'Kota Kinabalu'],
+  'Philippines': ['Manila', 'Cebu', 'Boracay', 'Palawan', 'Davao'],
+  'United Arab Emirates': ['Dubai', 'Abu Dhabi', 'Sharjah', 'Fujairah', 'Al Ain'],
+  'Turkey': ['Istanbul', 'Ankara', 'Antalya', 'Cappadocia', 'Izmir'],
+  'Israel': ['Tel Aviv', 'Jerusalem', 'Haifa', 'Eilat', 'Dead Sea'],
+  'Jordan': ['Amman', 'Petra', 'Wadi Rum', 'Aqaba', 'Jerash'],
+  'Sri Lanka': ['Colombo', 'Kandy', 'Galle', 'Ella', 'Sigiriya'],
+  'Cambodia': ['Phnom Penh', 'Siem Reap', 'Sihanoukville', 'Battambang', 'Kampot'],
+  'Nepal': ['Kathmandu', 'Pokhara', 'Lumbini', 'Chitwan', 'Nagarkot'],
+  'Maldives': ['Male', 'Maafushi', 'Hulhumale', 'Thulusdhoo', 'Dhigurah'],
   
   // North America
   'United States': ['New York', 'Los Angeles', 'Miami', 'Las Vegas', 'San Francisco'],
   'Canada': ['Toronto', 'Vancouver', 'Montreal', 'Quebec City', 'Calgary'],
   'Mexico': ['Cancun', 'Mexico City', 'Playa del Carmen', 'Puerto Vallarta', 'Cabo San Lucas'],
+  'Costa Rica': ['San Jose', 'Jaco', 'Tamarindo', 'La Fortuna', 'Puerto Viejo'],
+  'Panama': ['Panama City', 'Bocas del Toro', 'San Blas', 'Boquete', 'Coronado'],
   
   // South America
   'Peru': ['Lima', 'Cusco', 'Machu Picchu', 'Arequipa', 'Iquitos'],
@@ -57,16 +78,29 @@ const getWorldDestinations = () => ({
   'Ecuador': ['Quito', 'Guayaquil', 'Cuenca', 'Galapagos', 'Montanita'],
   'Uruguay': ['Montevideo', 'Punta del Este', 'Colonia', 'Salto', 'Piriapolis'],
   'Paraguay': ['Asuncion', 'Ciudad del Este', 'Encarnacion', 'San Bernardino', 'Villarrica'],
+  'Venezuela': ['Caracas', 'Margarita Island', 'Los Roques', 'Merida', 'Canaima'],
+  'Guyana': ['Georgetown', 'Kaieteur Falls', 'Lethem', 'New Amsterdam', 'Bartica'],
+  'Suriname': ['Paramaribo', 'Nieuw Nickerie', 'Brokopondo', 'Albina', 'Moengo'],
   
   // Oceania
   'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Gold Coast'],
   'New Zealand': ['Auckland', 'Wellington', 'Queenstown', 'Christchurch', 'Rotorua'],
+  'Fiji': ['Nadi', 'Suva', 'Coral Coast', 'Mamanuca Islands', 'Yasawa Islands'],
   
   // Africa
   'Egypt': ['Cairo', 'Luxor', 'Aswan', 'Alexandria', 'Hurghada'],
   'Morocco': ['Marrakech', 'Casablanca', 'Fes', 'Rabat', 'Tangier'],
   'South Africa': ['Cape Town', 'Johannesburg', 'Durban', 'Pretoria', 'Port Elizabeth'],
-  'Kenya': ['Nairobi', 'Mombasa', 'Masai Mara', 'Nakuru', 'Kisumu']
+  'Kenya': ['Nairobi', 'Mombasa', 'Masai Mara', 'Nakuru', 'Kisumu'],
+  'Tanzania': ['Dar es Salaam', 'Zanzibar', 'Arusha', 'Serengeti', 'Kilimanjaro'],
+  'Tunisia': ['Tunis', 'Sousse', 'Djerba', 'Hammamet', 'Carthage'],
+  'Mauritius': ['Port Louis', 'Grand Baie', 'Flic en Flac', 'Belle Mare', 'Le Morne'],
+  
+  // Caribbean
+  'Dominican Republic': ['Punta Cana', 'Santo Domingo', 'Puerto Plata', 'La Romana', 'Samana'],
+  'Jamaica': ['Kingston', 'Montego Bay', 'Negril', 'Ocho Rios', 'Port Antonio'],
+  'Cuba': ['Havana', 'Varadero', 'Trinidad', 'Santiago de Cuba', 'Vinales'],
+  'Bahamas': ['Nassau', 'Paradise Island', 'Freeport', 'Exuma', 'Eleuthera']
 });
 
 interface RealPlace {
