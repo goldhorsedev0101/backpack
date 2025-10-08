@@ -1,346 +1,406 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "wouter";
-import { Search, MapPin, Calendar, Thermometer, Filter, X } from "lucide-react";
+import { Search, MapPin, Loader2, AlertCircle, Hotel, UtensilsCrossed, Landmark, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { CONTINENTS, CONTINENT_COUNTRY_MAP, type Continent } from "@/lib/constants";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useInfiniteDestinations } from "@/hooks/useInfiniteDestinations";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 
-interface Destination {
-  id: string;
-  name: string;
-  country: string;
-  continent: Continent;
-  type: string[];
-  description: string;
-  rating: number;
-  trending: boolean;
-  bestSeason: string[];
-  imageUrl?: string;
-  flag: string;
-}
-
-// Sample destinations data
-const SAMPLE_DESTINATIONS: Destination[] = [
-  { id: "paris", name: "Paris", country: "France", continent: "Europe", type: ["city", "culture"], description: "The City of Light offers iconic landmarks, world-class art, and exquisite cuisine", rating: 4.8, trending: true, bestSeason: ["spring", "autumn"], flag: "🇫🇷" },
-  { id: "tokyo", name: "Tokyo", country: "Japan", continent: "Asia", type: ["city", "culture"], description: "A fascinating blend of ancient tradition and cutting-edge modernity", rating: 4.9, trending: true, bestSeason: ["spring", "autumn"], flag: "🇯🇵" },
-  { id: "barcelona", name: "Barcelona", country: "Spain", continent: "Europe", type: ["city", "beach", "culture"], description: "Stunning architecture, beautiful beaches, and vibrant culture", rating: 4.7, trending: true, bestSeason: ["spring", "summer", "autumn"], flag: "🇪🇸" },
-  { id: "bali", name: "Bali", country: "Indonesia", continent: "Asia", type: ["beach", "nature", "culture"], description: "Tropical paradise with stunning beaches, temples, and rice terraces", rating: 4.6, trending: true, bestSeason: ["spring", "summer", "autumn"], flag: "🇮🇩" },
-  { id: "newyork", name: "New York", country: "United States", continent: "North America", type: ["city", "culture"], description: "The city that never sleeps, iconic skyline and diverse culture", rating: 4.7, trending: false, bestSeason: ["spring", "autumn"], flag: "🇺🇸" },
-  { id: "rome", name: "Rome", country: "Italy", continent: "Europe", type: ["city", "culture"], description: "The Eternal City filled with ancient history and Renaissance art", rating: 4.8, trending: false, bestSeason: ["spring", "autumn"], flag: "🇮🇹" },
-  { id: "dubai", name: "Dubai", country: "United Arab Emirates", continent: "Asia", type: ["city", "beach"], description: "Futuristic city with luxury shopping and modern architecture", rating: 4.5, trending: true, bestSeason: ["winter", "spring"], flag: "🇦🇪" },
-  { id: "sydney", name: "Sydney", country: "Australia", continent: "Oceania", type: ["city", "beach"], description: "Harbor city known for the Opera House and beautiful beaches", rating: 4.7, trending: false, bestSeason: ["spring", "summer", "autumn"], flag: "🇦🇺" },
-  { id: "capetown", name: "Cape Town", country: "South Africa", continent: "Africa", type: ["city", "beach", "nature"], description: "Stunning landscapes, Table Mountain, and vibrant culture", rating: 4.6, trending: false, bestSeason: ["summer", "autumn"], flag: "🇿🇦" },
-  { id: "rio", name: "Rio de Janeiro", country: "Brazil", continent: "South America", type: ["city", "beach", "nature"], description: "Iconic beaches, Christ the Redeemer, and Carnival celebrations", rating: 4.5, trending: false, bestSeason: ["summer", "autumn"], flag: "🇧🇷" },
-  { id: "puntacana", name: "Punta Cana", country: "Dominican Republic", continent: "Caribbean", type: ["beach", "nature"], description: "Paradise beaches and all-inclusive resorts", rating: 4.4, trending: true, bestSeason: ["winter", "spring"], flag: "🇩🇴" },
-  { id: "reykjavik", name: "Reykjavik", country: "Iceland", continent: "Europe", type: ["city", "nature", "adventure"], description: "Gateway to natural wonders like Northern Lights and hot springs", rating: 4.6, trending: true, bestSeason: ["summer", "winter"], flag: "🇮🇸" },
+// Popular world destinations with coordinates
+const POPULAR_DESTINATIONS = [
+  { name: "Paris", country: "France", lat: 48.8566, lng: 2.3522, flag: "🇫🇷" },
+  { name: "Tokyo", country: "Japan", lat: 35.6762, lng: 139.6503, flag: "🇯🇵" },
+  { name: "New York", country: "USA", lat: 40.7128, lng: -74.0060, flag: "🇺🇸" },
+  { name: "London", country: "UK", lat: 51.5074, lng: -0.1278, flag: "🇬🇧" },
+  { name: "Dubai", country: "UAE", lat: 25.2048, lng: 55.2708, flag: "🇦🇪" },
+  { name: "Barcelona", country: "Spain", lat: 41.3851, lng: 2.1734, flag: "🇪🇸" },
+  { name: "Rome", country: "Italy", lat: 41.9028, lng: 12.4964, flag: "🇮🇹" },
+  { name: "Sydney", country: "Australia", lat: -33.8688, lng: 151.2093, flag: "🇦🇺" },
+  { name: "Istanbul", country: "Turkey", lat: 41.0082, lng: 28.9784, flag: "🇹🇷" },
+  { name: "Bangkok", country: "Thailand", lat: 13.7563, lng: 100.5018, flag: "🇹🇭" },
 ];
 
 export default function DestinationsHub() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "he";
 
+  const [activeTab, setActiveTab] = useState<string>("destinations");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedContinent, setSelectedContinent] = useState<string>("all");
-  const [selectedCountry, setSelectedCountry] = useState<string>("all");
-  const [selectedType, setSelectedType] = useState<string>("all");
-  const [selectedSeason, setSelectedSeason] = useState<string>("all");
-  const [sortBy, setSortBy] = useState<string>("trending");
+  const [selectedDestination, setSelectedDestination] = useState(POPULAR_DESTINATIONS[0]);
+  const [infiniteScrollEnabled, setInfiniteScrollEnabled] = useState(true);
 
-  // Filter destinations
-  const filteredDestinations = useMemo(() => {
-    let results = SAMPLE_DESTINATIONS;
-
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      results = results.filter(
-        (d) =>
-          d.name.toLowerCase().includes(query) ||
-          d.country.toLowerCase().includes(query) ||
-          d.description.toLowerCase().includes(query)
-      );
+  // Map tab to Google Places type
+  const getPlaceType = (tab: string) => {
+    switch (tab) {
+      case "accommodations":
+        return "lodging";
+      case "restaurants":
+        return "restaurant";
+      case "attractions":
+        return "tourist_attraction";
+      default:
+        return undefined;
     }
-
-    // Continent filter
-    if (selectedContinent !== "all") {
-      results = results.filter((d) => d.continent === selectedContinent);
-    }
-
-    // Country filter
-    if (selectedCountry !== "all") {
-      results = results.filter((d) => d.country === selectedCountry);
-    }
-
-    // Type filter
-    if (selectedType !== "all") {
-      results = results.filter((d) => d.type.includes(selectedType));
-    }
-
-    // Season filter
-    if (selectedSeason !== "all") {
-      results = results.filter((d) => d.bestSeason.includes(selectedSeason));
-    }
-
-    // Sort
-    switch (sortBy) {
-      case "trending":
-        results = [...results].sort((a, b) => (b.trending ? 1 : 0) - (a.trending ? 1 : 0));
-        break;
-      case "rating":
-        results = [...results].sort((a, b) => b.rating - a.rating);
-        break;
-      case "a_z":
-        results = [...results].sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case "z_a":
-        results = [...results].sort((a, b) => b.name.localeCompare(a.name));
-        break;
-    }
-
-    return results;
-  }, [searchQuery, selectedContinent, selectedCountry, selectedType, selectedSeason, sortBy]);
-
-  const availableCountries = useMemo(() => {
-    if (selectedContinent === "all") return [];
-    return CONTINENT_COUNTRY_MAP[selectedContinent as Continent] || [];
-  }, [selectedContinent]);
-
-  const clearFilters = () => {
-    setSearchQuery("");
-    setSelectedContinent("all");
-    setSelectedCountry("all");
-    setSelectedType("all");
-    setSelectedSeason("all");
   };
 
-  const hasActiveFilters =
-    searchQuery || selectedContinent !== "all" || selectedCountry !== "all" || selectedType !== "all" || selectedSeason !== "all";
+  const { places, isLoading, isLoadingMore, error, hasMore, loadMore, meta } = 
+    useInfiniteDestinations({
+      lat: selectedDestination.lat,
+      lng: selectedDestination.lng,
+      radius: 10000, // 10km around selected destination
+      type: getPlaceType(activeTab),
+      lang: i18n.language,
+      enabled: activeTab !== "destinations"
+    });
 
-  // Get destination image URL
-  const getDestinationImageUrl = (destinationName: string) => {
+  // Intersection observer for infinite scroll
+  const sentinelRef = useIntersectionObserver({
+    onIntersect: () => {
+      if (infiniteScrollEnabled && hasMore && !isLoadingMore && activeTab !== "destinations") {
+        loadMore();
+        console.log('[Telemetry] infinite_scroll_page_loaded', {
+          tab: activeTab,
+          page: meta?.currentPage ? meta.currentPage + 1 : 2,
+          totalLoaded: meta?.totalLoaded || 0,
+          hasNext: hasMore
+        });
+      }
+    },
+    enabled: infiniteScrollEnabled && hasMore && !isLoadingMore && activeTab !== "destinations",
+    threshold: 0.1,
+    rootMargin: '200px'
+  });
+
+  // Client-side filtering for search query
+  const filteredPlaces = useMemo(() => {
+    // Ensure places is an array before filtering
+    if (!Array.isArray(places)) return [];
+    if (!searchQuery) return places;
+    
+    const query = searchQuery.toLowerCase();
+    return places.filter((place) =>
+      place.name.toLowerCase().includes(query) ||
+      place.types.some((type) => type.toLowerCase().includes(query))
+    );
+  }, [places, searchQuery]);
+
+  // Get place image URL
+  const getPlaceImageUrl = (placeName: string, photoRefs: string[]) => {
+    if (photoRefs && photoRefs.length > 0) {
+      const params = new URLSearchParams({
+        source: 'google',
+        ref: photoRefs[0],
+        maxwidth: '600',
+        lang: i18n.language,
+      });
+      return `/api/media/proxy?${params}`;
+    }
+    
+    // Fallback to Unsplash
     const params = new URLSearchParams({
       source: 'unsplash',
-      query: `${destinationName} cityscape`,
+      query: `${placeName} landmark`,
       maxwidth: '600',
       lang: i18n.language,
     });
     return `/api/media/proxy?${params}`;
   };
 
+  useEffect(() => {
+    console.log('[Telemetry] destinations_hub_tab_change', {
+      tab: activeTab,
+      destination: selectedDestination.name
+    });
+  }, [activeTab, selectedDestination]);
+
   return (
     <div className={`min-h-screen bg-gray-50 ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-slate-800 mb-3">{t("destinations.hub_title")}</h1>
-          <p className="text-lg text-gray-600">{t("destinations.hub_subtitle")}</p>
+          <h1 className="text-4xl font-bold text-slate-800 mb-3">
+            {t("destinations.hub_title", "Explore Destinations")}
+          </h1>
+          <p className="text-lg text-gray-600">
+            {t("destinations.hub_subtitle", "Discover amazing places around the world")}
+          </p>
         </div>
 
-        {/* Search Bar */}
-        <div className="max-w-2xl mx-auto mb-8">
-          <div className="relative">
-            <Search className={`absolute ${isRTL ? "right-3" : "left-3"} top-3 h-5 w-5 text-gray-400`} />
-            <Input
-              type="text"
-              placeholder={t("destinations.search_placeholder")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={`${isRTL ? "pr-10" : "pl-10"} py-6 text-lg`}
-              data-testid="input-search-destinations"
-            />
-          </div>
-        </div>
+        {/* Tabs Navigation */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4 mb-8" dir={isRTL ? "rtl" : "ltr"}>
+            <TabsTrigger value="destinations" className="flex items-center gap-2" data-testid="tab-destinations">
+              <Globe className="h-4 w-4" />
+              {t("destinations.tabs.destinations", "יעדים")}
+            </TabsTrigger>
+            <TabsTrigger value="accommodations" className="flex items-center gap-2" data-testid="tab-accommodations">
+              <Hotel className="h-4 w-4" />
+              {t("destinations.tabs.accommodations", "לינה")}
+            </TabsTrigger>
+            <TabsTrigger value="restaurants" className="flex items-center gap-2" data-testid="tab-restaurants">
+              <UtensilsCrossed className="h-4 w-4" />
+              {t("destinations.tabs.restaurants", "מסעדות")}
+            </TabsTrigger>
+            <TabsTrigger value="attractions" className="flex items-center gap-2" data-testid="tab-attractions">
+              <Landmark className="h-4 w-4" />
+              {t("destinations.tabs.attractions", "אטרקציות")}
+            </TabsTrigger>
+          </TabsList>
 
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Filters Sidebar */}
-          <div className="lg:w-64 space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span className="flex items-center gap-2">
-                    <Filter className="h-5 w-5" />
-                    {t("destinations.filters.title")}
-                  </span>
-                  {hasActiveFilters && (
-                    <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8">
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Continent Filter */}
-                <div>
-                  <label className="text-sm font-medium mb-2 block">{t("destinations.filters.region")}</label>
-                  <Select value={selectedContinent} onValueChange={setSelectedContinent}>
-                    <SelectTrigger data-testid="select-continent-filter">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t("destinations.all_continents")}</SelectItem>
-                      {CONTINENTS.map((continent) => (
-                        <SelectItem key={continent} value={continent}>
-                          {t(`trips.continents.${continent}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Country Filter */}
-                <div>
-                  <label className="text-sm font-medium mb-2 block">{t("destinations.filters.country")}</label>
-                  <Select value={selectedCountry} onValueChange={setSelectedCountry} disabled={selectedContinent === "all"}>
-                    <SelectTrigger data-testid="select-country-filter">
-                      <SelectValue placeholder={t("destinations.select_country")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t("destinations.all_countries")}</SelectItem>
-                      {availableCountries.map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {t(`trips.countries.${country}`) || country}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Separator />
-
-                {/* Type Filter */}
-                <div>
-                  <label className="text-sm font-medium mb-2 block">{t("destinations.filters.type")}</label>
-                  <Select value={selectedType} onValueChange={setSelectedType}>
-                    <SelectTrigger data-testid="select-type-filter">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t("destinations.all_types")}</SelectItem>
-                      <SelectItem value="city">{t("destinations.types.city")}</SelectItem>
-                      <SelectItem value="beach">{t("destinations.types.beach")}</SelectItem>
-                      <SelectItem value="nature">{t("destinations.types.nature")}</SelectItem>
-                      <SelectItem value="culture">{t("destinations.types.culture")}</SelectItem>
-                      <SelectItem value="adventure">{t("destinations.types.adventure")}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Season Filter */}
-                <div>
-                  <label className="text-sm font-medium mb-2 block">{t("destinations.filters.season")}</label>
-                  <Select value={selectedSeason} onValueChange={setSelectedSeason}>
-                    <SelectTrigger data-testid="select-season-filter">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t("destinations.all_seasons")}</SelectItem>
-                      <SelectItem value="spring">{t("destinations.seasons.spring")}</SelectItem>
-                      <SelectItem value="summer">{t("destinations.seasons.summer")}</SelectItem>
-                      <SelectItem value="autumn">{t("destinations.seasons.autumn")}</SelectItem>
-                      <SelectItem value="winter">{t("destinations.seasons.winter")}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Main Content */}
-          <div className="flex-1">
-            {/* Sort Bar */}
-            <div className="flex items-center justify-between mb-6">
+          {/* Destinations Tab - Popular Cities */}
+          <TabsContent value="destinations" className="space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-semibold mb-2">
+                {t("destinations.popular_destinations", "יעדים פופולריים מרחבי העולם")}
+              </h2>
               <p className="text-gray-600">
-                {filteredDestinations.length} {filteredDestinations.length === 1 ? t("destinations.destination") : t("destinations.destinations_count")}
+                {t("destinations.select_destination", "בחר יעד כדי לראות לינה, מסעדות ואטרקציות")}
               </p>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">{t("destinations.sort.label")}:</span>
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-[180px]" data-testid="select-sort">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="trending">{t("destinations.sort.trending")}</SelectItem>
-                    <SelectItem value="rating">{t("destinations.sort.rating")}</SelectItem>
-                    <SelectItem value="a_z">{t("destinations.sort.a_z")}</SelectItem>
-                    <SelectItem value="z_a">{t("destinations.sort.z_a")}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
 
-            {/* Destinations Grid */}
-            {filteredDestinations.length === 0 ? (
-              <Card className="p-12 text-center">
-                <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">{t("destinations.states.no_results")}</h3>
-                <p className="text-gray-500">{t("destinations.states.no_results_desc")}</p>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredDestinations.map((destination) => (
-                  <Card key={destination.id} className="overflow-hidden hover:shadow-lg transition-shadow" data-testid={`card-destination-${destination.id}`}>
-                    <div className="h-48 relative overflow-hidden">
-                      <img 
-                        src={getDestinationImageUrl(destination.name)}
-                        alt={destination.name}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-black/20" />
-                      <div className="absolute top-4 right-4 flex gap-2">
-                        {destination.trending && (
-                          <Badge className="bg-red-500 text-white">
-                            {t("destinations.sort.trending")}
-                          </Badge>
-                        )}
-                        <Badge className="bg-white/90 text-gray-800">
-                          {t(`trips.continents.${destination.continent}`, destination.continent)}
-                        </Badge>
-                      </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {POPULAR_DESTINATIONS.map((dest) => (
+                <Card
+                  key={dest.name}
+                  className={`cursor-pointer transition-all hover:shadow-lg ${
+                    selectedDestination.name === dest.name ? "ring-2 ring-primary" : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedDestination(dest);
+                    setActiveTab("accommodations");
+                  }}
+                  data-testid={`card-destination-${dest.name.toLowerCase()}`}
+                >
+                  <div className="h-48 relative overflow-hidden">
+                    <img
+                      src={getPlaceImageUrl(dest.name, [])}
+                      alt={dest.name}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-black/20" />
+                    <div className="absolute top-4 right-4 text-4xl">
+                      {dest.flag}
                     </div>
-                    <CardHeader>
-                      <CardTitle className="flex items-center justify-between">
-                        <span>{t(`destinations.cities.${destination.id}`, destination.name)}</span>
-                        <span className="text-sm font-normal text-gray-500">⭐ {destination.rating}</span>
-                      </CardTitle>
-                      <CardDescription>{t(`trips.countries.${destination.country}`, destination.country)}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-gray-600 mb-3">{t(`destinations.city_descriptions.${destination.id}`, destination.description)}</p>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {destination.type.map((type) => (
-                          <Badge key={type} variant="outline" className="text-xs">
-                            {t(`destinations.types.${type}`)}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Calendar className="h-4 w-4" />
-                        <span>
-                          {destination.bestSeason
-                            .map((s) => t(`destinations.seasons.${s}`))
-                            .join(", ")}
-                        </span>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="flex gap-2">
-                      <Link href={`/destinations/${destination.id}`} className="flex-1">
-                        <Button className="w-full" data-testid={`button-view-${destination.id}`}>
-                          {t("destinations.card.view_details")}
-                        </Button>
-                      </Link>
-                    </CardFooter>
-                  </Card>
-                ))}
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="text-xl">{dest.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600">{dest.country}</p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button className="w-full" variant="outline">
+                      <MapPin className="h-4 w-4 mr-2" />
+                      {t("destinations.explore", "גלה")}
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Other Tabs - Places from API */}
+          {["accommodations", "restaurants", "attractions"].map((tab) => (
+            <TabsContent key={tab} value={tab} className="space-y-6">
+              {/* Current Destination Banner */}
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">{selectedDestination.flag}</span>
+                  <div>
+                    <h3 className="font-semibold text-lg">{selectedDestination.name}</h3>
+                    <p className="text-sm text-gray-600">{selectedDestination.country}</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => setActiveTab("destinations")}
+                  data-testid="button-change-destination"
+                >
+                  {t("destinations.change_destination", "שנה יעד")}
+                </Button>
               </div>
-            )}
-          </div>
-        </div>
+
+              {/* Search Bar */}
+              <div className="max-w-2xl mx-auto">
+                <div className="relative">
+                  <Search className={`absolute ${isRTL ? "right-3" : "left-3"} top-3 h-5 w-5 text-gray-400`} />
+                  <Input
+                    type="text"
+                    placeholder={t("destinations.search_placeholder", "חפש...")}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className={`${isRTL ? "pr-10" : "pl-10"} py-6 text-lg`}
+                    data-testid={`input-search-${tab}`}
+                  />
+                </div>
+              </div>
+
+              {/* Results Count & Stats */}
+              <div className="flex items-center justify-between">
+                <p className="text-gray-600">
+                  {filteredPlaces.length}{" "}
+                  {filteredPlaces.length === 1 ? t("destinations.result", "תוצאה") : t("destinations.results", "תוצאות")}
+                  {meta && meta.totalLoaded > filteredPlaces.length && ` (${t("destinations.filtered_from", "מסונן מתוך")} ${meta.totalLoaded})`}
+                </p>
+                {meta && (
+                  <div className="flex items-center gap-4 text-sm">
+                    <span className="text-gray-600">
+                      {t("destinations.stats.page", "עמוד")}: <span className="font-medium">{meta.currentPage}</span>
+                    </span>
+                    <Badge variant={meta.cacheHit ? "default" : "secondary"}>
+                      {meta.cacheHit ? t("destinations.stats.cache_hit", "מטמון") : t("destinations.stats.cache_miss", "טרי")}
+                    </Badge>
+                  </div>
+                )}
+              </div>
+
+              {/* Error Alert */}
+              {error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              {/* Loading State */}
+              {isLoading && filteredPlaces.length === 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[...Array(6)].map((_, i) => (
+                    <Card key={i} className="overflow-hidden">
+                      <div className="h-48 bg-gray-200 animate-pulse" />
+                      <CardHeader>
+                        <div className="h-6 bg-gray-200 rounded animate-pulse w-3/4" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-full mb-2" />
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              {/* Places Grid */}
+              {!isLoading || filteredPlaces.length > 0 ? (
+                <>
+                  {filteredPlaces.length === 0 && !isLoading ? (
+                    <Card className="p-12 text-center">
+                      <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        {t("destinations.states.no_results", "לא נמצאו תוצאות")}
+                      </h3>
+                      <p className="text-gray-500">
+                        {t("destinations.states.no_results_desc", "נסה לחפש משהו אחר או שנה יעד")}
+                      </p>
+                    </Card>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredPlaces.map((place) => (
+                        <Card
+                          key={place.placeId}
+                          className="overflow-hidden hover:shadow-lg transition-shadow"
+                          data-testid={`card-place-${place.placeId}`}
+                        >
+                          <div className="h-48 relative overflow-hidden">
+                            <img
+                              src={getPlaceImageUrl(place.name, place.photoRefs)}
+                              alt={place.name}
+                              className="absolute inset-0 w-full h-full object-cover"
+                              loading="lazy"
+                            />
+                            <div className="absolute inset-0 bg-black/20" />
+                            <div className="absolute top-4 right-4">
+                              {place.rating && (
+                                <Badge className="bg-white/90 text-gray-800">
+                                  ⭐ {place.rating}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <CardHeader>
+                            <CardTitle className="text-lg">{place.name}</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex flex-wrap gap-1 mb-3">
+                              {place.types.slice(0, 2).map((type) => (
+                                <Badge key={type} variant="outline" className="text-xs">
+                                  {type.replace(/_/g, " ")}
+                                </Badge>
+                              ))}
+                            </div>
+                            {place.userRatingsTotal && (
+                              <p className="text-sm text-gray-500">
+                                {place.userRatingsTotal.toLocaleString()} {t("destinations.reviews", "ביקורות")}
+                              </p>
+                            )}
+                          </CardContent>
+                          <CardFooter>
+                            <Button className="w-full" variant="outline" data-testid={`button-view-${place.placeId}`}>
+                              <MapPin className="h-4 w-4 mr-2" />
+                              {t("destinations.card.view_details", "פרטים")}
+                            </Button>
+                          </CardFooter>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Infinite Scroll Sentinel */}
+                  {infiniteScrollEnabled && hasMore && (
+                    <div ref={sentinelRef} className="h-20 flex items-center justify-center">
+                      {isLoadingMore && (
+                        <div className="flex items-center gap-2 text-gray-500">
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                          <span>{t("destinations.loading_more", "טוען עוד...")}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Manual Load More Button */}
+                  {!infiniteScrollEnabled && hasMore && (
+                    <div className="flex justify-center">
+                      <Button
+                        onClick={() => {
+                          loadMore();
+                          console.log('[Telemetry] load_more_clicked', {
+                            tab: activeTab,
+                            page: meta?.currentPage ? meta.currentPage + 1 : 2,
+                            totalLoaded: meta?.totalLoaded || 0
+                          });
+                        }}
+                        disabled={isLoadingMore}
+                        size="lg"
+                        data-testid="button-load-more"
+                      >
+                        {isLoadingMore ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            {t("destinations.loading", "טוען...")}
+                          </>
+                        ) : (
+                          t("destinations.load_more", "טען עוד")
+                        )}
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* End of Results */}
+                  {!hasMore && filteredPlaces.length > 0 && (
+                    <div className="text-center text-gray-500 py-4">
+                      {t("destinations.no_more_results", "אין עוד תוצאות")}
+                    </div>
+                  )}
+                </>
+              ) : null}
+            </TabsContent>
+          ))}
+        </Tabs>
       </div>
     </div>
   );

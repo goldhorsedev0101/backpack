@@ -3225,6 +3225,76 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Popular destinations from Google Places API
+  app.get('/api/destinations/popular', async (req, res) => {
+    try {
+      const popularCities = [
+        { name: 'Paris, France', query: 'Paris Eiffel Tower' },
+        { name: 'Tokyo, Japan', query: 'Tokyo Tower Japan' },
+        { name: 'New York, USA', query: 'New York Statue of Liberty' },
+        { name: 'London, UK', query: 'London Big Ben' },
+        { name: 'Dubai, UAE', query: 'Dubai Burj Khalifa' },
+        { name: 'Rome, Italy', query: 'Rome Colosseum' },
+        { name: 'Barcelona, Spain', query: 'Barcelona Sagrada Familia' },
+        { name: 'Sydney, Australia', query: 'Sydney Opera House' },
+        { name: 'Bangkok, Thailand', query: 'Bangkok Grand Palace' },
+        { name: 'Istanbul, Turkey', query: 'Istanbul Hagia Sophia' },
+        { name: 'Amsterdam, Netherlands', query: 'Amsterdam canals' },
+        { name: 'Singapore', query: 'Singapore Marina Bay Sands' },
+        { name: 'Prague, Czech Republic', query: 'Prague Castle' },
+        { name: 'Vienna, Austria', query: 'Vienna Schonbrunn Palace' },
+        { name: 'Bali, Indonesia', query: 'Bali Uluwatu Temple' },
+        { name: 'Cape Town, South Africa', query: 'Cape Town Table Mountain' },
+        { name: 'Rio de Janeiro, Brazil', query: 'Rio Christ the Redeemer' },
+        { name: 'Cairo, Egypt', query: 'Cairo Pyramids of Giza' },
+        { name: 'Athens, Greece', query: 'Athens Acropolis' },
+        { name: 'Lisbon, Portugal', query: 'Lisbon Belem Tower' },
+        { name: 'Mumbai, India', query: 'Mumbai Gateway of India' },
+        { name: 'Los Angeles, USA', query: 'Los Angeles Hollywood Sign' },
+        { name: 'Seoul, South Korea', query: 'Seoul Gyeongbokgung Palace' },
+        { name: 'Berlin, Germany', query: 'Berlin Brandenburg Gate' },
+        { name: 'Mexico City, Mexico', query: 'Mexico City Zocalo' },
+        { name: 'Buenos Aires, Argentina', query: 'Buenos Aires Obelisco' },
+        { name: 'Hong Kong', query: 'Hong Kong Victoria Peak' },
+        { name: 'Miami, USA', query: 'Miami South Beach' },
+        { name: 'Moscow, Russia', query: 'Moscow Red Square' },
+        { name: 'Marrakech, Morocco', query: 'Marrakech Jemaa el-Fnaa' },
+      ];
+
+      const destinations = await Promise.all(
+        popularCities.map(async (city) => {
+          try {
+            const results = await googlePlaces.searchPlaces(city.query);
+            if (results && results.length > 0) {
+              const place = results[0];
+              return {
+                id: place.place_id,
+                name: city.name,
+                slug: city.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+                country: city.name.split(',').pop()?.trim() || '',
+                lat: place.geometry.location.lat,
+                lon: place.geometry.location.lng,
+                rating: place.rating || 0,
+                photos: place.photos || [],
+                types: place.types || []
+              };
+            }
+            return null;
+          } catch (error) {
+            console.error(`Error fetching ${city.name}:`, error);
+            return null;
+          }
+        })
+      );
+
+      const validDestinations = destinations.filter(d => d !== null);
+      res.json(validDestinations);
+    } catch (error) {
+      console.error('Error fetching popular destinations:', error);
+      res.status(500).json({ error: 'Failed to fetch popular destinations' });
+    }
+  });
+
   // Destinations Hub Feature Flags (must be before :locationId route)
   app.get('/api/destinations/feature-flags', (_req, res) => {
     try {
