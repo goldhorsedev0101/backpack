@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 interface GooglePlacePhoto {
@@ -65,21 +65,59 @@ export function useInfiniteDestinations({
   lang = 'en',
   enabled = true
 }: UseInfiniteDestinationsParams) {
-  const [currentPage, setCurrentPage] = useState(1);
   const [allPlaces, setAllPlaces] = useState<Place[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  
+  // Store page tokens separately to avoid triggering refetches
+  const pageTokensRef = useRef<Map<number, string>>(new Map());
+  
+  // Reset state when search parameters change
+  const searchParamsKey = `${lat}-${lng}-${radius}-${type}`;
+  const prevSearchParamsRef = useRef(searchParamsKey);
+  
+  useEffect(() => {
+    if (prevSearchParamsRef.current !== searchParamsKey) {
+      setAllPlaces([]);
+      setCurrentPage(1);
+      setHasMore(true);
+      pageTokensRef.current.clear();
+      prevSearchParamsRef.current = searchParamsKey;
+    }
+  }, [searchParamsKey]);
 
-  const queryKey = ['places', 'nearby', lat, lng, radius, type, lang, currentPage];
+  // Include currentPage in queryKey to trigger fetch on loadMore
+  const queryKey = ['/api/places/nearby', lat, lng, radius, type, currentPage];
 
   const { data, isLoading, error, isFetching } = useQuery<PlacesResponse>({
     queryKey,
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        lat: lat.toString(),
+        lng: lng.toString(),
+        radius: radius.toString(),
+        ...(type && { type })
+      });
+      
+      // Use stored token for pages > 1
+      const pageToken = pageTokensRef.current.get(currentPage);
+      if (pageToken) {
+        params.append('pageToken', pageToken);
+      }
+      
+      const response = await fetch(`/api/places/nearby?${params}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch places');
+      }
+      return response.json();
+    },
     enabled: enabled && hasMore,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 1,
     refetchOnWindowFocus: false,
   });
 
-  // Update all places when new data arrives
+  // Update places when new data arrives
   useEffect(() => {
     if (data?.results) {
       const newPlaces = data.results.map((place) => ({
@@ -99,8 +137,15 @@ export function useInfiniteDestinations({
         setAllPlaces(prev => [...prev, ...newPlaces]);
       }
 
-      // If we got less than expected or no next_page_token, no more results
-      if (!data.next_page_token || newPlaces.length === 0) {
+      // Store next page token if available
+      if (data.next_page_token) {
+        pageTokensRef.current.set(currentPage + 1, data.next_page_token);
+      } else {
+        setHasMore(false);
+      }
+
+      // No results means no more pages
+      if (newPlaces.length === 0) {
         setHasMore(false);
       }
     }
@@ -115,7 +160,7 @@ export function useInfiniteDestinations({
   const meta: Meta = {
     currentPage,
     totalLoaded: allPlaces.length,
-    cacheHit: false // Could be enhanced with actual cache hit detection
+    cacheHit: false
   };
 
   return {
