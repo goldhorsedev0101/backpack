@@ -7,11 +7,15 @@ GlobeMate is a full-stack web application for global travel planning and communi
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (October 8, 2025)
-- **Destinations Hub - Google Places Integration**: Replaced hardcoded 12 destinations with dynamic data from Google Places API
-  - Created `/api/destinations/popular` endpoint fetching 30+ major global cities
-  - Updated `destinations-hub.tsx` to use TanStack Query for data fetching
-  - Added proper loading states, error handling, and skeleton screens
-  - Implemented country-to-continent mapping for filtering
+- **Destinations Hub - Tabbed Interface Implementation**: Restructured destinations hub with four categories
+  - **Destinations Tab**: Shows popular worldwide destinations from database (30+ major cities)
+  - **Accommodations Tab**: Google Places API results filtered by type "lodging" with infinite scroll
+  - **Restaurants Tab**: Google Places API results filtered by type "restaurant" with infinite scroll
+  - **Attractions Tab**: Google Places API results filtered by type "tourist_attraction" with infinite scroll
+  - Each tab (except Destinations) uses `/api/destinations/infinite` endpoint with 10km radius
+  - Added telemetry tracking for tab changes (destinations_hub_tab_change event)
+  - Fixed "results is not iterable" error by adding Array.isArray validation in filteredPlaces
+  - Cleared Vite cache to ensure browser loads latest code
   - Note: **Server must be manually started** via Workflows UI (see below)
 
 ## Important Setup Notes
