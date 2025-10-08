@@ -263,6 +263,10 @@ async function startServer() {
   // IMPORTANT: Register API routes BEFORE Vite middleware in development
   await registerRoutes(app);
   
+  // Add Unsplash routes
+  const { default: unsplashRouter } = await import('./integrations/unsplash/unsplashRoutes.js');
+  app.use('/api/unsplash', unsplashRouter);
+  
   // Add itinerary routes
   const { default: itineraryRouter } = await import('./itineraryRoutes.js');
   app.use(itineraryRouter);

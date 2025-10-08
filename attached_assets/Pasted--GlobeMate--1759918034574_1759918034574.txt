@@ -1,0 +1,154 @@
+בצע את המשימות הבאות בפרויקט GlobeMate. אל תציג קוד בתשובה — רק תיישם בקבצים.
+מטרה: לעמוד בכל דרישות Unsplash ל־Production (Hotlink, Download Trigger, Attribution, Screenshots).
+
+0) ENV / Feature Flags
+
+הוסף/עדכן Secrets:
+
+UNSPLASH_ACCESS_KEY=
+ENABLE_UNSPLASH=true
+
+
+אל תחשוף מפתחות ללקוח; כל קריאות ה־API דרך השרת בלבד.
+
+1) שכבת אינטגרציה ל־Unsplash (שרת)
+
+צור מודול: src/integrations/unsplash/ עם פונקציות:
+
+searchPhotos({ query, page, perPage, orientation })
+
+getPhotoById(id)
+
+randomPhotos({ query, count, orientation })
+
+triggerDownload(download_location) // GET אל download_location עם Authorization: Client-ID
+
+כל הפונקציות מוסיפות לוגים סטנדרטיים: provider=unsplash, endpoint, latencyMs, status.
+
+אין להגיש ביטים של תמונות מהשרת. לא פרוקסי. (רק redirect בסעיף הבא).
+
+2) Hotlink / Redirect בלבד לתמונות
+
+צור endpoint:
+
+GET /api/unsplash/redirect?id=<photoId>&variant=<regular|full|small|thumb>
+
+התנהגות: שלוף את פרטי התמונה (אם אין בקאש), מצא את photo.urls[variant], החזר 302 Redirect ל־URL המקורי של Unsplash.
+
+אל תגיש תמונה מהשרת. מותר רק 302 → images.unsplash.com.
+
+3) Download Trigger (חובה)
+
+צור endpoint:
+
+POST /api/unsplash/download
+
+body: { download_location: string, photo_id: string, context?: string }
+
+בשרת: בצע GET ל־download_location עם כותרת Authorization: Client-ID <UNSPLASH_ACCESS_KEY>.
+
+רשום לוג: action=download_triggered, photo_id, status, latencyMs.
+
+החזר JSON עם ok: true/false, status, photo_id.
+
+בצד הלקוח: בכל פעולה של “שימוש בתמונה” (למשל: שמור יעד, קבע כ־Hero, שתף), יש לשלוח קריאה ל־/api/unsplash/download עם ה־download_location מתוך אובייקט התמונה.
+
+הוסף מנגנון Debounce כדי לא לשלוח כפול על אותו אירוע.
+
+4) Attribution מלא ונכון
+
+צור קומפוננטה אחידה: AttributionUnsplash.
+
+קלט: אובייקט photo מ־Unsplash.
+
+פלט (תמיד מוצג מתחת/על התמונה, גם בגריד וגם ב-Lightbox):
+
+טקסט: “Photo by {user.name} on Unsplash”
+
+user.name מקושר ל־photo.user.links.html (target=_blank, rel=noopener)
+
+המילה Unsplash מקושרת ל־https://unsplash.com
+
+אל תציג רק Badge “Unsplash” — חובה הטקסט המלא עם שני הקישורים.
+
+5) שימוש בפועל בגלריה וב־Hero
+
+בעמוד /destinations/:slug:
+
+Hero: השתמש ב־Hotlink (או /api/unsplash/redirect שמחזיר 302) להצגת photo.urls.regular/full.
+
+Gallery: כל התמונות מ־Unsplash יוצגו ב־img/src עם ה־URL המקורי (או redirect 302).
+
+ליד כל כרטיס/תמונה: כפתור “Use this photo” שמפעיל POST /api/unsplash/download עם ה־download_location.
+
+הצמד AttributionUnsplash מתחת לכל תמונה/ב־overlay.
+
+6) דף דמו פנימי + צילום מסך
+
+הוסף מסך: /integrations-demo/unsplash
+
+טופס חיפוש (query, orientation, perPage), כפתור Search.
+
+גריד תוצאות עם:
+
+img באמצעות Hotlink/Redirect 302
+
+AttributionUnsplash מלא
+
+כפתור Use this photo שמבצע POST /api/unsplash/download ומציג תוצאת 200 OK.
+
+פאנל Status המציג: latencyMs, status, ו־log גוף קצר מהשרת.
+
+כפתור “DevTools Guide” שמציג הוראות לצילום מסך:
+
+לפתוח Network → לוודא שהתמונה נמשכת מ־images.unsplash.com (או Redirect לשם).
+
+ללחוץ Use this photo → לראות בקשת .../photos/{id}/download עם סטטוס 200.
+
+הוסף כפתור “Export Production Checklist (Markdown)” שמייצר קובץ .md עם ✔ ליד כל סעיף.
+
+7) קאשינג ולוגים
+
+קאשינג סביר רק ל־מטא (תוצאות חיפוש/פרטי תמונה) — לא לתמונות עצמן:
+
+unsplash:photo:<id> — TTL 12h
+
+unsplash:search:<query>:<page>:<orientation>:<perPage> — TTL 1h
+
+לוגים: provider=unsplash, endpoint, latencyMs, status, ו־event=download_triggered בעת טריגר הורדה.
+
+8) נגישות, i18n ו־RTL
+
+אתרי טקסטים דרך i18n:
+
+media.unsplash.attributionPrefix (“Photo by”)
+
+media.unsplash.onUnsplash (“on Unsplash”)
+
+media.unsplash.usePhoto (“Use this photo” / “השתמש בתמונה”)
+
+Alt של <img>: {destinationName} — Photo by {user.name} (Unsplash).
+
+RTL/לייאאוט: וודא שאין שבירת תצוגה בכיתובים.
+
+9) קבלה (Acceptance)
+
+Hotlink: כל התמונות נטענות מ־Unsplash CDN (או 302 Redirect אליו). אין הגשת ביטים מהשרת.
+
+Download Trigger: לחיצה על “Use this photo” או פעולה מקבילה שולחת בקשה ל־download_location ומקבלת 200 OK.
+
+Attribution: מוצג בכל מקום כטקסט מלא עם שני הקישורים הנכונים.
+
+Screenshots מוכנים להגשה:
+
+כרטיס/גלריה עם הקרדיט התקין.
+
+DevTools Network → טעינת תמונה מ־images.unsplash.com (או 302 לשם).
+
+DevTools Network → קריאת .../download עם 200 OK אחרי “Use this photo”.
+
+מסך ה־Demo שמראה את המדדים והלוג.
+
+לוגים וקאשינג בהתאם לדרישות.
+
+אין שימוש בלוגו Unsplash, השם GlobeMate ברור ונפרד.
