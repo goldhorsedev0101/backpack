@@ -1,6 +1,36 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
+interface GooglePlacePhoto {
+  photo_reference: string;
+  height: number;
+  width: number;
+}
+
+interface GooglePlaceResult {
+  place_id: string;
+  name: string;
+  formatted_address?: string;
+  geometry: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
+  rating?: number;
+  user_ratings_total?: number;
+  price_level?: number;
+  types: string[];
+  photos?: GooglePlacePhoto[];
+  vicinity?: string;
+  business_status?: string;
+}
+
+interface PlacesResponse {
+  results: GooglePlaceResult[];
+  next_page_token?: string;
+}
+
 interface Place {
   placeId: string;
   name: string;
@@ -41,7 +71,7 @@ export function useInfiniteDestinations({
 
   const queryKey = ['places', 'nearby', lat, lng, radius, type, lang, currentPage];
 
-  const { data, isLoading, error, isFetching } = useQuery<{ results: any[] }>({
+  const { data, isLoading, error, isFetching } = useQuery<PlacesResponse>({
     queryKey,
     enabled: enabled && hasMore,
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -52,13 +82,13 @@ export function useInfiniteDestinations({
   // Update all places when new data arrives
   useEffect(() => {
     if (data?.results) {
-      const newPlaces = data.results.map((place: any) => ({
+      const newPlaces = data.results.map((place) => ({
         placeId: place.place_id,
         name: place.name,
         types: place.types || [],
         rating: place.rating,
         userRatingsTotal: place.user_ratings_total,
-        photoRefs: place.photos?.map((p: any) => p.photo_reference) || [],
+        photoRefs: place.photos?.map((p) => p.photo_reference) || [],
         vicinity: place.vicinity,
         formattedAddress: place.formatted_address
       }));
@@ -69,8 +99,8 @@ export function useInfiniteDestinations({
         setAllPlaces(prev => [...prev, ...newPlaces]);
       }
 
-      // If we got less than 20 results (typical page size), no more results
-      if (newPlaces.length < 20) {
+      // If we got less than expected or no next_page_token, no more results
+      if (!data.next_page_token || newPlaces.length === 0) {
         setHasMore(false);
       }
     }
