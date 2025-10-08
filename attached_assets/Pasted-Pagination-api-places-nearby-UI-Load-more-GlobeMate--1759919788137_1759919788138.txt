@@ -1,0 +1,114 @@
+Pagination ל־/api/places/nearby + UI “Load more” (ללא קוד)
+
+בצע את המשימות הבאות בפרויקט GlobeMate. אל תציג קוד בתשובה — רק תיישם בקבצים.
+
+מטרות
+
+להוסיף פאג’ינציה “אמיתית” ל־/api/places/nearby עם תמיכה ב־pageToken.
+
+לאפשר ב־UI (Destinations Hub + /destinations/:slug) טעינה מדורגת באמצעות Load more/Infinite Scroll.
+
+לשמור על קאשינג, לוגים ואבטחה קיימים.
+
+שרת — עדכון /api/places/nearby
+
+פרמטרים נתמכים (Query):
+
+lat, lng, radius, type, lang, pageToken (אופציונלי), pageSize (אופציונלי, ברירת מחדל 20, לא לחרוג ממגבלות ספק).
+
+התנהגות:
+
+אם אין pageToken: בצע Nearby Search רגיל והחזר results + nextPageToken (אם קיים).
+
+אם יש pageToken: בצע קריאה עם הטוקן והחזר results + nextPageToken הבא (אם קיים).
+
+חשוב: יש ספקים שמצריכים השהיה קצרה (~2 שניות) לפני שימוש ב־nextPageToken. הטמיע השהיה פנימית חכמה רק כאשר pageToken מתקבל בפעם הראשונה והספק מציין זאת.
+
+מבנה תגובה (Contract אחיד):
+
+{
+  "results": [ { placeId, name, coordinates, rating, userRatingsTotal, types[], photoRefs[], openingHours } ],
+  "nextPageToken": "string|null",
+  "meta": { "provider": "google_places", "cacheHit": boolean, "latencyMs": number, "page": number }
+}
+
+
+אבטחה: דרישת x-globemate-key כפי שקיים כיום. אם חסר/לא תקף → 401.
+
+לוגים: הוסף page (1,2,3…), hasNext (true/false), latencyMs, cacheHit.
+
+קאשינג: מפתח קאש יכלול גם pageToken/page:
+
+places:nearby:<lat>:<lng>:<radius>:<type>:<lang>:<pageToken-or-1>
+
+טיפול שגיאות: אם הספק מחזיר Over Query Limit/Quota → 503 ידידותי עם provider ו-retryAfter (אם קיים).
+
+לקוח — Destinations Hub (/destinations ו־/destinations/:slug)
+
+רכיב רשימת אטרקציות יקבל state:
+
+items[], nextPageToken, loading, error.
+
+טעינה ראשונית: קריאה ללא pageToken → עדכון items + nextPageToken.
+
+Load more:
+
+כפתור בתחתית הגריד שמופיע אם nextPageToken קיים.
+
+בלחיצה: מבצע קריאה עם pageToken=<nextPageToken> ומצרף את התוצאות ל־items[].
+
+אם חוזר nextPageToken=null → הסתר כפתור.
+
+Infinite Scroll (אופציונלי): אם מופעל, נטען אוטומטית כש־sentinel ב־viewport ו־nextPageToken קיים.
+
+UI/UX:
+
+הצג Counter: “Loaded X of ~60” (אם יש הערכה; אחרת “Loaded X”).
+
+הצג Skeleton בזמן טעינה, והגן מכפלות (debounce/memo).
+
+הצג הודעת ריקנות כשאין תוצאות.
+
+i18n/RTL:
+
+מחרוזות: destinations.loadMore, destinations.loadedCount, destinations.noResults, destinations.error.
+
+נגישות:
+
+הכפתור נגיש למקלדת (role="button", aria-label), ומצב disabled בזמן טעינה.
+
+דמו פנימי — /integrations-demo/places-pagination
+
+שדה קלט ל־lat/lng/radius/type + lang.
+
+כפתור “Search (Page 1)” → קריאה ראשונה, מציג JSON (results count, nextPageToken).
+
+כפתור “Load next page” → משתמש ב־nextPageToken האחרון ומדגים שרשור תוצאות.
+
+הצג מדדים: latencyMs, cacheHit, page, hasNext.
+
+קבלה (Acceptance)
+
+קריאה ראשונה ל־/api/places/nearby?... ללא pageToken מחזירה results + nextPageToken (אם קיים).
+
+קריאה שנייה עם pageToken מחזירה עמוד נוסף של תוצאות, עד גמר הטוקנים.
+
+ב־UI, לחיצה על Load more מוסיפה פריטים לרשימה מבלי לאפס את הקיימים.
+
+כשלספק אין עוד עמודים, הכפתור נעלם.
+
+לוגים כוללים page ו־hasNext; קאשינג עובד (קריאה חוזרת לעמוד זהה → cacheHit=true).
+
+401 ללא x-globemate-key תקף; 503 ידידותי במקרה מכסה/שגיאת ספק.
+
+עדכון תיעוד
+
+עדכן docs/places.md:
+
+פרמטר חדש: pageToken.
+
+דוגמאות URLs לעמודים 1–3.
+
+הערת השהיה קצרה לפני שימוש ב־nextPageToken כשהוא מופיע לראשונה.
+
+חוזה תגובה כולל meta.page ו־hasNext.
