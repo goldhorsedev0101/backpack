@@ -100,11 +100,39 @@ export default function DestinationDetail() {
     booking: featureFlags?.tbo ?? false,
   };
 
+  // Get hero image URL
+  const getHeroImageUrl = () => {
+    const params = new URLSearchParams({
+      source: 'unsplash',
+      query: `${destination.name} cityscape`,
+      maxwidth: '1920',
+      lang: i18n.language,
+    });
+    return `/api/media/proxy?${params}`;
+  };
+
+  // Get attraction image URL
+  const getAttractionImageUrl = (photoRef: string) => {
+    const params = new URLSearchParams({
+      source: 'google',
+      ref: photoRef,
+      maxwidth: '200',
+      lang: i18n.language,
+    });
+    return `/api/media/proxy?${params}`;
+  };
+
   return (
     <div className={`min-h-screen bg-gray-50 ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
-      {/* Hero Section */}
+      {/* Hero Section with Background Image */}
       <div className="relative h-[400px] bg-gradient-to-br from-blue-500 to-purple-600">
-        <div className="absolute inset-0 bg-black/20" />
+        <img 
+          src={getHeroImageUrl()} 
+          alt={destination.name}
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="eager"
+        />
+        <div className="absolute inset-0 bg-black/40" />
         <div className="container mx-auto px-4 h-full flex flex-col justify-between py-8 relative z-10">
           {/* Back Button */}
           <div>
@@ -222,9 +250,18 @@ export default function DestinationDetail() {
                   <div className="space-y-4">
                     {attractions.slice(0, 5).map((attraction) => (
                       <div key={attraction.place_id} className="flex items-start gap-4 p-4 hover:bg-gray-50 rounded-lg transition" data-testid={`attraction-${attraction.place_id}`}>
-                        <div className="h-20 w-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center text-3xl">
-                          📍
-                        </div>
+                        {attraction.photos && attraction.photos.length > 0 ? (
+                          <img 
+                            src={getAttractionImageUrl(attraction.photos[0].photo_reference)}
+                            alt={attraction.name}
+                            className="h-20 w-20 rounded-lg object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="h-20 w-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center text-3xl">
+                            📍
+                          </div>
+                        )}
                         <div className="flex-1">
                           <h4 className="font-medium text-lg mb-1">{attraction.name}</h4>
                           <p className="text-sm text-gray-500 mb-2">{attraction.formatted_address}</p>
