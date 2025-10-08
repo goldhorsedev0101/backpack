@@ -41,6 +41,7 @@ Preferred communication style: Simple, everyday language.
 - **Multi-API Travel Data Integration**: Combines Google Places API for real-time search, a comprehensive seeded database, and a TripAdvisor-ready infrastructure.
 - **Weather Integration & Travel Timing System**: Real-time weather data (OpenWeather API) and historical climate analysis, providing "Best Time to Travel" recommendations.
 - **Real Places Booking Integration**: Enriches AI-generated suggestions with bookable locations from Google Places API.
+- **Google Places Nearby Search with Pagination**: Full pagination support for Google Places API nearby search (`/api/places/nearby`). Includes pageToken handling, intelligent caching with TTL, and API key authentication. Features demo page at `/integrations-demo/places-pagination` for testing and showcasing the functionality.
 - **UI/UX Decisions**: Consistent use of shadcn/ui components, Tailwind CSS for custom styling, responsive design, and unified interfaces with tabbed navigation. Features a continent-based trip selection system for improved UX.
 - **Destinations Hub**: Comprehensive destination discovery system with search, filters, sorting, and detailed destination pages including weather cards, attractions, and interactive maps. Features a robust feature flag system for external providers.
 - **Global Expansion & Multilingual Support**: Worldwide destination coverage with full Hebrew/English bilingual support across all features, including instant language toggling and RTL support.
