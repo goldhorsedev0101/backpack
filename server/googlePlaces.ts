@@ -98,6 +98,29 @@ export class GooglePlacesService {
     }
   }
 
+  async nearbySearch(lat: number, lng: number, radius: number = 1000, type?: string): Promise<GooglePlaceResult[]> {
+    try {
+      const params = new URLSearchParams({
+        location: `${lat},${lng}`,
+        radius: radius.toString(),
+        key: this.apiKey,
+        ...(type && { type })
+      });
+
+      const response = await fetch(`${BASE_URL}/nearbysearch/json?${params}`);
+      const data = await response.json();
+
+      if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
+        throw new Error(`Google Places API error: ${data.status}`);
+      }
+
+      return data.results || [];
+    } catch (error) {
+      console.error('Error in nearby search:', error);
+      return [];
+    }
+  }
+
   async getPlaceDetails(placeId: string): Promise<GooglePlaceDetails | null> {
     try {
       const params = new URLSearchParams({
@@ -132,6 +155,7 @@ export class GooglePlacesService {
     const accommodationData = {
       locationId: details.place_id,
       name: details.name,
+      country: this.extractCountryFromAddress(details.formatted_address),
       description: `${details.name} located at ${details.formatted_address}`,
       address: details.formatted_address,
       phone: details.formatted_phone_number,
@@ -161,6 +185,7 @@ export class GooglePlacesService {
     const restaurantData = {
       locationId: details.place_id,
       name: details.name,
+      country: this.extractCountryFromAddress(details.formatted_address),
       description: `${details.name} located at ${details.formatted_address}`,
       address: details.formatted_address,
       phone: details.formatted_phone_number,
@@ -191,6 +216,7 @@ export class GooglePlacesService {
     const attractionData = {
       locationId: details.place_id,
       name: details.name,
+      country: this.extractCountryFromAddress(details.formatted_address),
       description: `${details.name} located at ${details.formatted_address}`,
       address: details.formatted_address,
       phone: details.formatted_phone_number,
@@ -222,16 +248,15 @@ export class GooglePlacesService {
     for (const review of details.reviews.slice(0, 5)) { // Import up to 5 reviews
       const reviewData = {
         locationId: placeId,
-        category,
-        reviewId: `google_${Date.now()}_${Math.random()}`,
+        locationCategory: category,
+        rating: review.rating,
         title: review.text.substring(0, 100) + (review.text.length > 100 ? '...' : ''),
         text: review.text,
-        rating: review.rating,
-        author: review.author_name,
-        date: new Date(review.time * 1000).toISOString(),
         tripType: 'unknown',
         helpful: 0,
-        language: review.language || 'en'
+        language: review.language || 'en',
+        source: 'google' as const,
+        externalReviewId: `google_${Date.now()}_${Math.random()}`
       };
 
       const imported = await storage.createLocationReview(reviewData);
@@ -287,6 +312,13 @@ export class GooglePlacesService {
       }
     }
     return 'Attractions';
+  }
+
+  private extractCountryFromAddress(formattedAddress: string): string {
+    // Extract country from the last part of the formatted address
+    // Google formatted addresses typically end with the country
+    const parts = formattedAddress.split(',').map(p => p.trim());
+    return parts[parts.length - 1] || 'Unknown';
   }
 }
 

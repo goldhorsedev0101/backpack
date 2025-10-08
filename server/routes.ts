@@ -1112,6 +1112,27 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Nearby search using lat/lng
+  app.get('/api/places/nearby', noAuth, async (req: any, res) => {
+    try {
+      const { lat, lng, radius, type } = req.query;
+      if (!lat || !lng) {
+        return res.status(400).json({ error: 'lat and lng parameters are required' });
+      }
+      
+      const results = await googlePlaces.nearbySearch(
+        parseFloat(lat),
+        parseFloat(lng),
+        radius ? parseInt(radius) : 1000,
+        type
+      );
+      res.json({ results });
+    } catch (error) {
+      console.error('Nearby search error:', error);
+      res.status(500).json({ error: 'Failed to search nearby places' });
+    }
+  });
+
   // Import Google Places data to our database
   app.post('/api/places/import', noAuth, async (req: any, res) => {
     try {
