@@ -1121,8 +1121,8 @@ export async function registerRoutes(app: Express): Promise<void> {
 
   // ===== GOOGLE PLACES API INTEGRATION =====
   
-  // API key validation middleware
-  const validateApiKey = (req: any, res: any, next: any) => {
+  // API key validation middleware (hoisted function for use anywhere in this scope)
+  function validateApiKey(req: any, res: any, next: any) {
     const apiKey = req.headers['x-globemate-key'];
     const expectedKey = process.env.INTERNAL_API_KEY;
     
@@ -1139,7 +1139,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
     
     next();
-  };
+  }
   
   // Search places using Google Places API
   app.get('/api/places/search', noAuth, async (req: any, res) => {
@@ -1265,120 +1265,6 @@ export async function registerRoutes(app: Express): Promise<void> {
 
       res.status(500).json({ 
         error: 'Failed to search nearby places',
-        latencyMs 
-      });
-    }
-  });
-
-  // Unified destinations endpoint (passthrough to nearby with normalization)
-  app.get('/api/destinations/places', validateApiKey, async (req: any, res) => {
-    const startTime = Date.now();
-    
-    try {
-      const { lat, lng, radius, type, lang, pageToken, pageSize } = req.query;
-      
-      // Validate required params
-      if (!lat || !lng) {
-        return res.status(400).json({ error: 'lat and lng parameters are required' });
-      }
-
-      const latNum = parseFloat(lat);
-      const lngNum = parseFloat(lng);
-      const radiusNum = radius ? parseInt(radius) : 5000;
-      const pageSizeNum = pageSize ? parseInt(pageSize) : 20;
-
-      // Create cache key
-      const cacheKey = `destinations:places:${latNum}:${lngNum}:${radiusNum}:${type || 'all'}:${lang || 'en'}:${pageToken || '1'}`;
-      
-      // Check cache
-      const cached = nearbySearchCache.get(cacheKey);
-      if (cached) {
-        const latencyMs = Date.now() - startTime;
-        console.log('[Destinations Places] Cache hit:', { cacheKey, latencyMs });
-        
-        return res.json({
-          ...cached,
-          meta: {
-            ...cached.meta,
-            cacheHit: true,
-            latencyMs
-          }
-        });
-      }
-
-      // Call Google Places API via nearby search
-      const result = await googlePlaces.nearbySearch({
-        lat: latNum,
-        lng: lngNum,
-        radius: radiusNum,
-        type,
-        lang,
-        pageToken,
-        pageSize: pageSizeNum
-      });
-
-      // Transform and normalize results
-      const transformedResults = result.results.map(place => ({
-        placeId: place.place_id,
-        name: place.name,
-        coordinates: {
-          lat: place.geometry.location.lat,
-          lng: place.geometry.location.lng
-        },
-        rating: place.rating,
-        userRatingsTotal: place.user_ratings_total,
-        types: place.types,
-        photoRefs: place.photos?.map(p => p.photo_reference) || []
-      }));
-
-      // Calculate page number
-      const page = pageToken ? 
-        (pageToken.includes('page') ? parseInt(pageToken.split('_')[1] || '2') : 2) : 
-        1;
-      
-      const response = {
-        results: transformedResults,
-        nextPageToken: result.nextPageToken || null,
-        meta: {
-          provider: 'google_places',
-          page,
-          hasNext: !!result.nextPageToken,
-          cacheHit: false,
-          latencyMs: Date.now() - startTime
-        }
-      };
-
-      // Cache the result (12 hours TTL)
-      nearbySearchCache.set(cacheKey, response, 12 * 60 * 60 * 1000);
-
-      console.log('[Destinations Places] API call:', {
-        lat: latNum,
-        lng: lngNum,
-        radius: radiusNum,
-        type,
-        page,
-        hasNext: response.meta.hasNext,
-        resultsCount: transformedResults.length,
-        latencyMs: response.meta.latencyMs
-      });
-
-      res.json(response);
-
-    } catch (error) {
-      const latencyMs = Date.now() - startTime;
-      console.error('[Destinations Places] Error:', error);
-      
-      if (error instanceof Error && error.message === 'OVER_QUERY_LIMIT') {
-        return res.status(503).json({
-          error: 'Service Unavailable',
-          message: 'API quota exceeded',
-          provider: 'google_places',
-          retryAfter: 60
-        });
-      }
-
-      res.status(500).json({ 
-        error: 'Failed to fetch destinations',
         latencyMs 
       });
     }
@@ -3511,6 +3397,121 @@ export async function registerRoutes(app: Express): Promise<void> {
     } catch (error) {
       console.error('Error fetching feature flags:', error);
       res.status(500).json({ error: 'Failed to fetch feature flags' });
+    }
+  });
+
+  // Unified destinations endpoint (passthrough to nearby with normalization)
+  // Must come BEFORE /api/destinations/:locationId to avoid parameter matching
+  app.get('/api/destinations/places', validateApiKey, async (req: any, res) => {
+    const startTime = Date.now();
+    
+    try {
+      const { lat, lng, radius, type, lang, pageToken, pageSize } = req.query;
+      
+      // Validate required params
+      if (!lat || !lng) {
+        return res.status(400).json({ error: 'lat and lng parameters are required' });
+      }
+
+      const latNum = parseFloat(lat);
+      const lngNum = parseFloat(lng);
+      const radiusNum = radius ? parseInt(radius) : 5000;
+      const pageSizeNum = pageSize ? parseInt(pageSize) : 20;
+
+      // Create cache key
+      const cacheKey = `destinations:places:${latNum}:${lngNum}:${radiusNum}:${type || 'all'}:${lang || 'en'}:${pageToken || '1'}`;
+      
+      // Check cache
+      const cached = nearbySearchCache.get(cacheKey);
+      if (cached) {
+        const latencyMs = Date.now() - startTime;
+        console.log('[Destinations Places] Cache hit:', { cacheKey, latencyMs });
+        
+        return res.json({
+          ...cached,
+          meta: {
+            ...cached.meta,
+            cacheHit: true,
+            latencyMs
+          }
+        });
+      }
+
+      // Call Google Places API via nearby search
+      const result = await googlePlaces.nearbySearch({
+        lat: latNum,
+        lng: lngNum,
+        radius: radiusNum,
+        type,
+        lang,
+        pageToken,
+        pageSize: pageSizeNum
+      });
+
+      // Transform and normalize results
+      const transformedResults = result.results.map(place => ({
+        placeId: place.place_id,
+        name: place.name,
+        coordinates: {
+          lat: place.geometry.location.lat,
+          lng: place.geometry.location.lng
+        },
+        rating: place.rating,
+        userRatingsTotal: place.user_ratings_total,
+        types: place.types,
+        photoRefs: place.photos?.map(p => p.photo_reference) || []
+      }));
+
+      // Calculate page number
+      const page = pageToken ? 
+        (pageToken.includes('page') ? parseInt(pageToken.split('_')[1] || '2') : 2) : 
+        1;
+      
+      const response = {
+        results: transformedResults,
+        nextPageToken: result.nextPageToken || null,
+        meta: {
+          provider: 'google_places',
+          page,
+          hasNext: !!result.nextPageToken,
+          cacheHit: false,
+          latencyMs: Date.now() - startTime
+        }
+      };
+
+      // Cache the result (12 hours TTL)
+      nearbySearchCache.set(cacheKey, response, 12 * 60 * 60 * 1000);
+
+      console.log('[Destinations Places] API call:', {
+        lat: latNum,
+        lng: lngNum,
+        radius: radiusNum,
+        type,
+        page,
+        hasNext: response.meta.hasNext,
+        resultsCount: transformedResults.length,
+        latencyMs: response.meta.latencyMs
+      });
+
+      res.json(response);
+
+    } catch (error) {
+      const latencyMs = Date.now() - startTime;
+      console.error('[Destinations Places] Error:', error);
+      
+      if (error instanceof Error && error.message === 'OVER_QUERY_LIMIT') {
+        return res.status(503).json({
+          error: 'Service Unavailable',
+          message: 'API quota exceeded',
+          provider: 'google_places',
+          retryAfter: 60
+        });
+      }
+
+      res.status(500).json({ 
+        error: 'Failed to fetch destinations',
+        latencyMs 
+      });
     }
   });
 
