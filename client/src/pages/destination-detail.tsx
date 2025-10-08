@@ -26,35 +26,34 @@ export default function DestinationDetail() {
   const isRTL = i18n.language === "he";
   const [units, setUnits] = useState<'metric' | 'imperial'>('metric');
 
-  // Mock destination data (in real app, fetch from API)
-  const destinationMap: Record<string, any> = {
-    paris: { name: "Paris", country: "France", continent: "Europe", flag: "🇫🇷", lat: 48.8566, lon: 2.3522, currency: "EUR (€)", languages: ["French"], timezone: "UTC+1", bestTime: "April-June, September-October" },
-    tokyo: { name: "Tokyo", country: "Japan", continent: "Asia", flag: "🇯🇵", lat: 35.6762, lon: 139.6503, currency: "JPY (¥)", languages: ["Japanese"], timezone: "UTC+9", bestTime: "March-May, September-November" },
-    barcelona: { name: "Barcelona", country: "Spain", continent: "Europe", flag: "🇪🇸", lat: 41.3874, lon: 2.1686, currency: "EUR (€)", languages: ["Spanish", "Catalan"], timezone: "UTC+1", bestTime: "May-June, September-October" },
-    bali: { name: "Bali", country: "Indonesia", continent: "Asia", flag: "🇮🇩", lat: -8.3405, lon: 115.0920, currency: "IDR (Rp)", languages: ["Indonesian"], timezone: "UTC+8", bestTime: "April-October" },
-    newyork: { name: "New York", country: "United States", continent: "North America", flag: "🇺🇸", lat: 40.7128, lon: -74.0060, currency: "USD ($)", languages: ["English"], timezone: "UTC-5", bestTime: "April-June, September-November" },
-    rome: { name: "Rome", country: "Italy", continent: "Europe", flag: "🇮🇹", lat: 41.9028, lon: 12.4964, currency: "EUR (€)", languages: ["Italian"], timezone: "UTC+1", bestTime: "April-June, September-October" },
-    dubai: { name: "Dubai", country: "United Arab Emirates", continent: "Asia", flag: "🇦🇪", lat: 25.2048, lon: 55.2708, currency: "AED (د.إ)", languages: ["Arabic"], timezone: "UTC+4", bestTime: "November-March" },
-    sydney: { name: "Sydney", country: "Australia", continent: "Oceania", flag: "🇦🇺", lat: -33.8688, lon: 151.2093, currency: "AUD ($)", languages: ["English"], timezone: "UTC+10", bestTime: "September-November, March-May" },
-    capetown: { name: "Cape Town", country: "South Africa", continent: "Africa", flag: "🇿🇦", lat: -33.9249, lon: 18.4241, currency: "ZAR (R)", languages: ["English", "Afrikaans"], timezone: "UTC+2", bestTime: "November-March" },
-    rio: { name: "Rio de Janeiro", country: "Brazil", continent: "South America", flag: "🇧🇷", lat: -22.9068, lon: -43.1729, currency: "BRL (R$)", languages: ["Portuguese"], timezone: "UTC-3", bestTime: "December-March" },
-    puntacana: { name: "Punta Cana", country: "Dominican Republic", continent: "Caribbean", flag: "🇩🇴", lat: 18.5601, lon: -68.3725, currency: "DOP ($)", languages: ["Spanish"], timezone: "UTC-4", bestTime: "December-April" },
-    reykjavik: { name: "Reykjavik", country: "Iceland", continent: "Europe", flag: "🇮🇸", lat: 64.1466, lon: -21.9426, currency: "ISK (kr)", languages: ["Icelandic"], timezone: "UTC+0", bestTime: "June-August" },
-  };
+  // Fetch all destinations from API
+  const { data: allDestinations, isLoading: destinationsLoading } = useQuery<any[]>({
+    queryKey: ['/api/destinations/popular'],
+  });
 
-  const destination = destinationMap[slug || ""] || {
+  // Find the destination by slug
+  const destination = allDestinations?.find(d => d.id === slug) || {
     id: slug,
     name: "Destination",
     country: "Country",
     continent: "Unknown",
     flag: "🌍",
     lat: 0,
-    lon: 0,
+    lng: 0,
     currency: "USD",
     languages: ["English"],
     timezone: "UTC",
-    bestTime: "Year-round"
+    bestTime: "Year-round",
+    description: "",
+    rating: 0,
+    userRatingsTotal: 0,
+    types: [],
+    photoRefs: []
   };
+
+  // Use lng instead of lon for consistency with API
+  const lat = destination.lat || 0;
+  const lng = destination.lng || destination.lon || 0;
 
   // Fetch feature flags (must be first!)
   const { data: featureFlags } = useQuery<{
@@ -95,15 +94,15 @@ export default function DestinationDetail() {
 
   // Fetch weather data
   const { data: weatherData, isLoading: weatherLoading } = useQuery({
-    queryKey: ["/api/destinations/weather", destination.lat, destination.lon, units, i18n.language],
+    queryKey: ["/api/destinations/weather", lat, lng, units, i18n.language],
     queryFn: async () => {
       const response = await fetch(
-        `/api/destinations/weather?lat=${destination.lat}&lon=${destination.lon}&units=${units}&lang=${i18n.language}`
+        `/api/destinations/weather?lat=${lat}&lon=${lng}&units=${units}&lang=${i18n.language}`
       );
       if (!response.ok) throw new Error('Failed to fetch weather');
       return response.json();
     },
-    enabled: !!destination.lat && !!destination.lon && featureFlags?.openWeather === true,
+    enabled: !!lat && !!lng && featureFlags?.openWeather === true,
   });
 
   // Provider status (default to false when flags not loaded)
@@ -135,6 +134,36 @@ export default function DestinationDetail() {
     });
     return `/api/media/proxy?${params}`;
   };
+
+  // Show loading state while fetching destinations
+  if (destinationsLoading) {
+    return (
+      <div className={`min-h-screen bg-gray-50 flex items-center justify-center ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-lg text-gray-600">{t("destinations.states.loading", "Loading...")}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if destination not found
+  if (!allDestinations?.find(d => d.id === slug)) {
+    return (
+      <div className={`min-h-screen bg-gray-50 flex items-center justify-center ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">{t("destinations.states.no_results", "Destination not found")}</h1>
+          <p className="text-gray-600 mb-6">{t("destinations.states.no_results_desc", "Try searching for another destination")}</p>
+          <Link href="/destinations">
+            <Button data-testid="button-back-to-destinations">
+              <ArrowLeft className={`h-4 w-4 ${isRTL ? "ml-2" : "mr-2"}`} />
+              {t("destinations.hub_title")}
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen bg-gray-50 ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
