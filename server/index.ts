@@ -228,6 +228,40 @@ async function startServer() {
         return res.status(400).json({ error: 'source parameter is required' });
       }
 
+      // Special handling for Unsplash: redirect instead of serving buffer
+      if (source === 'unsplash') {
+        const { unsplashService } = await import('./integrations/unsplash/unsplashService.js');
+        
+        if (!unsplashService.isEnabled()) {
+          return res.status(503).json({ error: 'Unsplash is not enabled' });
+        }
+
+        let photo;
+        if (id && typeof id === 'string') {
+          photo = await unsplashService.getPhotoById(id);
+        } else if (query && typeof query === 'string') {
+          const result = await unsplashService.searchPhotos({ query, perPage: 1 });
+          if (result.results.length === 0) {
+            return res.status(404).json({ error: 'No photos found' });
+          }
+          photo = result.results[0];
+        } else {
+          return res.status(400).json({ error: 'Either id or query is required for Unsplash' });
+        }
+
+        // Determine variant based on maxwidth
+        let variant: keyof typeof photo.urls = 'regular';
+        if (maxwidth) {
+          const width = parseInt(maxwidth as string);
+          if (width <= 200) variant = 'thumb';
+          else if (width <= 400) variant = 'small';
+          else if (width >= 2000) variant = 'full';
+        }
+
+        // 302 Redirect to Unsplash CDN
+        return res.redirect(302, photo.urls[variant]);
+      }
+
       const { mediaProxyService } = await import('./integrations/media/mediaProxyService.js');
 
       const params: any = {

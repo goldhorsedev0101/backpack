@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, X, Info } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Info, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -10,6 +10,20 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import AttributionUnsplash from './AttributionUnsplash.js';
+
+interface UnsplashPhotoData {
+  id: string;
+  user: {
+    name: string;
+    links: {
+      html: string;
+    };
+  };
+  links: {
+    download_location: string;
+  };
+}
 
 interface GalleryImage {
   source: string;
@@ -24,6 +38,7 @@ interface GalleryImage {
     attributionUrl?: string;
     license?: string;
   };
+  unsplashData?: UnsplashPhotoData;
 }
 
 interface DestinationGalleryProps {
@@ -103,6 +118,29 @@ export default function DestinationGallery({
     setLightboxOpen(true);
   };
 
+  const handleUsePhoto = async (image: GalleryImage) => {
+    if (!image.unsplashData) return;
+
+    try {
+      const response = await fetch('/api/unsplash/download', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          download_location: image.unsplashData.links.download_location,
+          photo_id: image.unsplashData.id,
+          context: `destination-gallery:${destinationName}`,
+        }),
+      });
+
+      const result = await response.json();
+      console.log('[Unsplash] Download triggered:', result);
+    } catch (error) {
+      console.error('[Unsplash] Failed to trigger download:', error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-4" data-testid="gallery-loading">
@@ -164,7 +202,11 @@ export default function DestinationGallery({
           )}
 
           {/* Attribution */}
-          {imageAttributions[`hero-${currentHeroIndex}`] && (
+          {heroImages[currentHeroIndex].unsplashData ? (
+            <div className={`absolute bottom-4 ${isRTL ? 'left-4' : 'right-4'} bg-black/70 text-white px-3 py-2 rounded-lg`}>
+              <AttributionUnsplash user={heroImages[currentHeroIndex].unsplashData!.user} className="text-white" />
+            </div>
+          ) : imageAttributions[`hero-${currentHeroIndex}`] && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -193,6 +235,20 @@ export default function DestinationGallery({
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
+          )}
+
+          {/* Use Photo Button for Unsplash */}
+          {heroImages[currentHeroIndex].unsplashData && (
+            <Button
+              variant="secondary"
+              size="sm"
+              className={`absolute bottom-4 ${isRTL ? 'right-4' : 'left-4'} opacity-0 group-hover:opacity-100 transition-opacity`}
+              onClick={() => handleUsePhoto(heroImages[currentHeroIndex])}
+              data-testid="hero-use-photo-btn"
+            >
+              <Download className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              {t('media.unsplash.usePhoto', 'Use this photo')}
+            </Button>
           )}
 
           {/* Full View Button */}
@@ -230,7 +286,23 @@ export default function DestinationGallery({
                 />
                 
                 {/* Attribution Overlay */}
-                {imageAttributions[`poi-${index}`] && (
+                {image.unsplashData ? (
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
+                    <AttributionUnsplash user={image.unsplashData.user} className="text-white mb-2" />
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        handleUsePhoto(image);
+                      }}
+                      data-testid={`poi-use-photo-${index}`}
+                    >
+                      <Download className="h-3 w-3 mr-1" />
+                      {t('media.unsplash.usePhoto', 'Use this photo')}
+                    </Button>
+                  </div>
+                ) : imageAttributions[`poi-${index}`] && (
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
                     <p className="text-white text-xs">
                       {imageAttributions[`poi-${index}`].attributionText || imageAttributions[`poi-${index}`].provider}
