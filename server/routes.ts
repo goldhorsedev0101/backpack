@@ -3246,40 +3246,45 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  // Popular destinations from Google Places API
+  // Popular destinations from Google Places API with full details
   app.get('/api/destinations/popular', async (req, res) => {
     try {
       const popularCities = [
-        { name: 'Paris, France', query: 'Paris Eiffel Tower' },
-        { name: 'Tokyo, Japan', query: 'Tokyo Tower Japan' },
-        { name: 'New York, USA', query: 'New York Statue of Liberty' },
-        { name: 'London, UK', query: 'London Big Ben' },
-        { name: 'Dubai, UAE', query: 'Dubai Burj Khalifa' },
-        { name: 'Rome, Italy', query: 'Rome Colosseum' },
-        { name: 'Barcelona, Spain', query: 'Barcelona Sagrada Familia' },
-        { name: 'Sydney, Australia', query: 'Sydney Opera House' },
-        { name: 'Bangkok, Thailand', query: 'Bangkok Grand Palace' },
-        { name: 'Istanbul, Turkey', query: 'Istanbul Hagia Sophia' },
-        { name: 'Amsterdam, Netherlands', query: 'Amsterdam canals' },
-        { name: 'Singapore', query: 'Singapore Marina Bay Sands' },
-        { name: 'Prague, Czech Republic', query: 'Prague Castle' },
-        { name: 'Vienna, Austria', query: 'Vienna Schonbrunn Palace' },
-        { name: 'Bali, Indonesia', query: 'Bali Uluwatu Temple' },
-        { name: 'Cape Town, South Africa', query: 'Cape Town Table Mountain' },
-        { name: 'Rio de Janeiro, Brazil', query: 'Rio Christ the Redeemer' },
-        { name: 'Cairo, Egypt', query: 'Cairo Pyramids of Giza' },
-        { name: 'Athens, Greece', query: 'Athens Acropolis' },
-        { name: 'Lisbon, Portugal', query: 'Lisbon Belem Tower' },
-        { name: 'Mumbai, India', query: 'Mumbai Gateway of India' },
-        { name: 'Los Angeles, USA', query: 'Los Angeles Hollywood Sign' },
-        { name: 'Seoul, South Korea', query: 'Seoul Gyeongbokgung Palace' },
-        { name: 'Berlin, Germany', query: 'Berlin Brandenburg Gate' },
-        { name: 'Mexico City, Mexico', query: 'Mexico City Zocalo' },
-        { name: 'Buenos Aires, Argentina', query: 'Buenos Aires Obelisco' },
-        { name: 'Hong Kong', query: 'Hong Kong Victoria Peak' },
-        { name: 'Miami, USA', query: 'Miami South Beach' },
-        { name: 'Moscow, Russia', query: 'Moscow Red Square' },
-        { name: 'Marrakech, Morocco', query: 'Marrakech Jemaa el-Fnaa' },
+        { name: 'Paris', country: 'France', continent: 'Europe', query: 'Paris Eiffel Tower', trending: true, flag: '🇫🇷' },
+        { name: 'Tokyo', country: 'Japan', continent: 'Asia', query: 'Tokyo Tower Japan', trending: true, flag: '🇯🇵' },
+        { name: 'New York', country: 'United States', continent: 'North America', query: 'New York Statue of Liberty', trending: false, flag: '🇺🇸' },
+        { name: 'London', country: 'UK', continent: 'Europe', query: 'London Big Ben', trending: true, flag: '🇬🇧' },
+        { name: 'Dubai', country: 'United Arab Emirates', continent: 'Asia', query: 'Dubai Burj Khalifa', trending: true, flag: '🇦🇪' },
+        { name: 'Rome', country: 'Italy', continent: 'Europe', query: 'Rome Colosseum', trending: false, flag: '🇮🇹' },
+        { name: 'Barcelona', country: 'Spain', continent: 'Europe', query: 'Barcelona Sagrada Familia', trending: true, flag: '🇪🇸' },
+        { name: 'Sydney', country: 'Australia', continent: 'Oceania', query: 'Sydney Opera House', trending: false, flag: '🇦🇺' },
+        { name: 'Bangkok', country: 'Thailand', continent: 'Asia', query: 'Bangkok Grand Palace', trending: true, flag: '🇹🇭' },
+        { name: 'Istanbul', country: 'Turkey', continent: 'Asia', query: 'Istanbul Hagia Sophia', trending: false, flag: '🇹🇷' },
+        { name: 'Amsterdam', country: 'Netherlands', continent: 'Europe', query: 'Amsterdam canals', trending: false, flag: '🇳🇱' },
+        { name: 'Singapore', country: 'Singapore', continent: 'Asia', query: 'Singapore Marina Bay Sands', trending: true, flag: '🇸🇬' },
+        { name: 'Prague', country: 'Czech Republic', continent: 'Europe', query: 'Prague Castle', trending: false, flag: '🇨🇿' },
+        { name: 'Vienna', country: 'Austria', continent: 'Europe', query: 'Vienna Schonbrunn Palace', trending: false, flag: '🇦🇹' },
+        { name: 'Bali', country: 'Indonesia', continent: 'Asia', query: 'Bali Uluwatu Temple', trending: true, flag: '🇮🇩' },
+        { name: 'Cape Town', country: 'South Africa', continent: 'Africa', query: 'Cape Town Table Mountain', trending: false, flag: '🇿🇦' },
+        { name: 'Rio de Janeiro', country: 'Brazil', continent: 'South America', query: 'Rio Christ the Redeemer', trending: false, flag: '🇧🇷' },
+        { name: 'Cairo', country: 'Egypt', continent: 'Africa', query: 'Cairo Pyramids of Giza', trending: false, flag: '🇪🇬' },
+        { name: 'Athens', country: 'Greece', continent: 'Europe', query: 'Athens Acropolis', trending: false, flag: '🇬🇷' },
+        { name: 'Lisbon', country: 'Portugal', continent: 'Europe', query: 'Lisbon Belem Tower', trending: true, flag: '🇵🇹' },
+        { name: 'Mumbai', country: 'India', continent: 'Asia', query: 'Mumbai Gateway of India', trending: false, flag: '🇮🇳' },
+        { name: 'Los Angeles', country: 'United States', continent: 'North America', query: 'Los Angeles Hollywood Sign', trending: false, flag: '🇺🇸' },
+        { name: 'Seoul', country: 'South Korea', continent: 'Asia', query: 'Seoul Gyeongbokgung Palace', trending: true, flag: '🇰🇷' },
+        { name: 'Berlin', country: 'Germany', continent: 'Europe', query: 'Berlin Brandenburg Gate', trending: false, flag: '🇩🇪' },
+        { name: 'Mexico City', country: 'Mexico', continent: 'North America', query: 'Mexico City Zocalo', trending: false, flag: '🇲🇽' },
+        { name: 'Buenos Aires', country: 'Argentina', continent: 'South America', query: 'Buenos Aires Obelisco', trending: false, flag: '🇦🇷' },
+        { name: 'Hong Kong', country: 'Hong Kong', continent: 'Asia', query: 'Hong Kong Victoria Peak', trending: true, flag: '🇭🇰' },
+        { name: 'Miami', country: 'United States', continent: 'North America', query: 'Miami South Beach', trending: false, flag: '🇺🇸' },
+        { name: 'Moscow', country: 'Russia', continent: 'Europe', query: 'Moscow Red Square', trending: false, flag: '🇷🇺' },
+        { name: 'Marrakech', country: 'Morocco', continent: 'Africa', query: 'Marrakech Jemaa el-Fnaa', trending: false, flag: '🇲🇦' },
+        { name: 'Punta Cana', country: 'Dominican Republic', continent: 'Caribbean', query: 'Punta Cana beach', trending: true, flag: '🇩🇴' },
+        { name: 'Reykjavik', country: 'Iceland', continent: 'Europe', query: 'Reykjavik Hallgrimskirkja', trending: true, flag: '🇮🇸' },
+        { name: 'Santorini', country: 'Greece', continent: 'Europe', query: 'Santorini Oia', trending: true, flag: '🇬🇷' },
+        { name: 'Kyoto', country: 'Japan', continent: 'Asia', query: 'Kyoto Fushimi Inari', trending: false, flag: '🇯🇵' },
+        { name: 'Venice', country: 'Italy', continent: 'Europe', query: 'Venice Grand Canal', trending: false, flag: '🇮🇹' },
       ];
 
       const destinations = await Promise.all(
@@ -3288,16 +3293,74 @@ export async function registerRoutes(app: Express): Promise<void> {
             const results = await googlePlaces.searchPlaces(city.query);
             if (results && results.length > 0) {
               const place = results[0];
+              
+              // Determine types based on Google Places types
+              const cityTypes = [];
+              if (place.types.includes('locality') || place.types.includes('administrative_area_level_1')) {
+                cityTypes.push('city');
+              }
+              if (place.types.includes('natural_feature') || place.types.includes('park')) {
+                cityTypes.push('nature');
+              }
+              if (place.types.includes('tourist_attraction') || place.types.includes('point_of_interest')) {
+                cityTypes.push('culture');
+              }
+              if (cityTypes.length === 0) cityTypes.push('city');
+
+              // Create description based on city
+              const descriptions: { [key: string]: string } = {
+                'Paris': 'The City of Light offers iconic landmarks, world-class art, and exquisite cuisine',
+                'Tokyo': 'A fascinating blend of ancient tradition and cutting-edge modernity',
+                'New York': 'The city that never sleeps, iconic skyline and diverse culture',
+                'London': 'Historic capital with royal palaces, museums, and vibrant culture',
+                'Dubai': 'Futuristic city with luxury shopping and modern architecture',
+                'Rome': 'The Eternal City filled with ancient history and Renaissance art',
+                'Barcelona': 'Stunning architecture, beautiful beaches, and vibrant culture',
+                'Sydney': 'Harbor city known for the Opera House and beautiful beaches',
+                'Bangkok': 'Vibrant street life, ornate shrines, and bustling markets',
+                'Istanbul': 'Where East meets West, rich history and stunning architecture',
+                'Amsterdam': 'Artistic heritage, canals, and cycling culture',
+                'Singapore': 'Modern city-state with diverse culture and incredible food',
+                'Prague': 'Fairy-tale architecture and rich medieval history',
+                'Vienna': 'Imperial palaces, classical music, and elegant coffee houses',
+                'Bali': 'Tropical paradise with stunning beaches, temples, and rice terraces',
+                'Cape Town': 'Stunning landscapes, Table Mountain, and vibrant culture',
+                'Rio de Janeiro': 'Iconic beaches, Christ the Redeemer, and Carnival celebrations',
+                'Cairo': 'Ancient pyramids, pharaohs, and the Nile River',
+                'Athens': 'Cradle of Western civilization and ancient landmarks',
+                'Lisbon': 'Coastal capital with colorful architecture and historic trams',
+                'Mumbai': 'Bollywood, colonial architecture, and bustling markets',
+                'Los Angeles': 'Entertainment capital, beaches, and diverse neighborhoods',
+                'Seoul': 'Modern metropolis with ancient temples and vibrant K-culture',
+                'Berlin': 'Creative hub with rich history and dynamic nightlife',
+                'Mexico City': 'Ancient Aztec heritage, museums, and vibrant street life',
+                'Buenos Aires': 'Tango, steakhouses, and European-style architecture',
+                'Hong Kong': 'Skyscrapers, dim sum, and harbor views',
+                'Miami': 'Art Deco architecture, beaches, and Latin culture',
+                'Moscow': 'Red Square, Kremlin, and onion-domed churches',
+                'Marrakech': 'Bustling souks, palaces, and Moroccan culture',
+                'Punta Cana': 'Paradise beaches and all-inclusive resorts',
+                'Reykjavik': 'Gateway to natural wonders like Northern Lights and hot springs',
+                'Santorini': 'White-washed villages, stunning sunsets, and volcanic beaches',
+                'Kyoto': 'Ancient temples, traditional geishas, and zen gardens',
+                'Venice': 'Romantic canals, gondolas, and historic architecture'
+              };
+
               return {
-                id: place.place_id,
+                id: city.name.toLowerCase().replace(/\s+/g, ''),
                 name: city.name,
-                slug: city.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-                country: city.name.split(',').pop()?.trim() || '',
+                country: city.country,
+                continent: city.continent,
+                flag: city.flag,
                 lat: place.geometry.location.lat,
-                lon: place.geometry.location.lng,
-                rating: place.rating || 0,
-                photos: place.photos || [],
-                types: place.types || []
+                lng: place.geometry.location.lng,
+                rating: place.rating || 4.5,
+                userRatingsTotal: place.user_ratings_total || 0,
+                types: cityTypes,
+                description: descriptions[city.name] || `Explore the beauty and culture of ${city.name}`,
+                trending: city.trending,
+                photoRefs: place.photos?.map(p => p.photo_reference) || [],
+                placeId: place.place_id
               };
             }
             return null;
