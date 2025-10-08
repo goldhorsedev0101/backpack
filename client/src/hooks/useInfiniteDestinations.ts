@@ -73,7 +73,7 @@ export function useInfiniteDestinations({
   const pageTokensRef = useRef<Map<number, string>>(new Map());
   
   // Reset state when search parameters change
-  const searchParamsKey = `${lat}-${lng}-${radius}-${type}`;
+  const searchParamsKey = `${lat}-${lng}-${radius}-${type}-${lang}`;
   const prevSearchParamsRef = useRef(searchParamsKey);
   
   useEffect(() => {
@@ -87,7 +87,7 @@ export function useInfiniteDestinations({
   }, [searchParamsKey]);
 
   // Include currentPage in queryKey to trigger fetch on loadMore
-  const queryKey = ['/api/places/nearby', lat, lng, radius, type, currentPage];
+  const queryKey = ['/api/places/nearby', lat, lng, radius, type, lang, currentPage];
 
   const { data, isLoading, error, isFetching } = useQuery<PlacesResponse>({
     queryKey,
@@ -96,7 +96,8 @@ export function useInfiniteDestinations({
         lat: lat.toString(),
         lng: lng.toString(),
         radius: radius.toString(),
-        ...(type && { type })
+        ...(type && { type }),
+        ...(lang && { lang })
       });
       
       // Use stored token for pages > 1
