@@ -299,19 +299,19 @@ export default function DestinationsHub() {
                           </Badge>
                         )}
                         <Badge className="bg-white/90 text-gray-800">
-                          {t(`trips.continents.${destination.continent}`)}
+                          {t(`trips.continents.${destination.continent}`, destination.continent)}
                         </Badge>
                       </div>
                     </div>
                     <CardHeader>
                       <CardTitle className="flex items-center justify-between">
-                        <span>{t(`destinations.cities.${destination.id}`)}</span>
+                        <span>{t(`destinations.cities.${destination.id}`, destination.name)}</span>
                         <span className="text-sm font-normal text-gray-500">⭐ {destination.rating}</span>
                       </CardTitle>
-                      <CardDescription>{t(`trips.countries.${destination.country}`) || destination.country}</CardDescription>
+                      <CardDescription>{t(`trips.countries.${destination.country}`, destination.country)}</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-gray-600 mb-3">{t(`destinations.city_descriptions.${destination.id}`)}</p>
+                      <p className="text-sm text-gray-600 mb-3">{t(`destinations.city_descriptions.${destination.id}`, destination.description)}</p>
                       <div className="flex flex-wrap gap-2 mb-3">
                         {destination.type.map((type) => (
                           <Badge key={type} variant="outline" className="text-xs">
