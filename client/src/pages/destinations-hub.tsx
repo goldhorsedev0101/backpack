@@ -1,144 +1,114 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
-import { Search, MapPin, Calendar, Thermometer, Filter, X } from "lucide-react";
+import { Search, MapPin, Filter, X, Loader2, AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { CONTINENTS, CONTINENT_COUNTRY_MAP, type Continent } from "@/lib/constants";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useInfiniteDestinations } from "@/hooks/useInfiniteDestinations";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 
-interface Destination {
-  id: string;
-  name: string;
-  country: string;
-  continent: Continent;
-  type: string[];
-  description: string;
-  rating: number;
-  trending: boolean;
-  bestSeason: string[];
-  imageUrl?: string;
-  flag: string;
-}
-
-// Sample destinations data
-const SAMPLE_DESTINATIONS: Destination[] = [
-  { id: "paris", name: "Paris", country: "France", continent: "Europe", type: ["city", "culture"], description: "The City of Light offers iconic landmarks, world-class art, and exquisite cuisine", rating: 4.8, trending: true, bestSeason: ["spring", "autumn"], flag: "🇫🇷" },
-  { id: "tokyo", name: "Tokyo", country: "Japan", continent: "Asia", type: ["city", "culture"], description: "A fascinating blend of ancient tradition and cutting-edge modernity", rating: 4.9, trending: true, bestSeason: ["spring", "autumn"], flag: "🇯🇵" },
-  { id: "barcelona", name: "Barcelona", country: "Spain", continent: "Europe", type: ["city", "beach", "culture"], description: "Stunning architecture, beautiful beaches, and vibrant culture", rating: 4.7, trending: true, bestSeason: ["spring", "summer", "autumn"], flag: "🇪🇸" },
-  { id: "bali", name: "Bali", country: "Indonesia", continent: "Asia", type: ["beach", "nature", "culture"], description: "Tropical paradise with stunning beaches, temples, and rice terraces", rating: 4.6, trending: true, bestSeason: ["spring", "summer", "autumn"], flag: "🇮🇩" },
-  { id: "newyork", name: "New York", country: "United States", continent: "North America", type: ["city", "culture"], description: "The city that never sleeps, iconic skyline and diverse culture", rating: 4.7, trending: false, bestSeason: ["spring", "autumn"], flag: "🇺🇸" },
-  { id: "rome", name: "Rome", country: "Italy", continent: "Europe", type: ["city", "culture"], description: "The Eternal City filled with ancient history and Renaissance art", rating: 4.8, trending: false, bestSeason: ["spring", "autumn"], flag: "🇮🇹" },
-  { id: "dubai", name: "Dubai", country: "United Arab Emirates", continent: "Asia", type: ["city", "beach"], description: "Futuristic city with luxury shopping and modern architecture", rating: 4.5, trending: true, bestSeason: ["winter", "spring"], flag: "🇦🇪" },
-  { id: "sydney", name: "Sydney", country: "Australia", continent: "Oceania", type: ["city", "beach"], description: "Harbor city known for the Opera House and beautiful beaches", rating: 4.7, trending: false, bestSeason: ["spring", "summer", "autumn"], flag: "🇦🇺" },
-  { id: "capetown", name: "Cape Town", country: "South Africa", continent: "Africa", type: ["city", "beach", "nature"], description: "Stunning landscapes, Table Mountain, and vibrant culture", rating: 4.6, trending: false, bestSeason: ["summer", "autumn"], flag: "🇿🇦" },
-  { id: "rio", name: "Rio de Janeiro", country: "Brazil", continent: "South America", type: ["city", "beach", "nature"], description: "Iconic beaches, Christ the Redeemer, and Carnival celebrations", rating: 4.5, trending: false, bestSeason: ["summer", "autumn"], flag: "🇧🇷" },
-  { id: "puntacana", name: "Punta Cana", country: "Dominican Republic", continent: "Caribbean", type: ["beach", "nature"], description: "Paradise beaches and all-inclusive resorts", rating: 4.4, trending: true, bestSeason: ["winter", "spring"], flag: "🇩🇴" },
-  { id: "reykjavik", name: "Reykjavik", country: "Iceland", continent: "Europe", type: ["city", "nature", "adventure"], description: "Gateway to natural wonders like Northern Lights and hot springs", rating: 4.6, trending: true, bestSeason: ["summer", "winter"], flag: "🇮🇸" },
-];
+// Default center: Tel Aviv, Israel
+const DEFAULT_LAT = 32.0853;
+const DEFAULT_LNG = 34.7818;
+const DEFAULT_RADIUS = 50000; // 50km
 
 export default function DestinationsHub() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "he";
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedContinent, setSelectedContinent] = useState<string>("all");
-  const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
-  const [selectedSeason, setSelectedSeason] = useState<string>("all");
-  const [sortBy, setSortBy] = useState<string>("trending");
+  const [radius, setRadius] = useState<number>(DEFAULT_RADIUS);
+  const [infiniteScrollEnabled, setInfiniteScrollEnabled] = useState(true);
 
-  // Filter destinations
-  const filteredDestinations = useMemo(() => {
-    let results = SAMPLE_DESTINATIONS;
+  const { places, isLoading, isLoadingMore, error, hasMore, loadMore, meta } = 
+    useInfiniteDestinations({
+      lat: DEFAULT_LAT,
+      lng: DEFAULT_LNG,
+      radius,
+      type: selectedType !== 'all' ? selectedType : undefined,
+      lang: i18n.language,
+      enabled: true
+    });
 
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      results = results.filter(
-        (d) =>
-          d.name.toLowerCase().includes(query) ||
-          d.country.toLowerCase().includes(query) ||
-          d.description.toLowerCase().includes(query)
-      );
-    }
+  // Intersection observer for infinite scroll
+  const sentinelRef = useIntersectionObserver({
+    onIntersect: () => {
+      if (infiniteScrollEnabled && hasMore && !isLoadingMore) {
+        loadMore();
+        console.log('[Telemetry] infinite_scroll_page_loaded', {
+          page: meta?.currentPage ? meta.currentPage + 1 : 2,
+          totalLoaded: meta?.totalLoaded || 0,
+          hasNext: hasMore
+        });
+      }
+    },
+    enabled: infiniteScrollEnabled && hasMore && !isLoadingMore,
+    threshold: 0.1,
+    rootMargin: '200px'
+  });
 
-    // Continent filter
-    if (selectedContinent !== "all") {
-      results = results.filter((d) => d.continent === selectedContinent);
-    }
-
-    // Country filter
-    if (selectedCountry !== "all") {
-      results = results.filter((d) => d.country === selectedCountry);
-    }
-
-    // Type filter
-    if (selectedType !== "all") {
-      results = results.filter((d) => d.type.includes(selectedType));
-    }
-
-    // Season filter
-    if (selectedSeason !== "all") {
-      results = results.filter((d) => d.bestSeason.includes(selectedSeason));
-    }
-
-    // Sort
-    switch (sortBy) {
-      case "trending":
-        results = [...results].sort((a, b) => (b.trending ? 1 : 0) - (a.trending ? 1 : 0));
-        break;
-      case "rating":
-        results = [...results].sort((a, b) => b.rating - a.rating);
-        break;
-      case "a_z":
-        results = [...results].sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case "z_a":
-        results = [...results].sort((a, b) => b.name.localeCompare(a.name));
-        break;
-    }
-
-    return results;
-  }, [searchQuery, selectedContinent, selectedCountry, selectedType, selectedSeason, sortBy]);
-
-  const availableCountries = useMemo(() => {
-    if (selectedContinent === "all") return [];
-    return CONTINENT_COUNTRY_MAP[selectedContinent as Continent] || [];
-  }, [selectedContinent]);
+  // Client-side filtering for search query
+  const filteredPlaces = useMemo(() => {
+    if (!searchQuery) return places;
+    
+    const query = searchQuery.toLowerCase();
+    return places.filter((place: typeof places[0]) =>
+      place.name.toLowerCase().includes(query) ||
+      place.types.some((type: string) => type.toLowerCase().includes(query))
+    );
+  }, [places, searchQuery]);
 
   const clearFilters = () => {
     setSearchQuery("");
-    setSelectedContinent("all");
-    setSelectedCountry("all");
     setSelectedType("all");
-    setSelectedSeason("all");
+    setRadius(DEFAULT_RADIUS);
   };
 
-  const hasActiveFilters =
-    searchQuery || selectedContinent !== "all" || selectedCountry !== "all" || selectedType !== "all" || selectedSeason !== "all";
+  const hasActiveFilters = searchQuery || selectedType !== "all" || radius !== DEFAULT_RADIUS;
 
-  // Get destination image URL
-  const getDestinationImageUrl = (destinationName: string) => {
+  // Get place image URL
+  const getPlaceImageUrl = (placeName: string, photoRefs: string[]) => {
+    if (photoRefs.length > 0) {
+      const params = new URLSearchParams({
+        source: 'google',
+        ref: photoRefs[0],
+        maxwidth: '600',
+        lang: i18n.language,
+      });
+      return `/api/media/proxy?${params}`;
+    }
+    
+    // Fallback to Unsplash
     const params = new URLSearchParams({
       source: 'unsplash',
-      query: `${destinationName} cityscape`,
+      query: `${placeName} landmark`,
       maxwidth: '600',
       lang: i18n.language,
     });
     return `/api/media/proxy?${params}`;
   };
 
+  useEffect(() => {
+    console.log('[Telemetry] destinations_page_view', {
+      page: 1,
+      itemsLoaded: places.length,
+      hasNext: hasMore
+    });
+  }, []); // Only on mount
+
   return (
     <div className={`min-h-screen bg-gray-50 ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-slate-800 mb-3">{t("destinations.hub_title")}</h1>
-          <p className="text-lg text-gray-600">{t("destinations.hub_subtitle")}</p>
+          <h1 className="text-4xl font-bold text-slate-800 mb-3">{t("destinations.hub_title", "Explore Destinations")}</h1>
+          <p className="text-lg text-gray-600">{t("destinations.hub_subtitle", "Discover amazing places around the world")}</p>
         </div>
 
         {/* Search Bar */}
@@ -147,9 +117,9 @@ export default function DestinationsHub() {
             <Search className={`absolute ${isRTL ? "right-3" : "left-3"} top-3 h-5 w-5 text-gray-400`} />
             <Input
               type="text"
-              placeholder={t("destinations.search_placeholder")}
+              placeholder={t("destinations.search_placeholder", "Search destinations...")}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
               className={`${isRTL ? "pr-10" : "pl-10"} py-6 text-lg`}
               data-testid="input-search-destinations"
             />
@@ -164,7 +134,7 @@ export default function DestinationsHub() {
                 <CardTitle className="flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <Filter className="h-5 w-5" />
-                    {t("destinations.filters.title")}
+                    {t("destinations.filters.title", "Filters")}
                   </span>
                   {hasActiveFilters && (
                     <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8">
@@ -174,171 +144,232 @@ export default function DestinationsHub() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Continent Filter */}
+                {/* Type Filter */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">{t("destinations.filters.region")}</label>
-                  <Select value={selectedContinent} onValueChange={setSelectedContinent}>
-                    <SelectTrigger data-testid="select-continent-filter">
+                  <label className="text-sm font-medium mb-2 block">{t("destinations.filters.type", "Type")}</label>
+                  <Select value={selectedType} onValueChange={setSelectedType}>
+                    <SelectTrigger data-testid="select-type-filter">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">{t("destinations.all_continents")}</SelectItem>
-                      {CONTINENTS.map((continent) => (
-                        <SelectItem key={continent} value={continent}>
-                          {t(`trips.continents.${continent}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Country Filter */}
-                <div>
-                  <label className="text-sm font-medium mb-2 block">{t("destinations.filters.country")}</label>
-                  <Select value={selectedCountry} onValueChange={setSelectedCountry} disabled={selectedContinent === "all"}>
-                    <SelectTrigger data-testid="select-country-filter">
-                      <SelectValue placeholder={t("destinations.select_country")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t("destinations.all_countries")}</SelectItem>
-                      {availableCountries.map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {t(`trips.countries.${country}`) || country}
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="all">{t("destinations.all_types", "All Types")}</SelectItem>
+                      <SelectItem value="tourist_attraction">{t("destinations.types.tourist_attraction", "Tourist Attraction")}</SelectItem>
+                      <SelectItem value="museum">{t("destinations.types.museum", "Museum")}</SelectItem>
+                      <SelectItem value="park">{t("destinations.types.park", "Park")}</SelectItem>
+                      <SelectItem value="restaurant">{t("destinations.types.restaurant", "Restaurant")}</SelectItem>
+                      <SelectItem value="cafe">{t("destinations.types.cafe", "Cafe")}</SelectItem>
+                      <SelectItem value="shopping_mall">{t("destinations.types.shopping_mall", "Shopping Mall")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <Separator />
 
-                {/* Type Filter */}
+                {/* Radius Filter */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">{t("destinations.filters.type")}</label>
-                  <Select value={selectedType} onValueChange={setSelectedType}>
-                    <SelectTrigger data-testid="select-type-filter">
+                  <label className="text-sm font-medium mb-2 block">
+                    {t("destinations.filters.radius", "Search Radius")}
+                  </label>
+                  <Select value={radius.toString()} onValueChange={(val) => setRadius(parseInt(val))}>
+                    <SelectTrigger data-testid="select-radius-filter">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">{t("destinations.all_types")}</SelectItem>
-                      <SelectItem value="city">{t("destinations.types.city")}</SelectItem>
-                      <SelectItem value="beach">{t("destinations.types.beach")}</SelectItem>
-                      <SelectItem value="nature">{t("destinations.types.nature")}</SelectItem>
-                      <SelectItem value="culture">{t("destinations.types.culture")}</SelectItem>
-                      <SelectItem value="adventure">{t("destinations.types.adventure")}</SelectItem>
+                      <SelectItem value="5000">5 km</SelectItem>
+                      <SelectItem value="10000">10 km</SelectItem>
+                      <SelectItem value="25000">25 km</SelectItem>
+                      <SelectItem value="50000">50 km</SelectItem>
+                      <SelectItem value="100000">100 km</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
-                {/* Season Filter */}
-                <div>
-                  <label className="text-sm font-medium mb-2 block">{t("destinations.filters.season")}</label>
-                  <Select value={selectedSeason} onValueChange={setSelectedSeason}>
-                    <SelectTrigger data-testid="select-season-filter">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t("destinations.all_seasons")}</SelectItem>
-                      <SelectItem value="spring">{t("destinations.seasons.spring")}</SelectItem>
-                      <SelectItem value="summer">{t("destinations.seasons.summer")}</SelectItem>
-                      <SelectItem value="autumn">{t("destinations.seasons.autumn")}</SelectItem>
-                      <SelectItem value="winter">{t("destinations.seasons.winter")}</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <Separator />
+
+                {/* Infinite Scroll Toggle */}
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">
+                    {t("destinations.filters.infinite_scroll", "Infinite Scroll")}
+                  </label>
+                  <Button
+                    variant={infiniteScrollEnabled ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setInfiniteScrollEnabled(!infiniteScrollEnabled)}
+                    data-testid="button-toggle-infinite-scroll"
+                  >
+                    {infiniteScrollEnabled ? t("destinations.filters.on", "ON") : t("destinations.filters.off", "OFF")}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Stats Card */}
+            {meta && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm">{t("destinations.stats.title", "Stats")}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">{t("destinations.stats.loaded", "Loaded")}:</span>
+                    <span className="font-medium">{meta.totalLoaded}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">{t("destinations.stats.page", "Page")}:</span>
+                    <span className="font-medium">{meta.currentPage}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">{t("destinations.stats.cache", "Cache")}:</span>
+                    <Badge variant={meta.cacheHit ? "default" : "secondary"} className="h-5">
+                      {meta.cacheHit ? t("destinations.stats.hit", "HIT") : t("destinations.stats.miss", "MISS")}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Main Content */}
           <div className="flex-1">
-            {/* Sort Bar */}
+            {/* Results Count */}
             <div className="flex items-center justify-between mb-6">
               <p className="text-gray-600">
-                {filteredDestinations.length} {filteredDestinations.length === 1 ? t("destinations.destination") : t("destinations.destinations_count")}
+                {filteredPlaces.length} {filteredPlaces.length === 1 ? t("destinations.result", "result") : t("destinations.results", "results")}
+                {meta && meta.totalLoaded > filteredPlaces.length && ` (${t("destinations.filtered_from", "filtered from")} ${meta.totalLoaded})`}
               </p>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">{t("destinations.sort.label")}:</span>
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-[180px]" data-testid="select-sort">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="trending">{t("destinations.sort.trending")}</SelectItem>
-                    <SelectItem value="rating">{t("destinations.sort.rating")}</SelectItem>
-                    <SelectItem value="a_z">{t("destinations.sort.a_z")}</SelectItem>
-                    <SelectItem value="z_a">{t("destinations.sort.z_a")}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
 
-            {/* Destinations Grid */}
-            {filteredDestinations.length === 0 ? (
-              <Card className="p-12 text-center">
-                <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">{t("destinations.states.no_results")}</h3>
-                <p className="text-gray-500">{t("destinations.states.no_results_desc")}</p>
-              </Card>
-            ) : (
+            {/* Error Alert */}
+            {error && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Loading State */}
+            {isLoading && places.length === 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredDestinations.map((destination) => (
-                  <Card key={destination.id} className="overflow-hidden hover:shadow-lg transition-shadow" data-testid={`card-destination-${destination.id}`}>
-                    <div className="h-48 relative overflow-hidden">
-                      <img 
-                        src={getDestinationImageUrl(destination.name)}
-                        alt={destination.name}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-black/20" />
-                      <div className="absolute top-4 right-4 flex gap-2">
-                        {destination.trending && (
-                          <Badge className="bg-red-500 text-white">
-                            {t("destinations.sort.trending")}
-                          </Badge>
-                        )}
-                        <Badge className="bg-white/90 text-gray-800">
-                          {t(`trips.continents.${destination.continent}`, destination.continent)}
-                        </Badge>
-                      </div>
-                    </div>
+                {[...Array(6)].map((_, i) => (
+                  <Card key={i} className="overflow-hidden">
+                    <div className="h-48 bg-gray-200 animate-pulse" />
                     <CardHeader>
-                      <CardTitle className="flex items-center justify-between">
-                        <span>{t(`destinations.cities.${destination.id}`, destination.name)}</span>
-                        <span className="text-sm font-normal text-gray-500">⭐ {destination.rating}</span>
-                      </CardTitle>
-                      <CardDescription>{t(`trips.countries.${destination.country}`, destination.country)}</CardDescription>
+                      <div className="h-6 bg-gray-200 rounded animate-pulse w-3/4" />
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-gray-600 mb-3">{t(`destinations.city_descriptions.${destination.id}`, destination.description)}</p>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {destination.type.map((type) => (
-                          <Badge key={type} variant="outline" className="text-xs">
-                            {t(`destinations.types.${type}`)}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Calendar className="h-4 w-4" />
-                        <span>
-                          {destination.bestSeason
-                            .map((s) => t(`destinations.seasons.${s}`))
-                            .join(", ")}
-                        </span>
-                      </div>
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-full mb-2" />
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
                     </CardContent>
-                    <CardFooter className="flex gap-2">
-                      <Link href={`/destinations/${destination.id}`} className="flex-1">
-                        <Button className="w-full" data-testid={`button-view-${destination.id}`}>
-                          {t("destinations.card.view_details")}
-                        </Button>
-                      </Link>
-                    </CardFooter>
                   </Card>
                 ))}
               </div>
             )}
+
+            {/* Destinations Grid */}
+            {!isLoading || places.length > 0 ? (
+              <>
+                {filteredPlaces.length === 0 && !isLoading ? (
+                  <Card className="p-12 text-center">
+                    <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">{t("destinations.states.no_results", "No results found")}</h3>
+                    <p className="text-gray-500">{t("destinations.states.no_results_desc", "Try adjusting your filters or search query")}</p>
+                  </Card>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {filteredPlaces.map((place) => (
+                      <Card key={place.placeId} className="overflow-hidden hover:shadow-lg transition-shadow" data-testid={`card-destination-${place.placeId}`}>
+                        <div className="h-48 relative overflow-hidden">
+                          <img 
+                            src={getPlaceImageUrl(place.name, place.photoRefs)}
+                            alt={place.name}
+                            className="absolute inset-0 w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-black/20" />
+                          <div className="absolute top-4 right-4">
+                            {place.rating && (
+                              <Badge className="bg-white/90 text-gray-800">
+                                ⭐ {place.rating}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        <CardHeader>
+                          <CardTitle className="text-lg">{place.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {place.types.slice(0, 3).map((type) => (
+                              <Badge key={type} variant="outline" className="text-xs">
+                                {type.replace(/_/g, ' ')}
+                              </Badge>
+                            ))}
+                          </div>
+                          {place.userRatingsTotal && (
+                            <p className="text-sm text-gray-500">
+                              {place.userRatingsTotal.toLocaleString()} {t("destinations.reviews", "reviews")}
+                            </p>
+                          )}
+                        </CardContent>
+                        <CardFooter>
+                          <Button className="w-full" variant="outline" data-testid={`button-view-${place.placeId}`}>
+                            <MapPin className="h-4 w-4 mr-2" />
+                            {t("destinations.card.view_location", "View Location")}
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* Infinite Scroll Sentinel */}
+                {infiniteScrollEnabled && hasMore && (
+                  <div ref={sentinelRef} className="h-20 flex items-center justify-center mt-8">
+                    {isLoadingMore && (
+                      <div className="flex items-center gap-2 text-gray-500">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span>{t("destinations.loading_more", "Loading more...")}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Manual Load More Button */}
+                {!infiniteScrollEnabled && hasMore && (
+                  <div className="flex justify-center mt-8">
+                    <Button
+                      onClick={() => {
+                        loadMore();
+                        console.log('[Telemetry] load_more_clicked', {
+                          page: meta?.currentPage ? meta.currentPage + 1 : 2,
+                          totalLoaded: meta?.totalLoaded || 0,
+                          hasNext: hasMore
+                        });
+                      }}
+                      disabled={isLoadingMore}
+                      size="lg"
+                      data-testid="button-load-more"
+                    >
+                      {isLoadingMore ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {t("destinations.loading", "Loading...")}
+                        </>
+                      ) : (
+                        t("destinations.load_more", "Load More")
+                      )}
+                    </Button>
+                  </div>
+                )}
+
+                {/* End of Results */}
+                {!hasMore && places.length > 0 && (
+                  <div className="text-center text-gray-500 mt-8 py-4">
+                    {t("destinations.no_more_results", "No more results available")}
+                  </div>
+                )}
+              </>
+            ) : null}
           </div>
         </div>
       </div>

@@ -1,0 +1,88 @@
+Destinations (Production) עם אינפיניט סקרול מלא
+
+בצע את המשימות הבאות בפרויקט GlobeMate. אל תציג קוד כאן — רק תיישם בקבצים.
+
+מטרות
+
+להפוך את /destinations לדף פרודקשן שמציג את כל התוצאות הזמינות עם פאג’ינציה אמיתית (Google Places nextPageToken) + אינפיניט סקרול/Load more.
+
+להחליף שימוש בדף הדמו הפנימי; הדמו נשאר רק לבדיקה, אבל ה־UI הציבורי מציג הכל.
+
+שרת (API)
+
+הרחב את /api/places/nearby (קיים) כך שיישאר כ־source.
+
+הוסף endpoint מאחד לרשימת יעדים:
+
+GET /api/destinations/places
+
+פרמטרים: lat,lng,radius,type,lang,pageToken,pageSize
+
+החזר:
+
+{
+  results: [ { placeId, name, coordinates, rating, userRatingsTotal, types[], photoRefs[] } ],
+  nextPageToken: string|null,
+  meta: { provider:"google_places", page:number, hasNext:boolean, cacheHit:boolean, latencyMs:number }
+}
+
+
+אל תמחק/תשנה את ה־Contract הקיים — זהו passthrough ל־nearby + עיבוד קל (נורמליזציה).
+
+מדיניות קאשינג: מפתח כולל pageToken/page.
+
+אבטחה: דרוש x-globemate-key (401 אם חסר).
+
+לקוח (UI) — /destinations
+
+החלף את הדמו:
+
+קומפוננטה DestinationsList צורכת את /api/destinations/places.
+
+טעינה ראשונית ללא pageToken → מציג כרטיסים.
+
+Infinite Scroll: כשה־sentinel בתחתית נכנס ל־viewport ויש nextPageToken, שלוף את הדף הבא ושרשר ל־state.
+
+חלופה: כפתור Load more אם אינפיניט כבוי.
+
+הצג מונה טעינה: “Loaded X” (או “X/≈60” אם יש הערכה).
+
+הסר limit קשיח (12). הגריד צריך להיות רספונסיבי, ולטעון עד שנגמרים טוקנים.
+
+מסננים/חיפוש: type (attraction/museum/restaurant…), lang, radius, טקסט חופשי (אם יש Text Search).
+
+מצבי UI: Skeleton, Empty, Error (כולל provider ו־retryAfter אם 503).
+
+קאשינג בצד לקוח
+
+Memo לפי המפתח: (lat,lng,radius,type,lang) + pageToken.
+
+אל תבצע קריאות כפולות; נעל state בזמן טעינה.
+
+טלמטריה
+
+שלח אירועים: destinations_page_view, load_more_clicked, infinite_scroll_page_loaded, עם שדות page, itemsLoaded, hasNext, latencyMs, cacheHit.
+
+(אופציונלי) קטלוג בסיסי משלך
+
+כדי לעקוף מגבלת 60 תוצאות של Google בכל שאילתה נקודתית, הכן seed של יעדים פופולריים (DB/table) עם: name, country, lat, lng, slug.
+
+דף /destinations יטען:
+
+אם אין קלט lat/lng — השתמש בקטלוג המקומי להצגת “כל היעדים” (פאג’ינציה DB).
+
+בלחיצה על יעד ספציפי/מיקום — טען אטרקציות בסביבתו דרך Google עם אינפיניט סקרול.
+
+הוסף endpoint: GET /api/catalog/destinations?query=&region=&page=&pageSize=
+
+קבלה (Acceptance)
+
+גלילה בדף /destinations ממשיכה לטעון דפים עד שלא נשאר nextPageToken.
+
+אין חיתוך ל־12; מספר הכרטיסים גדל בהתאם לדפים.
+
+כפתור “Load more” (אם מופעל) נעלם כשאין יותר דפים.
+
+לוגים מראים page, hasNext, latencyMs, cacheHit.
+
+(אם שותלים קטלוג) — חיפוש/פאג’ינציה בקטלוג המקומי עובד, והמעבר לחיפוש סביבת Google נעשה בעת בחירת יעד.
