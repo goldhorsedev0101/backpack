@@ -1123,11 +1123,16 @@ export async function registerRoutes(app: Express): Promise<void> {
   
   // API key validation middleware (hoisted function for use anywhere in this scope)
   function validateApiKey(req: any, res: any, next: any) {
+    // In development, skip API key validation for easier testing
+    if (process.env.NODE_ENV === 'development') {
+      return next();
+    }
+    
     const apiKey = req.headers['x-globemate-key'];
     const expectedKey = process.env.INTERNAL_API_KEY;
     
     if (!expectedKey) {
-      // If no key is configured, allow access (development mode)
+      // If no key is configured in production, still allow access
       return next();
     }
     
