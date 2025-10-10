@@ -556,7 +556,10 @@ export default function DestinationDetail() {
                         <Clock className="h-5 w-5 text-gray-400 mt-0.5" />
                         <div className="flex-1">
                           <p className="font-medium">{t("destinations.detail.timezones")}</p>
-                          <p className="text-sm text-gray-600">{geoData.country.timezones.join(", ")}</p>
+                          <p className="text-sm text-gray-600">
+                            {geoData.country.timezones.slice(0, 2).join(", ")}
+                            {geoData.country.timezones.length > 2 && ` +${geoData.country.timezones.length - 2}`}
+                          </p>
                         </div>
                       </div>
                     )}
