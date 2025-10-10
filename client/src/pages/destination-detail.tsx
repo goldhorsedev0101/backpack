@@ -237,15 +237,15 @@ export default function DestinationDetail() {
             <Card>
               <CardHeader className={isRTL ? "text-right" : "text-left"}>
                 <div className={`flex items-center justify-between gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>
-                  <CardTitle className={`flex items-center gap-2 ${isRTL ? "text-right flex-row-reverse" : "text-left"}`}>
-                    <Star className="h-5 w-5" />
-                    {t("destinations.detail.top_attractions")}
-                  </CardTitle>
                   {providers.googlePlaces && (
                     <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex-shrink-0">
                       {t("destinations.states.live_badge")}
                     </Badge>
                   )}
+                  <CardTitle className={`flex items-center gap-2 ${isRTL ? "text-right flex-row-reverse" : "text-left"}`}>
+                    <Star className="h-5 w-5" />
+                    {t("destinations.detail.top_attractions")}
+                  </CardTitle>
                 </div>
               </CardHeader>
               <CardContent className={isRTL ? "text-right" : "text-left"}>
@@ -310,10 +310,6 @@ export default function DestinationDetail() {
             <Card>
               <CardHeader className={isRTL ? "text-right" : "text-left"}>
                 <div className={`flex items-center justify-between gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>
-                  <CardTitle className={`flex items-center gap-2 ${isRTL ? "text-right flex-row-reverse" : "text-left"}`}>
-                    <Cloud className="h-5 w-5" />
-                    {t("destinations.detail.weather")}
-                  </CardTitle>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {providers.weather && weatherData && (
                       <div className="flex items-center gap-1 text-xs bg-gray-100 rounded-full p-1">
@@ -347,6 +343,10 @@ export default function DestinationDetail() {
                       </Badge>
                     )}
                   </div>
+                  <CardTitle className={`flex items-center gap-2 ${isRTL ? "text-right flex-row-reverse" : "text-left"}`}>
+                    <Cloud className="h-5 w-5" />
+                    {t("destinations.detail.weather")}
+                  </CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
@@ -533,10 +533,10 @@ export default function DestinationDetail() {
             <Card>
               <CardHeader className={isRTL ? "text-right" : "text-left"}>
                 <div className={`flex items-center justify-between gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>
-                  <CardTitle className={isRTL ? "text-right" : "text-left"}>{t("destinations.detail.booking")}</CardTitle>
                   <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 flex-shrink-0">
                     {t("destinations.states.soon_badge")}
                   </Badge>
+                  <CardTitle className={isRTL ? "text-right" : "text-left"}>{t("destinations.detail.booking")}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className={`space-y-3 ${isRTL ? "text-right" : "text-left"}`}>
