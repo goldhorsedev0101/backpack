@@ -287,7 +287,12 @@ export default function DestinationDetail() {
                                 ⭐ {attraction.rating}
                               </span>
                               {attraction.user_ratings_total && (
-                                <span className="text-gray-400">({attraction.user_ratings_total} {t("destinations.detail.reviews", "reviews")})</span>
+                                <span className="text-gray-400" dir={isRTL ? "rtl" : "ltr"}>
+                                  ({isRTL 
+                                    ? `${attraction.user_ratings_total.toLocaleString()} ${t("destinations.detail.reviews")}`
+                                    : `${attraction.user_ratings_total.toLocaleString()} ${t("destinations.detail.reviews", "reviews")}`
+                                  })
+                                </span>
                               )}
                             </div>
                           )}
