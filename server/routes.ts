@@ -3595,6 +3595,33 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Public proxy endpoint for geo basics (handles security server-side)
+  app.get('/api/destinations/geo-basics', async (req, res) => {
+    try {
+      const { getBasics } = await import('./services/destinations/geoService.js');
+      const { country, city, lang = 'en' } = req.query;
+
+      if (!country) {
+        return res.status(400).json({ error: 'Country parameter is required' });
+      }
+
+      const result = await getBasics({
+        countryName: country as string,
+        cityName: city as string,
+        lang: lang as 'en' | 'he',
+      });
+
+      if (!result) {
+        return res.status(404).json({ error: 'Location not found' });
+      }
+
+      res.json(result);
+    } catch (error) {
+      console.error('Geo basics error:', error);
+      res.status(500).json({ error: 'Failed to fetch location data' });
+    }
+  });
+
   app.get('/api/destinations/:locationId', async (req, res) => {
     try {
       const { locationId } = req.params;
@@ -4579,33 +4606,6 @@ export async function registerRoutes(app: Express): Promise<void> {
     
     next();
   };
-
-  // Public proxy endpoint for geo basics (handles security server-side)
-  app.get('/api/destinations/geo-basics', async (req, res) => {
-    try {
-      const { getBasics } = await import('./services/destinations/geoService.js');
-      const { country, city, lang = 'en' } = req.query;
-
-      if (!country) {
-        return res.status(400).json({ error: 'Country parameter is required' });
-      }
-
-      const result = await getBasics({
-        countryName: country as string,
-        cityName: city as string,
-        lang: lang as 'en' | 'he',
-      });
-
-      if (!result) {
-        return res.status(404).json({ error: 'Location not found' });
-      }
-
-      res.json(result);
-    } catch (error) {
-      console.error('Geo basics error:', error);
-      res.status(500).json({ error: 'Failed to fetch location data' });
-    }
-  });
 
   // Internal Geo API endpoints (require x-globemate-key for direct access)
   app.get('/api/geo/country', requireGlobeMateKey, async (req, res) => {
