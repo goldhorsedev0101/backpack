@@ -3605,8 +3605,18 @@ export async function registerRoutes(app: Express): Promise<void> {
         return res.status(400).json({ error: 'Country parameter is required' });
       }
 
+      // Map common abbreviations to full country names
+      const countryMapping: Record<string, string> = {
+        'UK': 'United Kingdom',
+        'USA': 'United States',
+        'UAE': 'United Arab Emirates',
+        'US': 'United States',
+      };
+
+      const countryName = countryMapping[country as string] || country as string;
+
       const result = await getBasics({
-        countryName: country as string,
+        countryName,
         cityName: city as string,
         lang: lang as 'en' | 'he',
       });
