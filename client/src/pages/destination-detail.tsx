@@ -189,14 +189,14 @@ export default function DestinationDetail() {
 
           {/* Title */}
           <div className="text-white">
-            <div className={`flex items-center gap-4 mb-4 ${isRTL ? "flex-row-reverse justify-end" : ""}`}>
+            <div className={`flex items-center gap-4 mb-4 ${isRTL ? "flex-row-reverse" : ""}`}>
+              <span className="text-8xl">{destination.flag}</span>
               <div className={`flex-1 ${isRTL ? "text-right" : "text-left"}`}>
                 <h1 className="text-5xl font-bold mb-2">{t(`destinations.cities.${slug}`, destination.name)}</h1>
                 <p className="text-xl opacity-90">
                   {t(`trips.countries.${destination.country}`, destination.country)} • {t(`trips.continents.${destination.continent}`, destination.continent)}
                 </p>
               </div>
-              <span className="text-8xl">{destination.flag}</span>
             </div>
           </div>
 
@@ -236,18 +236,13 @@ export default function DestinationDetail() {
             {/* Top Attractions */}
             <Card>
               <CardHeader>
-                <div className="flex items-center gap-4">
-                  {isRTL && providers.googlePlaces && (
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                      {t("destinations.states.live_badge")}
-                    </Badge>
-                  )}
-                  <CardTitle className={`flex items-center gap-2 flex-1 ${isRTL ? "text-right justify-end" : "text-left"}`}>
+                <div className="flex items-center justify-between">
+                  <CardTitle className={`flex items-center gap-2 ${isRTL ? "order-2 text-right" : "order-1 text-left"}`}>
                     <Star className="h-5 w-5" />
                     {t("destinations.detail.top_attractions")}
                   </CardTitle>
-                  {!isRTL && providers.googlePlaces && (
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  {providers.googlePlaces && (
+                    <Badge variant="outline" className={`bg-green-50 text-green-700 border-green-200 ${isRTL ? "order-1" : "order-2"}`}>
                       {t("destinations.states.live_badge")}
                     </Badge>
                   )}
@@ -314,81 +309,44 @@ export default function DestinationDetail() {
             {/* Weather */}
             <Card>
               <CardHeader>
-                <div className="flex items-center gap-4">
-                  {isRTL && (
-                    <div className="flex items-center gap-2">
-                      {providers.weather ? (
-                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                          {t("destinations.states.live_badge")}
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-                          {t("destinations.states.soon_badge")}
-                        </Badge>
-                      )}
-                      {providers.weather && weatherData && (
-                        <div className="flex items-center gap-1 text-xs bg-gray-100 rounded-full p-1">
-                          <button
-                            onClick={() => setUnits('metric')}
-                            className={`px-2 py-1 rounded-full transition ${
-                              units === 'metric' ? 'bg-white shadow-sm' : 'text-gray-500'
-                            }`}
-                            data-testid="button-celsius"
-                          >
-                            °C
-                          </button>
-                          <button
-                            onClick={() => setUnits('imperial')}
-                            className={`px-2 py-1 rounded-full transition ${
-                              units === 'imperial' ? 'bg-white shadow-sm' : 'text-gray-500'
-                            }`}
-                            data-testid="button-fahrenheit"
-                          >
-                            °F
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  <CardTitle className={`flex items-center gap-2 flex-1 ${isRTL ? "text-right justify-end" : "text-left"}`}>
+                <div className="flex items-center justify-between">
+                  <CardTitle className={`flex items-center gap-2 ${isRTL ? "order-2 text-right" : "order-1 text-left"}`}>
                     <Cloud className="h-5 w-5" />
                     {t("destinations.detail.weather")}
                   </CardTitle>
-                  {!isRTL && (
-                    <div className="flex items-center gap-2">
-                      {providers.weather && weatherData && (
-                        <div className="flex items-center gap-1 text-xs bg-gray-100 rounded-full p-1">
-                          <button
-                            onClick={() => setUnits('metric')}
-                            className={`px-2 py-1 rounded-full transition ${
-                              units === 'metric' ? 'bg-white shadow-sm' : 'text-gray-500'
-                            }`}
-                            data-testid="button-celsius"
-                          >
-                            °C
-                          </button>
-                          <button
-                            onClick={() => setUnits('imperial')}
-                            className={`px-2 py-1 rounded-full transition ${
-                              units === 'imperial' ? 'bg-white shadow-sm' : 'text-gray-500'
-                            }`}
-                            data-testid="button-fahrenheit"
-                          >
-                            °F
-                          </button>
-                        </div>
-                      )}
-                      {providers.weather ? (
-                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                          {t("destinations.states.live_badge")}
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-                          {t("destinations.states.soon_badge")}
-                        </Badge>
-                      )}
-                    </div>
-                  )}
+                  <div className={`flex items-center gap-2 ${isRTL ? "order-1" : "order-2"}`}>
+                    {providers.weather && weatherData && (
+                      <div className="flex items-center gap-1 text-xs bg-gray-100 rounded-full p-1">
+                        <button
+                          onClick={() => setUnits('metric')}
+                          className={`px-2 py-1 rounded-full transition ${
+                            units === 'metric' ? 'bg-white shadow-sm' : 'text-gray-500'
+                          }`}
+                          data-testid="button-celsius"
+                        >
+                          °C
+                        </button>
+                        <button
+                          onClick={() => setUnits('imperial')}
+                          className={`px-2 py-1 rounded-full transition ${
+                            units === 'imperial' ? 'bg-white shadow-sm' : 'text-gray-500'
+                          }`}
+                          data-testid="button-fahrenheit"
+                        >
+                          °F
+                        </button>
+                      </div>
+                    )}
+                    {providers.weather ? (
+                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                        {t("destinations.states.live_badge")}
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                        {t("destinations.states.soon_badge")}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -574,18 +532,11 @@ export default function DestinationDetail() {
             {/* Booking (Stub) */}
             <Card>
               <CardHeader>
-                <div className="flex items-center gap-4">
-                  {isRTL && (
-                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-                      {t("destinations.states.soon_badge")}
-                    </Badge>
-                  )}
-                  <CardTitle className={`flex-1 ${isRTL ? "text-right" : "text-left"}`}>{t("destinations.detail.booking")}</CardTitle>
-                  {!isRTL && (
-                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-                      {t("destinations.states.soon_badge")}
-                    </Badge>
-                  )}
+                <div className="flex items-center justify-between">
+                  <CardTitle className={`${isRTL ? "order-2 text-right" : "order-1 text-left"}`}>{t("destinations.detail.booking")}</CardTitle>
+                  <Badge variant="outline" className={`bg-amber-50 text-amber-700 border-amber-200 ${isRTL ? "order-1" : "order-2"}`}>
+                    {t("destinations.states.soon_badge")}
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent className={`space-y-3 ${isRTL ? "text-right" : "text-left"}`}>
