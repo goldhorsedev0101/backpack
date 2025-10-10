@@ -287,7 +287,7 @@ export default function DestinationDetail() {
                                 ⭐ {attraction.rating}
                               </span>
                               {attraction.user_ratings_total && (
-                                <span className="text-gray-400">({attraction.user_ratings_total} reviews)</span>
+                                <span className="text-gray-400">({attraction.user_ratings_total} {t("destinations.detail.reviews", "reviews")})</span>
                               )}
                             </div>
                           )}
