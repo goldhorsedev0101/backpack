@@ -237,7 +237,7 @@ export default function DestinationDetail() {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className={`flex items-center gap-2 ${isRTL ? "order-2 text-right" : "order-1 text-left"}`}>
+                  <CardTitle className={`flex items-center gap-2 ${isRTL ? "order-2 text-right flex-row-reverse" : "order-1 text-left"}`}>
                     <Star className="h-5 w-5" />
                     {t("destinations.detail.top_attractions")}
                   </CardTitle>
@@ -310,7 +310,7 @@ export default function DestinationDetail() {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className={`flex items-center gap-2 ${isRTL ? "order-2 text-right" : "order-1 text-left"}`}>
+                  <CardTitle className={`flex items-center gap-2 ${isRTL ? "order-2 text-right flex-row-reverse" : "order-1 text-left"}`}>
                     <Cloud className="h-5 w-5" />
                     {t("destinations.detail.weather")}
                   </CardTitle>
