@@ -515,7 +515,7 @@ export default function DestinationDetail() {
                     <Skeleton className="h-12 w-full" />
                     <Skeleton className="h-12 w-full" />
                   </div>
-                ) : geoData && providers.geo ? (
+                ) : geoData?.country && providers.geo ? (
                   <>
                     {/* Country */}
                     <div className="flex items-start gap-3" data-testid="geo-country">
