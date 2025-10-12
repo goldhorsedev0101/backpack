@@ -654,12 +654,35 @@ export default function MyTripsNew() {
       const durationText = suggestion.duration.toLowerCase();
       let durationDays = 7; // default
       
-      if (durationText.includes('week')) {
+      console.log('Parsing suggestion duration:', suggestion.duration);
+      
+      // Handle ranges like "20-25 days" or "2-3 weeks" (supports all dash types: - – —)
+      const rangeMatch = durationText.match(/(\d+)\s*[-–—]\s*(\d+)/);
+      if (rangeMatch) {
+        const min = parseInt(rangeMatch[1]);
+        const max = parseInt(rangeMatch[2]);
+        
+        console.log(`Found range: ${min}-${max}`);
+        
+        if (durationText.includes('week') || durationText.includes('שבוע')) {
+          // Use the maximum number of weeks
+          durationDays = max * 7;
+          console.log(`Parsed as weeks: ${max} weeks = ${durationDays} days`);
+        } else {
+          // Use the maximum number of days
+          durationDays = max;
+          console.log(`Parsed as days: ${max} days`);
+        }
+      } else if (durationText.includes('week') || durationText.includes('שבוע')) {
         const weeks = parseInt(durationText) || 1;
         durationDays = weeks * 7;
-      } else if (durationText.includes('day')) {
+        console.log(`Parsed single week value: ${weeks} weeks = ${durationDays} days`);
+      } else if (durationText.includes('day') || durationText.includes('יום')) {
         durationDays = parseInt(durationText) || 7;
+        console.log(`Parsed single day value: ${durationDays} days`);
       }
+      
+      console.log('Final duration in days:', durationDays);
       
       console.log('Generating itinerary for suggestion:', {
         destination: suggestion.destination,
