@@ -172,6 +172,8 @@ interface TripFormData {
   travelStyle: string[];
   interests: string[];
   duration: string;
+  adults: number;
+  children: number;
 }
 
 const travelStyles = [
@@ -195,7 +197,9 @@ export default function MyTripsScreen() {
     dailyBudget: 50,
     travelStyle: [],
     interests: [],
-    duration: ""
+    duration: "",
+    adults: 2,
+    children: 0
   });
   
   // Get available cities for selected country - recalculate every time
@@ -534,6 +538,47 @@ export default function MyTripsScreen() {
                             <SelectItem value="2-4 weeks">{t('trips.duration_2_4_weeks')}</SelectItem>
                             <SelectItem value="1-2 months">{t('trips.duration_1_2_months')}</SelectItem>
                             <SelectItem value="3+ months">{t('trips.duration_3_months')}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* Travelers Count */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="adults" className="text-sm font-medium text-slate-700">
+                          {t('trips.adults')}
+                        </Label>
+                        <Select 
+                          value={formData.adults.toString()} 
+                          onValueChange={(value: string) => setFormData(prev => ({ ...prev, adults: parseInt(value) }))}
+                        >
+                          <SelectTrigger className="w-full p-3 h-12" data-testid="select-adults-mytrips">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[1, 2, 3, 4, 5, 6, 7, 8].map(count => (
+                              <SelectItem key={count} value={count.toString()}>{count}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="children" className="text-sm font-medium text-slate-700">
+                          {t('trips.children')}
+                        </Label>
+                        <Select 
+                          value={formData.children.toString()} 
+                          onValueChange={(value: string) => setFormData(prev => ({ ...prev, children: parseInt(value) }))}
+                        >
+                          <SelectTrigger className="w-full p-3 h-12" data-testid="select-children-mytrips">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[0, 1, 2, 3, 4, 5, 6].map(count => (
+                              <SelectItem key={count} value={count.toString()}>{count}</SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </div>
