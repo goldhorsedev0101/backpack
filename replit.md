@@ -16,17 +16,17 @@ Preferred communication style: Simple, everyday language.
     - Uniform 2xl font-size headers
   - **Sections Redesigned**: Preferences, Suggestions, Itinerary, My Itineraries, Saved Trips
   
-- **Trip Type & Travelers Header**: Interactive header section with title in My Trips page
+- **Trip Type & Travelers Header**: Interactive header section ONLY in Preferences tab
   - **Section Title**: "הרכב המטיילים ואופי הטיול / Travelers & Trip Type" with Users icon
   - **Description**: Explanatory text encouraging users to share travel group details
   - **Trip Type Selector**: Choose from 11 trip types including new "ירח דבש/Honeymoon" option
   - **Adults/Children Counters**: Interactive +/- buttons for selecting travelers
     - Adults: 1-8 travelers (default: 2)
     - Children: 0-10 kids (updated from 0-6)
-  - **Visual Design**: Orange title header above white semi-transparent card, positioned BELOW tabs
+  - **Visual Design**: Orange title header above gradient card (orange→teal)
   - **AI Integration**: Trip type, adults, and children data sent to AI for personalized recommendations
   - **Translations**: Full Hebrew/English support for all 11 trip types
-  - **Location**: Header appears BELOW tab bar, before tab content
+  - **Location**: Inside Preferences tab only, at the top before destination selection
   - **Removed Duplicates**: Deleted redundant adults/children fields from Preferences tab
 
 ## Previous Updates (October 12, 2025)

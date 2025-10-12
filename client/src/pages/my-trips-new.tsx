@@ -820,130 +820,130 @@ export default function MyTripsNew() {
             </TabsList>
           </div>
 
-          {/* Trip Type & Travelers Header */}
-          <div className="mt-6 mb-6">
-            <div className="text-center mb-4">
-              <h2 className={`text-2xl font-bold text-orange-500 mb-2 flex items-center gap-2 ${i18n.language === 'he' ? 'justify-center flex-row-reverse' : 'justify-center'}`}>
-                <Users className="w-6 h-6" />
-                {t('trips.travelers_and_trip_type')}
-              </h2>
-              <p className={`text-sm text-gray-600 ${i18n.language === 'he' ? 'text-center' : 'text-center'}`}>
-                {t('trips.travelers_and_trip_type_desc')}
-              </p>
-            </div>
-            <Card className="shadow-lg bg-gradient-to-r from-orange-50 to-teal-50 border-none">
-              <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Trip Type */}
-                <div className="space-y-2">
-                  <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
-                    <Users className="w-4 h-4 inline mr-2" />
-                    {t('trips.trip_type')}
-                  </Label>
-                  <Select 
-                    value={tripType} 
-                    onValueChange={(value) => {
-                      setTripType(value);
-                      form.setValue('tripType', value);
-                    }}
-                  >
-                    <SelectTrigger className="w-full bg-white" data-testid="select-trip-type">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="family">{t('trips.trip_types.family')}</SelectItem>
-                      <SelectItem value="couples">{t('trips.trip_types.couples')}</SelectItem>
-                      <SelectItem value="bachelor_party">{t('trips.trip_types.bachelor_party')}</SelectItem>
-                      <SelectItem value="bachelorette_party">{t('trips.trip_types.bachelorette_party')}</SelectItem>
-                      <SelectItem value="friends">{t('trips.trip_types.friends')}</SelectItem>
-                      <SelectItem value="solo">{t('trips.trip_types.solo')}</SelectItem>
-                      <SelectItem value="business">{t('trips.trip_types.business')}</SelectItem>
-                      <SelectItem value="adventure">{t('trips.trip_types.adventure')}</SelectItem>
-                      <SelectItem value="romantic">{t('trips.trip_types.romantic')}</SelectItem>
-                      <SelectItem value="group">{t('trips.trip_types.group')}</SelectItem>
-                      <SelectItem value="honeymoon">{t('trips.trip_types.honeymoon')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Adults */}
-                <div className="space-y-2">
-                  <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
-                    {t('trips.adults')}
-                  </Label>
-                  <div className="flex items-center gap-3">
-                    <Button 
-                      type="button"
-                      variant="outline" 
-                      size="icon" 
-                      className="h-10 w-10"
-                      onClick={() => {
-                        const current = form.watch('adults') || 2;
-                        if (current > 1) form.setValue('adults', current - 1);
-                      }}
-                    >
-                      -
-                    </Button>
-                    <div className="flex-1 text-center">
-                      <span className="text-2xl font-bold text-orange-600">{form.watch('adults') || 2}</span>
-                    </div>
-                    <Button 
-                      type="button"
-                      variant="outline" 
-                      size="icon" 
-                      className="h-10 w-10"
-                      onClick={() => {
-                        const current = form.watch('adults') || 2;
-                        if (current < 8) form.setValue('adults', current + 1);
-                      }}
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Children */}
-                <div className="space-y-2">
-                  <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
-                    {t('trips.children')}
-                  </Label>
-                  <div className="flex items-center gap-3">
-                    <Button 
-                      type="button"
-                      variant="outline" 
-                      size="icon" 
-                      className="h-10 w-10"
-                      onClick={() => {
-                        const current = form.watch('children') || 0;
-                        if (current > 0) form.setValue('children', current - 1);
-                      }}
-                    >
-                      -
-                    </Button>
-                    <div className="flex-1 text-center">
-                      <span className="text-2xl font-bold text-teal-600">{form.watch('children') || 0}</span>
-                    </div>
-                    <Button 
-                      type="button"
-                      variant="outline" 
-                      size="icon" 
-                      className="h-10 w-10"
-                      onClick={() => {
-                        const current = form.watch('children') || 0;
-                        if (current < 10) form.setValue('children', current + 1);
-                      }}
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          </div>
-
           {/* Tab 1: Preferences */}
           <TabsContent value="preferences" className="mt-6">
+            {/* Trip Type & Travelers Header */}
+            <div className="mb-6">
+              <div className="text-center mb-4">
+                <h2 className={`text-2xl font-bold text-orange-500 mb-2 flex items-center gap-2 ${i18n.language === 'he' ? 'justify-center flex-row-reverse' : 'justify-center'}`}>
+                  <Users className="w-6 h-6" />
+                  {t('trips.travelers_and_trip_type')}
+                </h2>
+                <p className={`text-sm text-gray-600 ${i18n.language === 'he' ? 'text-center' : 'text-center'}`}>
+                  {t('trips.travelers_and_trip_type_desc')}
+                </p>
+              </div>
+              <Card className="shadow-lg bg-gradient-to-r from-orange-50 to-teal-50 border-none">
+                <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Trip Type */}
+                  <div className="space-y-2">
+                    <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                      <Users className="w-4 h-4 inline mr-2" />
+                      {t('trips.trip_type')}
+                    </Label>
+                    <Select 
+                      value={tripType} 
+                      onValueChange={(value) => {
+                        setTripType(value);
+                        form.setValue('tripType', value);
+                      }}
+                    >
+                      <SelectTrigger className="w-full bg-white" data-testid="select-trip-type">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="family">{t('trips.trip_types.family')}</SelectItem>
+                        <SelectItem value="couples">{t('trips.trip_types.couples')}</SelectItem>
+                        <SelectItem value="bachelor_party">{t('trips.trip_types.bachelor_party')}</SelectItem>
+                        <SelectItem value="bachelorette_party">{t('trips.trip_types.bachelorette_party')}</SelectItem>
+                        <SelectItem value="friends">{t('trips.trip_types.friends')}</SelectItem>
+                        <SelectItem value="solo">{t('trips.trip_types.solo')}</SelectItem>
+                        <SelectItem value="business">{t('trips.trip_types.business')}</SelectItem>
+                        <SelectItem value="adventure">{t('trips.trip_types.adventure')}</SelectItem>
+                        <SelectItem value="romantic">{t('trips.trip_types.romantic')}</SelectItem>
+                        <SelectItem value="group">{t('trips.trip_types.group')}</SelectItem>
+                        <SelectItem value="honeymoon">{t('trips.trip_types.honeymoon')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Adults */}
+                  <div className="space-y-2">
+                    <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                      {t('trips.adults')}
+                    </Label>
+                    <div className="flex items-center gap-3">
+                      <Button 
+                        type="button"
+                        variant="outline" 
+                        size="icon" 
+                        className="h-10 w-10"
+                        onClick={() => {
+                          const current = form.watch('adults') || 2;
+                          if (current > 1) form.setValue('adults', current - 1);
+                        }}
+                      >
+                        -
+                      </Button>
+                      <div className="flex-1 text-center">
+                        <span className="text-2xl font-bold text-orange-600">{form.watch('adults') || 2}</span>
+                      </div>
+                      <Button 
+                        type="button"
+                        variant="outline" 
+                        size="icon" 
+                        className="h-10 w-10"
+                        onClick={() => {
+                          const current = form.watch('adults') || 2;
+                          if (current < 8) form.setValue('adults', current + 1);
+                        }}
+                      >
+                        +
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Children */}
+                  <div className="space-y-2">
+                    <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                      {t('trips.children')}
+                    </Label>
+                    <div className="flex items-center gap-3">
+                      <Button 
+                        type="button"
+                        variant="outline" 
+                        size="icon" 
+                        className="h-10 w-10"
+                        onClick={() => {
+                          const current = form.watch('children') || 0;
+                          if (current > 0) form.setValue('children', current - 1);
+                        }}
+                      >
+                        -
+                      </Button>
+                      <div className="flex-1 text-center">
+                        <span className="text-2xl font-bold text-teal-600">{form.watch('children') || 0}</span>
+                      </div>
+                      <Button 
+                        type="button"
+                        variant="outline" 
+                        size="icon" 
+                        className="h-10 w-10"
+                        onClick={() => {
+                          const current = form.watch('children') || 0;
+                          if (current < 10) form.setValue('children', current + 1);
+                        }}
+                      >
+                        +
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            </div>
+
             <div className="text-center mb-4">
               <h2 className={`text-2xl font-bold text-orange-500 mb-2 flex items-center gap-2 ${i18n.language === 'he' ? 'justify-center flex-row-reverse' : 'justify-center'}`}>
                 <Bot className="w-6 h-6" />
