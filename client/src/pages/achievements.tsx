@@ -58,7 +58,7 @@ const getLevelName = (level: number, t: any) => {
 
 export default function Achievements() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, signInWithGoogle } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -292,7 +292,7 @@ export default function Achievements() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={() => window.location.href = '/api/auth/google'}>
+              <Button onClick={signInWithGoogle} data-testid="button-signin-google">
                 {t('auth.sign_in_with_google')}
               </Button>
             </CardContent>
