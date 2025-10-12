@@ -6,6 +6,33 @@ GlobeMate is a full-stack web application designed for global travel planning an
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (October 12, 2025)
+- **Visual Consistency for Preferences Section**: Enhanced Travel Style and Interests with colorful gradient backgrounds
+  - **Colorful Cards**: Both sections now use the signature gradient (orange-50 → teal-50 → blue-50)
+  - **RTL Support**: Text alignment switches to right-to-left in Hebrew for both sections
+  - **Hover Effects**: Subtle gradient preview on hover for unselected items
+  - **Selection State**: Selected items show full gradient with orange border and shadow
+  - **Icon & Text Alignment**: Icons and text properly aligned for RTL languages
+
+- **AI Personalization Based on Travelers & Trip Type**: Complete integration of traveler composition and trip type into AI recommendations
+  - **Backend Integration**: 
+    - Updated `/api/ai/travel-suggestions` to accept adults, children, tripType parameters
+    - Updated `/api/ai/itinerary` endpoint to include traveler composition in itinerary generation
+    - Modified OpenAI prompts in `server/openai.ts` and `server/generateItinerary.ts` to consider:
+      - Number of adults (1-8) and children (0-10)
+      - Trip type (family, couples, honeymoon, solo, friends, bachelor/bachelorette, business, adventure, romantic, group)
+    - AI now provides family-friendly activities when children are present
+    - AI adapts recommendations based on trip type (romantic for honeymoon, social for friends, etc.)
+  - **Frontend Updates**:
+    - Both "Generate Itinerary" flows now send adults, children, tripType to backend
+    - Data flows from Preferences tab selections to AI API calls
+  - **Smart Prompting**: AI receives context like "2 adults and 2 children on a family trip" and tailors all suggestions accordingly
+  
+- **Enhanced Budget Range**: Updated budget slider with currency-specific ranges
+  - **English**: $500 - $10,000 (step: $100)
+  - **Hebrew**: ₪2,000 - ₪50,000 (step: ₪500)
+  - **Display**: Formatted numbers with currency symbols and locale-aware formatting
+
 ## System Architecture
 ### Frontend Architecture
 - **Framework**: React 18 with TypeScript

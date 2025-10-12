@@ -1101,15 +1101,15 @@ export default function MyTripsNew() {
                       <div
                         key={style.id}
                         onClick={() => toggleStyle(style.id)}
-                        className={`p-4 rounded-lg border hover:bg-accent transition cursor-pointer ${
+                        className={`p-4 rounded-lg border transition cursor-pointer ${
                           selectedStyles.includes(style.id)
-                            ? 'border-primary bg-primary/10 text-primary'
-                            : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-orange-500 bg-gradient-to-br from-orange-50 via-teal-50 to-blue-50 shadow-md'
+                            : 'border-gray-200 bg-white hover:border-orange-300 hover:bg-gradient-to-br hover:from-orange-50/50 hover:via-teal-50/50 hover:to-blue-50/50'
                         }`}
                       >
-                        <div className="flex items-start space-x-3">
+                        <div className={`flex items-start gap-3 ${i18n.language === 'he' ? 'flex-row-reverse text-right' : ''}`}>
                           <style.icon className="w-5 h-5 flex-shrink-0 mt-1" />
-                          <div>
+                          <div className={i18n.language === 'he' ? 'text-right' : ''}>
                             <h4 className="font-medium">{style.label}</h4>
                             <p className="text-sm text-muted-foreground">{style.description}</p>
                           </div>
@@ -1124,17 +1124,19 @@ export default function MyTripsNew() {
                   <Label className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
 {t('trips.interests')} <span className="text-xs text-gray-500">({t('trips.select_multiple')})</span>
                   </Label>
-                  <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                  <div className="grid grid-cols-2 gap-3 max-h-40 overflow-y-auto pr-2">
                     {INTERESTS.map((interest) => (
-                      <Button
+                      <div
                         key={interest}
-                        type="button"
-                        variant={selectedInterests.includes(interest) ? "default" : "outline"}
                         onClick={() => toggleInterest(interest)}
-                        className="justify-start h-8 text-xs"
+                        className={`p-3 rounded-lg border transition cursor-pointer ${
+                          selectedInterests.includes(interest)
+                            ? 'border-orange-500 bg-gradient-to-br from-orange-50 via-teal-50 to-blue-50 shadow-md'
+                            : 'border-gray-200 bg-white hover:border-orange-300 hover:bg-gradient-to-br hover:from-orange-50/50 hover:via-teal-50/50 hover:to-blue-50/50'
+                        } ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}
                       >
-                        {interest}
-                      </Button>
+                        <p className="text-sm font-medium">{interest}</p>
+                      </div>
                     ))}
                   </div>
                 </div>
