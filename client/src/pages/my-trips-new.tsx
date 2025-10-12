@@ -1067,15 +1067,19 @@ export default function MyTripsNew() {
                         setBudget(value);
                         form.setValue('budget', value[0]);
                       }}
-                      max={5000}
-                      min={500}
-                      step={100}
+                      max={i18n.language === 'he' ? 50000 : 10000}
+                      min={i18n.language === 'he' ? 2000 : 500}
+                      step={i18n.language === 'he' ? 500 : 100}
                       className="mb-4"
                     />
                     <div className="flex justify-between text-sm text-gray-600">
-                      <span>$500</span>
-                      <span className="text-orange-500 font-bold text-xl">${budget[0]}</span>
-                      <span>$5000</span>
+                      <span>{i18n.language === 'he' ? '₪2,000' : '$500'}</span>
+                      <span className="text-orange-500 font-bold text-xl">
+                        {i18n.language === 'he' 
+                          ? `₪${budget[0].toLocaleString('he-IL')}` 
+                          : `$${budget[0].toLocaleString('en-US')}`}
+                      </span>
+                      <span>{i18n.language === 'he' ? '₪50,000' : '$10,000'}</span>
                     </div>
                   </div>
                 </div>

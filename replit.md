@@ -7,6 +7,12 @@ GlobeMate is a full-stack web application for global travel planning and communi
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (October 12, 2025)
+- **Enhanced Budget Range**: Updated budget slider with currency-specific ranges
+  - **English**: $500 - $10,000 (step: $100)
+  - **Hebrew**: ₪2,000 - ₪50,000 (step: ₪500)
+  - **Display**: Formatted numbers with currency symbols and locale-aware formatting
+  
+## Previous Updates (October 12, 2025)
 - **Colorful Page Redesign**: Complete visual overhaul of My Trips page for vibrant, modern look
   - **Background**: Clean white background for entire page
   - **Card Design**: All cards now use colorful gradient backgrounds (orange-50 → teal-50 → blue-50)
