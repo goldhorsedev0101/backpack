@@ -70,6 +70,7 @@ type TripFormData = {
   interests: string[];
   adults: number;
   children: number;
+  tripType: string;
 };
 
 const getWorldDestinations = () => ({
@@ -254,6 +255,7 @@ export default function MyTripsNew() {
   const [selectedContinent, setSelectedContinent] = useState<Continent | "">("");
   const [specificCity, setSpecificCity] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
+  const [tripType, setTripType] = useState<string>("family");
   
   const WORLD_DESTINATIONS = getWorldDestinations();
   
@@ -275,6 +277,7 @@ export default function MyTripsNew() {
       interests: [],
       adults: 2,
       children: 0,
+      tripType: "family",
     },
   });
 
@@ -335,6 +338,9 @@ export default function MyTripsNew() {
             duration: data.duration,
             interests: data.interests,
             language: i18n.language,
+            adults: data.adults || 2,
+            children: data.children || 0,
+            tripType: data.tripType || 'family',
           }),
         });
         const jsonData = await response.json();
@@ -787,6 +793,116 @@ export default function MyTripsNew() {
           <h1 className="text-3xl md:text-4xl font-bold text-slate-700 mb-4">{t('trips.my_trip_planner')}</h1>
           <p className="text-lg text-gray-600">{t('trips.planner_subtitle')}</p>
         </div>
+
+        {/* Trip Type & Travelers Header */}
+        <Card className="mb-6 bg-gradient-to-r from-orange-50 to-teal-50 border-none shadow-md">
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Trip Type */}
+              <div className="space-y-2">
+                <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                  <Users className="w-4 h-4 inline mr-2" />
+                  {t('trips.trip_type')}
+                </Label>
+                <Select 
+                  value={tripType} 
+                  onValueChange={(value) => {
+                    setTripType(value);
+                    form.setValue('tripType', value);
+                  }}
+                >
+                  <SelectTrigger className="w-full bg-white" data-testid="select-trip-type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="family">{t('trips.trip_types.family')}</SelectItem>
+                    <SelectItem value="couples">{t('trips.trip_types.couples')}</SelectItem>
+                    <SelectItem value="bachelor_party">{t('trips.trip_types.bachelor_party')}</SelectItem>
+                    <SelectItem value="bachelorette_party">{t('trips.trip_types.bachelorette_party')}</SelectItem>
+                    <SelectItem value="friends">{t('trips.trip_types.friends')}</SelectItem>
+                    <SelectItem value="solo">{t('trips.trip_types.solo')}</SelectItem>
+                    <SelectItem value="business">{t('trips.trip_types.business')}</SelectItem>
+                    <SelectItem value="adventure">{t('trips.trip_types.adventure')}</SelectItem>
+                    <SelectItem value="romantic">{t('trips.trip_types.romantic')}</SelectItem>
+                    <SelectItem value="group">{t('trips.trip_types.group')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Adults */}
+              <div className="space-y-2">
+                <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                  {t('trips.adults')}
+                </Label>
+                <div className="flex items-center gap-3">
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    size="icon" 
+                    className="h-10 w-10"
+                    onClick={() => {
+                      const current = form.watch('adults') || 2;
+                      if (current > 1) form.setValue('adults', current - 1);
+                    }}
+                  >
+                    -
+                  </Button>
+                  <div className="flex-1 text-center">
+                    <span className="text-2xl font-bold text-orange-600">{form.watch('adults') || 2}</span>
+                  </div>
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    size="icon" 
+                    className="h-10 w-10"
+                    onClick={() => {
+                      const current = form.watch('adults') || 2;
+                      if (current < 8) form.setValue('adults', current + 1);
+                    }}
+                  >
+                    +
+                  </Button>
+                </div>
+              </div>
+
+              {/* Children */}
+              <div className="space-y-2">
+                <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                  {t('trips.children')}
+                </Label>
+                <div className="flex items-center gap-3">
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    size="icon" 
+                    className="h-10 w-10"
+                    onClick={() => {
+                      const current = form.watch('children') || 0;
+                      if (current > 0) form.setValue('children', current - 1);
+                    }}
+                  >
+                    -
+                  </Button>
+                  <div className="flex-1 text-center">
+                    <span className="text-2xl font-bold text-teal-600">{form.watch('children') || 0}</span>
+                  </div>
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    size="icon" 
+                    className="h-10 w-10"
+                    onClick={() => {
+                      const current = form.watch('children') || 0;
+                      if (current < 6) form.setValue('children', current + 1);
+                    }}
+                  >
+                    +
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
