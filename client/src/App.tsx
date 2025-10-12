@@ -29,6 +29,11 @@ import DestinationDetail from "./pages/destination-detail.js";
 import IntegrationsDemoDestinations from "./pages/integrations-demo-destinations.js";
 import MediaDemo from "./pages/media-demo.js";
 import IntegrationsDemoUnsplash from "./pages/integrations-demo-unsplash.js";
+import HelpCenter from "./pages/help-center.js";
+import Contact from "./pages/contact.js";
+import PrivacyPolicy from "./pages/privacy-policy.js";
+import TermsOfService from "./pages/terms-of-service.js";
+import About from "./pages/about.js";
 import Navigation from "./components/navigation.js";
 import { ErrorBoundary } from "./components/error-boundary.js";
 
@@ -61,6 +66,11 @@ function Router() {
           <Route path="/integrations-demo/destinations" component={IntegrationsDemoDestinations} />
           <Route path="/integrations-demo/media" component={MediaDemo} />
           <Route path="/integrations-demo/unsplash" component={IntegrationsDemoUnsplash} />
+          <Route path="/help" component={HelpCenter} />
+          <Route path="/contact" component={Contact} />
+          <Route path="/privacy" component={PrivacyPolicy} />
+          <Route path="/terms" component={TermsOfService} />
+          <Route path="/about" component={About} />
           <Route path="/auth/callback" component={Callback} />
           <Route component={NotFound} />
         </Switch>

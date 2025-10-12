@@ -1361,5 +1361,240 @@
       "onUnsplash": "on",
       "usePhoto": "Use this photo"
     }
+  },
+  "help": {
+    "title": "Help Center",
+    "subtitle": "Find answers to common questions and get help using GlobeMate",
+    "contact": {
+      "email": {
+        "title": "Email"
+      },
+      "phone": {
+        "title": "Phone"
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "description": "Find answers to the most common questions",
+      "trip_planning": {
+        "question": "How do I plan a trip with GlobeMate?",
+        "answer": "Start by selecting a destination, budget, and dates. Our system will create a personalized itinerary with AI-powered recommendations."
+      },
+      "budget_tracking": {
+        "question": "How do I track my expenses?",
+        "answer": "Use our budget tracker to record expenses, set budgets, and view visual analytics of your trip spending."
+      },
+      "community": {
+        "question": "What is the GlobeMate community?",
+        "answer": "Join our community to share experiences, connect with fellow travelers, and get local travel tips."
+      },
+      "destinations": {
+        "question": "How do I search for destinations?",
+        "answer": "Browse our destinations hub, filter by continent or country, and discover detailed information about each place."
+      },
+      "account": {
+        "question": "How do I manage my account?",
+        "answer": "Access your account settings to update personal details, preferences, and security information."
+      },
+      "languages": {
+        "question": "What languages are supported?",
+        "answer": "GlobeMate is available in Hebrew and English. Switch languages anytime through the language selector."
+      }
+    },
+    "need_more_help": "Need More Help?",
+    "contact_description": "Can't find what you're looking for? Contact us and we'll be happy to help.",
+    "contact_us_button": "Contact Us",
+    "community_button": "Visit Community"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We'd love to hear from you! Send us a message and we'll get back to you soon.",
+    "form": {
+      "title": "Send a Message",
+      "description": "Fill out the form and we'll get back to you within 24 hours",
+      "name": "Full Name",
+      "name_placeholder": "Enter your name",
+      "email": "Email",
+      "email_placeholder": "your@email.com",
+      "subject": "Subject",
+      "subject_placeholder": "How can we help?",
+      "message": "Message",
+      "message_placeholder": "Tell us more about your inquiry...",
+      "required": "This field is required",
+      "email_invalid": "Invalid email",
+      "send": "Send Message",
+      "sending": "Sending..."
+    },
+    "info": {
+      "title": "Contact Information",
+      "description": "You can also reach us directly",
+      "email": "Email",
+      "phone": "Phone",
+      "location": "Location",
+      "israel": "Israel",
+      "hours": "Business Hours",
+      "hours_value": "Sun-Thu, 9:00-18:00"
+    },
+    "quick_response": {
+      "title": "Quick Response",
+      "description": "We're committed to responding within 24 hours. For urgent matters, call us directly."
+    },
+    "success": {
+      "title": "Message sent successfully!",
+      "description": "We'll get back to you as soon as possible."
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "last_updated": "Last updated: {{date}}",
+    "contact_email": "Contact",
+    "sections": {
+      "intro": {
+        "title": "Introduction",
+        "content": "At GlobeMate, we are committed to protecting your privacy. This privacy policy explains how we collect, use, and protect your personal information."
+      },
+      "collection": {
+        "title": "Information Collection",
+        "content": "We collect information you provide directly, such as:\n• Name, email, and phone number\n• Travel preferences and trip plans\n• Payment information (secured)\n• Content you share in the community"
+      },
+      "usage": {
+        "title": "Information Usage",
+        "content": "We use your information to:\n• Provide and improve our services\n• Personalize your travel experience\n• Communicate with you about your account and trips\n• Enhance platform security"
+      },
+      "sharing": {
+        "title": "Information Sharing",
+        "content": "We do not sell or rent your personal information. We may share information only:\n• With your explicit consent\n• With trusted service providers\n• When required by law"
+      },
+      "security": {
+        "title": "Information Security",
+        "content": "We use advanced security measures including:\n• SSL/TLS encryption\n• Secure database storage\n• Limited access controls\n• Continuous security monitoring"
+      },
+      "cookies": {
+        "title": "Cookies",
+        "content": "We use cookies to:\n• Improve user experience\n• Analyze site usage\n• Save preferences\nYou can manage cookie preferences in your browser settings."
+      },
+      "rights": {
+        "title": "Your Rights",
+        "content": "You have the right to:\n• Access your personal information\n• Correct inaccurate information\n• Delete your account\n• Withdraw consent at any time\n• File a complaint with the privacy authority"
+      },
+      "children": {
+        "title": "Children's Privacy",
+        "content": "Our services are not intended for children under 13. We do not knowingly collect information from children."
+      },
+      "changes": {
+        "title": "Policy Changes",
+        "content": "We may update this policy from time to time. We will notify you of significant changes via email or site notice."
+      },
+      "contact": {
+        "title": "Contact",
+        "content": "For questions about this privacy policy, contact:\nsupport@globemate.co.il\n0525530454"
+      }
+    }
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "last_updated": "Last updated: {{date}}",
+    "contact_email": "Contact",
+    "sections": {
+      "acceptance": {
+        "title": "Acceptance of Terms",
+        "content": "By accessing and using GlobeMate services, you agree to these terms of service. If you disagree, please do not use our services."
+      },
+      "services": {
+        "title": "Service Description",
+        "content": "GlobeMate provides:\n• AI-powered trip planning\n• Budget tracking\n• Traveler community\n• Destination information\n• Travel coordination tools"
+      },
+      "account": {
+        "title": "User Account",
+        "content": "You are responsible for:\n• Maintaining account confidentiality\n• All activity on your account\n• Reporting unauthorized use\n• Providing accurate and current information"
+      },
+      "user_content": {
+        "title": "User Content",
+        "content": "You retain ownership of your content but grant us a license to use it for service improvement. You are responsible for ensuring your content does not:\n• Infringe copyrights\n• Contain offensive or illegal material\n• Contain viruses or malicious software"
+      },
+      "prohibited": {
+        "title": "Prohibited Uses",
+        "content": "You may not:\n• Use the service for illegal purposes\n• Violate others' privacy\n• Upload malicious content\n• Copy or duplicate the service\n• Harass other users"
+      },
+      "intellectual": {
+        "title": "Intellectual Property",
+        "content": "All GlobeMate content and technology are protected by copyrights and trademarks. You may not use them without explicit permission."
+      },
+      "third_party": {
+        "title": "Third-Party Services",
+        "content": "Our service may include links to third-party sites. We are not responsible for the content or privacy of these sites."
+      },
+      "disclaimer": {
+        "title": "Disclaimer",
+        "content": "The service is provided 'as is'. We do not guarantee:\n• Continuous availability\n• Absolute accuracy of information\n• Fitness for specific purposes\nUse the service at your own risk."
+      },
+      "limitation": {
+        "title": "Limitation of Liability",
+        "content": "GlobeMate will not be liable for:\n• Indirect or consequential damages\n• Loss of profits or information\n• Damages arising from use or inability to use"
+      },
+      "termination": {
+        "title": "Termination",
+        "content": "We reserve the right to:\n• Suspend or close accounts\n• Discontinue the service\n• Change the terms\nIn case of violation of these terms."
+      },
+      "changes": {
+        "title": "Changes to Terms",
+        "content": "We may update these terms. Continued use after changes constitutes acceptance of updated terms."
+      },
+      "governing": {
+        "title": "Governing Law",
+        "content": "These terms are governed by Israeli law. Exclusive jurisdiction is granted to Israeli courts."
+      },
+      "contact": {
+        "title": "Contact",
+        "content": "For questions about these terms:\nsupport@globemate.co.il\n0525530454"
+      }
+    }
+  },
+  "about": {
+    "title": "About Us",
+    "subtitle": "GlobeMate is an innovative travel planning platform that combines artificial intelligence with a vibrant community of travelers.",
+    "mission": {
+      "title": "Our Mission",
+      "content": "To make travel planning easy, accessible, and enjoyable for everyone. We combine advanced AI technology with community knowledge to create personalized travel experiences."
+    },
+    "stats": {
+      "countries": "Countries",
+      "languages": "Languages",
+      "support": "Support",
+      "satisfaction": "Satisfaction"
+    },
+    "values": {
+      "title": "Our Values",
+      "global": {
+        "title": "Global Thinking",
+        "description": "We believe travel brings cultures together and broadens horizons."
+      },
+      "community": {
+        "title": "Community",
+        "description": "The strength of our community lies in its diversity and shared experiences."
+      },
+      "innovation": {
+        "title": "Innovation",
+        "description": "We use advanced technology to create smart travel solutions."
+      },
+      "passion": {
+        "title": "Travel Passion",
+        "description": "Our passion for exploring the world drives us to be the best."
+      }
+    },
+    "story": {
+      "title": "Our Story",
+      "paragraph1": "GlobeMate was founded on the belief that trip planning should be simple and enjoyable. We saw travelers spending countless hours searching for information, deliberating, and comparing options.",
+      "paragraph2": "We decided to create a platform that combines the power of artificial intelligence with community wisdom. Our technology learns from user preferences and provides personalized recommendations, while the community shares real experiences and tips.",
+      "paragraph3": "Today, GlobeMate serves travelers in 70+ countries, provides support in multiple languages, and helps thousands plan their dream trips."
+    },
+    "cta": {
+      "title": "Let's Connect",
+      "description": "Have questions or ideas? We'd love to hear from you!",
+      "button": "Send Us a Message"
+    }
+  },
+  "landing": {
+    "destinations_nav": "Popular Destinations"
   }
 }

@@ -6,7 +6,18 @@ GlobeMate is a full-stack web application for global travel planning and communi
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
-## Recent Changes (October 11, 2025)
+## Recent Changes (October 12, 2025)
+- **Support Pages Implementation**: Created comprehensive support and informational pages
+  - **Help Center** (/help): FAQ section with 6 common questions, quick contact options
+  - **Contact Us** (/contact): Contact form with email/phone details (support@globemate.co.il, 0525530454)
+  - **Privacy Policy** (/privacy): Complete privacy policy with 10 sections
+  - **Terms of Service** (/terms): Full terms of service with 13 sections
+  - **About Us** (/about): Company mission, values, story, and stats
+  - All pages fully translated in Hebrew and English with RTL support
+  - All interactive elements have data-testid attributes for testing
+  - Footer links updated to navigate to support pages
+
+## Previous Changes (October 11, 2025)
 - **Explore Page Removal**: Completely removed the /explore page and all related functionality
   - Deleted client/src/pages/explore.tsx (1251 lines)
   - Removed route from App.tsx

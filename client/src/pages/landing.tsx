@@ -454,11 +454,11 @@ export default function Landing() {
             <div>
               <h3 className="text-lg font-semibold mb-4">{t('landing.support_nav')}</h3>
               <ul className="space-y-2 text-gray-300">
-                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">{t('landing.help_center')}</Button></li>
-                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">{t('landing.contact_us')}</Button></li>
-                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">{t('landing.privacy_policy')}</Button></li>
-                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">{t('landing.terms_of_service')}</Button></li>
-                <li><Button type="button" className="hover:text-white bg-transparent p-0 h-auto text-gray-300">{t('landing.about_us')}</Button></li>
+                <li><Link href="/help" className="hover:text-white">{t('landing.help_center')}</Link></li>
+                <li><Link href="/contact" className="hover:text-white">{t('landing.contact_us')}</Link></li>
+                <li><Link href="/privacy" className="hover:text-white">{t('landing.privacy_policy')}</Link></li>
+                <li><Link href="/terms" className="hover:text-white">{t('landing.terms_of_service')}</Link></li>
+                <li><Link href="/about" className="hover:text-white">{t('landing.about_us')}</Link></li>
               </ul>
             </div>
           </div>
