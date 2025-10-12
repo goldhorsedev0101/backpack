@@ -1220,12 +1220,12 @@ export default function MyTripsNew() {
                     </div>
 
                     {aiSuggestions.map((suggestion, index) => (
-                      <div key={index} className={`border rounded-lg p-4 space-y-4 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                      <div key={index} className={`border rounded-lg p-4 space-y-4 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
                         <div>
-                          <h3 className="text-xl font-bold text-slate-700 mb-1">
+                          <h3 className="text-xl font-bold text-slate-700 mb-1" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                             {translateCity(suggestion.destination)}, {translateCountry(suggestion.country)}
                           </h3>
-                          <p className="text-gray-600 leading-relaxed">
+                          <p className="text-gray-600 leading-relaxed" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                             {suggestion.description}
                           </p>
                         </div>
@@ -1265,7 +1265,7 @@ export default function MyTripsNew() {
                           </div>
                           <div className="grid grid-cols-2 gap-2">
                             {suggestion.highlights.map((highlight, idx) => (
-                              <div key={idx} className={`flex items-center text-sm text-gray-700 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                              <div key={idx} className={`flex items-center text-sm text-gray-700 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                                 <span className={`w-2 h-2 bg-yellow-500 rounded-full ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`}></span>
                                 {highlight}
                               </div>
@@ -1403,7 +1403,7 @@ export default function MyTripsNew() {
                     </div>
                     
                     {itinerary.map((day) => (
-                      <Card key={day.day} className={`border-l-4 border-l-primary ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                      <Card key={day.day} className={`border-l-4 border-l-primary ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
                         <CardHeader className="pb-3">
                           <CardTitle className={`flex items-center text-lg ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                             <Calendar className={`w-5 h-5 text-primary ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
@@ -1419,7 +1419,7 @@ export default function MyTripsNew() {
                             </div>
                             <ul className="space-y-1">
                               {day.activities.map((activity, idx) => (
-                                <li key={idx} className={`text-sm text-gray-700 flex items-start ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                <li key={idx} className={`text-sm text-gray-700 flex items-start ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                                   <span className={`w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0 ${i18n.language === 'he' ? 'ml-3' : 'mr-3'}`}></span>
                                   {activity}
                                 </li>
@@ -1444,7 +1444,7 @@ export default function MyTripsNew() {
                             </div>
                             <ul className="space-y-1">
                               {day.tips.map((tip, idx) => (
-                                <li key={idx} className={`text-sm text-gray-700 flex items-start ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                <li key={idx} className={`text-sm text-gray-700 flex items-start ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                                   <span className={`w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0 ${i18n.language === 'he' ? 'ml-3' : 'mr-3'}`}></span>
                                   {tip}
                                 </li>
@@ -1629,7 +1629,7 @@ export default function MyTripsNew() {
                     </p>
 
                     {savedTrips.map((trip) => (
-                      <Card key={trip.id} className={`border hover:shadow-md transition-shadow ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                      <Card key={trip.id} className={`border hover:shadow-md transition-shadow ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
                         <CardHeader className="pb-3">
                           <div className={`flex items-start justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                             <div>

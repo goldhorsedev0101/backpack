@@ -7,6 +7,13 @@ GlobeMate is a full-stack web application designed for global travel planning an
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (October 12, 2025)
+- **Complete RTL Support for All Content**: Full RTL implementation across entire My Trips page
+  - **Text Direction**: All Hebrew text uses `dir="rtl"` for proper punctuation placement
+  - **Visual Alignment**: Elements remain right-aligned while text flows correctly RTL
+  - **Smart Implementation**: `dir="rtl"` applied only to text elements (paragraphs, headings, list items) to preserve layout
+  - **Punctuation Fix**: Periods and commas now appear at end of sentences (left side) in Hebrew
+  - **Comprehensive Coverage**: RTL support in AI suggestions, itineraries, activities, tips, highlights, and saved trips
+
 - **Visual Consistency for Preferences Section**: Enhanced Travel Style and Interests with colorful gradient backgrounds
   - **Colorful Cards**: Both sections now use the signature gradient (orange-50 → teal-50 → blue-50)
   - **RTL Support**: Text alignment switches to right-to-left in Hebrew for both sections
