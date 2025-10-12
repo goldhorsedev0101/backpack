@@ -794,116 +794,6 @@ export default function MyTripsNew() {
           <p className="text-lg text-gray-600">{t('trips.planner_subtitle')}</p>
         </div>
 
-        {/* Trip Type & Travelers Header */}
-        <Card className="mb-6 bg-gradient-to-r from-orange-50 to-teal-50 border-none shadow-md">
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Trip Type */}
-              <div className="space-y-2">
-                <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
-                  <Users className="w-4 h-4 inline mr-2" />
-                  {t('trips.trip_type')}
-                </Label>
-                <Select 
-                  value={tripType} 
-                  onValueChange={(value) => {
-                    setTripType(value);
-                    form.setValue('tripType', value);
-                  }}
-                >
-                  <SelectTrigger className="w-full bg-white" data-testid="select-trip-type">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="family">{t('trips.trip_types.family')}</SelectItem>
-                    <SelectItem value="couples">{t('trips.trip_types.couples')}</SelectItem>
-                    <SelectItem value="bachelor_party">{t('trips.trip_types.bachelor_party')}</SelectItem>
-                    <SelectItem value="bachelorette_party">{t('trips.trip_types.bachelorette_party')}</SelectItem>
-                    <SelectItem value="friends">{t('trips.trip_types.friends')}</SelectItem>
-                    <SelectItem value="solo">{t('trips.trip_types.solo')}</SelectItem>
-                    <SelectItem value="business">{t('trips.trip_types.business')}</SelectItem>
-                    <SelectItem value="adventure">{t('trips.trip_types.adventure')}</SelectItem>
-                    <SelectItem value="romantic">{t('trips.trip_types.romantic')}</SelectItem>
-                    <SelectItem value="group">{t('trips.trip_types.group')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Adults */}
-              <div className="space-y-2">
-                <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
-                  {t('trips.adults')}
-                </Label>
-                <div className="flex items-center gap-3">
-                  <Button 
-                    type="button"
-                    variant="outline" 
-                    size="icon" 
-                    className="h-10 w-10"
-                    onClick={() => {
-                      const current = form.watch('adults') || 2;
-                      if (current > 1) form.setValue('adults', current - 1);
-                    }}
-                  >
-                    -
-                  </Button>
-                  <div className="flex-1 text-center">
-                    <span className="text-2xl font-bold text-orange-600">{form.watch('adults') || 2}</span>
-                  </div>
-                  <Button 
-                    type="button"
-                    variant="outline" 
-                    size="icon" 
-                    className="h-10 w-10"
-                    onClick={() => {
-                      const current = form.watch('adults') || 2;
-                      if (current < 8) form.setValue('adults', current + 1);
-                    }}
-                  >
-                    +
-                  </Button>
-                </div>
-              </div>
-
-              {/* Children */}
-              <div className="space-y-2">
-                <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
-                  {t('trips.children')}
-                </Label>
-                <div className="flex items-center gap-3">
-                  <Button 
-                    type="button"
-                    variant="outline" 
-                    size="icon" 
-                    className="h-10 w-10"
-                    onClick={() => {
-                      const current = form.watch('children') || 0;
-                      if (current > 0) form.setValue('children', current - 1);
-                    }}
-                  >
-                    -
-                  </Button>
-                  <div className="flex-1 text-center">
-                    <span className="text-2xl font-bold text-teal-600">{form.watch('children') || 0}</span>
-                  </div>
-                  <Button 
-                    type="button"
-                    variant="outline" 
-                    size="icon" 
-                    className="h-10 w-10"
-                    onClick={() => {
-                      const current = form.watch('children') || 0;
-                      if (current < 6) form.setValue('children', current + 1);
-                    }}
-                  >
-                    +
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
             <TabsList className="inline-flex w-auto min-w-full sm:w-full justify-start sm:justify-evenly h-auto sm:h-10 gap-0.5 sm:gap-2 p-1">
@@ -929,6 +819,117 @@ export default function MyTripsNew() {
               </TabsTrigger>
             </TabsList>
           </div>
+
+          {/* Trip Type & Travelers Header */}
+          <Card className="mb-6 mt-6 bg-gradient-to-r from-orange-50 to-teal-50 border-none shadow-md">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Trip Type */}
+                <div className="space-y-2">
+                  <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                    <Users className="w-4 h-4 inline mr-2" />
+                    {t('trips.trip_type')}
+                  </Label>
+                  <Select 
+                    value={tripType} 
+                    onValueChange={(value) => {
+                      setTripType(value);
+                      form.setValue('tripType', value);
+                    }}
+                  >
+                    <SelectTrigger className="w-full bg-white" data-testid="select-trip-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="family">{t('trips.trip_types.family')}</SelectItem>
+                      <SelectItem value="couples">{t('trips.trip_types.couples')}</SelectItem>
+                      <SelectItem value="bachelor_party">{t('trips.trip_types.bachelor_party')}</SelectItem>
+                      <SelectItem value="bachelorette_party">{t('trips.trip_types.bachelorette_party')}</SelectItem>
+                      <SelectItem value="friends">{t('trips.trip_types.friends')}</SelectItem>
+                      <SelectItem value="solo">{t('trips.trip_types.solo')}</SelectItem>
+                      <SelectItem value="business">{t('trips.trip_types.business')}</SelectItem>
+                      <SelectItem value="adventure">{t('trips.trip_types.adventure')}</SelectItem>
+                      <SelectItem value="romantic">{t('trips.trip_types.romantic')}</SelectItem>
+                      <SelectItem value="group">{t('trips.trip_types.group')}</SelectItem>
+                      <SelectItem value="honeymoon">{t('trips.trip_types.honeymoon')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Adults */}
+                <div className="space-y-2">
+                  <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                    {t('trips.adults')}
+                  </Label>
+                  <div className="flex items-center gap-3">
+                    <Button 
+                      type="button"
+                      variant="outline" 
+                      size="icon" 
+                      className="h-10 w-10"
+                      onClick={() => {
+                        const current = form.watch('adults') || 2;
+                        if (current > 1) form.setValue('adults', current - 1);
+                      }}
+                    >
+                      -
+                    </Button>
+                    <div className="flex-1 text-center">
+                      <span className="text-2xl font-bold text-orange-600">{form.watch('adults') || 2}</span>
+                    </div>
+                    <Button 
+                      type="button"
+                      variant="outline" 
+                      size="icon" 
+                      className="h-10 w-10"
+                      onClick={() => {
+                        const current = form.watch('adults') || 2;
+                        if (current < 8) form.setValue('adults', current + 1);
+                      }}
+                    >
+                      +
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Children */}
+                <div className="space-y-2">
+                  <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                    {t('trips.children')}
+                  </Label>
+                  <div className="flex items-center gap-3">
+                    <Button 
+                      type="button"
+                      variant="outline" 
+                      size="icon" 
+                      className="h-10 w-10"
+                      onClick={() => {
+                        const current = form.watch('children') || 0;
+                        if (current > 0) form.setValue('children', current - 1);
+                      }}
+                    >
+                      -
+                    </Button>
+                    <div className="flex-1 text-center">
+                      <span className="text-2xl font-bold text-teal-600">{form.watch('children') || 0}</span>
+                    </div>
+                    <Button 
+                      type="button"
+                      variant="outline" 
+                      size="icon" 
+                      className="h-10 w-10"
+                      onClick={() => {
+                        const current = form.watch('children') || 0;
+                        if (current < 10) form.setValue('children', current + 1);
+                      }}
+                    >
+                      +
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Tab 1: Preferences */}
           <TabsContent value="preferences" className="mt-6">
@@ -1038,46 +1039,6 @@ export default function MyTripsNew() {
                         <SelectItem key={duration.value} value={duration.value}>
                           {duration.label}
                         </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Adults */}
-                <div>
-                  <Label htmlFor="adults" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
-                    {t('trips.adults')}
-                  </Label>
-                  <Select 
-                    value={form.watch('adults')?.toString() || '2'} 
-                    onValueChange={(value) => form.setValue('adults', parseInt(value))}
-                  >
-                    <SelectTrigger className="w-full p-3" data-testid="select-adults-mytrips">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[1, 2, 3, 4, 5, 6, 7, 8].map(count => (
-                        <SelectItem key={count} value={count.toString()}>{count}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Children */}
-                <div>
-                  <Label htmlFor="children" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
-                    {t('trips.children')}
-                  </Label>
-                  <Select 
-                    value={form.watch('children')?.toString() || '0'} 
-                    onValueChange={(value) => form.setValue('children', parseInt(value))}
-                  >
-                    <SelectTrigger className="w-full p-3" data-testid="select-children-mytrips">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[0, 1, 2, 3, 4, 5, 6].map(count => (
-                        <SelectItem key={count} value={count.toString()}>{count}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

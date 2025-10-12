@@ -365,7 +365,8 @@
       "business": "Business Trip",
       "adventure": "Adventure Trip",
       "romantic": "Romantic Getaway",
-      "group": "Group Trip"
+      "group": "Group Trip",
+      "honeymoon": "Honeymoon"
     },
     "no_trips": "No trips yet",
     "create_first_trip": "Create your first trip to get started",
