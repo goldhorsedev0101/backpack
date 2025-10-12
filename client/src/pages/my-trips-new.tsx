@@ -1220,7 +1220,7 @@ export default function MyTripsNew() {
                     </div>
 
                     {aiSuggestions.map((suggestion, index) => (
-                      <div key={index} className="border rounded-lg p-4 space-y-4" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                      <div key={index} className={`border rounded-lg p-4 space-y-4 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                         <div>
                           <h3 className="text-xl font-bold text-slate-700 mb-1">
                             {translateCity(suggestion.destination)}, {translateCountry(suggestion.country)}
@@ -1403,7 +1403,7 @@ export default function MyTripsNew() {
                     </div>
                     
                     {itinerary.map((day) => (
-                      <Card key={day.day} className="border-l-4 border-l-primary" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                      <Card key={day.day} className={`border-l-4 border-l-primary ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                         <CardHeader className="pb-3">
                           <CardTitle className={`flex items-center text-lg ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                             <Calendar className={`w-5 h-5 text-primary ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
@@ -1629,7 +1629,7 @@ export default function MyTripsNew() {
                     </p>
 
                     {savedTrips.map((trip) => (
-                      <Card key={trip.id} className="border hover:shadow-md transition-shadow" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                      <Card key={trip.id} className={`border hover:shadow-md transition-shadow ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                         <CardHeader className="pb-3">
                           <div className={`flex items-start justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                             <div>
