@@ -543,7 +543,7 @@ export default function MyTripsScreen() {
                       </div>
                     </div>
 
-                    {/* Travelers Count */}
+                    {/* Travelers Count - Family Planning */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="adults" className="text-sm font-medium text-slate-700">
