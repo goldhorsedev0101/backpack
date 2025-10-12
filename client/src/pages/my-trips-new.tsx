@@ -1220,7 +1220,7 @@ export default function MyTripsNew() {
                     </div>
 
                     {aiSuggestions.map((suggestion, index) => (
-                      <div key={index} className="border rounded-lg p-4 space-y-4">
+                      <div key={index} className={`border rounded-lg p-4 space-y-4 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
                         <div>
                           <h3 className="text-xl font-bold text-slate-700 mb-1">
                             {translateCity(suggestion.destination)}, {translateCountry(suggestion.country)}
@@ -1232,16 +1232,16 @@ export default function MyTripsNew() {
 
                         <div className="grid grid-cols-2 gap-4">
                           <div className="bg-blue-50 p-3 rounded-lg">
-                            <div className="flex items-center mb-1">
-                              <Calendar className="w-4 h-4 mr-2 text-blue-600" />
+                            <div className={`flex items-center mb-1 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                              <Calendar className={`w-4 h-4 text-blue-600 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
                               <span className="font-semibold text-blue-800 text-sm">{t('trips.duration')}</span>
                             </div>
                             <p className="text-blue-700 text-sm">{suggestion.duration}</p>
                           </div>
 
                           <div className="bg-green-50 p-3 rounded-lg">
-                            <div className="flex items-center mb-1">
-                              <DollarSign className="w-4 h-4 mr-2 text-green-600" />
+                            <div className={`flex items-center mb-1 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                              <DollarSign className={`w-4 h-4 text-green-600 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
                               <span className="font-semibold text-green-800 text-sm">{t('trips.budget')}</span>
                             </div>
                             <p className="text-green-700 text-sm font-bold">
@@ -1251,22 +1251,22 @@ export default function MyTripsNew() {
                         </div>
 
                         <div className="bg-orange-50 p-3 rounded-lg">
-                          <div className="flex items-center mb-1">
-                            <Calendar className="w-4 h-4 mr-2 text-orange-600" />
+                          <div className={`flex items-center mb-1 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                            <Calendar className={`w-4 h-4 text-orange-600 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
                             <span className="font-semibold text-orange-800 text-sm">{t('trips.best_time_to_visit')}</span>
                           </div>
                           <p className="text-orange-700 text-sm">{suggestion.bestTimeToVisit}</p>
                         </div>
 
                         <div>
-                          <div className="flex items-center mb-2">
-                            <Star className="w-4 h-4 mr-2 text-yellow-600" />
+                          <div className={`flex items-center mb-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                            <Star className={`w-4 h-4 text-yellow-600 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
                             <span className="font-semibold text-gray-800 text-sm">{t('trips.highlights')}</span>
                           </div>
                           <div className="grid grid-cols-2 gap-2">
                             {suggestion.highlights.map((highlight, idx) => (
-                              <div key={idx} className="flex items-center text-sm text-gray-700">
-                                <span className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
+                              <div key={idx} className={`flex items-center text-sm text-gray-700 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                <span className={`w-2 h-2 bg-yellow-500 rounded-full ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`}></span>
                                 {highlight}
                               </div>
                             ))}
@@ -1281,7 +1281,7 @@ export default function MyTripsNew() {
                         )}
                         */}
 
-                        <div className="flex flex-wrap gap-2 mb-4">
+                        <div className={`flex flex-wrap gap-2 mb-4 ${i18n.language === 'he' ? 'justify-end' : 'justify-start'}`}>
                           {suggestion.travelStyle.map((style) => {
                             const styleConfig = TRAVEL_STYLES.find(ts => ts.id === style.trim().toLowerCase());
                             return (
@@ -1292,18 +1292,18 @@ export default function MyTripsNew() {
                           })}
                         </div>
 
-                        <div className="flex justify-between items-center pt-4 border-t">
+                        <div className={`flex items-center pt-4 border-t gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                           <Button 
                             onClick={() => handleGenerateItineraryForSuggestion(suggestion)}
                             disabled={isGeneratingItinerary}
                             variant="outline"
                             size="sm"
-                            className="mr-2"
+                            className={`${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}
                           >
                             {isGeneratingItinerary ? (
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              <Loader2 className={`w-4 h-4 animate-spin ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
                             ) : (
-                              <Route className="w-4 h-4 mr-2" />
+                              <Route className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
                             )}
 {t('trips.generate_daily_itinerary')}
                           </Button>
@@ -1313,11 +1313,12 @@ export default function MyTripsNew() {
                             disabled={saveTripMutation.isPending}
                             variant="default"
                             size="sm"
+                            className={`${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}
                           >
                             {saveTripMutation.isPending ? (
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              <Loader2 className={`w-4 h-4 animate-spin ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
                             ) : (
-                              <Heart className="w-4 h-4 mr-2" />
+                              <Heart className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
                             )}
                             {t('trips.save_trip')}
                           </Button>
@@ -1402,24 +1403,24 @@ export default function MyTripsNew() {
                     </div>
                     
                     {itinerary.map((day) => (
-                      <Card key={day.day} className="border-l-4 border-l-primary">
+                      <Card key={day.day} className={`border-l-4 border-l-primary ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
                         <CardHeader className="pb-3">
-                          <CardTitle className="flex items-center text-lg">
-                            <Calendar className="w-5 h-5 mr-2 text-primary" />
+                          <CardTitle className={`flex items-center text-lg ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                            <Calendar className={`w-5 h-5 text-primary ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
 {t('trips.day')} {day.day} – {translateCity(day.location)}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                           {/* Activities */}
                           <div>
-                            <div className="flex items-center mb-2">
-                              <ListChecks className="w-4 h-4 mr-2 text-blue-600" />
+                            <div className={`flex items-center mb-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                              <ListChecks className={`w-4 h-4 text-blue-600 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
                               <span className="font-semibold text-blue-800 text-sm">{t('trips.activities')}</span>
                             </div>
                             <ul className="space-y-1">
                               {day.activities.map((activity, idx) => (
-                                <li key={idx} className="text-sm text-gray-700 flex items-start">
-                                  <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                <li key={idx} className={`text-sm text-gray-700 flex items-start ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                  <span className={`w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0 ${i18n.language === 'he' ? 'ml-3' : 'mr-3'}`}></span>
                                   {activity}
                                 </li>
                               ))}
@@ -1428,8 +1429,8 @@ export default function MyTripsNew() {
 
                           {/* Cost */}
                           <div className="bg-green-50 p-3 rounded-lg">
-                            <div className="flex items-center mb-1">
-                              <DollarSign className="w-4 h-4 mr-2 text-green-600" />
+                            <div className={`flex items-center mb-1 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                              <DollarSign className={`w-4 h-4 text-green-600 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
                               <span className="font-semibold text-green-800 text-sm">{t('trips.estimated_cost')}</span>
                             </div>
                             <p className="text-green-700 font-bold">${day.estimatedCost}</p>
@@ -1437,14 +1438,14 @@ export default function MyTripsNew() {
 
                           {/* Tips */}
                           <div>
-                            <div className="flex items-center mb-2">
-                              <Lightbulb className="w-4 h-4 mr-2 text-yellow-600" />
+                            <div className={`flex items-center mb-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                              <Lightbulb className={`w-4 h-4 text-yellow-600 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
                               <span className="font-semibold text-yellow-800 text-sm">{t('trips.local_tips')}</span>
                             </div>
                             <ul className="space-y-1">
                               {day.tips.map((tip, idx) => (
-                                <li key={idx} className="text-sm text-gray-700 flex items-start">
-                                  <span className="w-2 h-2 bg-yellow-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                <li key={idx} className={`text-sm text-gray-700 flex items-start ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                  <span className={`w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0 ${i18n.language === 'he' ? 'ml-3' : 'mr-3'}`}></span>
                                   {tip}
                                 </li>
                               ))}
@@ -1628,16 +1629,16 @@ export default function MyTripsNew() {
                     </p>
 
                     {savedTrips.map((trip) => (
-                      <Card key={trip.id} className="border hover:shadow-md transition-shadow">
+                      <Card key={trip.id} className={`border hover:shadow-md transition-shadow ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
                         <CardHeader className="pb-3">
-                          <div className="flex items-start justify-between">
+                          <div className={`flex items-start justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                             <div>
                               <CardTitle className="text-lg">{trip.title}</CardTitle>
                               <p className="text-sm text-gray-500 mt-1">
                                 {t('common.created')} {formatDate(new Date(trip.createdAt))}
                               </p>
                             </div>
-                            <div className="flex flex-col items-end space-y-1">
+                            <div className={`flex flex-col space-y-1 ${i18n.language === 'he' ? 'items-start' : 'items-end'}`}>
                               <Badge variant="outline" className="text-xs">
                                 {trip.duration}
                               </Badge>
@@ -1650,8 +1651,8 @@ export default function MyTripsNew() {
                         <CardContent>
                           <p className="text-sm text-gray-600 mb-3">{trip.description}</p>
                           
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-2">
+                          <div className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                            <div className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                               <MapPin className="w-4 h-4 text-gray-400" />
                               <span className="text-sm text-gray-600">
                                 {typeof trip.destinations === 'object' && trip.destinations?.name 
@@ -1660,9 +1661,9 @@ export default function MyTripsNew() {
                               </span>
                             </div>
                             
-                            <div className="flex space-x-2">
-                              <Button variant="outline" size="sm">
-                                <ExternalLink className="w-4 h-4 mr-1" />
+                            <div className={`flex gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                              <Button variant="outline" size="sm" className={`${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                <ExternalLink className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-1' : 'mr-1'}`} />
                                 {t('common.view')}
                               </Button>
                               <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
@@ -1672,7 +1673,7 @@ export default function MyTripsNew() {
                           </div>
 
                           {trip.travelStyle && (
-                            <div className="flex flex-wrap gap-1 mt-3">
+                            <div className={`flex flex-wrap gap-1 mt-3 ${i18n.language === 'he' ? 'justify-end' : 'justify-start'}`}>
                               {trip.travelStyle.split(',').map((style, idx) => {
                                 const trimmedStyle = style.trim();
                                 const styleConfig = TRAVEL_STYLES.find(ts => ts.id === trimmedStyle.toLowerCase());
