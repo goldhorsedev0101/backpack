@@ -376,7 +376,7 @@ export default function JourneyDetailPage() {
               {journey.destinations.map((dest, idx) => (
                 <Card key={idx} className="overflow-hidden border-l-4 border-orange-500">
                   <CardContent className="p-0">
-                    <div className="bg-gradient-to-r from-orange-50 to-teal-50 p-4">
+                    <div className="bg-gradient-to-r from-orange-50 to-teal-50 p-0">
                       <div className="flex items-center gap-3 w-full" style={isRTL ? { justifyContent: 'flex-end' } : {}}>
                         <div className="flex-shrink-0 w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
                           {idx + 1}
