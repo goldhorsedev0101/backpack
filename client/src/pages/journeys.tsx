@@ -41,7 +41,7 @@ export default function JourneysPage() {
   const isRTL = i18n.language === 'he';
   
   const [filters, setFilters] = useState({
-    season: "",
+    season: "all",
     minBudget: 0,
     maxBudget: 10000,
     tags: [] as string[],
@@ -118,7 +118,7 @@ export default function JourneysPage() {
                     <SelectValue placeholder={isRTL ? 'כל העונות' : 'All Seasons'} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">
+                    <SelectItem value="all">
                       {isRTL ? 'כל העונות' : 'All Seasons'}
                     </SelectItem>
                     <SelectItem value="spring">{isRTL ? 'אביב' : 'Spring'}</SelectItem>
