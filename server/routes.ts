@@ -38,6 +38,7 @@ import { supabaseAdmin } from './supabase.js';
 //   insertTravelBuddyApplicationSchema,
 //   insertLocationReviewSchema,
 // } from "@shared/schema";
+import { insertJourneySchema } from "@shared/schema";
 import {
   generateTravelSuggestions,
   generateItinerary,
@@ -606,6 +607,54 @@ export async function registerRoutes(app: Express): Promise<void> {
     } catch (error) {
       console.error("Error fetching trip:", error);
       res.status(500).json({ message: "Failed to fetch trip" });
+    }
+  });
+
+  // Journey routes (multi-destination routes)
+  app.get('/api/journeys', async (req, res) => {
+    try {
+      const filters: any = {};
+      
+      if (req.query.season) filters.season = req.query.season as string;
+      if (req.query.minBudget) filters.minBudget = parseInt(req.query.minBudget as string);
+      if (req.query.maxBudget) filters.maxBudget = parseInt(req.query.maxBudget as string);
+      if (req.query.minNights) filters.minNights = parseInt(req.query.minNights as string);
+      if (req.query.maxNights) filters.maxNights = parseInt(req.query.maxNights as string);
+      if (req.query.tags) filters.tags = (req.query.tags as string).split(',');
+      if (req.query.audienceTags) filters.audienceTags = (req.query.audienceTags as string).split(',');
+      if (req.query.limit) filters.limit = parseInt(req.query.limit as string);
+      if (req.query.offset) filters.offset = parseInt(req.query.offset as string);
+      
+      const journeys = await storage.getJourneys(filters);
+      res.json(journeys);
+    } catch (error) {
+      console.error("Error fetching journeys:", error);
+      res.status(500).json({ message: "Failed to fetch journeys" });
+    }
+  });
+
+  app.get('/api/journeys/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const journey = await storage.getJourneyById(id);
+      if (!journey) {
+        return res.status(404).json({ message: "Journey not found" });
+      }
+      res.json(journey);
+    } catch (error) {
+      console.error("Error fetching journey:", error);
+      res.status(500).json({ message: "Failed to fetch journey" });
+    }
+  });
+
+  app.post('/api/journeys', async (req, res) => {
+    try {
+      const validatedData = insertJourneySchema.parse(req.body);
+      const journey = await storage.createJourney(validatedData);
+      res.status(201).json(journey);
+    } catch (error) {
+      console.error("Error creating journey:", error);
+      res.status(400).json({ message: "Failed to create journey", error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -4714,6 +4763,18 @@ export async function registerRoutes(app: Express): Promise<void> {
     } catch (error) {
       console.error('Geo coords error:', error);
       res.status(500).json({ error: 'Failed to fetch location data' });
+    }
+  });
+
+  // Seed journeys (development only)
+  app.post('/api/seed/journeys', async (req, res) => {
+    try {
+      const { seedJourneys } = await import('./journeysSeeder.js');
+      const result = await seedJourneys();
+      res.json(result);
+    } catch (error) {
+      console.error('Error seeding journeys:', error);
+      res.status(500).json({ message: 'Failed to seed journeys', error: String(error) });
     }
   });
 

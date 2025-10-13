@@ -7,6 +7,26 @@ GlobeMate is a full-stack web application designed for worldwide travel planning
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (October 13, 2025)
+- **Multi-Destination Journeys System**: NEW feature showcasing pre-planned itineraries across multiple destinations
+  - **Database Schema**: Added `journeys` table with destination chains, nightly breakdown per city, transport details, pricing ranges, seasonal suitability, tags, audience filters, ratings, daily itineraries, and cost breakdowns
+  - **API Routes**: 
+    - `GET /api/journeys` with filters (season, budget range, tags, pagination)
+    - `GET /api/journeys/:id` for detailed journey view
+    - `POST /api/trips/from-journey` to convert journey inspiration into personal trip
+  - **Sample Data**: Seeded 5 diverse journeys covering Asia, Europe, Southeast Asia, Mediterranean, and USA
+  - **List Page (`/journeys`)**: 
+    - Grid layout with journey cards showing destination chains (e.g., "Tokyo ← Kyoto ← Osaka")
+    - Advanced filters: season dropdown, budget slider (currency-aware), tag selection (nature, food, culture, etc.)
+    - Rating display, duration info, audience tags (12+, couple, family, etc.)
+    - RTL support with proper arrow direction (→ for Hebrew, ← for English)
+  - **Detail Page (`/journeys/:id`)**:
+    - Hero image with journey title, rating, price range, total nights
+    - 5-tab navigation: Overview (destination trail with transport info), Nights per Destination (table view), Daily Schedule (day-by-day activities by destination), Costs (breakdown by transport/activities/lodging), Map (placeholder)
+    - CTAs: "Build me a similar journey" (AI customization), "Save to my trips", "Share"
+  - **Home Page Integration**: "Popular Journeys" section displaying 4 featured journeys with link to `/journeys`
+  - **Full i18n**: Complete Hebrew/English translations for all journey labels, filters, and content
+  - **Routes**: Registered `/journeys` and `/journeys/:id` in App.tsx
+
 - **Global Platform Rebranding**: Complete transition from South American focus to worldwide travel platform
   - **UI Text Updates**: Changed all references from "South America" to "worldwide/global" across entire platform
   - **Translation Updates**: Updated both Hebrew and English translations:
@@ -83,10 +103,11 @@ Preferred communication style: Simple, everyday language.
 
 ### Database Design
 - **ORM**: Drizzle with PostgreSQL
-- **Key Tables**: Users, Sessions, Trips, Reviews, Expenses, Chat (rooms & messages), User Connections. Includes detailed tables for destinations, accommodations, attractions, restaurants, location_reviews, location_photos, location_ancestors.
+- **Key Tables**: Users, Sessions, Trips, Reviews, Expenses, Chat (rooms & messages), User Connections, **Journeys** (multi-destination pre-planned itineraries). Includes detailed tables for destinations, accommodations, attractions, restaurants, location_reviews, location_photos, location_ancestors.
 
 ### Core Features & Technical Implementations
 - **AI-Powered Trip Planning**: Utilizes OpenAI for personalized trip recommendations, itinerary generation, and an interactive travel assistant, considering traveler composition and trip type. Integrates Google Places API for real-world booking suggestions.
+- **Multi-Destination Journeys**: Pre-planned itinerary inspiration system featuring curated multi-city routes with detailed breakdowns (nightly accommodations, daily schedules, transport logistics, cost estimates). Includes filterable list page (`/journeys`) and detailed journey pages with tabbed navigation. Users can convert journeys into personalized trips via AI customization.
 - **Community Features**: Reviews system, user connections, WebSocket-based real-time chat, content sharing, and gamified achievements.
 - **Budget Tracking**: Expense categorization, trip association, visual analytics, and multi-currency support with dynamic budget range display.
 - **User Onboarding & Personalization**: Multi-step registration to collect user preferences for personalized recommendations.

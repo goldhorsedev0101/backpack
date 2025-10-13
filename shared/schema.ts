@@ -74,6 +74,28 @@ export const trips = pgTable("trips", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Multi-Destination Journeys table (pre-made travel routes)
+export const journeys = pgTable("journeys", {
+  id: serial("id").primaryKey(),
+  title: varchar("title").notNull(),
+  description: text("description").notNull(),
+  destinations: jsonb("destinations").notNull(), // Array of {name, country, nights, transport: {type, cost, duration}}
+  totalNights: integer("total_nights").notNull(),
+  priceMin: decimal("price_min", { precision: 10, scale: 2 }).notNull(),
+  priceMax: decimal("price_max", { precision: 10, scale: 2 }).notNull(),
+  season: text("season").array(), // ["summer", "winter", "spring", "fall", "year-round"]
+  tags: text("tags").array(), // ["nature", "food", "culture", "nightlife", "adventure"]
+  audienceTags: text("audience_tags").array(), // ["12+", "couple", "family", "solo", "group", "friends"]
+  rating: decimal("rating", { precision: 3, scale: 2 }).default("0"), // 0.00 - 5.00
+  popularity: integer("popularity").default(0),
+  heroImage: text("hero_image"),
+  images: text("images").array(),
+  dailyItinerary: jsonb("daily_itinerary"), // Structured by destination: {destinationIndex: [{day, activities}]}
+  costsBreakdown: jsonb("costs_breakdown"), // {transport: {min, max}, activities: {min, max}, lodging: {min, max}}
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Enhanced Reviews table for real places
 export const placeReviews = pgTable("place_reviews", {
   id: serial("id").primaryKey(),
@@ -873,6 +895,14 @@ export const insertTripSchema = createInsertSchema(trips).omit({
   updatedAt: true,
 });
 
+export const insertJourneySchema = createInsertSchema(journeys).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  rating: true,
+  popularity: true,
+});
+
 export const insertReviewSchema = createInsertSchema(reviews).omit({
   id: true,
   createdAt: true,
@@ -1089,6 +1119,8 @@ export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type Trip = typeof trips.$inferSelect;
 export type InsertTrip = z.infer<typeof insertTripSchema>;
+export type Journey = typeof journeys.$inferSelect;
+export type InsertJourney = z.infer<typeof insertJourneySchema>;
 export type Review = typeof reviews.$inferSelect;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Expense = typeof expenses.$inferSelect;

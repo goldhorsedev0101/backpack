@@ -27,6 +27,8 @@ import AdminTranslations from "./pages/admin/translations.js";
 import DestinationsHub from "./pages/destinations-hub.js";
 import DestinationDetail from "./pages/destination-detail.js";
 import IntegrationsDemoDestinations from "./pages/integrations-demo-destinations.js";
+import Journeys from "./pages/journeys.js";
+import JourneyDetail from "./pages/journey-detail.js";
 import MediaDemo from "./pages/media-demo.js";
 import IntegrationsDemoUnsplash from "./pages/integrations-demo-unsplash.js";
 import HelpCenter from "./pages/help-center.js";
@@ -63,6 +65,8 @@ function Router() {
           <Route path="/admin/translations" component={AdminTranslations} />
           <Route path="/destinations" component={DestinationsHub} />
           <Route path="/destinations/:slug" component={DestinationDetail} />
+          <Route path="/journeys" component={Journeys} />
+          <Route path="/journeys/:id" component={JourneyDetail} />
           <Route path="/integrations-demo/destinations" component={IntegrationsDemoDestinations} />
           <Route path="/integrations-demo/media" component={MediaDemo} />
           <Route path="/integrations-demo/unsplash" component={IntegrationsDemoUnsplash} />

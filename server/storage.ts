@@ -1,6 +1,7 @@
 import {
   users,
   trips,
+  journeys,
   reviews,
   expenses,
   chatRooms,
@@ -72,6 +73,8 @@ import {
   type InsertItinerary,
   type ItineraryItem,
   type InsertItineraryItem,
+  type Journey,
+  type InsertJourney,
 } from "../shared/schema.js";
 import { db } from "./db.js";
 import { eq, desc, and, or, sql } from "drizzle-orm";
@@ -89,6 +92,13 @@ export interface IStorage {
   getTripById(id: number): Promise<Trip | undefined>;
   updateTrip(id: number, trip: Partial<InsertTrip>): Promise<Trip>;
   saveUserTrip(userId: string, trip: any): Promise<void>;
+  
+  // Journey operations (multi-destination routes)
+  getJourneys(filters?: { season?: string; minBudget?: number; maxBudget?: number; minNights?: number; maxNights?: number; tags?: string[]; audienceTags?: string[]; limit?: number; offset?: number }): Promise<Journey[]>;
+  getJourneyById(id: number): Promise<Journey | undefined>;
+  createJourney(journey: InsertJourney): Promise<Journey>;
+  updateJourney(id: number, journey: Partial<InsertJourney>): Promise<Journey>;
+  deleteJourney(id: number): Promise<boolean>;
   
   // Review operations
   createReview(review: InsertReview): Promise<Review>;
@@ -330,6 +340,82 @@ export class DatabaseStorage implements IStorage {
       console.error('Error details:', error);
       throw new Error('Failed to save trip to database');
     }
+  }
+
+  // Journey operations (multi-destination routes)
+  async getJourneys(filters?: { season?: string; minBudget?: number; maxBudget?: number; minNights?: number; maxNights?: number; tags?: string[]; audienceTags?: string[]; limit?: number; offset?: number }): Promise<Journey[]> {
+    let query = db.select().from(journeys);
+    
+    const conditions = [];
+    
+    if (filters?.season) {
+      conditions.push(sql`${filters.season} = ANY(${journeys.season})`);
+    }
+    
+    // Budget range overlap: journey's price range must overlap with user's budget range
+    if (filters?.minBudget !== undefined) {
+      conditions.push(sql`${journeys.priceMax} >= ${filters.minBudget}`);
+    }
+    
+    if (filters?.maxBudget !== undefined) {
+      conditions.push(sql`${journeys.priceMin} <= ${filters.maxBudget}`);
+    }
+    
+    if (filters?.minNights !== undefined) {
+      conditions.push(sql`${journeys.totalNights} >= ${filters.minNights}`);
+    }
+    
+    if (filters?.maxNights !== undefined) {
+      conditions.push(sql`${journeys.totalNights} <= ${filters.maxNights}`);
+    }
+    
+    if (filters?.tags && filters.tags.length > 0) {
+      conditions.push(sql`${journeys.tags} && ${filters.tags}`);
+    }
+    
+    if (filters?.audienceTags && filters.audienceTags.length > 0) {
+      conditions.push(sql`${journeys.audienceTags} && ${filters.audienceTags}`);
+    }
+    
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
+    }
+    
+    query = query.orderBy(desc(journeys.popularity), desc(journeys.rating)) as any;
+    
+    if (filters?.limit) {
+      query = query.limit(filters.limit) as any;
+    }
+    
+    if (filters?.offset) {
+      query = query.offset(filters.offset) as any;
+    }
+    
+    return await query;
+  }
+
+  async getJourneyById(id: number): Promise<Journey | undefined> {
+    const [journey] = await db.select().from(journeys).where(eq(journeys.id, id));
+    return journey;
+  }
+
+  async createJourney(journey: InsertJourney): Promise<Journey> {
+    const [newJourney] = await db.insert(journeys).values(journey).returning();
+    return newJourney;
+  }
+
+  async updateJourney(id: number, journeyData: Partial<InsertJourney>): Promise<Journey> {
+    const [updatedJourney] = await db
+      .update(journeys)
+      .set({ ...journeyData, updatedAt: new Date() })
+      .where(eq(journeys.id, id))
+      .returning();
+    return updatedJourney;
+  }
+
+  async deleteJourney(id: number): Promise<boolean> {
+    const result = await db.delete(journeys).where(eq(journeys.id, id));
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
   // Review operations

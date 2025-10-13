@@ -118,8 +118,11 @@ export default function Home() {
             {/* Personalized Recommendations */}
             <PersonalizedRecommendations className="mb-12" />
 
+            {/* Popular Journeys */}
+            <PopularJourneysSection />
+
             {/* Popular Routes */}
-            <section>
+            <section className="mt-12">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-slate-700">{t('home.popular_routes')}</h2>
                 <Button variant="outline">{t('home.view_all')}</Button>
@@ -272,5 +275,90 @@ export default function Home() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Popular Journeys Section Component
+function PopularJourneysSection() {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'he';
+
+  const { data: journeys = [], isLoading } = useQuery<any[]>({
+    queryKey: ["/api/journeys", { limit: 4 }],
+    enabled: true,
+  });
+
+  const formatDestinationChain = (destinations: any[]) => {
+    if (!destinations || destinations.length === 0) return '';
+    const arrow = isRTL ? '→' : '←';
+    return destinations.map(d => d.name).join(` ${arrow} `);
+  };
+
+  return (
+    <section className="mb-12">
+      <div className={`flex items-center justify-between mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-orange-600" dir={isRTL ? 'rtl' : 'ltr'}>
+            <MapPin className="inline w-6 h-6 mr-2 mb-1" />
+            {isRTL ? 'מסעות פופולריים ברחבי העולם' : 'Popular Multi-Destination Journeys'}
+          </h2>
+        </div>
+        <Button asChild variant="outline" className="border-orange-500 text-orange-600 hover:bg-orange-50">
+          <Link href="/journeys">
+            <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'כל המסעות →' : 'All Journeys →'}</span>
+          </Link>
+        </Button>
+      </div>
+
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} className="animate-pulse overflow-hidden">
+              <div className="h-32 bg-gray-200"></div>
+              <CardContent className="p-4">
+                <div className="h-4 bg-gray-200 rounded mb-3"></div>
+                <div className="h-3 bg-gray-200 rounded mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : journeys.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {journeys.slice(0, 4).map((journey) => (
+            <Link key={journey.id} href={`/journeys/${journey.id}`}>
+              <Card className="h-full overflow-hidden hover:shadow-xl transition-shadow cursor-pointer group">
+                <div className="relative h-32 overflow-hidden">
+                  <img
+                    src={journey.heroImage || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828'}
+                    alt={journey.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="font-bold mb-2 line-clamp-1" dir={isRTL ? 'rtl' : 'ltr'}>{journey.title}</h3>
+                  <div className={`flex items-center gap-1 text-xs text-orange-600 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <MapPin className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate" dir={isRTL ? 'rtl' : 'ltr'}>
+                      {formatDestinationChain(journey.destinations)}
+                    </span>
+                  </div>
+                  <div className={`flex items-center gap-3 text-xs text-gray-600 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <Calendar className="w-3 h-3" />
+                      <span>{journey.totalNights} {isRTL ? 'לילות' : 'nights'}</span>
+                    </div>
+                    <div className={`flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                      <span>{parseFloat(journey.rating || '0').toFixed(1)}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      ) : null}
+    </section>
   );
 }
