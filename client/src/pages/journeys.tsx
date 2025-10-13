@@ -262,7 +262,7 @@ export default function JourneysPage() {
                     <h3 className="text-xl font-bold mb-2" dir={isRTL ? 'rtl' : 'ltr'}>{translateJourneyTitle(journey.title)}</h3>
                     
                     {/* Destination Chain */}
-                    <div className={`flex items-center gap-2 mb-3 text-orange-600 font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex items-center gap-2 mb-3 text-orange-600 font-medium ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
                       <MapPin className="w-4 h-4 flex-shrink-0" />
                       <span className="text-sm" dir={isRTL ? 'rtl' : 'ltr'}>
                         {formatDestinationChain(journey.destinations)}
@@ -282,7 +282,7 @@ export default function JourneysPage() {
                     </div>
 
                     {/* Audience Tags */}
-                    <div className={`flex flex-wrap gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex flex-wrap gap-2 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
                       {journey.audience_tags?.slice(0, 3).map((tag) => (
                         <Badge key={tag} variant="secondary" className="text-xs" dir={isRTL ? 'rtl' : 'ltr'}>
                           {translateTag(tag)}
