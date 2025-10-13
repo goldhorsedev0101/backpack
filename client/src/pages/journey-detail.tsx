@@ -497,32 +497,32 @@ export default function JourneyDetailPage() {
                 <div className="space-y-4">
                   {journey.costs_breakdown && (
                     <>
-                      <div className="p-4 bg-blue-50 rounded-lg">
-                        <div className="flex justify-between items-center" style={isRTL ? { flexDirection: 'row-reverse' } : {}}>
+                      <div className="p-4 bg-blue-50 rounded-lg" style={isRTL ? { textAlign: 'right' } : {}}>
+                        <div className="flex justify-between items-center">
                           <span className="font-semibold" dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'תחבורה' : 'Transport'}</span>
                           <span className="text-lg font-bold" dir={isRTL ? 'rtl' : 'ltr'}>
                             {formatCost(journey.costs_breakdown.transport.min)} - {formatCost(journey.costs_breakdown.transport.max)}
                           </span>
                         </div>
                       </div>
-                      <div className="p-4 bg-green-50 rounded-lg">
-                        <div className="flex justify-between items-center" style={isRTL ? { flexDirection: 'row-reverse' } : {}}>
+                      <div className="p-4 bg-green-50 rounded-lg" style={isRTL ? { textAlign: 'right' } : {}}>
+                        <div className="flex justify-between items-center">
                           <span className="font-semibold" dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'פעילויות' : 'Activities'}</span>
                           <span className="text-lg font-bold" dir={isRTL ? 'rtl' : 'ltr'}>
                             {formatCost(journey.costs_breakdown.activities.min)} - {formatCost(journey.costs_breakdown.activities.max)}
                           </span>
                         </div>
                       </div>
-                      <div className="p-4 bg-purple-50 rounded-lg">
-                        <div className="flex justify-between items-center" style={isRTL ? { flexDirection: 'row-reverse' } : {}}>
+                      <div className="p-4 bg-purple-50 rounded-lg" style={isRTL ? { textAlign: 'right' } : {}}>
+                        <div className="flex justify-between items-center">
                           <span className="font-semibold" dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'לינה' : 'Lodging'}</span>
                           <span className="text-lg font-bold" dir={isRTL ? 'rtl' : 'ltr'}>
                             {formatCost(journey.costs_breakdown.lodging.min)} - {formatCost(journey.costs_breakdown.lodging.max)}
                           </span>
                         </div>
                       </div>
-                      <div className="p-4 bg-orange-100 rounded-lg border-2 border-orange-500">
-                        <div className="flex justify-between items-center" style={isRTL ? { flexDirection: 'row-reverse' } : {}}>
+                      <div className="p-4 bg-orange-100 rounded-lg border-2 border-orange-500" style={isRTL ? { textAlign: 'right' } : {}}>
+                        <div className="flex justify-between items-center">
                           <span className="font-bold text-lg" dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'סה"כ משוער' : 'Total Estimated'}</span>
                           <span className="text-2xl font-bold text-orange-600" dir={isRTL ? 'rtl' : 'ltr'}>
                             {formatPrice(journey.price_min, journey.price_max)}
