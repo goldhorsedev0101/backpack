@@ -493,8 +493,8 @@ export default function JourneyDetailPage() {
                               </li>
                             ))}
                           </ul>
-                          <p className={`text-sm text-gray-500 mt-2 ${isRTL ? 'text-right' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                            <Clock className="inline w-3 h-3 mr-1" />
+                          <p className="text-sm text-gray-500 mt-2" style={isRTL ? { textAlign: 'right' } : {}} dir={isRTL ? 'rtl' : 'ltr'}>
+                            <Clock className="inline w-3 h-3" style={isRTL ? { marginLeft: '0.25rem' } : { marginRight: '0.25rem' }} />
                             {formatDuration(day.duration)}
                           </p>
                         </div>
@@ -514,11 +514,11 @@ export default function JourneyDetailPage() {
                   <DollarSign className={`inline w-6 h-6 ${isRTL ? 'ml-2' : 'mr-2'}`} />
                   {isRTL ? 'פירוט עלויות משוער' : 'Estimated Cost Breakdown'}
                 </h3>
-                <div className={`space-y-4 ${isRTL ? 'text-right' : ''}`}>
+                <div className="space-y-4">
                   {journey.costs_breakdown && (
                     <>
                       <div className="p-4 bg-blue-50 rounded-lg">
-                        <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className="flex justify-between items-center" style={isRTL ? { flexDirection: 'row-reverse' } : {}}>
                           <span className="font-semibold" dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'תחבורה' : 'Transport'}</span>
                           <span className="text-lg font-bold" dir={isRTL ? 'rtl' : 'ltr'}>
                             {formatCost(journey.costs_breakdown.transport.min)} - {formatCost(journey.costs_breakdown.transport.max)}
@@ -526,7 +526,7 @@ export default function JourneyDetailPage() {
                         </div>
                       </div>
                       <div className="p-4 bg-green-50 rounded-lg">
-                        <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className="flex justify-between items-center" style={isRTL ? { flexDirection: 'row-reverse' } : {}}>
                           <span className="font-semibold" dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'פעילויות' : 'Activities'}</span>
                           <span className="text-lg font-bold" dir={isRTL ? 'rtl' : 'ltr'}>
                             {formatCost(journey.costs_breakdown.activities.min)} - {formatCost(journey.costs_breakdown.activities.max)}
@@ -534,7 +534,7 @@ export default function JourneyDetailPage() {
                         </div>
                       </div>
                       <div className="p-4 bg-purple-50 rounded-lg">
-                        <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className="flex justify-between items-center" style={isRTL ? { flexDirection: 'row-reverse' } : {}}>
                           <span className="font-semibold" dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'לינה' : 'Lodging'}</span>
                           <span className="text-lg font-bold" dir={isRTL ? 'rtl' : 'ltr'}>
                             {formatCost(journey.costs_breakdown.lodging.min)} - {formatCost(journey.costs_breakdown.lodging.max)}
@@ -542,7 +542,7 @@ export default function JourneyDetailPage() {
                         </div>
                       </div>
                       <div className="p-4 bg-orange-100 rounded-lg border-2 border-orange-500">
-                        <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className="flex justify-between items-center" style={isRTL ? { flexDirection: 'row-reverse' } : {}}>
                           <span className="font-bold text-lg" dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'סה"כ משוער' : 'Total Estimated'}</span>
                           <span className="text-2xl font-bold text-orange-600" dir={isRTL ? 'rtl' : 'ltr'}>
                             {formatPrice(journey.price_min, journey.price_max)}
