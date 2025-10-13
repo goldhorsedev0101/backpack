@@ -461,13 +461,26 @@ export default function JourneyDetailPage() {
                     <div className="space-y-4">
                       {days.map((day, idx) => (
                         <div key={idx} className="border-l-4 border-orange-500 pl-4">
-                          <div className={`flex justify-between items-start mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                            <h4 className="font-semibold" dir={isRTL ? 'rtl' : 'ltr'}>
-                              {isRTL ? `יום ${day.day}` : `Day ${day.day}`}
-                            </h4>
-                            <Badge variant="secondary" dir={isRTL ? 'rtl' : 'ltr'}>
-                              {formatCost(day.estimatedCost)}
-                            </Badge>
+                          <div className="flex justify-between items-start mb-2">
+                            {isRTL ? (
+                              <>
+                                <Badge variant="secondary" className="bg-teal-500 text-white" dir="rtl">
+                                  {formatCost(day.estimatedCost)}
+                                </Badge>
+                                <h4 className="font-semibold" dir="rtl">
+                                  יום {day.day}
+                                </h4>
+                              </>
+                            ) : (
+                              <>
+                                <h4 className="font-semibold">
+                                  Day {day.day}
+                                </h4>
+                                <Badge variant="secondary" className="bg-teal-500 text-white">
+                                  {formatCost(day.estimatedCost)}
+                                </Badge>
+                              </>
+                            )}
                           </div>
                           <ul className={`space-y-1 text-gray-700 ${isRTL ? 'pr-4' : 'pl-4'}`}>
                             {day.activities.map((activity, actIdx) => (
