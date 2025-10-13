@@ -416,14 +416,14 @@ export default function JourneyDetailPage() {
         <p className="text-lg text-gray-700 mb-8" dir={isRTL ? 'rtl' : 'ltr'}>{translateDescription(journey.title)}</p>
 
         {/* Tags */}
-        <div className={`flex flex-wrap gap-2 mb-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className="flex flex-wrap gap-2 mb-8" style={isRTL ? { justifyContent: 'flex-end', textAlign: 'right' } : {}}>
           {journey.tags?.map((tag) => (
-            <Badge key={tag} className="bg-gradient-to-r from-orange-100 to-teal-100 text-gray-800 border-0">
+            <Badge key={tag} className="bg-gradient-to-r from-orange-100 to-teal-100 text-gray-800 border-0" dir={isRTL ? 'rtl' : 'ltr'}>
               {translateTag(tag)}
             </Badge>
           ))}
           {journey.audience_tags?.map((tag) => (
-            <Badge key={tag} variant="outline" className="border-orange-500 text-orange-600">
+            <Badge key={tag} variant="outline" className="border-orange-500 text-orange-600" dir={isRTL ? 'rtl' : 'ltr'}>
               {translateTag(tag)}
             </Badge>
           ))}
