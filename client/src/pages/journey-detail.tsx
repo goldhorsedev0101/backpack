@@ -490,9 +490,20 @@ export default function JourneyDetailPage() {
           <TabsContent value="costs" className="mt-6">
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-2xl font-bold mb-6 text-orange-600" dir={isRTL ? 'rtl' : 'ltr'}>
-                  <DollarSign className={`inline w-6 h-6 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                  {isRTL ? 'פירוט עלויות משוער' : 'Estimated Cost Breakdown'}
+                <h3 className="text-2xl font-bold mb-6 text-orange-600" style={isRTL ? { textAlign: 'right' } : {}}>
+                  <div className="inline-flex items-center gap-2">
+                    {isRTL ? (
+                      <>
+                        <span dir="rtl">פירוט עלויות משוער</span>
+                        <span className="text-3xl">₪</span>
+                      </>
+                    ) : (
+                      <>
+                        <DollarSign className="w-6 h-6" />
+                        <span>Estimated Cost Breakdown</span>
+                      </>
+                    )}
+                  </div>
                 </h3>
                 <div className="space-y-4">
                   {journey.costs_breakdown && (
