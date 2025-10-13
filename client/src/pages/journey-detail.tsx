@@ -416,17 +416,23 @@ export default function JourneyDetailPage() {
         <p className="text-lg text-gray-700 mb-8" dir={isRTL ? 'rtl' : 'ltr'}>{translateDescription(journey.title)}</p>
 
         {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-8" style={isRTL ? { justifyContent: 'flex-end', textAlign: 'right' } : {}}>
-          {journey.tags?.map((tag) => (
-            <Badge key={tag} className="bg-gradient-to-r from-orange-100 to-teal-100 text-gray-800 border-0" dir={isRTL ? 'rtl' : 'ltr'}>
-              {translateTag(tag)}
-            </Badge>
-          ))}
-          {journey.audience_tags?.map((tag) => (
-            <Badge key={tag} variant="outline" className="border-orange-500 text-orange-600" dir={isRTL ? 'rtl' : 'ltr'}>
-              {translateTag(tag)}
-            </Badge>
-          ))}
+        <div className="mb-8 space-y-3">
+          {/* Content Tags - First Row */}
+          <div className={`flex flex-wrap gap-2 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+            {journey.tags?.map((tag) => (
+              <Badge key={tag} className="bg-gradient-to-r from-orange-100 to-teal-100 text-gray-800 border-0" dir={isRTL ? 'rtl' : 'ltr'}>
+                {translateTag(tag)}
+              </Badge>
+            ))}
+          </div>
+          {/* Audience Tags - Second Row */}
+          <div className={`flex flex-wrap gap-2 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+            {journey.audience_tags?.map((tag) => (
+              <Badge key={tag} variant="outline" className="border-orange-500 text-orange-600" dir={isRTL ? 'rtl' : 'ltr'}>
+                {translateTag(tag)}
+              </Badge>
+            ))}
+          </div>
         </div>
 
         {/* CTAs - v3 RTL FIX */}
