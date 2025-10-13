@@ -2,10 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import RTL support */
-@import './i18n/rtl.css';
+/* RTL Support - Essential rules only */
+[dir="rtl"] {
+  direction: rtl;
+}
 
-@import './styles/mobile-responsive.css';
+[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left;
+}
 
 :root {
   --background: hsl(0, 0%, 100%);

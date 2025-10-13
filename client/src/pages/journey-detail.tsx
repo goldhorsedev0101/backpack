@@ -58,6 +58,8 @@ export default function JourneyDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'he';
+  
+  console.log('🔴 RTL FIX VERSION 3 LOADED - isRTL:', isRTL, 'language:', i18n.language);
 
   const { data: journey, isLoading } = useQuery<Journey>({
     queryKey: [`/api/journeys/${id}`],
@@ -343,11 +345,11 @@ export default function JourneyDetailPage() {
           ))}
         </div>
 
-        {/* CTAs */}
+        {/* CTAs - v3 RTL FIX */}
         <div className={`flex gap-4 mb-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
-          <Button className="bg-orange-500 hover:bg-orange-600" data-testid="build-similar-journey">
-            <Sparkles className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-            <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'בנה לי מסע דומה' : 'Build me a similar journey'}</span>
+          <Button className={`bg-orange-500 hover:bg-orange-600 ${isRTL ? 'flex-row-reverse' : ''}`} data-testid="build-similar-journey-v3">
+            <Sparkles className="w-4 h-4" />
+            <span className={isRTL ? 'mr-2' : 'ml-2'} dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'בנה לי מסע דומה ⭐' : '⭐ Build me a similar journey'}</span>
           </Button>
           <Button variant="outline" data-testid="save-journey">
             <Heart className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
