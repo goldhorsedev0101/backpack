@@ -381,18 +381,18 @@ export default function JourneyDetailPage() {
                 </h3>
                 <div className="space-y-4">
                   {journey.destinations.map((dest, idx) => (
-                    <div key={idx} className={`flex items-center gap-4 p-4 bg-gradient-to-r from-orange-50 to-teal-50 rounded-lg`}>
-                      <div className={`flex-shrink-0 w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold ${isRTL ? 'order-3' : 'order-1'}`}>
+                    <div key={idx} className="flex items-center gap-4 p-4 bg-gradient-to-r from-orange-50 to-teal-50 rounded-lg" style={isRTL ? { flexDirection: 'row-reverse' } : {}}>
+                      <div className="flex-shrink-0 w-10 h-10 text-white rounded-full flex items-center justify-center font-bold" style={isRTL ? { backgroundColor: '#3b82f6' } : { backgroundColor: '#f97316' }}>
                         {idx + 1}
                       </div>
-                      <div className={`flex-1 ${isRTL ? 'text-right order-2' : 'text-left order-2'}`}>
+                      <div className="flex-1" style={isRTL ? { textAlign: 'right' } : { textAlign: 'left' }}>
                         <h4 className="font-bold text-lg" dir={isRTL ? 'rtl' : 'ltr'}>{translateCityName(dest.name)}, {translateCountry(dest.country)}</h4>
                         <p className="text-sm text-gray-600" dir={isRTL ? 'rtl' : 'ltr'}>
                           {dest.nights} {isRTL ? 'לילות' : 'nights'}
                         </p>
                       </div>
                       {dest.transport && (
-                        <div className={`flex items-center gap-2 text-sm text-gray-600 ${isRTL ? 'flex-row-reverse order-1' : 'order-3'}`}>
+                        <div className={`flex items-center gap-2 text-sm text-gray-600 ${isRTL ? 'flex-row-reverse mr-auto' : ''}`}>
                           {getTransportIcon(dest.transport.type)}
                           <span dir={isRTL ? 'rtl' : 'ltr'}>{translateTransportType(dest.transport.type)}</span>
                           <span dir={isRTL ? 'rtl' : 'ltr'}>{formatDuration(dest.transport.duration)}</span>
