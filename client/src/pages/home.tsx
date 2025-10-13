@@ -312,7 +312,7 @@ function PopularJourneysSection() {
 
   const formatDestinationChain = (destinations: any[]) => {
     if (!destinations || destinations.length === 0) return '';
-    const arrow = isRTL ? '→' : '←';
+    const arrow = '←';
     return destinations.map(d => translateCityName(d.name)).join(` ${arrow} `);
   };
 

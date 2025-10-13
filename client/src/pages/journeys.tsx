@@ -55,11 +55,9 @@ export default function JourneysPage() {
   });
 
   const formatDestinationChain = (destinations: Journey['destinations']) => {
-    const arrow = isRTL ? '←' : '←';
+    const arrow = '←';
     const cities = destinations.map(d => translateCityName(d.name));
-    // Reverse order for RTL to read from right to left
-    const orderedCities = isRTL ? cities.reverse() : cities;
-    return orderedCities.join(` ${arrow} `);
+    return cities.join(` ${arrow} `);
   };
 
   const formatPrice = (min: number, max: number) => {
@@ -286,7 +284,7 @@ export default function JourneysPage() {
                     {/* Audience Tags */}
                     <div className={`flex flex-wrap gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       {journey.audience_tags?.slice(0, 3).map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
+                        <Badge key={tag} variant="secondary" className="text-xs" dir={isRTL ? 'rtl' : 'ltr'}>
                           {translateTag(tag)}
                         </Badge>
                       ))}
