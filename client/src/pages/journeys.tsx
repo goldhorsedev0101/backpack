@@ -166,18 +166,28 @@ export default function JourneysPage() {
                   {isRTL ? 'עונה' : 'Season'}
                 </label>
                 <Select value={filters.season} onValueChange={(val) => setFilters(prev => ({ ...prev, season: val }))}>
-                  <SelectTrigger>
+                  <SelectTrigger className={isRTL ? 'text-right' : ''}>
                     <SelectValue placeholder={isRTL ? 'כל העונות' : 'All Seasons'} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">
-                      {isRTL ? 'כל העונות' : 'All Seasons'}
+                    <SelectItem value="all" className={isRTL ? 'text-right' : ''}>
+                      <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'כל העונות' : 'All Seasons'}</span>
                     </SelectItem>
-                    <SelectItem value="spring">{isRTL ? 'אביב' : 'Spring'}</SelectItem>
-                    <SelectItem value="summer">{isRTL ? 'קיץ' : 'Summer'}</SelectItem>
-                    <SelectItem value="fall">{isRTL ? 'סתיו' : 'Fall'}</SelectItem>
-                    <SelectItem value="winter">{isRTL ? 'חורף' : 'Winter'}</SelectItem>
-                    <SelectItem value="year-round">{isRTL ? 'כל השנה' : 'Year-round'}</SelectItem>
+                    <SelectItem value="spring" className={isRTL ? 'text-right' : ''}>
+                      <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'אביב' : 'Spring'}</span>
+                    </SelectItem>
+                    <SelectItem value="summer" className={isRTL ? 'text-right' : ''}>
+                      <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'קיץ' : 'Summer'}</span>
+                    </SelectItem>
+                    <SelectItem value="fall" className={isRTL ? 'text-right' : ''}>
+                      <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'סתיו' : 'Fall'}</span>
+                    </SelectItem>
+                    <SelectItem value="winter" className={isRTL ? 'text-right' : ''}>
+                      <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'חורף' : 'Winter'}</span>
+                    </SelectItem>
+                    <SelectItem value="year-round" className={isRTL ? 'text-right' : ''}>
+                      <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'כל השנה' : 'Year-round'}</span>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -292,7 +302,7 @@ export default function JourneysPage() {
 
                     <Button className="w-full mt-4 bg-orange-500 hover:bg-orange-600" data-testid={`view-journey-${journey.id}`}>
                       <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'הצג מסלול' : 'View Journey'}</span>
-                      <ArrowLeft className={`w-4 h-4 ${isRTL ? 'mr-2 rotate-180' : 'ml-2'}`} />
+                      <ArrowLeft className={`w-4 h-4 ${isRTL ? 'ml-2' : 'ml-2'}`} />
                     </Button>
                   </CardContent>
                 </Card>
