@@ -30,23 +30,23 @@ interface Journey {
     nights: number;
     transport?: { type: string; cost: number; duration: string };
   }>;
-  totalNights: number;
-  priceMin: string;
-  priceMax: string;
+  total_nights: number;
+  price_min: number;
+  price_max: number;
   season: string[];
   tags: string[];
-  audienceTags: string[];
-  rating: string;
+  audience_tags: string[];
+  rating: number;
   popularity: number;
-  heroImage: string;
+  hero_image: string;
   images: string[];
-  dailyItinerary: Record<string, Array<{
+  daily_itinerary: Record<string, Array<{
     day: number;
     activities: string[];
     duration: string;
     estimatedCost: number;
   }>>;
-  costsBreakdown: {
+  costs_breakdown: {
     transport: { min: number; max: number };
     activities: { min: number; max: number };
     lodging: { min: number; max: number };
@@ -118,7 +118,7 @@ export default function JourneyDetailPage() {
       {/* Hero Section */}
       <div className="relative h-96 overflow-hidden">
         <img
-          src={journey.heroImage}
+          src={journey.hero_image}
           alt={journey.title}
           className="w-full h-full object-cover"
         />
@@ -135,12 +135,12 @@ export default function JourneyDetailPage() {
             <div className={`flex items-center gap-4 text-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
               <div className="flex items-center gap-2">
                 <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                <span>{parseFloat(journey.rating).toFixed(1)}</span>
+                <span>{journey.rating.toFixed(1)}</span>
               </div>
               <span>•</span>
-              <span dir={isRTL ? 'rtl' : 'ltr'}>{formatPrice(journey.priceMin, journey.priceMax)}</span>
+              <span dir={isRTL ? 'rtl' : 'ltr'}>{formatPrice(journey.price_min, journey.price_max)}</span>
               <span>•</span>
-              <span dir={isRTL ? 'rtl' : 'ltr'}>{journey.totalNights} {isRTL ? 'לילות' : 'nights'}</span>
+              <span dir={isRTL ? 'rtl' : 'ltr'}>{journey.total_nights} {isRTL ? 'לילות' : 'nights'}</span>
             </div>
           </div>
         </div>
@@ -157,7 +157,7 @@ export default function JourneyDetailPage() {
               {tag}
             </Badge>
           ))}
-          {journey.audienceTags?.map((tag) => (
+          {journey.audience_tags?.map((tag) => (
             <Badge key={tag} variant="outline" className="border-orange-500 text-orange-600">
               {tag}
             </Badge>
@@ -273,7 +273,7 @@ export default function JourneyDetailPage() {
           {/* Daily Schedule Tab */}
           <TabsContent value="schedule" className="mt-6">
             <div className="space-y-6">
-              {Object.entries(journey.dailyItinerary || {}).map(([destIdx, days]) => (
+              {Object.entries(journey.daily_itinerary || {}).map(([destIdx, days]) => (
                 <Card key={destIdx}>
                   <CardContent className="p-6">
                     <h3 className="text-xl font-bold mb-4 text-orange-600" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -320,13 +320,13 @@ export default function JourneyDetailPage() {
                   {isRTL ? 'פירוט עלויות משוער' : 'Estimated Cost Breakdown'}
                 </h3>
                 <div className="space-y-4">
-                  {journey.costsBreakdown && (
+                  {journey.costs_breakdown && (
                     <>
                       <div className="p-4 bg-blue-50 rounded-lg">
                         <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
                           <span className="font-semibold" dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'תחבורה' : 'Transport'}</span>
                           <span className="text-lg font-bold" dir={isRTL ? 'rtl' : 'ltr'}>
-                            ${journey.costsBreakdown.transport.min} - ${journey.costsBreakdown.transport.max}
+                            ${journey.costs_breakdown.transport.min} - ${journey.costs_breakdown.transport.max}
                           </span>
                         </div>
                       </div>
@@ -334,7 +334,7 @@ export default function JourneyDetailPage() {
                         <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
                           <span className="font-semibold" dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'פעילויות' : 'Activities'}</span>
                           <span className="text-lg font-bold" dir={isRTL ? 'rtl' : 'ltr'}>
-                            ${journey.costsBreakdown.activities.min} - ${journey.costsBreakdown.activities.max}
+                            ${journey.costs_breakdown.activities.min} - ${journey.costs_breakdown.activities.max}
                           </span>
                         </div>
                       </div>
@@ -342,7 +342,7 @@ export default function JourneyDetailPage() {
                         <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
                           <span className="font-semibold" dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'לינה' : 'Lodging'}</span>
                           <span className="text-lg font-bold" dir={isRTL ? 'rtl' : 'ltr'}>
-                            ${journey.costsBreakdown.lodging.min} - ${journey.costsBreakdown.lodging.max}
+                            ${journey.costs_breakdown.lodging.min} - ${journey.costs_breakdown.lodging.max}
                           </span>
                         </div>
                       </div>
@@ -350,7 +350,7 @@ export default function JourneyDetailPage() {
                         <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
                           <span className="font-bold text-lg" dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'סה"כ משוער' : 'Total Estimated'}</span>
                           <span className="text-2xl font-bold text-orange-600" dir={isRTL ? 'rtl' : 'ltr'}>
-                            {formatPrice(journey.priceMin, journey.priceMax)}
+                            {formatPrice(journey.price_min, journey.price_max)}
                           </span>
                         </div>
                       </div>
