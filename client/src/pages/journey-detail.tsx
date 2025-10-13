@@ -435,20 +435,22 @@ export default function JourneyDetailPage() {
           </div>
         </div>
 
-        {/* CTAs - v3 RTL FIX */}
-        <div className={`flex gap-4 mb-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
-          <Button className={`bg-orange-500 hover:bg-orange-600 ${isRTL ? 'flex-row-reverse' : ''}`} data-testid="build-similar-journey-v3">
-            <Sparkles className="w-4 h-4" />
-            <span className={isRTL ? 'mr-2' : 'ml-2'} dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'בנה לי מסע דומה ⭐' : '⭐ Build me a similar journey'}</span>
-          </Button>
-          <Button variant="outline" data-testid="save-journey">
-            <Heart className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-            <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'שמור למסעות שלי' : 'Save to my trips'}</span>
-          </Button>
-          <Button variant="outline" data-testid="share-journey">
-            <Share2 className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-            <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'שתף' : 'Share'}</span>
-          </Button>
+        {/* CTAs - Scrollable Horizontal */}
+        <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 mb-8">
+          <div className={`flex gap-4 ${isRTL ? 'flex-row-reverse' : ''} flex-nowrap min-w-max`}>
+            <Button className={`bg-orange-500 hover:bg-orange-600 ${isRTL ? 'flex-row-reverse' : ''} whitespace-nowrap`} data-testid="build-similar-journey-v3">
+              <Sparkles className="w-4 h-4" />
+              <span className={isRTL ? 'mr-2' : 'ml-2'} dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'בנה לי מסע דומה ⭐' : '⭐ Build me a similar journey'}</span>
+            </Button>
+            <Button variant="outline" className="whitespace-nowrap" data-testid="save-journey">
+              <Heart className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'שמור למסעות שלי' : 'Save to my trips'}</span>
+            </Button>
+            <Button variant="outline" className="whitespace-nowrap" data-testid="share-journey">
+              <Share2 className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'שתף' : 'Share'}</span>
+            </Button>
+          </div>
         </div>
 
         {/* Tabs - My Trips style with icons */}
