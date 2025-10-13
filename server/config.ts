@@ -47,10 +47,11 @@ if (!supabaseProjectId) {
   throw new Error('Invalid SUPABASE_URL format');
 }
 
-// Use Supabase direct connection instead of Transaction Pooler
-export const DATABASE_URL = `postgresql://postgres.wuzhvkmfdyiwaaladyxc:QK83yFVTMcDMJ2uX@db.wuzhvkmfdyiwaaladyxc.supabase.co:5432/postgres`;
+// Use Supavisor Session Pooler (supports IPv4, fixes ENOTFOUND error)
+// Session mode (port 5432) - more compatible, supports prepared statements
+export const DATABASE_URL = `postgresql://postgres.wuzhvkmfdyiwaaladyxc:QK83yFVTMcDMJ2uX@aws-0-us-east-1.pooler.supabase.com:5432/postgres`;
 
-console.log('🔧 Using direct Supabase connection (not Transaction Pooler)');
+console.log('🔧 Using Supavisor Session Pooler (IPv4/IPv6 compatible)');
 
 // Configuration object for application use
 export const config = {
