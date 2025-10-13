@@ -613,20 +613,49 @@ export async function registerRoutes(app: Express): Promise<void> {
   // Journey routes (multi-destination routes)
   app.get('/api/journeys', async (req, res) => {
     try {
-      const filters: any = {};
+      const { getSupabaseAdmin } = await import('./supabase.js');
+      const supabase = getSupabaseAdmin();
       
-      if (req.query.season) filters.season = req.query.season as string;
-      if (req.query.minBudget) filters.minBudget = parseInt(req.query.minBudget as string);
-      if (req.query.maxBudget) filters.maxBudget = parseInt(req.query.maxBudget as string);
-      if (req.query.minNights) filters.minNights = parseInt(req.query.minNights as string);
-      if (req.query.maxNights) filters.maxNights = parseInt(req.query.maxNights as string);
-      if (req.query.tags) filters.tags = (req.query.tags as string).split(',');
-      if (req.query.audienceTags) filters.audienceTags = (req.query.audienceTags as string).split(',');
-      if (req.query.limit) filters.limit = parseInt(req.query.limit as string);
-      if (req.query.offset) filters.offset = parseInt(req.query.offset as string);
+      let query = supabase.from('journeys').select('*');
       
-      const journeys = await storage.getJourneys(filters);
-      res.json(journeys);
+      // Apply filters
+      if (req.query.season && req.query.season !== 'all') {
+        query = query.contains('suitable_seasons', [req.query.season as string]);
+      }
+      if (req.query.minBudget) {
+        query = query.gte('price_min', parseInt(req.query.minBudget as string));
+      }
+      if (req.query.maxBudget) {
+        query = query.lte('price_max', parseInt(req.query.maxBudget as string));
+      }
+      if (req.query.minNights) {
+        query = query.gte('total_nights', parseInt(req.query.minNights as string));
+      }
+      if (req.query.maxNights) {
+        query = query.lte('total_nights', parseInt(req.query.maxNights as string));
+      }
+      if (req.query.tags) {
+        const tags = (req.query.tags as string).split(',');
+        query = query.overlaps('tags', tags);
+      }
+      if (req.query.audienceTags) {
+        const audienceTags = (req.query.audienceTags as string).split(',');
+        query = query.overlaps('audience_tags', audienceTags);
+      }
+      
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
+      
+      const { data: journeys, error } = await query
+        .range(offset, offset + limit - 1)
+        .order('rating', { ascending: false });
+      
+      if (error) {
+        console.error("Supabase error fetching journeys:", error);
+        return res.status(500).json({ message: "Failed to fetch journeys", error: error.message });
+      }
+      
+      res.json(journeys || []);
     } catch (error) {
       console.error("Error fetching journeys:", error);
       res.status(500).json({ message: "Failed to fetch journeys" });
@@ -635,11 +664,21 @@ export async function registerRoutes(app: Express): Promise<void> {
 
   app.get('/api/journeys/:id', async (req, res) => {
     try {
+      const { getSupabaseAdmin } = await import('./supabase.js');
+      const supabase = getSupabaseAdmin();
+      
       const id = parseInt(req.params.id);
-      const journey = await storage.getJourneyById(id);
-      if (!journey) {
+      const { data: journey, error } = await supabase
+        .from('journeys')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (error || !journey) {
+        console.error("Supabase error fetching journey:", error);
         return res.status(404).json({ message: "Journey not found" });
       }
+      
       res.json(journey);
     } catch (error) {
       console.error("Error fetching journey:", error);
