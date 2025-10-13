@@ -437,34 +437,52 @@ export default function JourneyDetailPage() {
           </Button>
         </div>
 
-        {/* Tabs - Styled like Journeys page */}
+        {/* Tabs - My Trips style with icons */}
         <Tabs defaultValue="overview" className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
-          <TabsList className={`grid w-full grid-cols-4 gap-2 bg-white p-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-            <TabsTrigger 
-              value="overview"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white rounded-lg font-medium transition-all"
-            >
-              {isRTL ? 'סקירה' : 'Overview'}
-            </TabsTrigger>
-            <TabsTrigger 
-              value="schedule"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white rounded-lg font-medium transition-all"
-            >
-              {isRTL ? 'לוח זמנים יומי' : 'Daily Schedule'}
-            </TabsTrigger>
-            <TabsTrigger 
-              value="costs"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white rounded-lg font-medium transition-all"
-            >
-              {isRTL ? 'עלויות' : 'Costs'}
-            </TabsTrigger>
-            <TabsTrigger 
-              value="map"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white rounded-lg font-medium transition-all"
-            >
-              {isRTL ? 'מפה' : 'Map'}
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+            <TabsList className={`inline-flex w-auto min-w-full sm:w-full justify-start sm:justify-evenly h-auto sm:h-10 gap-0.5 sm:gap-2 p-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <TabsTrigger 
+                value="overview" 
+                className="flex flex-col sm:flex-row items-center justify-center px-1 sm:px-4 py-1.5 sm:py-0 w-[24%] sm:w-auto h-auto sm:h-10"
+                data-testid="tab-overview"
+              >
+                <MapPin className="w-4 h-4 sm:mr-2 mb-0.5 sm:mb-0 flex-shrink-0" />
+                <span className="text-[8px] sm:text-sm leading-[1.1] text-center w-full whitespace-normal break-words overflow-wrap-anywhere">
+                  {isRTL ? 'סקירה' : 'Overview'}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="schedule" 
+                className="flex flex-col sm:flex-row items-center justify-center px-1 sm:px-4 py-1.5 sm:py-0 w-[24%] sm:w-auto h-auto sm:h-10"
+                data-testid="tab-schedule"
+              >
+                <Calendar className="w-4 h-4 sm:mr-2 mb-0.5 sm:mb-0 flex-shrink-0" />
+                <span className="text-[8px] sm:text-sm leading-[1.1] text-center w-full whitespace-normal break-words overflow-wrap-anywhere">
+                  {isRTL ? 'לוח זמנים יומי' : 'Daily Schedule'}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="costs" 
+                className="flex flex-col sm:flex-row items-center justify-center px-1 sm:px-4 py-1.5 sm:py-0 w-[24%] sm:w-auto h-auto sm:h-10"
+                data-testid="tab-costs"
+              >
+                <DollarSign className="w-4 h-4 sm:mr-2 mb-0.5 sm:mb-0 flex-shrink-0" />
+                <span className="text-[8px] sm:text-sm leading-[1.1] text-center w-full whitespace-normal break-words overflow-wrap-anywhere">
+                  {isRTL ? 'עלויות' : 'Costs'}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="map" 
+                className="flex flex-col sm:flex-row items-center justify-center px-1 sm:px-4 py-1.5 sm:py-0 w-[24%] sm:w-auto h-auto sm:h-10"
+                data-testid="tab-map"
+              >
+                <MapPin className="w-4 h-4 sm:mr-2 mb-0.5 sm:mb-0 flex-shrink-0" />
+                <span className="text-[8px] sm:text-sm leading-[1.1] text-center w-full whitespace-normal break-words overflow-wrap-anywhere">
+                  {isRTL ? 'מפה' : 'Map'}
+                </span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Overview Tab - Card Design */}
           <TabsContent value="overview" className="mt-6">
