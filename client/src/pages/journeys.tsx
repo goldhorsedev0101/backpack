@@ -166,7 +166,7 @@ export default function JourneysPage() {
                   {isRTL ? 'עונה' : 'Season'}
                 </label>
                 <Select value={filters.season} onValueChange={(val) => setFilters(prev => ({ ...prev, season: val }))}>
-                  <SelectTrigger className={isRTL ? 'text-right' : ''}>
+                  <SelectTrigger className={isRTL ? 'text-right' : ''} dir={isRTL ? 'rtl' : 'ltr'}>
                     <SelectValue placeholder={isRTL ? 'כל העונות' : 'All Seasons'} />
                   </SelectTrigger>
                   <SelectContent>
