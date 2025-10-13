@@ -386,6 +386,7 @@ export default function JourneyDetailPage() {
                       {dest.transport && (
                         <div className={`flex items-center gap-2 text-sm text-gray-600 ${isRTL ? 'flex-row-reverse' : ''}`}>
                           {getTransportIcon(dest.transport.type)}
+                          <span dir={isRTL ? 'rtl' : 'ltr'}>{translateTransportType(dest.transport.type)}</span>
                           <span dir={isRTL ? 'rtl' : 'ltr'}>{formatDuration(dest.transport.duration)}</span>
                           <span dir={isRTL ? 'rtl' : 'ltr'}>{formatCost(dest.transport.cost)}</span>
                         </div>
