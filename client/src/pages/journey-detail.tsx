@@ -382,7 +382,7 @@ export default function JourneyDetailPage() {
                       <div className="flex-shrink-0 w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold">
                         {idx + 1}
                       </div>
-                      <div className="flex-1">
+                      <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
                         <h4 className="font-bold text-lg" dir={isRTL ? 'rtl' : 'ltr'}>{translateCityName(dest.name)}, {translateCountry(dest.country)}</h4>
                         <p className="text-sm text-gray-600" dir={isRTL ? 'rtl' : 'ltr'}>
                           {dest.nights} {isRTL ? 'לילות' : 'nights'}
@@ -431,13 +431,13 @@ export default function JourneyDetailPage() {
                     <tbody>
                       {journey.destinations.map((dest, idx) => (
                         <tr key={idx} className="border-b hover:bg-gray-50">
-                          <td className={`py-4 ${isRTL ? 'pr-4' : 'pl-4'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                          <td className={`py-4 ${isRTL ? 'pr-4 text-right' : 'pl-4 text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
                             <span className="font-medium">{translateCityName(dest.name)}</span>, {translateCountry(dest.country)}
                           </td>
-                          <td className="py-4" dir={isRTL ? 'rtl' : 'ltr'}>{dest.nights}</td>
-                          <td className="py-4" dir={isRTL ? 'rtl' : 'ltr'}>{translateTransportType(dest.transport?.type || '-')}</td>
-                          <td className="py-4" dir={isRTL ? 'rtl' : 'ltr'}>{dest.transport?.duration ? formatDuration(dest.transport.duration) : '-'}</td>
-                          <td className={`py-4 ${isRTL ? 'pr-4' : 'pl-4'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                          <td className={`py-4 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>{dest.nights}</td>
+                          <td className={`py-4 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>{translateTransportType(dest.transport?.type || '-')}</td>
+                          <td className={`py-4 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>{dest.transport?.duration ? formatDuration(dest.transport.duration) : '-'}</td>
+                          <td className={`py-4 ${isRTL ? 'pr-4 text-right' : 'pl-4 text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
                             {dest.transport?.cost ? formatCost(dest.transport.cost) : '-'}
                           </td>
                         </tr>
@@ -511,7 +511,7 @@ export default function JourneyDetailPage() {
                   <DollarSign className={`inline w-6 h-6 ${isRTL ? 'ml-2' : 'mr-2'}`} />
                   {isRTL ? 'פירוט עלויות משוער' : 'Estimated Cost Breakdown'}
                 </h3>
-                <div className="space-y-4">
+                <div className={`space-y-4 ${isRTL ? 'text-right' : ''}`}>
                   {journey.costs_breakdown && (
                     <>
                       <div className="p-4 bg-blue-50 rounded-lg">
