@@ -377,11 +377,11 @@ export default function JourneyDetailPage() {
                 <Card key={idx} className="overflow-hidden border-l-4 border-orange-500">
                   <CardContent className="p-0">
                     <div className="bg-gradient-to-r from-orange-50 to-teal-50 p-4">
-                      <div className="flex items-center gap-3" style={isRTL ? { flexDirection: 'row-reverse' } : {}}>
-                        <div className="flex-shrink-0 w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold" style={isRTL ? { marginRight: 'auto' } : {}}>
+                      <div className="flex items-center gap-3" style={isRTL ? { flexDirection: 'row-reverse', justifyContent: 'flex-end' } : {}}>
+                        <div className="flex-shrink-0 w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold">
                           {idx + 1}
                         </div>
-                        <div className="flex-1" style={isRTL ? { textAlign: 'right' } : { textAlign: 'left' }}>
+                        <div style={isRTL ? { textAlign: 'right' } : { textAlign: 'left' }}>
                           <h4 className="font-bold text-lg" dir={isRTL ? 'rtl' : 'ltr'}>
                             {translateCityName(dest.name)}, {translateCountry(dest.country)}
                           </h4>
