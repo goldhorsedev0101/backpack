@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-// RTL support for Hebrew - Updated Oct 13, 2025
+// RTL support for Hebrew - Force rebuild v2
 interface Journey {
   id: number;
   title: string;
