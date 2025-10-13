@@ -363,51 +363,15 @@ export default function JourneyDetailPage() {
 
         {/* Tabs */}
         <Tabs defaultValue="overview" className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
-          <TabsList className={`grid w-full grid-cols-5 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <TabsList className={`grid w-full grid-cols-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <TabsTrigger value="overview">{isRTL ? 'סקירה' : 'Overview'}</TabsTrigger>
-            <TabsTrigger value="nights">{isRTL ? 'לילות לכל יעד' : 'Nights per Destination'}</TabsTrigger>
             <TabsTrigger value="schedule">{isRTL ? 'לוח זמנים יומי' : 'Daily Schedule'}</TabsTrigger>
             <TabsTrigger value="costs">{isRTL ? 'עלויות' : 'Costs'}</TabsTrigger>
             <TabsTrigger value="map">{isRTL ? 'מפה' : 'Map'}</TabsTrigger>
           </TabsList>
 
-          {/* Overview Tab */}
+          {/* Overview Tab - Card Design */}
           <TabsContent value="overview" className="mt-6">
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="text-2xl font-bold mb-4 text-orange-600" dir={isRTL ? 'rtl' : 'ltr'}>
-                  <MapPin className={`inline w-6 h-6 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                  {isRTL ? 'שביל היעדים' : 'Destination Trail'}
-                </h3>
-                <div className="space-y-4">
-                  {journey.destinations.map((dest, idx) => (
-                    <div key={idx} className="flex items-center gap-4 p-4 bg-gradient-to-r from-orange-50 to-teal-50 rounded-lg">
-                      <div className="flex-shrink-0 w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold" style={isRTL ? { marginLeft: 'auto' } : {}}>
-                        {idx + 1}
-                      </div>
-                      <div className="flex-1" style={isRTL ? { textAlign: 'right', marginRight: '1rem' } : { textAlign: 'left' }}>
-                        <h4 className="font-bold text-lg" dir={isRTL ? 'rtl' : 'ltr'}>{translateCityName(dest.name)}, {translateCountry(dest.country)}</h4>
-                        <p className="text-sm text-gray-600" dir={isRTL ? 'rtl' : 'ltr'}>
-                          {dest.nights} {isRTL ? 'לילות' : 'nights'}
-                        </p>
-                      </div>
-                      {dest.transport && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600" style={isRTL ? { flexDirection: 'row-reverse', marginRight: 'auto' } : {}}>
-                          {getTransportIcon(dest.transport.type)}
-                          <span dir={isRTL ? 'rtl' : 'ltr'}>{translateTransportType(dest.transport.type)}</span>
-                          <span dir={isRTL ? 'rtl' : 'ltr'}>{formatDuration(dest.transport.duration)}</span>
-                          <span dir={isRTL ? 'rtl' : 'ltr'}>{formatCost(dest.transport.cost)}</span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Nights Tab */}
-          <TabsContent value="nights" className="mt-6">
             <div className="space-y-4">
               {journey.destinations.map((dest, idx) => (
                 <Card key={idx} className="overflow-hidden border-l-4 border-orange-500">
