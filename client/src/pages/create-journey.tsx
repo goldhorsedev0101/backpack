@@ -256,7 +256,7 @@ export default function CreateJourneyPage() {
                 : 'e.g., I want to visit ancient temples, try local street food, and avoid crowded tourist attractions...'
               }
               value={customRequest}
-              onChange={(e) => setCustomRequest(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCustomRequest(e.target.value)}
               className="min-h-32"
               dir={isRTL ? 'rtl' : 'ltr'}
             />
