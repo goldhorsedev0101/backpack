@@ -47,10 +47,10 @@ if (!supabaseProjectId) {
   throw new Error('Invalid SUPABASE_URL format');
 }
 
-// Use direct Supabase connection (Session mode - port 5432)
-export const DATABASE_URL = `postgresql://postgres.wuzhvkmfdyiwaaladyxc:QK83yFVTMcDMJ2uX@db.wuzhvkmfdyiwaaladyxc.supabase.co:5432/postgres`;
+// Use Replit's built-in PostgreSQL database
+export const DATABASE_URL = process.env.DATABASE_URL || `postgresql://postgres.wuzhvkmfdyiwaaladyxc:QK83yFVTMcDMJ2uX@db.wuzhvkmfdyiwaaladyxc.supabase.co:5432/postgres`;
 
-console.log('🔧 Using direct Supabase connection (Session mode)');
+console.log('🔧 Using Replit PostgreSQL database');
 
 // Configuration object for application use
 export const config = {
