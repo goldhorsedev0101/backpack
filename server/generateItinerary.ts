@@ -25,12 +25,13 @@ export interface ItineraryRequest {
   adults?: number;
   children?: number;
   tripType?: string;
+  customRequest?: string;
 }
 
 export async function generateItinerary(request: ItineraryRequest): Promise<ItineraryDay[]> {
   console.log('generateItinerary called with request:', request);
   
-  const { destination, duration, interests, travelStyle, budget, language, adults = 2, children = 0, tripType = 'family' } = request;
+  const { destination, duration, interests, travelStyle, budget, language, adults = 2, children = 0, tripType = 'family', customRequest } = request;
   
   // Validate inputs
   if (!destination) {
@@ -69,6 +70,7 @@ Using the user's preferences:
 - Interests: ${interests.join(', ')}
 - Travel Style: ${travelStyle.join(', ')}
 - Daily Budget: $${budget}
+${customRequest ? `\n🎯 SPECIAL REQUEST: ${customRequest}\nIMPORTANT: Carefully incorporate this request into the itinerary.` : ''}
 
 Create a full travel itinerary. For each day, include:
 - day number (starting from 1)

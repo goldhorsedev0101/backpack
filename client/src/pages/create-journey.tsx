@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, 
   MapPin, 
@@ -40,6 +41,7 @@ export default function CreateJourneyPage() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'he';
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   
   // Parse URL params
   const urlParams = new URLSearchParams(window.location.search);
@@ -89,16 +91,46 @@ export default function CreateJourneyPage() {
   const handleGenerateJourney = async () => {
     setIsGenerating(true);
     
-    // Simulate AI generation (replace with actual API call)
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/ai/generate-custom-journey', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          journeyId,
+          adults,
+          children,
+          tripType,
+          startDate,
+          budget,
+          customRequest,
+          language: i18n.language,
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate journey');
+      }
+      
+      const data = await response.json();
       setIsGenerating(false);
       setGenerationComplete(true);
       
-      // After generation, redirect to My Trips
+      // After generation, redirect to the new journey page
       setTimeout(() => {
-        setLocation('/my-trips');
+        setLocation(`/my-journey/${data.tripId}`);
       }, 2000);
-    }, 3000);
+    } catch (error) {
+      console.error('Error generating journey:', error);
+      setIsGenerating(false);
+      // Show error message to user
+      toast({
+        title: isRTL ? 'שגיאה ביצירת המסע' : 'Error Creating Journey',
+        description: isRTL ? 'אירעה שגיאה ביצירת המסע. אנא נסה שוב.' : 'An error occurred while creating your journey. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (isLoading) {

@@ -1668,6 +1668,90 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Generate custom journey based on inspiration
+  app.post('/api/ai/generate-custom-journey', noAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id || 'guest';
+      const { journeyId, adults, children, tripType, startDate, budget, customRequest, language } = req.body;
+      
+      // Normalize language parameter
+      const normalizedLanguage = (language || req.headers['accept-language'] || 'en').toString().toLowerCase();
+      const isHebrew = normalizedLanguage.startsWith('he');
+      const finalLanguage = isHebrew ? 'he' : 'en';
+      
+      console.log('Custom journey request:', { journeyId, adults, children, tripType, startDate, budget });
+      
+      // Validate required fields
+      if (!journeyId) {
+        return res.status(400).json({ message: "Journey ID is required" });
+      }
+      
+      // Get the original journey for inspiration
+      const journey = await storage.getJourneyById(parseInt(journeyId));
+      if (!journey) {
+        return res.status(404).json({ message: "Journey not found" });
+      }
+      
+      // Extract destinations from journey
+      const destinations = Array.isArray(journey.destinations) 
+        ? journey.destinations.map((d: any) => d.name).join(', ')
+        : 'Multiple destinations';
+      
+      // Calculate duration from journey
+      const duration = journey.totalNights || 14;
+      
+      // Generate customized itinerary using AI
+      const itinerary = await generateDetailedItinerary({
+        userId,
+        destination: destinations,
+        duration,
+        interests: ['culture', 'food', 'sightseeing'], // Default interests based on journey type
+        travelStyle: [tripType],
+        budget: budget ? parseFloat(budget) : 2000,
+        language: finalLanguage,
+        adults: adults || 2,
+        children: children || 0,
+        tripType: tripType || 'family',
+        customRequest: customRequest || undefined
+      });
+      
+      // Create trip title based on language
+      const tripTitle = finalLanguage === 'he' 
+        ? `מסע מותאם אישית מבוסס על ${journey.title}`
+        : `Custom Journey inspired by ${journey.title}`;
+      
+      // Create new trip in database
+      const newTrip = await storage.createTrip({
+        userId,
+        title: tripTitle,
+        description: customRequest || journey.description,
+        destinations: journey.destinations,
+        startDate: startDate ? new Date(startDate) : null,
+        budget: budget || null,
+        travelStyle: tripType,
+        itinerary,
+        adults: adults || 2,
+        children: children || 0,
+        isPublic: false
+      });
+      
+      console.log('Created custom journey with ID:', newTrip.id);
+      
+      // Return the new trip ID
+      res.status(201).json({ 
+        tripId: newTrip.id,
+        message: finalLanguage === 'he' ? 'המסע נוצר בהצלחה' : 'Journey created successfully'
+      });
+    } catch (error) {
+      console.error("Error generating custom journey:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      res.status(500).json({ 
+        message: "Failed to generate custom journey",
+        error: errorMessage
+      });
+    }
+  });
+
   // AI-powered budget analysis
   app.post('/api/ai/budget-analysis', noAuth, async (req: any, res) => {
     try {
