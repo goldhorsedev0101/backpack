@@ -33,7 +33,6 @@ export default function OptimizedImage({
   const [retryCount, setRetryCount] = useState(0);
   const [currentSrc, setCurrentSrc] = useState(src);
   const imgRef = useRef<HTMLImageElement>(null);
-  const observerRef = useRef<IntersectionObserver | null>(null);
 
   // Reset state when src changes
   useEffect(() => {
@@ -42,53 +41,6 @@ export default function OptimizedImage({
     setHasError(false);
     setRetryCount(0);
   }, [src]);
-
-  // Update src for non-priority images when currentSrc changes (for retries/fallback)
-  useEffect(() => {
-    if (!priority && imgRef.current) {
-      // Check if image has an explicit src attribute (already observed/loaded)
-      const hasExplicitSrc = imgRef.current.getAttribute('src') !== null;
-      
-      if (hasExplicitSrc || hasError) {
-        // If image was already loaded or in error state, update src directly for retry/fallback
-        imgRef.current.src = currentSrc;
-      } else {
-        // Otherwise update data-src for intersection observer to pick up
-        imgRef.current.dataset.src = currentSrc;
-      }
-    }
-  }, [currentSrc, priority, hasError]);
-
-  // Intersection Observer for lazy loading
-  useEffect(() => {
-    if (priority || !imgRef.current) return;
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && imgRef.current) {
-            // Start loading the image when it enters viewport
-            const img = imgRef.current;
-            if (img.dataset.src && !img.src) {
-              img.src = img.dataset.src;
-            }
-          }
-        });
-      },
-      {
-        rootMargin: '50px', // Start loading 50px before entering viewport
-        threshold: 0.01,
-      }
-    );
-
-    observerRef.current.observe(imgRef.current);
-
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
-  }, [priority, hasError]);
 
   const handleLoad = () => {
     setIsLoading(false);
@@ -146,7 +98,7 @@ export default function OptimizedImage({
           data-testid={testId ? `${testId}-retry` : 'image-retry'}
         >
           <RefreshCw className="h-4 w-4" />
-          נסה שוב
+          Try Again
         </Button>
       </div>
     );
@@ -159,8 +111,7 @@ export default function OptimizedImage({
       )}
       <img
         ref={imgRef}
-        src={priority ? currentSrc : undefined}
-        data-src={priority ? undefined : currentSrc}
+        src={currentSrc}
         alt={alt}
         className={`w-full h-full object-cover rounded-lg transition-opacity duration-300 ${
           isLoading ? 'opacity-0' : 'opacity-100'
