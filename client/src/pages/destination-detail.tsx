@@ -192,12 +192,12 @@ export default function DestinationDetail() {
     return `/api/media/proxy?${params}`;
   };
 
-  // Get attraction image URL
-  const getAttractionImageUrl = (photoRef: string) => {
+  // Get attraction image URL - using Unsplash for reliable images
+  const getAttractionImageUrl = (attractionName: string, destinationName: string) => {
     const params = new URLSearchParams({
-      source: 'google',
-      ref: photoRef,
-      maxwidth: '200',
+      source: 'unsplash',
+      query: `${attractionName} ${destinationName}`,
+      maxwidth: '600',
       lang: i18n.language,
     });
     return `/api/media/proxy?${params}`;
@@ -334,18 +334,12 @@ export default function DestinationDetail() {
                   <div className="space-y-4">
                     {attractions.slice(0, 5).map((attraction) => (
                       <div key={attraction.place_id} className="flex items-start gap-4 p-4 hover:bg-gray-50 rounded-lg transition" data-testid={`attraction-${attraction.place_id}`}>
-                        {attraction.photos && attraction.photos.length > 0 ? (
-                          <img 
-                            src={getAttractionImageUrl(attraction.photos[0].photo_reference)}
-                            alt={attraction.name}
-                            className="h-20 w-20 rounded-lg object-cover"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="h-20 w-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center text-3xl">
-                            📍
-                          </div>
-                        )}
+                        <img 
+                          src={getAttractionImageUrl(attraction.name, destination.name)}
+                          alt={attraction.name}
+                          className="h-20 w-20 rounded-lg object-cover"
+                          loading="lazy"
+                        />
                         <div className="flex-1">
                           <h4 className="font-medium text-lg mb-1">{attraction.name}</h4>
                           <p className="text-sm text-gray-500 mb-2">{attraction.formatted_address}</p>
