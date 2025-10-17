@@ -107,19 +107,8 @@ export default function DestinationsHub() {
   const hasActiveFilters =
     searchQuery || selectedContinent !== "all" || selectedCountry !== "all" || selectedType !== "all";
 
-  // Get destination image URL
+  // Get destination image URL - using Unsplash for reliable images
   const getDestinationImageUrl = (destination: Destination) => {
-    if (destination.photoRefs && destination.photoRefs.length > 0) {
-      const params = new URLSearchParams({
-        source: 'google',
-        ref: destination.photoRefs[0],
-        maxwidth: '600',
-        lang: i18n.language,
-      });
-      return `/api/media/proxy?${params}`;
-    }
-    
-    // Fallback to Unsplash
     const params = new URLSearchParams({
       source: 'unsplash',
       query: `${destination.name} cityscape`,
