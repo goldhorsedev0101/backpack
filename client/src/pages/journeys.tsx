@@ -93,6 +93,8 @@ export default function JourneysPage() {
       'Paris': { he: 'פריז', en: 'Paris' },
       'Amsterdam': { he: 'אמסטרדם', en: 'Amsterdam' },
       'Berlin': { he: 'ברלין', en: 'Berlin' },
+      'Vienna': { he: 'וינה', en: 'Vienna' },
+      'Prague': { he: 'פראג', en: 'Prague' },
       'Barcelona': { he: 'ברצלונה', en: 'Barcelona' },
       'Nice': { he: 'ניס', en: 'Nice' },
       'Rome': { he: 'רומא', en: 'Rome' },
