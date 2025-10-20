@@ -47,10 +47,14 @@ if (!supabaseProjectId) {
   throw new Error('Invalid SUPABASE_URL format');
 }
 
-// Use Supabase PostgreSQL database
-export const DATABASE_URL = `postgresql://postgres.wuzhvkmfdyiwaaladyxc:QK83yFVTMcDMJ2uX@db.wuzhvkmfdyiwaaladyxc.supabase.co:5432/postgres`;
+// Use Supabase PostgreSQL database from Secrets
+export const DATABASE_URL = process.env.DATABASE_URL;
 
-console.log('🔧 Using Supabase PostgreSQL database');
+if (!DATABASE_URL) {
+  throw new Error('DATABASE_URL is not set in environment variables');
+}
+
+console.log('🔧 Using Supabase PostgreSQL database (from Secrets)');
 
 // Configuration object for application use
 export const config = {
