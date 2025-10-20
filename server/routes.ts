@@ -799,6 +799,28 @@ export async function registerRoutes(app: Express): Promise<void> {
       }).returning();
 
       console.log("Successfully created inquiry:", inquiry[0]);
+
+      // Send email notification
+      try {
+        const { sendHotelInquiryEmail } = await import('./email.js');
+        await sendHotelInquiryEmail({
+          destination,
+          checkIn,
+          checkOut,
+          adults: adults || 2,
+          children: children || 0,
+          budget,
+          phone,
+          email,
+          notes,
+          whatsappConsent: whatsappConsent || false
+        });
+        console.log("✅ Notification email sent to support@globemate.co.il");
+      } catch (emailError) {
+        // Log email error but don't fail the request
+        console.error("⚠️ Failed to send email notification:", emailError);
+      }
+
       res.status(201).json({ success: true, inquiry: inquiry[0] });
     } catch (error) {
       console.error("Error creating hotel inquiry:", error);
