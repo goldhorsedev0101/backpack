@@ -34,6 +34,7 @@ import {
   MapPin,
   Cloud,
   Globe,
+  Hotel,
 } from "lucide-react";
 
 // Navigation items will be translated dynamically
@@ -41,6 +42,7 @@ const getNavigationItems = (t: any) => [
   { href: "/", label: t('navigation.home'), icon: Home },
   { href: "/my-trips", label: t('navigation.my_trips'), icon: Calendar },
   { href: "/journeys", label: t('navigation.journeys'), icon: MapPin },
+  { href: "/hotel-deals", label: t('navigation.hotel_deals'), icon: Hotel },
   { href: "/destinations", label: t('destinations.hub_title'), icon: Globe },
   { href: "/weather", label: t('navigation.weather'), icon: Cloud },
   { href: "/community", label: t('navigation.community'), icon: Users },
