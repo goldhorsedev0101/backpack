@@ -42,6 +42,7 @@ export default function HotelDeals() {
 
   const submitInquiry = useMutation({
     mutationFn: async (data: typeof formData) => {
+      console.log("Submitting data:", data);
       return await apiRequest("/api/hotel-inquiries", {
         method: "POST",
         body: JSON.stringify(data),
@@ -68,10 +69,11 @@ export default function HotelDeals() {
         whatsappConsent: false
       });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Submission error:", error);
       toast({
         title: "אופס...",
-        description: "משהו השתבש. אנא נסה שוב או צור קשר ישירות.",
+        description: error?.message || "משהו השתבש. אנא נסה שוב או צור קשר ישירות.",
         variant: "destructive"
       });
     }

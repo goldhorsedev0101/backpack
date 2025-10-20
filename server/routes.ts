@@ -764,11 +764,26 @@ export async function registerRoutes(app: Express): Promise<void> {
   // Hotel Inquiries (hotel-deals page)
   app.post('/api/hotel-inquiries', async (req, res) => {
     try {
+      console.log("Received hotel inquiry request:", req.body);
       const { destination, checkIn, checkOut, adults, children, budget, phone, email, notes, whatsappConsent } = req.body;
       
       if (!destination || !checkIn || !checkOut || !phone || !email) {
+        console.error("Missing required fields:", { destination, checkIn, checkOut, phone, email });
         return res.status(400).json({ message: "Missing required fields" });
       }
+
+      console.log("Inserting into database:", {
+        destination,
+        checkIn,
+        checkOut,
+        adults: adults || 2,
+        children: children || 0,
+        budget,
+        phone,
+        email,
+        notes,
+        whatsappConsent: whatsappConsent || false
+      });
 
       const inquiry = await db.insert(hotelInquiries).values({
         destination,
@@ -783,10 +798,15 @@ export async function registerRoutes(app: Express): Promise<void> {
         whatsappConsent: whatsappConsent || false
       }).returning();
 
+      console.log("Successfully created inquiry:", inquiry[0]);
       res.status(201).json({ success: true, inquiry: inquiry[0] });
     } catch (error) {
       console.error("Error creating hotel inquiry:", error);
-      res.status(500).json({ message: "Failed to submit inquiry" });
+      console.error("Error stack:", error instanceof Error ? error.stack : 'No stack trace');
+      res.status(500).json({ 
+        message: "Failed to submit inquiry",
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 
