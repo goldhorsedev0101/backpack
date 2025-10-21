@@ -61,9 +61,10 @@ interface TripSuggestion {
 
 interface AiChatProps {
   className?: string;
+  initialMessage?: string;
 }
 
-export default function AiChat({ className }: AiChatProps) {
+export default function AiChat({ className, initialMessage }: AiChatProps) {
   const { t } = useTranslation();
   const [location, setLocation] = useLocation();
   const [messages, setMessages] = useState<Message[]>([
@@ -77,6 +78,7 @@ export default function AiChat({ className }: AiChatProps) {
   const [newMessage, setNewMessage] = useState("");
   const [allSuggestions, setAllSuggestions] = useState<TripSuggestion[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
+  const [hasProcessedInitialMessage, setHasProcessedInitialMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -133,6 +135,26 @@ export default function AiChat({ className }: AiChatProps) {
     }
   });
 
+  // Handle initial message auto-submit
+  useEffect(() => {
+    if (initialMessage && !hasProcessedInitialMessage && !chatMutation.isPending) {
+      setHasProcessedInitialMessage(true);
+      
+      // Add user message
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        content: initialMessage,
+        sender: 'user',
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, userMessage]);
+      
+      // Send to AI
+      chatMutation.mutate(initialMessage);
+    }
+  }, [initialMessage, hasProcessedInitialMessage, chatMutation.isPending]);
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || chatMutation.isPending) return;
@@ -145,15 +167,16 @@ export default function AiChat({ className }: AiChatProps) {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const messageToSend = newMessage.trim();
     setNewMessage("");
     
-    chatMutation.mutate(userMessage.content);
-    
     // If on home page and this is the first user message, redirect to AI Assistant page
+    // Save the message to sessionStorage so it can be picked up by the AI Assistant page
     if (location === '/' && messages.filter(m => m.sender === 'user').length === 0) {
-      setTimeout(() => {
-        setLocation('/ai-assistant');
-      }, 500); // Small delay to let the message be sent
+      sessionStorage.setItem('initialAiMessage', messageToSend);
+      setLocation('/ai-assistant');
+    } else {
+      chatMutation.mutate(messageToSend);
     }
   };
 
