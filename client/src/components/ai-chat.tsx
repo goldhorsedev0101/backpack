@@ -70,7 +70,7 @@ export default function AiChat({ className, initialMessage }: AiChatProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: "Hi! I'm GlobeMate – your smart travel assistant for worldwide adventures! 🌎\n\nWhether you're traveling solo, as a couple, or with family and kids, I'll help you build the perfect trip! Just tell me what you're thinking (even incomplete ideas like 'I want to go to Japan with 2 adults and 2 kids') and I'll ask the right questions about budget, timing, and what you love to do!\n\nTry one of the prompts below or just start chatting:",
+      content: t('ai_chat.welcome_message'),
       sender: 'ai',
       timestamp: new Date()
     }
@@ -85,6 +85,23 @@ export default function AiChat({ className, initialMessage }: AiChatProps) {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  // Update welcome message when language changes
+  useEffect(() => {
+    setMessages(prev => {
+      // Only update if the first message is still the welcome message
+      if (prev.length > 0 && prev[0].id === '1') {
+        return [
+          {
+            ...prev[0],
+            content: t('ai_chat.welcome_message')
+          },
+          ...prev.slice(1)
+        ];
+      }
+      return prev;
+    });
+  }, [i18n.language, t]);
 
   useEffect(() => {
     scrollToBottom();
