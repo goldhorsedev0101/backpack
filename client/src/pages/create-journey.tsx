@@ -51,6 +51,9 @@ export default function CreateJourneyPage() {
   const tripType = urlParams.get('tripType') || 'couple';
   const startDate = urlParams.get('startDate') || '';
   const budget = urlParams.get('budget') || '';
+  
+  console.log('🔍 Debug - journeyId from URL:', journeyId);
+  console.log('🔍 Debug - All URL params:', Object.fromEntries(urlParams.entries()));
 
   const [customRequest, setCustomRequest] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
