@@ -110,7 +110,9 @@ export default function CreateJourneyPage() {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to generate journey');
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        console.error('Server error:', response.status, errorData);
+        throw new Error(errorData.message || `Server error: ${response.status}`);
       }
       
       const data = await response.json();
