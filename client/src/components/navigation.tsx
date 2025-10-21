@@ -17,6 +17,7 @@ import {
 import { useIsMobile } from "../hooks/use-mobile.js";
 import { useScrollDirection } from "../hooks/useScrollDirection.js";
 import globeMateLogo from "../assets/globemate-logo.png";
+import { ScrollArea } from "./ui/scroll-area.js";
 import { 
   Compass, 
   Home, 
@@ -278,29 +279,31 @@ export default function Navigation() {
         </div>
         
         {/* Navigation Items */}
-        <nav className="flex-1 p-4 space-y-2">
-          {navigationItems.map((item) => (
-            <Button
-              key={item.href}
-              asChild
-              variant="ghost"
-              className={`w-full justify-start px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                location === item.href
-                  ? "bg-orange-100 text-orange-800 hover:bg-orange-200"
-                  : "text-slate-700 hover:bg-gray-100 hover:text-slate-900"
-              }`}
-            >
-              <Link href={item.href}>
-                {item.icon && (
-                  <span className="ml-1 mr-3">
-                    <item.icon className="w-5 h-5" />
-                  </span>
-                )}
-                <span>{item.label}</span>
-              </Link>
-            </Button>
-          ))}
-        </nav>
+        <ScrollArea className="flex-1">
+          <nav className="p-4 space-y-2">
+            {navigationItems.map((item) => (
+              <Button
+                key={item.href}
+                asChild
+                variant="ghost"
+                className={`w-full justify-start px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+                  location === item.href
+                    ? "bg-orange-100 text-orange-800 hover:bg-orange-200"
+                    : "text-slate-700 hover:bg-gray-100 hover:text-slate-900"
+                }`}
+              >
+                <Link href={item.href}>
+                  {item.icon && (
+                    <span className="ml-1 mr-3">
+                      <item.icon className="w-5 h-5" />
+                    </span>
+                  )}
+                  <span>{item.label}</span>
+                </Link>
+              </Button>
+            ))}
+          </nav>
+        </ScrollArea>
         
         {/* User Profile and Auth Section at Bottom */}
         <div className="p-4 border-t border-gray-200">
