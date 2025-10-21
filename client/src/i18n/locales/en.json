@@ -202,8 +202,10 @@
   },
   "ai_assistant": {
     "title": "AI Assistant",
-    "subtitle": "Plan your perfect trip with the smart AI assistant",
-    "viewing_history": "Viewing conversation history. Start a new chat to continue planning."
+    "subtitle": "Ask me anything about travel and I'll help you plan the perfect vacation",
+    "viewing_history": "Viewing conversation history. Start a new chat to continue planning.",
+    "badge": "AI-Powered",
+    "trip_suggestions": "Trip Suggestions"
   },
   "chat_history": {
     "title": "Chat History",
@@ -1721,7 +1723,7 @@
     "terms_of_service": "Terms of Service",
     "accessibility": "Accessibility Statement"
   },
-  "ai_assistant": {
+  "ai_chat": {
     "title": "GlobeMate Smart Assistant",
     "badge": "AI-Powered",
     "trip_suggestions": "Trip Suggestions",
