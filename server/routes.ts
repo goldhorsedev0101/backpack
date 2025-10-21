@@ -5016,4 +5016,120 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // ==================== AI Chat Sessions API ====================
+  
+  // Save a new chat session
+  app.post('/api/chat-sessions', noAuth, async (req: any, res) => {
+    try {
+      const { chatSessions, insertChatSessionSchema } = await import('@shared/schema');
+      const userId = req.user?.claims?.sub || 'anonymous';
+      
+      const sessionData = insertChatSessionSchema.parse({
+        ...req.body,
+        userId
+      });
+
+      const [newSession] = await db.insert(chatSessions).values(sessionData).returning();
+      res.json(newSession);
+    } catch (error) {
+      console.error('Error saving chat session:', error);
+      res.status(500).json({ message: 'Failed to save chat session', error: String(error) });
+    }
+  });
+
+  // Get all chat sessions for a user
+  app.get('/api/chat-sessions', noAuth, async (req: any, res) => {
+    try {
+      const { chatSessions } = await import('@shared/schema');
+      const userId = req.user?.claims?.sub || 'anonymous';
+      
+      const sessions = await db
+        .select()
+        .from(chatSessions)
+        .where(eq(chatSessions.userId, userId))
+        .orderBy(sql`${chatSessions.lastMessageAt} DESC`)
+        .limit(50);
+      
+      res.json(sessions);
+    } catch (error) {
+      console.error('Error fetching chat sessions:', error);
+      res.status(500).json({ message: 'Failed to fetch chat sessions', error: String(error) });
+    }
+  });
+
+  // Get a specific chat session
+  app.get('/api/chat-sessions/:id', noAuth, async (req: any, res) => {
+    try {
+      const { chatSessions } = await import('@shared/schema');
+      const sessionId = parseInt(req.params.id);
+      const userId = req.user?.claims?.sub || 'anonymous';
+      
+      const [session] = await db
+        .select()
+        .from(chatSessions)
+        .where(sql`${chatSessions.id} = ${sessionId} AND ${chatSessions.userId} = ${userId}`)
+        .limit(1);
+      
+      if (!session) {
+        return res.status(404).json({ message: 'Chat session not found' });
+      }
+      
+      res.json(session);
+    } catch (error) {
+      console.error('Error fetching chat session:', error);
+      res.status(500).json({ message: 'Failed to fetch chat session', error: String(error) });
+    }
+  });
+
+  // Update a chat session
+  app.put('/api/chat-sessions/:id', noAuth, async (req: any, res) => {
+    try {
+      const { chatSessions } = await import('@shared/schema');
+      const sessionId = parseInt(req.params.id);
+      const userId = req.user?.claims?.sub || 'anonymous';
+      
+      const [updatedSession] = await db
+        .update(chatSessions)
+        .set({
+          ...req.body,
+          lastMessageAt: new Date(),
+          updatedAt: new Date()
+        })
+        .where(sql`${chatSessions.id} = ${sessionId} AND ${chatSessions.userId} = ${userId}`)
+        .returning();
+      
+      if (!updatedSession) {
+        return res.status(404).json({ message: 'Chat session not found' });
+      }
+      
+      res.json(updatedSession);
+    } catch (error) {
+      console.error('Error updating chat session:', error);
+      res.status(500).json({ message: 'Failed to update chat session', error: String(error) });
+    }
+  });
+
+  // Delete a chat session
+  app.delete('/api/chat-sessions/:id', noAuth, async (req: any, res) => {
+    try {
+      const { chatSessions } = await import('@shared/schema');
+      const sessionId = parseInt(req.params.id);
+      const userId = req.user?.claims?.sub || 'anonymous';
+      
+      const [deletedSession] = await db
+        .delete(chatSessions)
+        .where(sql`${chatSessions.id} = ${sessionId} AND ${chatSessions.userId} = ${userId}`)
+        .returning();
+      
+      if (!deletedSession) {
+        return res.status(404).json({ message: 'Chat session not found' });
+      }
+      
+      res.json({ message: 'Chat session deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting chat session:', error);
+      res.status(500).json({ message: 'Failed to delete chat session', error: String(error) });
+    }
+  });
+
 }

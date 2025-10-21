@@ -74,6 +74,7 @@ export default function AiChat({ className }: AiChatProps) {
   ]);
   const [newMessage, setNewMessage] = useState("");
   const [allSuggestions, setAllSuggestions] = useState<TripSuggestion[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -197,6 +198,52 @@ export default function AiChat({ className }: AiChatProps) {
       chatMutation.mutate("Can you give me 3 more different trip suggestions?");
     }
   };
+
+  // Auto-save chat session
+  const saveSessionMutation = useMutation({
+    mutationFn: async () => {
+      if (messages.length <= 2) return null; // Don't save if only welcome message + 1 user message
+      
+      // Generate title from first user message
+      const firstUserMessage = messages.find(m => m.sender === 'user');
+      const title = firstUserMessage 
+        ? firstUserMessage.content.substring(0, 60) + (firstUserMessage.content.length > 60 ? '...' : '')
+        : 'New Conversation';
+      
+      const sessionData = {
+        title,
+        messages: messages.slice(1), // Exclude welcome message
+      };
+
+      if (currentSessionId) {
+        // Update existing session
+        const response = await apiRequest(`/api/chat-sessions/${currentSessionId}`, {
+          method: 'PUT',
+          body: JSON.stringify(sessionData)
+        });
+        return response.json();
+      } else {
+        // Create new session
+        const response = await apiRequest('/api/chat-sessions', {
+          method: 'POST',
+          body: JSON.stringify(sessionData)
+        });
+        const newSession = await response.json();
+        setCurrentSessionId(newSession.id);
+        return newSession;
+      }
+    }
+  });
+
+  // Auto-save when messages change
+  useEffect(() => {
+    if (messages.length > 2) {
+      const timer = setTimeout(() => {
+        saveSessionMutation.mutate();
+      }, 2000); // Save 2 seconds after last message
+      return () => clearTimeout(timer);
+    }
+  }, [messages]);
 
   const SuggestionCard = ({ suggestion }: { suggestion: TripSuggestion }) => (
     <div className="bg-card border rounded-lg p-4 mb-3 space-y-3 overflow-hidden">

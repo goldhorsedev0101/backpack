@@ -191,6 +191,7 @@
     "my_trips": "My Trips",
     "journeys": "Journeys",
     "hotel_deals": "Hotel Deals",
+    "chat_history": "Chat History",
     "destinations": "Destinations",
     "community": "Community",
     "budget_tracker": "Budget Tracker",
@@ -198,6 +199,20 @@
     "explore": "Explore",
     "weather": "Weather",
     "dashboard": "Dashboard"
+  },
+  "chat_history": {
+    "title": "Chat History",
+    "subtitle": "All your conversations with the AI assistant",
+    "new_chat": "New Chat",
+    "your_conversations": "Your Conversations",
+    "no_sessions": "No saved conversations",
+    "start_first_chat": "Start your first chat",
+    "messages": "messages",
+    "select_conversation": "Select a conversation",
+    "select_conversation_desc": "Choose a conversation from the list to see the full history",
+    "deleted_title": "Conversation deleted",
+    "deleted_desc": "The conversation was deleted successfully",
+    "delete_error": "Error deleting conversation"
   },
   "journeys": {
     "title": "Curated Journeys",

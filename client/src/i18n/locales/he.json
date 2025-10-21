@@ -335,6 +335,7 @@
     "my_trips": "הטיולים שלי",
     "journeys": "מסעות",
     "hotel_deals": "מבצעי מלונות",
+    "chat_history": "היסטוריית שיחות",
     "destinations": "יעדים",
     "community": "קהילה",
     "budget_tracker": "מעקב תקציב",
@@ -342,6 +343,20 @@
     "explore": "גלה",
     "weather": "מזג אויר",
     "dashboard": "לוח בקרה"
+  },
+  "chat_history": {
+    "title": "היסטוריית שיחות",
+    "subtitle": "כל השיחות שלך עם העוזר החכם",
+    "new_chat": "שיחה חדשה",
+    "your_conversations": "השיחות שלך",
+    "no_sessions": "אין שיחות שמורות",
+    "start_first_chat": "התחל שיחה ראשונה",
+    "messages": "הודעות",
+    "select_conversation": "בחר שיחה",
+    "select_conversation_desc": "בחר שיחה מהרשימה כדי לראות את ההיסטוריה המלאה",
+    "deleted_title": "השיחה נמחקה",
+    "deleted_desc": "השיחה נמחקה בהצלחה",
+    "delete_error": "שגיאה במחיקת השיחה"
   },
   "auth": {
     "sign_in": "התחבר",

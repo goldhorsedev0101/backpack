@@ -1192,6 +1192,27 @@ export const insertHotelInquirySchema = createInsertSchema(hotelInquiries).omit(
 export type HotelInquiry = typeof hotelInquiries.$inferSelect;
 export type InsertHotelInquiry = z.infer<typeof insertHotelInquirySchema>;
 
+// AI Chat Sessions table
+export const chatSessions = pgTable("chat_sessions", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  title: varchar("title").notNull(),
+  messages: jsonb("messages").notNull(), // Array of {id, content, sender, timestamp, suggestions?, type?}
+  lastMessageAt: timestamp("last_message_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertChatSessionSchema = createInsertSchema(chatSessions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastMessageAt: true,
+});
+
+export type ChatSession = typeof chatSessions.$inferSelect;
+export type InsertChatSession = z.infer<typeof insertChatSessionSchema>;
+
 // i18n types
 export type DestinationI18n = typeof destinationsI18n.$inferSelect;
 export type InsertDestinationI18n = z.infer<typeof insertDestinationI18nSchema>;
