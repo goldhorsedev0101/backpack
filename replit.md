@@ -13,7 +13,7 @@ Preferred communication style: Simple, everyday language.
 - **Routing**: Wouter
 - **State Management**: TanStack Query
 - **Form Handling**: React Hook Form with Zod
-- **UI/UX Decisions**: Responsive design with consistent shadcn/ui components, Tailwind CSS for custom styling, tabbed navigation, and a clean visual style with a white background, colorful gradient cards (orange-50 → teal-50 → blue-50), and orange (orange-500) section titles.
+- **UI/UX Decisions**: Responsive design with consistent shadcn/ui components, Tailwind CSS for custom styling, tabbed navigation, and a clean visual style with a white background, colorful gradient cards (orange-50 → teal-50 → blue-50), and orange (orange-500) section titles. Desktop sidebar navigation uses ScrollArea component to display all 11 menu items with proper scrolling.
 
 ### Backend Architecture
 - **Runtime**: Node.js with TypeScript
@@ -37,7 +37,7 @@ Preferred communication style: Simple, everyday language.
 - **Multi-Destination Journeys**: Pre-planned, curated multi-city itineraries with detailed breakdowns (accommodations, daily schedules, transport, cost estimates). Features a filterable list (`/journeys`) and detailed pages, with an option to convert journeys into personalized trips via AI.
 - **Community Features**: Reviews, user connections, real-time chat (WebSockets), content sharing, and gamified achievements.
 - **Budget Tracking**: Expense categorization, trip association, visual analytics, and multi-currency support with dynamic budget ranges.
-- **User Onboarding & Personalization**: Multi-step registration to collect preferences for tailored recommendations.
+- **User Onboarding & Personalization**: Multi-step registration to collect preferences for tailored recommendations. Fully translated with Hebrew/English support, using i18n for all UI text including step titles, descriptions, form labels, placeholders, and button text. Uses translation keys as stable identifiers to preserve backend data integrity.
 - **Multi-API Travel Data Integration**: Combines Google Places API for real-time search with a seeded database and TripAdvisor-ready infrastructure.
 - **Weather & Travel Timing System**: Real-time weather data (OpenWeather API) and historical climate analysis for "Best Time to Travel" recommendations.
 - **Real Places Booking Integration**: Enriches AI-generated suggestions with bookable locations from Google Places API.
