@@ -95,13 +95,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* AI Travel Assistant Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20 mb-8">
-        <AiChat />
-      </section>
-
       {/* Stats Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20 mb-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatsCard icon={Globe} value="70+" label={t('home.countries_available') || "Countries"} gradient="from-orange-400 to-red-500" />
           <StatsCard icon={Users} value="10K+" label={t('home.happy_travelers') || "Happy Travelers"} gradient="from-teal-400 to-cyan-500" />
@@ -265,6 +260,9 @@ export default function Home() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* AI Travel Assistant */}
+            <AiChat />
+
             {/* Quick Stats */}
             <Card className="border-t-4 border-t-orange-500 shadow-lg hover:shadow-xl transition-all">
               <CardHeader>
