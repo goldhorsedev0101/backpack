@@ -127,12 +127,12 @@ export default function Onboarding() {
       
       // Navigate to home page
       console.log('Attempting navigation to home page...');
-      setLocation('/home');
+      setLocation('/');
       
     } catch (error) {
       console.error('Error saving preferences:', error);
       // Still navigate even if save fails
-      setLocation('/home');
+      setLocation('/');
     }
   };
 
