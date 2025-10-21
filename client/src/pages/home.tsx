@@ -16,7 +16,15 @@ import {
   MessageCircle,
   Calendar,
   DollarSign,
-  Bot
+  Bot,
+  Globe,
+  Sparkles,
+  Zap,
+  Shield,
+  Heart,
+  Compass,
+  Award,
+  TrendingDown
 } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 
@@ -40,27 +48,117 @@ export default function Home() {
 
   return (
     <div className="bg-gray-50 pb-20 md:pb-0">
-      {/* Hero Section */}
-      <section className="gradient-bg text-white py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center md:text-left">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">{welcomeMessage}</h1>
-            <p className="text-xl opacity-90 mb-6">{t('home.welcome_message')}</p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-              <Button asChild className="bg-white text-primary hover:bg-gray-100 px-6 py-3">
+      {/* Enhanced Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-500 via-orange-400 to-teal-500 text-white py-20 px-4 sm:px-6 lg:px-8">
+        {/* Animated Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse delay-1000"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 animate-fade-in">
+              <Sparkles className="w-5 h-5" />
+              <span className="text-sm font-medium">AI-Powered Travel Planning</span>
+            </div>
+            
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in-up">
+              {welcomeMessage}
+            </h1>
+            <p className="text-xl md:text-2xl opacity-95 mb-8 max-w-3xl mx-auto animate-fade-in-up delay-100">
+              {t('home.welcome_message')}
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up delay-200">
+              <Button asChild size="lg" className="bg-white text-orange-600 hover:bg-gray-100 px-8 py-6 text-lg shadow-xl hover:shadow-2xl transition-all hover:scale-105">
                 <Link href="/my-trips">
                   <Plus className="w-5 h-5 mr-2" />
                   {t('home.new_trip')}
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="border-white text-white hover:bg-white hover:text-primary px-6 py-3">
-                <Link href="/community">
-                  <Users className="w-5 h-5 mr-2" />
-                  {t('navigation.community')}
+              <Button asChild size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-orange-600 px-8 py-6 text-lg shadow-xl hover:shadow-2xl transition-all hover:scale-105">
+                <Link href="/destinations">
+                  <Globe className="w-5 h-5 mr-2" />
+                  {t('navigation.destinations')}
                 </Link>
               </Button>
             </div>
           </div>
+        </div>
+
+        {/* Wave Bottom */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" className="w-full h-auto">
+            <path fill="#f9fafb" fillOpacity="1" d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,58.7C960,64,1056,64,1152,58.7C1248,53,1344,43,1392,37.3L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"></path>
+          </svg>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20 mb-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatsCard icon={Globe} value="70+" label={t('home.countries_available') || "Countries"} gradient="from-orange-400 to-red-500" />
+          <StatsCard icon={Users} value="10K+" label={t('home.happy_travelers') || "Happy Travelers"} gradient="from-teal-400 to-cyan-500" />
+          <StatsCard icon={MapPin} value="500+" label={t('home.destinations') || "Destinations"} gradient="from-blue-400 to-indigo-500" />
+          <StatsCard icon={Star} value="4.9/5" label={t('home.average_rating') || "Average Rating"} gradient="from-purple-400 to-pink-500" />
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
+            {t('home.why_choose_us') || "Why Choose GlobeMate?"}
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            {t('home.features_subtitle') || "Everything you need for the perfect trip, all in one place"}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <FeatureCard 
+            icon={Bot} 
+            title={t('home.ai_planning') || "AI-Powered Planning"}
+            description={t('home.ai_planning_desc') || "Get personalized itineraries tailored to your preferences"}
+            gradient="from-orange-50 to-orange-100"
+            iconColor="text-orange-600"
+          />
+          <FeatureCard 
+            icon={DollarSign} 
+            title={t('home.budget_tracking') || "Smart Budget Tracking"}
+            description={t('home.budget_tracking_desc') || "Track expenses and stay within your budget effortlessly"}
+            gradient="from-teal-50 to-teal-100"
+            iconColor="text-teal-600"
+          />
+          <FeatureCard 
+            icon={Users} 
+            title={t('home.community') || "Global Community"}
+            description={t('home.community_desc') || "Connect with travelers and share experiences"}
+            gradient="from-blue-50 to-blue-100"
+            iconColor="text-blue-600"
+          />
+          <FeatureCard 
+            icon={Shield} 
+            title={t('home.verified_places') || "Verified Places"}
+            description={t('home.verified_places_desc') || "Real booking suggestions from Google Places"}
+            gradient="from-purple-50 to-purple-100"
+            iconColor="text-purple-600"
+          />
+          <FeatureCard 
+            icon={Compass} 
+            title={t('home.curated_journeys') || "Curated Journeys"}
+            description={t('home.curated_journeys_desc') || "Pre-planned multi-city adventures"}
+            gradient="from-pink-50 to-pink-100"
+            iconColor="text-pink-600"
+          />
+          <FeatureCard 
+            icon={Zap} 
+            title={t('home.real_time') || "Real-Time Updates"}
+            description={t('home.real_time_desc') || "Live weather data and travel recommendations"}
+            gradient="from-amber-50 to-amber-100"
+            iconColor="text-amber-600"
+          />
         </div>
       </section>
 
@@ -71,8 +169,11 @@ export default function Home() {
             {/* My Trips */}
             <section>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-slate-700">{t('trips.my_trips')}</h2>
-                <Button asChild className="bg-primary hover:bg-orange-600">
+                <h2 className="text-2xl font-bold text-slate-700 flex items-center gap-2">
+                  <MapPin className="w-6 h-6 text-orange-600" />
+                  {t('trips.my_trips')}
+                </h2>
+                <Button asChild className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all">
                   <Link href="/my-trips">
                     <Plus className="w-4 h-4 mr-2" />
                     {t('home.new_trip')}
@@ -99,12 +200,14 @@ export default function Home() {
                   ))}
                 </div>
               ) : (
-                <Card className="border-dashed border-2 border-gray-300">
+                <Card className="border-dashed border-2 border-gray-300 bg-gradient-to-br from-orange-50 via-teal-50 to-blue-50 hover:shadow-lg transition-all">
                   <CardContent className="p-8 text-center">
-                    <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-600 mb-2">{t('home.no_trips_yet')}</h3>
-                    <p className="text-gray-500 mb-4">{t('home.start_first_adventure')}</p>
-                    <Button asChild className="bg-primary hover:bg-orange-600">
+                    <div className="bg-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 shadow-md">
+                      <MapPin className="w-10 h-10 text-orange-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('home.no_trips_yet')}</h3>
+                    <p className="text-gray-600 mb-4">{t('home.start_first_adventure')}</p>
+                    <Button asChild className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all">
                       <Link href="/my-trips">
                         <Plus className="w-4 h-4 mr-2" />
                         {t('home.create_first_trip')}
@@ -124,8 +227,13 @@ export default function Home() {
             {/* Popular Routes */}
             <section className="mt-12">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-slate-700">{t('home.popular_routes')}</h2>
-                <Button variant="outline">{t('home.view_all')}</Button>
+                <h2 className="text-2xl font-bold text-slate-700 flex items-center gap-2">
+                  <TrendingUp className="w-6 h-6 text-teal-600" />
+                  {t('home.popular_routes')}
+                </h2>
+                <Button variant="outline" className="hover:bg-teal-50 hover:border-teal-500 hover:text-teal-700 transition-all">
+                  {t('home.view_all')}
+                </Button>
               </div>
               
               {tripsLoading ? (
@@ -153,29 +261,29 @@ export default function Home() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Stats */}
-            <Card>
+            <Card className="border-t-4 border-t-orange-500 shadow-lg hover:shadow-xl transition-all">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <TrendingUp className="w-5 h-5 mr-2 text-primary" />
+                  <TrendingUp className="w-5 h-5 mr-2 text-orange-600" />
                   {t('home.your_stats')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">{t('home.trips_planned')}</span>
-                  <Badge variant="secondary">{userTrips.length}</Badge>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-orange-50 hover:bg-orange-100 transition-colors">
+                  <span className="text-gray-700 font-medium">{t('home.trips_planned')}</span>
+                  <Badge className="bg-orange-600 text-white">{userTrips.length}</Badge>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">{t('home.countries_visited')}</span>
-                  <Badge variant="secondary">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-teal-50 hover:bg-teal-100 transition-colors">
+                  <span className="text-gray-700 font-medium">{t('home.countries_visited')}</span>
+                  <Badge className="bg-teal-600 text-white">
                     {new Set(userTrips.flatMap((trip: any) => 
                       trip.destinations?.map((d: any) => d.country) || []
                     )).size}
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">{t('home.reviews_written')}</span>
-                  <Badge variant="secondary">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
+                  <span className="text-gray-700 font-medium">{t('home.reviews_written')}</span>
+                  <Badge className="bg-blue-600 text-white">
                     {reviews.filter((r: any) => r.userId === (user?.id || 'demo-user')).length}
                   </Badge>
                 </div>
@@ -183,10 +291,10 @@ export default function Home() {
             </Card>
 
             {/* Recent Community Activity */}
-            <Card>
+            <Card className="border-t-4 border-t-teal-500 shadow-lg hover:shadow-xl transition-all">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <MessageCircle className="w-5 h-5 mr-2 text-secondary" />
+                  <MessageCircle className="w-5 h-5 mr-2 text-teal-600" />
                   {t('home.community_activity')}
                 </CardTitle>
               </CardHeader>
@@ -206,7 +314,7 @@ export default function Home() {
                 ) : reviews.length > 0 ? (
                   <div className="space-y-4">
                     {reviews.slice(0, 3).map((review: any) => (
-                      <div key={review.id} className="border-b border-gray-100 last:border-0 pb-3 last:pb-0">
+                      <div key={review.id} className="border-b border-gray-100 last:border-0 pb-3 last:pb-0 hover:bg-gray-50 p-2 rounded transition-colors">
                         <div className="flex items-center space-x-2 mb-2">
                           <img 
                             src={review.user?.profileImageUrl || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face"} 
@@ -218,7 +326,7 @@ export default function Home() {
                           </span>
                           <div className="flex">
                             {Array.from({ length: review.rating }).map((_, i) => (
-                              <Star key={i} className="w-3 h-3 text-accent fill-current" />
+                              <Star key={i} className="w-3 h-3 text-amber-500 fill-current" />
                             ))}
                           </div>
                         </div>
@@ -234,7 +342,7 @@ export default function Home() {
                   <p className="text-gray-500 text-sm">{t('home.no_recent_activity')}</p>
                 )}
                 
-                <Button asChild variant="outline" size="sm" className="w-full mt-4">
+                <Button asChild variant="outline" size="sm" className="w-full mt-4 hover:bg-teal-50 hover:border-teal-500 hover:text-teal-700 transition-all">
                   <Link href="/community">
                     {t('home.view_all_activity')}
                   </Link>
@@ -243,24 +351,27 @@ export default function Home() {
             </Card>
 
             {/* Quick Actions */}
-            <Card>
+            <Card className="border-t-4 border-t-blue-500 shadow-lg hover:shadow-xl transition-all">
               <CardHeader>
-                <CardTitle>{t('home.quick_actions')}</CardTitle>
+                <CardTitle className="flex items-center">
+                  <Zap className="w-5 h-5 mr-2 text-blue-600" />
+                  {t('home.quick_actions')}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button asChild variant="outline" className="w-full justify-start">
+                <Button asChild variant="outline" className="w-full justify-start hover:bg-orange-50 hover:border-orange-500 hover:text-orange-700 transition-all">
                   <Link href="/my-trips" className="block">
                     <Calendar className="w-4 h-4 mr-2" />
                     {t('home.new_trip')}
                   </Link>
                 </Button>
-                <Button asChild variant="outline" className="w-full justify-start">
+                <Button asChild variant="outline" className="w-full justify-start hover:bg-teal-50 hover:border-teal-500 hover:text-teal-700 transition-all">
                   <Link href="/budget-tracker" className="block">
                     <DollarSign className="w-4 h-4 mr-2" />
                     {t('home.track_expenses')}
                   </Link>
                 </Button>
-                <Button asChild variant="outline" className="w-full justify-start">
+                <Button asChild variant="outline" className="w-full justify-start hover:bg-blue-50 hover:border-blue-500 hover:text-blue-700 transition-all">
                   <Link href="/community" className="block">
                     <Users className="w-4 h-4 mr-2" />
                     {t('home.find_travel_buddies')}
@@ -275,6 +386,45 @@ export default function Home() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Stats Card Component
+function StatsCard({ icon: Icon, value, label, gradient }: { 
+  icon: any; 
+  value: string; 
+  label: string; 
+  gradient: string;
+}) {
+  return (
+    <Card className={`bg-gradient-to-br ${gradient} text-white border-0 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer`}>
+      <CardContent className="p-6 text-center">
+        <Icon className="w-8 h-8 mx-auto mb-3 opacity-90" />
+        <div className="text-3xl font-bold mb-1">{value}</div>
+        <div className="text-sm opacity-90">{label}</div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Feature Card Component
+function FeatureCard({ icon: Icon, title, description, gradient, iconColor }: {
+  icon: any;
+  title: string;
+  description: string;
+  gradient: string;
+  iconColor: string;
+}) {
+  return (
+    <Card className={`bg-gradient-to-br ${gradient} border-0 shadow-md hover:shadow-xl hover:scale-105 transition-all cursor-pointer group`}>
+      <CardContent className="p-6">
+        <div className={`${iconColor} mb-4 group-hover:scale-110 transition-transform`}>
+          <Icon className="w-10 h-10" />
+        </div>
+        <h3 className="text-xl font-bold text-slate-800 mb-2">{title}</h3>
+        <p className="text-gray-600">{description}</p>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -298,103 +448,104 @@ function PopularJourneysSection() {
       'Berlin': { he: 'ברלין', en: 'Berlin' },
       'Vienna': { he: 'וינה', en: 'Vienna' },
       'Prague': { he: 'פראג', en: 'Prague' },
-      'Barcelona': { he: 'ברצלונה', en: 'Barcelona' },
-      'Nice': { he: 'ניס', en: 'Nice' },
-      'Rome': { he: 'רומא', en: 'Rome' },
       'Bangkok': { he: 'בנגקוק', en: 'Bangkok' },
-      'Chiang Mai': { he: 'צ\'יאנג מאי', en: 'Chiang Mai' },
       'Phuket': { he: 'פוקט', en: 'Phuket' },
+      'Chiang Mai': { he: 'צ\'יאנג מאי', en: 'Chiang Mai' },
+      'Krabi': { he: 'קראבי', en: 'Krabi' },
+      'Athens': { he: 'אתונה', en: 'Athens' },
+      'Santorini': { he: 'סנטוריני', en: 'Santorini' },
+      'Mykonos': { he: 'מיקונוס', en: 'Mykonos' },
+      'Crete': { he: 'כרתים', en: 'Crete' },
       'New York': { he: 'ניו יורק', en: 'New York' },
-      'Philadelphia': { he: 'פילדלפיה', en: 'Philadelphia' },
-      'Washington DC': { he: 'וושינגטון', en: 'Washington DC' },
-      'Boston': { he: 'בוסטון', en: 'Boston' },
+      'Las Vegas': { he: 'לאס וגאס', en: 'Las Vegas' },
+      'Los Angeles': { he: 'לוס אנג\'לס', en: 'Los Angeles' },
+      'San Francisco': { he: 'סן פרנסיסקו', en: 'San Francisco' },
     };
-    return cityTranslations[cityName]?.[isRTL ? 'he' : 'en'] || cityName;
+    const currentLang = i18n.language as 'he' | 'en';
+    return cityTranslations[cityName]?.[currentLang] || cityName;
   };
 
-  const formatDestinationChain = (destinations: any[]) => {
+  const formatDestinations = (destinations: string[]) => {
     if (!destinations || destinations.length === 0) return '';
-    const arrow = '←';
-    return destinations.map(d => translateCityName(d.name)).join(` ${arrow} `);
+    const translatedDests = destinations.map(d => translateCityName(d));
+    return isRTL 
+      ? translatedDests.join(' → ')  // Hebrew: right to left with arrow pointing left
+      : translatedDests.join(' ← ');  // English: left to right with arrow pointing right
   };
 
-  const translateJourneyTitle = (title: string) => {
-    const titleTranslations: Record<string, { he: string; en: string }> = {
-      'Classic Japan Circuit': { he: 'מסע יפן הקלאסי', en: 'Classic Japan Circuit' },
-      'European Highlights Tour': { he: 'סיור דגשי אירופה', en: 'European Highlights Tour' },
-      'European Capital Tour': { he: 'סיור בירות אירופה', en: 'European Capital Tour' },
-      'Southeast Asia Adventure': { he: 'הרפתקה בדרום מזרח אסיה', en: 'Southeast Asia Adventure' },
-      'Mediterranean Dream': { he: 'חלום ים תיכוני', en: 'Mediterranean Dream' },
-      'East Coast USA Explorer': { he: 'סיור החוף המזרחי של ארה"ב', en: 'East Coast USA Explorer' },
-    };
-    return titleTranslations[title]?.[isRTL ? 'he' : 'en'] || title;
-  };
-
-  return (
-    <section className="mb-12">
-      <div className={`flex items-center justify-between mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
-        <div className="flex items-center gap-2">
-          <h2 className="text-2xl font-bold text-orange-600" dir={isRTL ? 'rtl' : 'ltr'}>
-            <MapPin className="inline w-6 h-6 mr-2 mb-1" />
-            {isRTL ? 'מסעות פופולריים ברחבי העולם' : 'Popular Multi-Destination Journeys'}
-          </h2>
+  if (isLoading) {
+    return (
+      <section className="mt-12">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-slate-700">{t('journeys.popular_journeys')}</h2>
         </div>
-        <Button asChild variant="outline" className="border-orange-500 text-orange-600 hover:bg-orange-50">
-          <Link href="/journeys">
-            <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'כל המסעות →' : 'All Journeys →'}</span>
-          </Link>
-        </Button>
-      </div>
-
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i} className="animate-pulse overflow-hidden">
-              <div className="h-32 bg-gray-200"></div>
-              <CardContent className="p-4">
-                <div className="h-4 bg-gray-200 rounded mb-3"></div>
+            <Card key={i} className="animate-pulse">
+              <CardContent className="p-6">
+                <div className="h-4 bg-gray-200 rounded mb-4"></div>
                 <div className="h-3 bg-gray-200 rounded mb-2"></div>
                 <div className="h-3 bg-gray-200 rounded w-3/4"></div>
               </CardContent>
             </Card>
           ))}
         </div>
-      ) : journeys.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {journeys.slice(0, 4).map((journey) => (
-            <Link key={journey.id} href={`/journeys/${journey.id}`}>
-              <Card className="h-full overflow-hidden hover:shadow-xl transition-shadow cursor-pointer group">
-                <div className="relative h-32 overflow-hidden">
-                  <img
-                    src={journey.hero_image || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828'}
-                    alt={journey.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
+      </section>
+    );
+  }
+
+  if (journeys.length === 0) return null;
+
+  return (
+    <section className="mt-12">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-slate-700 flex items-center gap-2">
+          <Compass className="w-6 h-6 text-purple-600" />
+          {t('journeys.popular_journeys')}
+        </h2>
+        <Button asChild variant="outline" className="hover:bg-purple-50 hover:border-purple-500 hover:text-purple-700 transition-all">
+          <Link href="/journeys">
+            {t('home.view_all')}
+          </Link>
+        </Button>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {journeys.slice(0, 4).map((journey: any) => (
+          <Link key={journey.id} href={`/journeys/${journey.id}`}>
+            <Card className="hover:shadow-xl transition-all cursor-pointer group border-t-4 border-t-purple-500 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-lg font-bold text-slate-800 group-hover:text-purple-700 transition-colors" dir={isRTL ? 'rtl' : 'ltr'}>
+                    {isRTL ? journey.titleHe || journey.title : journey.title}
+                  </h3>
+                  <Badge className="bg-purple-600 text-white">
+                    {journey.totalNights} {t('journeys.nights')}
+                  </Badge>
                 </div>
-                <CardContent className="p-4">
-                  <h3 className="font-bold mb-2 line-clamp-1" dir={isRTL ? 'rtl' : 'ltr'}>{translateJourneyTitle(journey.title)}</h3>
-                  <div className={`flex items-center gap-1 text-xs text-orange-600 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <MapPin className="w-3 h-3 flex-shrink-0" />
-                    <span className="truncate" dir={isRTL ? 'rtl' : 'ltr'}>
-                      {formatDestinationChain(journey.destinations)}
-                    </span>
+                
+                <p className="text-sm text-gray-600 mb-3 line-clamp-2" dir={isRTL ? 'rtl' : 'ltr'}>
+                  {isRTL ? journey.descriptionHe || journey.description : journey.description}
+                </p>
+                
+                <div className="text-sm font-medium text-slate-700 mb-3" dir={isRTL ? 'rtl' : 'ltr'}>
+                  {formatDestinations(journey.destinations)}
+                </div>
+                
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center text-amber-600">
+                    <Star className="w-4 h-4 fill-current mr-1" />
+                    <span className="font-medium">{journey.rating}</span>
                   </div>
-                  <div className={`flex items-center gap-3 text-xs text-gray-600 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <div className={`flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                      <Calendar className="w-3 h-3" />
-                      <span>{journey.total_nights} {isRTL ? 'לילות' : 'nights'}</span>
-                    </div>
-                    <div className={`flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                      <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                      <span>{journey.rating.toFixed(1)}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      ) : null}
+                  <span className="text-slate-600 font-semibold">
+                    {isRTL ? `₪${Math.round(journey.minBudget * 3.5)} - ₪${Math.round(journey.maxBudget * 3.5)}` : `$${journey.minBudget} - $${journey.maxBudget}`}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </div>
     </section>
   );
 }
