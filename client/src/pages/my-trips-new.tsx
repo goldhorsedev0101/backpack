@@ -1131,18 +1131,15 @@ export default function MyTripsNew() {
                       <div
                         key={style.id}
                         onClick={() => toggleStyle(style.id)}
-                        className={`p-4 rounded-lg border transition cursor-pointer min-h-[5rem] ${
+                        className={`p-4 rounded-lg border transition cursor-pointer min-h-[4rem] flex items-center ${
                           selectedStyles.includes(style.id)
                             ? 'border-orange-500 bg-gradient-to-br from-orange-50 via-teal-50 to-blue-50 shadow-md'
                             : 'border-gray-200 bg-white hover:border-orange-300 hover:bg-gradient-to-br hover:from-orange-50/50 hover:via-teal-50/50 hover:to-blue-50/50 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-orange-400'
                         }`}
                       >
-                        <div className={`flex items-start gap-3 ${i18n.language === 'he' ? 'flex-row-reverse text-right' : ''}`}>
-                          <style.icon className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                          <div className={`flex-1 ${i18n.language === 'he' ? 'text-right' : ''}`}>
-                            <h4 className="font-medium text-base leading-relaxed">{style.label}</h4>
-                            <p className="text-sm text-muted-foreground leading-relaxed">{style.description}</p>
-                          </div>
+                        <div className={`flex items-center gap-3 w-full ${i18n.language === 'he' ? 'flex-row-reverse text-right' : ''}`}>
+                          <style.icon className="w-5 h-5 flex-shrink-0 text-orange-500" />
+                          <p className="text-base font-medium leading-relaxed">{style.label}</p>
                         </div>
                       </div>
                     ))}
@@ -1154,16 +1151,16 @@ export default function MyTripsNew() {
                   <Label className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
 {t('trips.interests')} <span className="text-xs text-gray-500">({t('trips.select_multiple')})</span>
                   </Label>
-                  <div className="grid grid-cols-2 gap-3 max-h-40 overflow-y-auto pr-2">
+                  <div className="grid grid-cols-2 gap-3">
                     {INTERESTS.map((interest) => (
                       <div
                         key={interest}
                         onClick={() => toggleInterest(interest)}
-                        className={`p-4 rounded-lg border transition cursor-pointer min-h-[3.5rem] flex items-center ${
+                        className={`p-4 rounded-lg border transition cursor-pointer min-h-[4rem] flex items-center ${
                           selectedInterests.includes(interest)
                             ? 'border-orange-500 bg-gradient-to-br from-orange-50 via-teal-50 to-blue-50 shadow-md'
                             : 'border-gray-200 bg-white hover:border-orange-300 hover:bg-gradient-to-br hover:from-orange-50/50 hover:via-teal-50/50 hover:to-blue-50/50 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-orange-400'
-                        } ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}
+                        } ${i18n.language === 'he' ? 'text-right justify-end' : 'text-left justify-start'}`}
                       >
                         <p className="text-base font-medium leading-relaxed">{interest}</p>
                       </div>
