@@ -562,10 +562,10 @@ export default function HotelDeals() {
             <div className="text-center md:text-left" dir="rtl">
               <h4 className="font-bold mb-4">יצירת קשר</h4>
               <p className="text-gray-300 text-sm mb-2">
-                📧 info@globemate.com
+                📧 support@globemate.co.il
               </p>
               <p className="text-gray-300 text-sm">
-                📞 050-123-4567
+                📞 0525530454
               </p>
             </div>
           </div>
