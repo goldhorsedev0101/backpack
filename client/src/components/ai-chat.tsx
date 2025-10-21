@@ -93,10 +93,13 @@ export default function AiChat({ className }: AiChatProps) {
         content: msg.content
       }));
       
-      const response = await apiRequest('POST', '/api/ai/chat', { 
-        message,
-        chatHistory,
-        previousSuggestions: allSuggestions
+      const response = await apiRequest('/api/ai/chat', { 
+        method: 'POST',
+        body: JSON.stringify({
+          message,
+          chatHistory,
+          previousSuggestions: allSuggestions
+        })
       });
       return response.json();
     },
@@ -167,7 +170,10 @@ export default function AiChat({ className }: AiChatProps) {
         travelStyle: suggestion.travelStyle
       };
       
-      const response = await apiRequest('POST', '/api/trips', tripData);
+      const response = await apiRequest('/api/trips', {
+        method: 'POST',
+        body: JSON.stringify(tripData)
+      });
       return response.json();
     },
     onSuccess: () => {
