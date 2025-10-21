@@ -25,13 +25,7 @@ import {
   Compass,
   Award,
   TrendingDown,
-  Plane,
-  Hotel,
-  Cloud,
-  Trophy,
-  Database,
-  Home,
-  LayoutGrid
+  Plane
 } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 
@@ -370,79 +364,37 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            {/* All Pages Navigation */}
+            {/* Quick Actions */}
             <Card className="border-t-4 border-t-blue-500 shadow-lg hover:shadow-xl transition-all">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <LayoutGrid className="w-5 h-5 mr-2 text-blue-600" />
-                  {t('navigation.explore')}
+                  <Zap className="w-5 h-5 mr-2 text-blue-600" />
+                  {t('home.quick_actions')}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
-                <Button asChild variant="outline" size="sm" className="w-full justify-start hover:bg-orange-50 hover:border-orange-500 hover:text-orange-700 transition-all">
-                  <Link href="/" className="block">
-                    <Home className="w-4 h-4 mr-2" />
-                    {t('navigation.home')}
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="sm" className="w-full justify-start hover:bg-orange-50 hover:border-orange-500 hover:text-orange-700 transition-all">
+              <CardContent className="space-y-3">
+                <Button asChild variant="outline" className="w-full justify-start hover:bg-orange-50 hover:border-orange-500 hover:text-orange-700 transition-all">
                   <Link href="/my-trips" className="block">
                     <Calendar className="w-4 h-4 mr-2" />
-                    {t('navigation.my_trips')}
+                    {t('home.new_trip')}
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="sm" className="w-full justify-start hover:bg-purple-50 hover:border-purple-500 hover:text-purple-700 transition-all">
+                <Button asChild variant="outline" className="w-full justify-start hover:bg-purple-50 hover:border-purple-500 hover:text-purple-700 transition-all">
                   <Link href="/ai-assistant" className="block">
                     <MessageCircle className="w-4 h-4 mr-2" />
                     {t('navigation.chat_history')}
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="sm" className="w-full justify-start hover:bg-pink-50 hover:border-pink-500 hover:text-pink-700 transition-all">
-                  <Link href="/journeys" className="block">
-                    <MapPin className="w-4 h-4 mr-2" />
-                    {t('navigation.journeys')}
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="sm" className="w-full justify-start hover:bg-amber-50 hover:border-amber-500 hover:text-amber-700 transition-all">
-                  <Link href="/hotel-deals" className="block">
-                    <Hotel className="w-4 h-4 mr-2" />
-                    {t('navigation.hotel_deals')}
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="sm" className="w-full justify-start hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-700 transition-all">
-                  <Link href="/destinations" className="block">
-                    <Globe className="w-4 h-4 mr-2" />
-                    {t('destinations.hub_title')}
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="sm" className="w-full justify-start hover:bg-cyan-50 hover:border-cyan-500 hover:text-cyan-700 transition-all">
-                  <Link href="/weather" className="block">
-                    <Cloud className="w-4 h-4 mr-2" />
-                    {t('navigation.weather')}
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="sm" className="w-full justify-start hover:bg-blue-50 hover:border-blue-500 hover:text-blue-700 transition-all">
-                  <Link href="/community" className="block">
-                    <Users className="w-4 h-4 mr-2" />
-                    {t('navigation.community')}
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="sm" className="w-full justify-start hover:bg-teal-50 hover:border-teal-500 hover:text-teal-700 transition-all">
+                <Button asChild variant="outline" className="w-full justify-start hover:bg-teal-50 hover:border-teal-500 hover:text-teal-700 transition-all">
                   <Link href="/budget-tracker" className="block">
                     <DollarSign className="w-4 h-4 mr-2" />
-                    {t('navigation.budget_tracker')}
+                    {t('home.track_expenses')}
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="sm" className="w-full justify-start hover:bg-yellow-50 hover:border-yellow-500 hover:text-yellow-700 transition-all">
-                  <Link href="/achievements" className="block">
-                    <Trophy className="w-4 h-4 mr-2" />
-                    {t('navigation.achievements')}
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="sm" className="w-full justify-start hover:bg-slate-50 hover:border-slate-500 hover:text-slate-700 transition-all">
-                  <Link href="/dashboard" className="block">
-                    <Database className="w-4 h-4 mr-2" />
-                    {t('navigation.dashboard')}
+                <Button asChild variant="outline" className="w-full justify-start hover:bg-blue-50 hover:border-blue-500 hover:text-blue-700 transition-all">
+                  <Link href="/community" className="block">
+                    <Users className="w-4 h-4 mr-2" />
+                    {t('home.find_travel_buddies')}
                   </Link>
                 </Button>
               </CardContent>
