@@ -1924,19 +1924,26 @@ export async function registerRoutes(app: Express): Promise<void> {
   // Enhanced AI chat assistant with conversation history
   app.post('/api/ai/chat', noAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
       const { message, chatHistory = [], previousSuggestions = [] } = req.body;
       
-      // Get user context
-      const userTrips = await storage.getUserTrips(userId);
-      const user = await storage.getUser(userId);
-      
-      const context = {
-        userTrips,
-        travelPreferences: user,
+      // Build context with optional user data if authenticated
+      const context: any = {
         chatHistory,
         previousSuggestions
       };
+      
+      // Add user context if user is authenticated
+      if (req.user?.claims?.sub) {
+        const userId = req.user.claims.sub;
+        try {
+          const userTrips = await storage.getUserTrips(userId);
+          const user = await storage.getUser(userId);
+          context.userTrips = userTrips;
+          context.travelPreferences = user;
+        } catch (err) {
+          console.log("Could not fetch user context, continuing without it");
+        }
+      }
 
       const response = await conversationalTripAssistant(message, context);
       
@@ -1952,7 +1959,10 @@ export async function registerRoutes(app: Express): Promise<void> {
       res.json(response);
     } catch (error) {
       console.error("Error in chat assistant:", error);
-      res.status(500).json({ message: "Failed to get chat response" });
+      res.status(500).json({ 
+        message: "Failed to get chat response",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
