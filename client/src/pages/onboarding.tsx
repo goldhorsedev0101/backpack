@@ -153,7 +153,7 @@ export default function Onboarding() {
             <CardContent>
               <div className="grid grid-cols-2 gap-3">
                 {interestKeys.map((interestKey) => (
-                  <div key={interestKey} className="flex items-center space-x-2 p-3 min-h-[3rem] border rounded-lg hover:bg-gray-50 transition-colors">
+                  <div key={interestKey} className="flex items-center gap-3 p-4 min-h-[3.5rem] border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <Checkbox
                       id={interestKey}
                       checked={preferences.interests.includes(interestKey)}
@@ -162,7 +162,7 @@ export default function Onboarding() {
                       }
                       className="flex-shrink-0"
                     />
-                    <Label htmlFor={interestKey} className="text-sm font-medium cursor-pointer break-words whitespace-normal leading-tight text-balance flex-1">
+                    <Label htmlFor={interestKey} className="text-base font-medium cursor-pointer break-words whitespace-normal leading-relaxed flex-1">
                       {t(`onboarding.interests.${interestKey}`)}
                     </Label>
                   </div>
@@ -187,7 +187,7 @@ export default function Onboarding() {
             <CardContent>
               <div className="grid grid-cols-1 gap-3">
                 {travelStyleKeys.map((styleKey) => (
-                  <div key={styleKey} className="flex items-center space-x-2 p-3 min-h-[3rem] border rounded-lg hover:bg-gray-50 transition-colors">
+                  <div key={styleKey} className="flex items-center gap-3 p-4 min-h-[3.5rem] border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <Checkbox
                       id={styleKey}
                       checked={preferences.travelStyle.includes(styleKey)}
@@ -196,7 +196,7 @@ export default function Onboarding() {
                       }
                       className="flex-shrink-0"
                     />
-                    <Label htmlFor={styleKey} className="text-sm font-medium cursor-pointer break-words whitespace-normal leading-tight text-balance flex-1">
+                    <Label htmlFor={styleKey} className="text-base font-medium cursor-pointer break-words whitespace-normal leading-relaxed flex-1">
                       {t(`onboarding.travel_styles.${styleKey}`)}
                     </Label>
                   </div>
@@ -287,15 +287,16 @@ export default function Onboarding() {
             <CardContent>
               <div className="grid grid-cols-2 gap-3">
                 {activityKeys.map((activityKey) => (
-                  <div key={activityKey} className="flex items-center space-x-2">
+                  <div key={activityKey} className="flex items-center gap-3 p-4 min-h-[3.5rem] border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <Checkbox
                       id={activityKey}
                       checked={preferences.activities.includes(activityKey)}
                       onCheckedChange={(checked) => 
                         handleArrayChange('activities', activityKey, checked as boolean)
                       }
+                      className="flex-shrink-0"
                     />
-                    <Label htmlFor={activityKey} className="text-sm font-medium cursor-pointer">
+                    <Label htmlFor={activityKey} className="text-base font-medium cursor-pointer break-words whitespace-normal leading-relaxed flex-1">
                       {t(`onboarding.activities.${activityKey}`)}
                     </Label>
                   </div>
@@ -339,15 +340,16 @@ export default function Onboarding() {
                 <Label>{t('onboarding.personality_traits_label')}</Label>
                 <div className="grid grid-cols-2 gap-3 mt-2">
                   {personalityTraitKeys.map((traitKey) => (
-                    <div key={traitKey} className="flex items-center space-x-2">
+                    <div key={traitKey} className="flex items-center gap-3 p-4 min-h-[3.5rem] border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                       <Checkbox
                         id={traitKey}
                         checked={preferences.personalityTraits.includes(traitKey)}
                         onCheckedChange={(checked) => 
                           handleArrayChange('personalityTraits', traitKey, checked as boolean)
                         }
+                        className="flex-shrink-0"
                       />
-                      <Label htmlFor={traitKey} className="text-sm font-medium cursor-pointer">
+                      <Label htmlFor={traitKey} className="text-base font-medium cursor-pointer break-words whitespace-normal leading-relaxed flex-1">
                         {t(`onboarding.personality_traits.${traitKey}`)}
                       </Label>
                     </div>
@@ -375,15 +377,16 @@ export default function Onboarding() {
                 <Label htmlFor="accommodation">{t('onboarding.accommodation.label')}</Label>
                 <div className="grid grid-cols-2 gap-3 mt-2">
                   {accommodationKeys.map((accommodationKey) => (
-                    <div key={accommodationKey} className="flex items-center space-x-2">
+                    <div key={accommodationKey} className="flex items-center gap-3 p-4 min-h-[3.5rem] border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                       <Checkbox
                         id={accommodationKey}
                         checked={preferences.accommodationType.includes(accommodationKey)}
                         onCheckedChange={(checked) => 
                           handleArrayChange('accommodationType', accommodationKey, checked as boolean)
                         }
+                        className="flex-shrink-0"
                       />
-                      <Label htmlFor={accommodationKey} className="text-sm font-medium cursor-pointer">
+                      <Label htmlFor={accommodationKey} className="text-base font-medium cursor-pointer break-words whitespace-normal leading-relaxed flex-1">
                         {t(`onboarding.accommodation.${accommodationKey}`)}
                       </Label>
                     </div>
