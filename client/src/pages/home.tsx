@@ -24,7 +24,8 @@ import {
   Heart,
   Compass,
   Award,
-  TrendingDown
+  TrendingDown,
+  Plane
 } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 
@@ -139,9 +140,9 @@ export default function Home() {
             iconColor="text-blue-600"
           />
           <FeatureCard 
-            icon={Shield} 
-            title={t('home.verified_places') || "Verified Places"}
-            description={t('home.verified_places_desc') || "Real booking suggestions from Google Places"}
+            icon={Plane} 
+            title={t('home.verified_places') || "Unbeatable Prices"}
+            description={t('home.verified_places_desc') || "Book hotels, flights and vacation packages at the best prices"}
             gradient="from-purple-50 to-purple-100"
             iconColor="text-purple-600"
           />
