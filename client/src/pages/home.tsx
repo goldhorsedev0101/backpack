@@ -465,12 +465,16 @@ function PopularJourneysSection() {
     return cityTranslations[cityName]?.[currentLang] || cityName;
   };
 
-  const formatDestinations = (destinations: string[]) => {
+  const formatDestinations = (destinations: any) => {
     if (!destinations || destinations.length === 0) return '';
-    const translatedDests = destinations.map(d => translateCityName(d));
+    // Handle both string arrays and object arrays
+    const cityNames = Array.isArray(destinations) 
+      ? destinations.map(d => typeof d === 'string' ? d : d.city || d.name || d)
+      : [];
+    const translatedDests = cityNames.map(d => translateCityName(d));
     return isRTL 
-      ? translatedDests.join(' → ')  // Hebrew: right to left with arrow pointing left
-      : translatedDests.join(' ← ');  // English: left to right with arrow pointing right
+      ? translatedDests.join(' ← ')  // Hebrew: left to right visually
+      : translatedDests.join(' → ');  // English: left to right
   };
 
   if (isLoading) {
@@ -517,15 +521,15 @@ function PopularJourneysSection() {
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="text-lg font-bold text-slate-800 group-hover:text-purple-700 transition-colors" dir={isRTL ? 'rtl' : 'ltr'}>
-                    {isRTL ? journey.titleHe || journey.title : journey.title}
+                    {journey.title}
                   </h3>
                   <Badge className="bg-purple-600 text-white">
-                    {journey.totalNights} {t('journeys.nights')}
+                    {journey.totalNights || journey.total_nights} {t('journeys.nights')}
                   </Badge>
                 </div>
                 
                 <p className="text-sm text-gray-600 mb-3 line-clamp-2" dir={isRTL ? 'rtl' : 'ltr'}>
-                  {isRTL ? journey.descriptionHe || journey.description : journey.description}
+                  {journey.description}
                 </p>
                 
                 <div className="text-sm font-medium text-slate-700 mb-3" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -535,11 +539,16 @@ function PopularJourneysSection() {
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center text-amber-600">
                     <Star className="w-4 h-4 fill-current mr-1" />
-                    <span className="font-medium">{journey.rating}</span>
+                    <span className="font-medium">{journey.rating || '4.8'}</span>
                   </div>
-                  <span className="text-slate-600 font-semibold">
-                    {isRTL ? `₪${Math.round(journey.minBudget * 3.5)} - ₪${Math.round(journey.maxBudget * 3.5)}` : `$${journey.minBudget} - $${journey.maxBudget}`}
-                  </span>
+                  {(journey.priceMin || journey.price_min) && (journey.priceMax || journey.price_max) && (
+                    <span className="text-slate-600 font-semibold">
+                      {isRTL 
+                        ? `₪${Math.round((journey.priceMin || journey.price_min) * 3.5)} - ₪${Math.round((journey.priceMax || journey.price_max) * 3.5)}` 
+                        : `$${journey.priceMin || journey.price_min} - $${journey.priceMax || journey.price_max}`
+                      }
+                    </span>
+                  )}
                 </div>
               </CardContent>
             </Card>
