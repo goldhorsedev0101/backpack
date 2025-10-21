@@ -51,8 +51,8 @@ function Router() {
       {/* Main content area adjusted for right sidebar on desktop, bottom padding for mobile nav */}
       <main className="pb-20 md:pb-0 md:pr-64">
         <Switch>
-          <Route path="/" component={Landing} />
-          <Route path="/home" component={Home} />
+          <Route path="/" component={Home} />
+          <Route path="/landing" component={Landing} />
           <Route path="/my-trips" component={MyTripsNew} />
           <Route path="/itineraries/:id" component={ItineraryDetail} />
           <Route path="/community" component={Community} />
