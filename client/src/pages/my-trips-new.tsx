@@ -49,13 +49,17 @@ import {
   BookOpen,
   Heart,
   Save,
-  Trash2
+  Trash2,
+  Waves,
+  Music,
+  ShoppingBag,
+  Globe
 } from "lucide-react";
 
 // Create form schema function that uses translations
 const createTripFormSchema = (t: any) => z.object({
   destination: z.string().min(1, t('trips.select_destination')),
-  travelStyle: z.array(z.string()).min(1, t('trips.select_travel_style')),
+  travelStyle: z.array(z.string()).optional(), // Keep for backward compatibility but optional
   budget: z.number().min(100, t('trips.budget_required')),
   duration: z.string().min(1, t('trips.select_duration')),
   interests: z.array(z.string()).min(1, t('trips.select_interests')),
@@ -232,31 +236,36 @@ export default function MyTripsNew() {
     return duration?.days || 7; // default to 7 days if not found
   };
 
-  const TRAVEL_STYLES = [
-    { id: 'adventure', icon: Mountain, label: t('trips.adventure'), description: t('trips.adventure_desc') },
-    { id: 'cultural', icon: Camera, label: t('trips.cultural'), description: t('trips.cultural_desc') },
-    { id: 'budget', icon: DollarSign, label: t('trips.budget_travel'), description: t('trips.budget_desc') },
-    { id: 'luxury', icon: Sparkles, label: t('trips.luxury'), description: t('trips.luxury_desc') },
-    { id: 'nature', icon: Mountain, label: t('trips.nature'), description: t('trips.nature_desc') },
-    { id: 'food', icon: Utensils, label: t('trips.food'), description: t('trips.food_desc') },
-    { id: 'nightlife', icon: GlassWater, label: t('trips.nightlife'), description: t('trips.nightlife_desc') },
-    { id: 'relaxation', icon: Clock, label: t('trips.relaxation'), description: t('trips.relaxation_desc') }
-  ];
-
-  const INTERESTS = [
-    t('trips.interests_list.history_culture'), t('trips.interests_list.adventure_sports'), 
-    t('trips.interests_list.nature_wildlife'), t('trips.interests_list.food_cuisine'), 
-    t('trips.interests_list.nightlife_entertainment'), t('trips.interests_list.photography'), 
-    t('trips.interests_list.architecture'), t('trips.interests_list.local_markets'),
-    t('trips.interests_list.beaches_coastlines'), t('trips.interests_list.mountains_hiking'), 
-    t('trips.interests_list.art_museums'), t('trips.interests_list.music_festivals'),
-    t('trips.interests_list.shopping'), t('trips.interests_list.wellness_relaxation'), 
-    t('trips.interests_list.language_learning'), t('trips.interests_list.volunteering')
+  // Combined interests (previously Travel Styles + Interests)
+  const ALL_INTERESTS = [
+    { id: 'adventure', icon: Mountain, label: t('trips.adventure') },
+    { id: 'cultural', icon: Camera, label: t('trips.cultural') },
+    { id: 'budget', icon: DollarSign, label: t('trips.budget_travel') },
+    { id: 'luxury', icon: Sparkles, label: t('trips.luxury') },
+    { id: 'nature', icon: Mountain, label: t('trips.nature') },
+    { id: 'food', icon: Utensils, label: t('trips.food') },
+    { id: 'nightlife', icon: GlassWater, label: t('trips.nightlife') },
+    { id: 'relaxation', icon: Clock, label: t('trips.relaxation') },
+    { id: 'history_culture', icon: Camera, label: t('trips.interests_list.history_culture') },
+    { id: 'adventure_sports', icon: Mountain, label: t('trips.interests_list.adventure_sports') },
+    { id: 'nature_wildlife', icon: Mountain, label: t('trips.interests_list.nature_wildlife') },
+    { id: 'food_cuisine', icon: Utensils, label: t('trips.interests_list.food_cuisine') },
+    { id: 'nightlife_entertainment', icon: GlassWater, label: t('trips.interests_list.nightlife_entertainment') },
+    { id: 'photography', icon: Camera, label: t('trips.interests_list.photography') },
+    { id: 'architecture', icon: Camera, label: t('trips.interests_list.architecture') },
+    { id: 'local_markets', icon: MapPin, label: t('trips.interests_list.local_markets') },
+    { id: 'beaches_coastlines', icon: Waves, label: t('trips.interests_list.beaches_coastlines') },
+    { id: 'mountains_hiking', icon: Mountain, label: t('trips.interests_list.mountains_hiking') },
+    { id: 'art_museums', icon: Camera, label: t('trips.interests_list.art_museums') },
+    { id: 'music_festivals', icon: Music, label: t('trips.interests_list.music_festivals') },
+    { id: 'shopping', icon: ShoppingBag, label: t('trips.interests_list.shopping') },
+    { id: 'wellness_relaxation', icon: Clock, label: t('trips.interests_list.wellness_relaxation') },
+    { id: 'language_learning', icon: Globe, label: t('trips.interests_list.language_learning') },
+    { id: 'volunteering', icon: Heart, label: t('trips.interests_list.volunteering') }
   ];
   
   // Form state
   const [budget, setBudget] = useState([1000]);
-  const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [selectedContinent, setSelectedContinent] = useState<Continent | "">("");
   const [specificCity, setSpecificCity] = useState("");
@@ -287,21 +296,14 @@ export default function MyTripsNew() {
     },
   });
 
-  // Helper functions
-  const toggleStyle = (styleId: string) => {
-    const newStyles = selectedStyles.includes(styleId)
-      ? selectedStyles.filter(s => s !== styleId)
-      : [...selectedStyles, styleId];
-    setSelectedStyles(newStyles);
-    form.setValue('travelStyle', newStyles);
-  };
-
-  const toggleInterest = (interest: string) => {
-    const newInterests = selectedInterests.includes(interest)
-      ? selectedInterests.filter(i => i !== interest)
-      : [...selectedInterests, interest];
+  // Helper function for toggling interests
+  const toggleInterest = (interestId: string) => {
+    const newInterests = selectedInterests.includes(interestId)
+      ? selectedInterests.filter(i => i !== interestId)
+      : [...selectedInterests, interestId];
     setSelectedInterests(newInterests);
     form.setValue('interests', newInterests);
+    form.setValue('travelStyle', newInterests); // Keep for backward compatibility
   };
 
   const handleContinentChange = (continent: string) => {
@@ -403,10 +405,6 @@ export default function MyTripsNew() {
         throw new Error(t('trips.please_select_interest'));
       }
       
-      if (selectedStyles.length === 0) {
-        throw new Error(t('trips.please_select_travel_style_one'));
-      }
-      
       // If a specific city is selected, use it instead of the country
       const effectiveDestination = formData.specificCity && formData.specificCity !== "ANY"
         ? `${formData.specificCity}, ${formData.destination}`
@@ -416,7 +414,7 @@ export default function MyTripsNew() {
         destination: effectiveDestination,
         duration: getDurationInDays(formData.duration || "1-2 weeks"),
         interests: selectedInterests,
-        travelStyle: selectedStyles,
+        travelStyle: selectedInterests, // Use interests for travel style too
         budget: budget[0] || 1000,
         adults: formData.adults || 2,
         children: formData.children || 0,
@@ -574,14 +572,12 @@ export default function MyTripsNew() {
     try {
       const formData = form.getValues();
       console.log('Form data:', formData);
-      console.log('Selected styles:', selectedStyles);
       console.log('Selected interests:', selectedInterests);
       console.log('Budget:', budget[0]);
       
-      if (!formData.destination || selectedStyles.length === 0 || selectedInterests.length === 0) {
+      if (!formData.destination || selectedInterests.length === 0) {
         console.log('Missing information check failed:', {
           destination: formData.destination,
-          stylesLength: selectedStyles.length,
           interestsLength: selectedInterests.length
         });
         toast({
@@ -600,7 +596,7 @@ export default function MyTripsNew() {
       const data = {
         ...formData,
         destination: effectiveDestination,
-        travelStyle: selectedStyles,
+        travelStyle: selectedInterests, // Use interests for both
         interests: selectedInterests,
         budget: budget[0],
         duration: getDurationInDays(formData.duration || "1-2 weeks"),
@@ -1121,48 +1117,26 @@ export default function MyTripsNew() {
                   </div>
                 </div>
 
-                {/* Travel Style */}
+                {/* Interests (Combined Travel Styles + Interests) */}
                 <div>
                   <Label className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
-                    {t('trips.travel_style')} <span className="text-xs text-gray-500">({t('trips.select_multiple')})</span>
+                    {t('trips.interests')} <span className="text-xs text-gray-500">({t('trips.select_multiple')})</span>
                   </Label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {TRAVEL_STYLES.map((style) => (
+                  <div className="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto pr-2">
+                    {ALL_INTERESTS.map((interest) => (
                       <div
-                        key={style.id}
-                        onClick={() => toggleStyle(style.id)}
+                        key={interest.id}
+                        onClick={() => toggleInterest(interest.id)}
                         className={`p-4 rounded-lg border transition cursor-pointer min-h-[4rem] flex items-center ${
-                          selectedStyles.includes(style.id)
+                          selectedInterests.includes(interest.id)
                             ? 'border-orange-500 bg-gradient-to-br from-orange-50 via-teal-50 to-blue-50 shadow-md'
                             : 'border-gray-200 bg-white hover:border-orange-300 hover:bg-gradient-to-br hover:from-orange-50/50 hover:via-teal-50/50 hover:to-blue-50/50 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-orange-400'
                         }`}
                       >
                         <div className={`flex items-center gap-3 w-full ${i18n.language === 'he' ? 'flex-row-reverse text-right' : ''}`}>
-                          <style.icon className="w-5 h-5 flex-shrink-0 text-orange-500" />
-                          <p className="text-base font-medium leading-relaxed">{style.label}</p>
+                          <interest.icon className="w-5 h-5 flex-shrink-0 text-orange-500" />
+                          <p className="text-base font-medium leading-relaxed">{interest.label}</p>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Interests */}
-                <div>
-                  <Label className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
-{t('trips.interests')} <span className="text-xs text-gray-500">({t('trips.select_multiple')})</span>
-                  </Label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {INTERESTS.map((interest) => (
-                      <div
-                        key={interest}
-                        onClick={() => toggleInterest(interest)}
-                        className={`p-4 rounded-lg border transition cursor-pointer min-h-[4rem] flex items-center ${
-                          selectedInterests.includes(interest)
-                            ? 'border-orange-500 bg-gradient-to-br from-orange-50 via-teal-50 to-blue-50 shadow-md'
-                            : 'border-gray-200 bg-white hover:border-orange-300 hover:bg-gradient-to-br hover:from-orange-50/50 hover:via-teal-50/50 hover:to-blue-50/50 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-orange-400'
-                        } ${i18n.language === 'he' ? 'text-right justify-end' : 'text-left justify-start'}`}
-                      >
-                        <p className="text-base font-medium leading-relaxed">{interest}</p>
                       </div>
                     ))}
                   </div>
@@ -1310,10 +1284,10 @@ export default function MyTripsNew() {
 
                         <div className={`flex flex-wrap gap-2 mb-4 ${i18n.language === 'he' ? 'justify-end' : 'justify-start'}`}>
                           {suggestion.travelStyle.map((style) => {
-                            const styleConfig = TRAVEL_STYLES.find(ts => ts.id === style.trim().toLowerCase());
+                            const interestConfig = ALL_INTERESTS.find(int => int.id === style.trim().toLowerCase());
                             return (
                               <Badge key={style} variant="secondary" className="text-xs">
-                                {styleConfig ? styleConfig.label : style}
+                                {interestConfig ? interestConfig.label : style}
                               </Badge>
                             );
                           })}
@@ -1703,10 +1677,10 @@ export default function MyTripsNew() {
                             <div className={`flex flex-wrap gap-1 mt-3 ${i18n.language === 'he' ? 'justify-end' : 'justify-start'}`}>
                               {trip.travelStyle.split(',').map((style, idx) => {
                                 const trimmedStyle = style.trim();
-                                const styleConfig = TRAVEL_STYLES.find(ts => ts.id === trimmedStyle.toLowerCase());
+                                const interestConfig = ALL_INTERESTS.find(int => int.id === trimmedStyle.toLowerCase());
                                 return (
                                   <Badge key={idx} variant="secondary" className="text-xs">
-                                    {styleConfig ? styleConfig.label : trimmedStyle}
+                                    {interestConfig ? interestConfig.label : trimmedStyle}
                                   </Badge>
                                 );
                               })}
