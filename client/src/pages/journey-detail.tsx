@@ -854,6 +854,7 @@ export default function JourneyDetailPage() {
             <Button 
               onClick={() => {
                 // Navigate to Create Journey page with inspiration
+                console.log('🎯 Creating journey - ID:', id, 'Type:', typeof id);
                 const params = new URLSearchParams({
                   journeyId: id || '',
                   adults: customTrip.adults.toString(),
@@ -862,6 +863,7 @@ export default function JourneyDetailPage() {
                   ...(customTrip.startDate && { startDate: customTrip.startDate }),
                   ...(customTrip.budget && { budget: customTrip.budget })
                 });
+                console.log('🎯 URL Params:', params.toString());
                 setLocation(`/create-journey?${params.toString()}`);
               }}
               className="bg-orange-500 hover:bg-orange-600"
