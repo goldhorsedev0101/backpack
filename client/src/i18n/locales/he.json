@@ -2046,7 +2046,9 @@
   },
   "ai_assistant": {
     "title": "העוזר החכם של GlobeMate",
-    "badge": "מונע בינה מלאכותית"
+    "badge": "מונע בינה מלאכותית",
+    "trip_suggestions": "הצעות טיול",
+    "more_ideas": "רעיונות נוספים"
   },
   "accessibility": {
     "title": "הצהרת נגישות",

@@ -1661,7 +1661,9 @@
   },
   "ai_assistant": {
     "title": "GlobeMate Smart Assistant",
-    "badge": "AI-Powered"
+    "badge": "AI-Powered",
+    "trip_suggestions": "Trip Suggestions",
+    "more_ideas": "More Ideas"
   },
   "accessibility": {
     "title": "Accessibility Statement",

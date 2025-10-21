@@ -288,7 +288,7 @@ export default function AiChat({ className }: AiChatProps) {
                   {message.suggestions && message.suggestions.length > 0 && (
                     <div className="mt-3 space-y-2">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-semibold text-sm">🌎 Trip Suggestions</h4>
+                        <h4 className="font-semibold text-sm">🌎 {t('ai_assistant.trip_suggestions') || 'Trip Suggestions'}</h4>
                         {allSuggestions.length > 0 && (
                           <Button
                             size="sm"
@@ -297,7 +297,7 @@ export default function AiChat({ className }: AiChatProps) {
                             disabled={chatMutation.isPending}
                           >
                             <RefreshCw className="w-3 h-3 mr-1" />
-                            More Ideas
+                            {t('ai_assistant.more_ideas') || 'More Ideas'}
                           </Button>
                         )}
                       </div>
