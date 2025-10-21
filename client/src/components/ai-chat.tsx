@@ -349,7 +349,7 @@ export default function AiChat({ className }: AiChatProps) {
         {messages.length === 1 && (
           <div className="px-4 py-3 border-t">
             <p className="text-sm text-muted-foreground mb-3">Quick questions to get started:</p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2">
               {quickPrompts.map((prompt, index) => {
                 const IconComponent = prompt.icon;
                 return (
@@ -358,10 +358,10 @@ export default function AiChat({ className }: AiChatProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => handleQuickPrompt(prompt.text)}
-                    className="justify-start text-left h-auto py-2 overflow-hidden"
+                    className="justify-start text-left h-auto py-2.5 px-3 w-full"
                   >
                     <IconComponent className="w-4 h-4 mr-2 flex-shrink-0" />
-                    <span className="text-xs break-words">{prompt.text}</span>
+                    <span className="text-xs truncate">{prompt.text}</span>
                   </Button>
                 );
               })}
