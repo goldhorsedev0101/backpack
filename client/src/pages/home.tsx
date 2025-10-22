@@ -64,20 +64,41 @@ export default function Home() {
         method: 'DELETE',
       });
     },
-    onSuccess: async () => {
-      // Refetch immediately to update the UI
-      await queryClient.refetchQueries({ queryKey: ['/api/trips/user'] });
+    onMutate: async (tripId: number) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['/api/trips/user'] });
+      
+      // Snapshot the previous value
+      const previousTrips = queryClient.getQueryData(['/api/trips/user']);
+      
+      // Optimistically update to remove the trip
+      queryClient.setQueryData(['/api/trips/user'], (old: any[]) => {
+        return old ? old.filter((trip: any) => trip.id !== tripId) : [];
+      });
+      
+      // Return context with the previous trips
+      return { previousTrips };
+    },
+    onSuccess: () => {
       toast({
         title: "Trip deleted",
         description: "Your trip has been deleted successfully.",
       });
     },
-    onError: () => {
+    onError: (err, tripId, context: any) => {
+      // Rollback to the previous value on error
+      if (context?.previousTrips) {
+        queryClient.setQueryData(['/api/trips/user'], context.previousTrips);
+      }
       toast({
         title: "Error",
         description: "Failed to delete trip. Please try again.",
         variant: "destructive",
       });
+    },
+    onSettled: () => {
+      // Always refetch after error or success to sync with server
+      queryClient.invalidateQueries({ queryKey: ['/api/trips/user'] });
     },
   });
 
