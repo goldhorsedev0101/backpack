@@ -54,6 +54,18 @@ export default function JourneysPage() {
     enabled: true,
   });
 
+  // Debug: Check what data we're receiving
+  console.log('📊 Journeys API Response:', {
+    count: journeys.length,
+    firstJourney: journeys[0],
+    priceFields: journeys[0] ? {
+      priceMin: journeys[0].priceMin,
+      priceMax: journeys[0].priceMax,
+      price_min: (journeys[0] as any).price_min,
+      price_max: (journeys[0] as any).price_max,
+    } : null
+  });
+
   const formatDestinationChain = (destinations: Journey['destinations']) => {
     const arrow = '←';
     const cities = destinations.map(d => translateCityName(d.name));
