@@ -59,6 +59,13 @@ export default function MyJourneysPage() {
     queryKey: ['/api/saved-journeys'],
   });
 
+  // Debug: Log the data to console
+  console.log('🔍 Saved Journeys Data:', savedJourneys);
+  if (savedJourneys.length > 0) {
+    console.log('🔍 First Journey:', savedJourneys[0]);
+    console.log('🔍 Journey Object:', savedJourneys[0].journey);
+  }
+
   const removeMutation = useMutation({
     mutationFn: async (savedJourneyId: number) => {
       await apiRequest(`/api/saved-journeys/${savedJourneyId}`, {
