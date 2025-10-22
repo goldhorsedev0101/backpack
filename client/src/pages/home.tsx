@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card.js";
 import { Button } from "../components/ui/button.js";
 import { Badge } from "../components/ui/badge.js";
@@ -7,6 +7,8 @@ import TripCard from "../components/trip-card.js";
 import AiChat from "../components/ai-chat.js";
 import PersonalizedRecommendations from "../components/personalized-recommendations.js";
 import { Link } from "wouter";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Plus, 
   MapPin, 
@@ -31,6 +33,7 @@ import { useTranslation } from 'react-i18next';
 
 export default function Home() {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const user = null as any; // Demo mode - no auth
 
   const { data: trips = [], isLoading: tripsLoading } = useQuery<any[]>({
@@ -44,6 +47,32 @@ export default function Home() {
   const { data: reviews = [], isLoading: reviewsLoading } = useQuery<any[]>({
     queryKey: ["/api/reviews"]
   });
+
+  const deleteTripMutation = useMutation({
+    mutationFn: async (tripId: number) => {
+      return await apiRequest(`/api/trips/${tripId}`, {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/trips/user'] });
+      toast({
+        title: "Trip deleted",
+        description: "Your trip has been deleted successfully.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete trip. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteTrip = (tripId: number) => {
+    deleteTripMutation.mutate(tripId);
+  };
 
   const welcomeMessage = t('home.welcome_title');
 
@@ -197,7 +226,7 @@ export default function Home() {
               ) : userTrips.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {userTrips.slice(0, 2).map((trip: any) => (
-                    <TripCard key={trip.id} trip={trip} />
+                    <TripCard key={trip.id} trip={trip} onDelete={handleDeleteTrip} />
                   ))}
                 </div>
               ) : (

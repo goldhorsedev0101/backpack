@@ -539,6 +539,22 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  app.delete('/api/trips/:id', noAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.claims?.sub || req.user.id;
+      if (!userId || userId === 'anonymous') {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const tripId = parseInt(req.params.id);
+      await storage.deleteTrip(tripId, userId);
+      res.json({ message: "Trip deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting trip:", error);
+      res.status(400).json({ message: "Failed to delete trip" });
+    }
+  });
+
   // Itinerary routes
   app.get('/api/itineraries', noAuth, async (req: any, res) => {
     try {

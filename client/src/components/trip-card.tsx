@@ -2,6 +2,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { 
   MapPin, 
   Calendar, 
@@ -10,8 +20,10 @@ import {
   Eye,
   Edit,
   Share,
-  Clock
+  Clock,
+  Trash2
 } from "lucide-react";
+import { useState } from "react";
 
 interface TripCardProps {
   trip: {
@@ -35,9 +47,12 @@ interface TripCardProps {
   showUser?: boolean;
   onEdit?: (tripId: number) => void;
   onView?: (tripId: number) => void;
+  onDelete?: (tripId: number) => void;
 }
 
-export default function TripCard({ trip, showUser = false, onEdit, onView }: TripCardProps) {
+export default function TripCard({ trip, showUser = false, onEdit, onView, onDelete }: TripCardProps) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  
   const destinations = Array.isArray(trip.destinations) ? trip.destinations : [];
   const destinationNames = destinations.map((dest: any) => 
     typeof dest === 'string' ? dest : dest.name || dest
@@ -179,28 +194,67 @@ export default function TripCard({ trip, showUser = false, onEdit, onView }: Tri
             size="sm" 
             className="flex-1"
             onClick={() => onView?.(trip.id)}
+            data-testid={`view-trip-${trip.id}`}
           >
             <Eye className="w-4 h-4 mr-1" />
             View
           </Button>
           
           {!showUser && (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex-1"
-              onClick={() => onEdit?.(trip.id)}
-            >
-              <Edit className="w-4 h-4 mr-1" />
-              Edit
-            </Button>
+            <>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex-1"
+                onClick={() => onEdit?.(trip.id)}
+                data-testid={`edit-trip-${trip.id}`}
+              >
+                <Edit className="w-4 h-4 mr-1" />
+                Edit
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                onClick={() => setShowDeleteDialog(true)}
+                data-testid={`delete-trip-${trip.id}`}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </>
           )}
           
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" data-testid={`share-trip-${trip.id}`}>
             <Share className="w-4 h-4" />
           </Button>
         </div>
       </CardContent>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Trip?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{trip.title}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="cancel-delete-trip">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                onDelete?.(trip.id);
+                setShowDeleteDialog(false);
+              }}
+              className="bg-red-600 hover:bg-red-700"
+              data-testid="confirm-delete-trip"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

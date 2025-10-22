@@ -6,6 +6,15 @@ GlobeMate is a full-stack web application for worldwide travel planning and comm
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+- **Trip Deletion Feature** (Oct 22, 2025): Added delete functionality for user trips with confirmation dialog. Users can now delete their trips from the "My Trips" section on the home page.
+  - Backend: Added DELETE `/api/trips/:id` endpoint with user authorization
+  - Storage: Implemented `deleteTrip` method in both DatabaseStorage and MemStorage
+  - Frontend: Added delete button to TripCard component with AlertDialog confirmation
+  - UX: Toast notifications for success/error feedback
+- **Home Page Trip Limit**: Limited "My Trips" section to display maximum 2 trips (changed from 4)
+- Added price breakdown explanations across all pages (journeys, journey-detail, home) in both Hebrew and English
+
 ## System Architecture
 ### Frontend Architecture
 - **Frameworks**: React 18 with TypeScript, Vite

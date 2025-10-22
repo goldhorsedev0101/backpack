@@ -92,6 +92,7 @@ export interface IStorage {
   getTripById(id: number): Promise<Trip | undefined>;
   updateTrip(id: number, trip: Partial<InsertTrip>): Promise<Trip>;
   saveUserTrip(userId: string, trip: any): Promise<void>;
+  deleteTrip(id: number, userId: string): Promise<void>;
   
   // Journey operations (multi-destination routes)
   getJourneys(filters?: { season?: string; minBudget?: number; maxBudget?: number; minNights?: number; maxNights?: number; tags?: string[]; audienceTags?: string[]; limit?: number; offset?: number }): Promise<Journey[]>;
@@ -303,6 +304,12 @@ export class DatabaseStorage implements IStorage {
       .where(eq(trips.id, id))
       .returning();
     return updatedTrip;
+  }
+
+  async deleteTrip(id: number, userId: string): Promise<void> {
+    await db
+      .delete(trips)
+      .where(and(eq(trips.id, id), eq(trips.userId, userId)));
   }
 
   // Simple trip saving for suggestions (creates a new trip)
@@ -1500,6 +1507,31 @@ class MemStorage implements IStorage {
     const userTrips = this.trips.filter(trip => trip.userId === userId);
     console.log(`📋 Found ${userTrips.length} trips for user: ${userId}`);
     return userTrips;
+  }
+
+  async getTripById(id: number): Promise<Trip | undefined> {
+    return this.trips.find(trip => trip.id === id);
+  }
+
+  async updateTrip(id: number, tripData: Partial<InsertTrip>): Promise<Trip> {
+    const tripIndex = this.trips.findIndex(trip => trip.id === id);
+    if (tripIndex === -1) {
+      throw new Error('Trip not found');
+    }
+    this.trips[tripIndex] = { ...this.trips[tripIndex], ...tripData, updatedAt: new Date() };
+    return this.trips[tripIndex];
+  }
+
+  async deleteTrip(id: number, userId: string): Promise<void> {
+    const tripIndex = this.trips.findIndex(trip => trip.id === id && trip.userId === userId);
+    if (tripIndex !== -1) {
+      this.trips.splice(tripIndex, 1);
+      console.log(`🗑️ Trip ${id} deleted for user ${userId}`);
+    }
+  }
+
+  async saveUserTrip(userId: string, trip: any): Promise<void> {
+    await this.createTrip({ ...trip, userId });
   }
 
   // Placeholder implementations for required interface methods
