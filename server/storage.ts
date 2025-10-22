@@ -455,7 +455,26 @@ export class DatabaseStorage implements IStorage {
         journeyId: savedJourneys.journeyId,
         notes: savedJourneys.notes,
         createdAt: savedJourneys.createdAt,
-        journey: journeys,
+        journey: {
+          id: journeys.id,
+          title: journeys.title,
+          description: journeys.description,
+          destinations: journeys.destinations,
+          totalNights: journeys.totalNights,
+          priceMin: journeys.priceMin,
+          priceMax: journeys.priceMax,
+          season: journeys.season,
+          tags: journeys.tags,
+          audienceTags: journeys.audienceTags,
+          rating: journeys.rating,
+          popularity: journeys.popularity,
+          heroImage: journeys.heroImage,
+          images: journeys.images,
+          dailyItinerary: journeys.dailyItinerary,
+          costsBreakdown: journeys.costsBreakdown,
+          createdAt: journeys.createdAt,
+          updatedAt: journeys.updatedAt,
+        },
       })
       .from(savedJourneys)
       .innerJoin(journeys, eq(savedJourneys.journeyId, journeys.id))
