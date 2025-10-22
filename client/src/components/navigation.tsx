@@ -287,11 +287,11 @@ export default function Navigation() {
                 key={item.href}
                 asChild
                 variant="ghost"
-                className={`w-full px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+                className={`w-full justify-start px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
                   location === item.href
                     ? "bg-orange-100 text-orange-800 hover:bg-orange-200"
                     : "text-slate-700 hover:bg-gray-100 hover:text-slate-900"
-                } ${isHebrew ? 'justify-end' : 'justify-start'}`}
+                }`}
               >
                 <Link href={item.href} className="flex items-center gap-3">
                   {item.icon && (
@@ -323,7 +323,7 @@ export default function Navigation() {
                 onClick={handleLogout}
                 variant="outline"
                 disabled={isLoading}
-                className={`w-full px-4 py-3 text-slate-700 border-gray-300 hover:bg-red-50 hover:text-red-700 hover:border-red-300 ${isHebrew ? 'justify-end' : 'justify-start'}`}
+                className="w-full justify-start px-4 py-3 text-slate-700 border-gray-300 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
               >
                 <LogOut className="w-5 h-5 mr-3" />
                 {isLoading ? t('common.loading') : t('auth.sign_out')}
