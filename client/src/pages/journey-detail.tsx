@@ -1,5 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, Link, useLocation } from "wouter";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -155,6 +157,7 @@ export default function JourneyDetailPage() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'he';
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   
   // Custom Journey Dialog State
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -172,6 +175,86 @@ export default function JourneyDetailPage() {
     queryKey: [`/api/journeys/${id}`],
     enabled: !!id,
   });
+
+  // Check if journey is saved
+  const { data: savedStatus } = useQuery<{ isSaved: boolean }>({
+    queryKey: [`/api/saved-journeys/check/${id}`],
+    enabled: !!id,
+  });
+
+  // Save journey mutation
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest('/api/saved-journeys', {
+        method: 'POST',
+        body: JSON.stringify({ journeyId: parseInt(id!) }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/saved-journeys/check/${id}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/saved-journeys'] });
+      toast({
+        title: isRTL ? 'נשמר בהצלחה' : 'Saved Successfully',
+        description: isRTL ? 'המסע נוסף למסעות השמורים שלך' : 'Journey added to your saved journeys',
+      });
+    },
+    onError: () => {
+      toast({
+        title: isRTL ? 'שגיאה' : 'Error',
+        description: isRTL ? 'לא ניתן לשמור את המסע' : 'Failed to save journey',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Get saved journeys from cache to find the saved journey ID
+  const { data: savedJourneys } = useQuery<any[]>({
+    queryKey: ['/api/saved-journeys'],
+    enabled: savedStatus?.isSaved === true, // Only fetch if we know it's saved
+  });
+
+  // Remove saved journey mutation
+  const removeMutation = useMutation({
+    mutationFn: async () => {
+      // Use cached data from React Query
+      const cachedJourneys = queryClient.getQueryData<any[]>(['/api/saved-journeys']) || savedJourneys;
+      
+      if (!cachedJourneys || cachedJourneys.length === 0) {
+        throw new Error('No saved journeys found in cache. Please refresh the page.');
+      }
+      
+      const saved = cachedJourneys.find((sj: any) => sj.journeyId === parseInt(id!));
+      if (!saved) {
+        throw new Error('This journey is not saved');
+      }
+      
+      return await apiRequest(`/api/saved-journeys/${saved.id}`, { method: 'DELETE' });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/saved-journeys/check/${id}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/saved-journeys'] });
+      toast({
+        title: isRTL ? 'הוסר בהצלחה' : 'Removed Successfully',
+        description: isRTL ? 'המסע הוסר מהמסעות השמורים שלך' : 'Journey removed from your saved journeys',
+      });
+    },
+    onError: () => {
+      toast({
+        title: isRTL ? 'שגיאה' : 'Error',
+        description: isRTL ? 'לא ניתן להסיר את המסע' : 'Failed to remove journey',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const handleSaveToggle = () => {
+    if (savedStatus?.isSaved) {
+      removeMutation.mutate();
+    } else {
+      saveMutation.mutate();
+    }
+  };
 
   const formatPrice = (min: string | number, max: string | number) => {
     const currency = isRTL ? '₪' : '$';
@@ -492,9 +575,19 @@ export default function JourneyDetailPage() {
               <Sparkles className="w-4 h-4" />
               <span className={isRTL ? 'mr-2' : 'ml-2'} dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'בנה לי מסע דומה ⭐' : '⭐ Build me a similar journey'}</span>
             </Button>
-            <Button variant="outline" className="whitespace-nowrap" data-testid="save-journey">
-              <Heart className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-              <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'שמור למסעות שלי' : 'Save to my trips'}</span>
+            <Button 
+              variant="outline" 
+              className={`whitespace-nowrap ${savedStatus?.isSaved ? 'bg-orange-50 border-orange-500 text-orange-600' : ''}`}
+              onClick={handleSaveToggle}
+              disabled={saveMutation.isPending || removeMutation.isPending}
+              data-testid="save-journey"
+            >
+              <Heart className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'} ${savedStatus?.isSaved ? 'fill-orange-500' : ''}`} />
+              <span dir={isRTL ? 'rtl' : 'ltr'}>
+                {savedStatus?.isSaved 
+                  ? (isRTL ? 'נשמר ✓' : 'Saved ✓')
+                  : (isRTL ? 'שמור מסע' : 'Save Journey')}
+              </span>
             </Button>
             <Button variant="outline" className="whitespace-nowrap" data-testid="share-journey">
               <Share2 className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />

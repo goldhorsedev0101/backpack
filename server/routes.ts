@@ -38,7 +38,7 @@ import { supabaseAdmin } from './supabase.js';
 //   insertTravelBuddyApplicationSchema,
 //   insertLocationReviewSchema,
 // } from "@shared/schema";
-import { insertJourneySchema, hotelInquiries } from "@shared/schema";
+import { insertJourneySchema, insertSavedJourneySchema, hotelInquiries } from "@shared/schema";
 import {
   generateTravelSuggestions,
   generateItinerary,
@@ -710,6 +710,80 @@ export async function registerRoutes(app: Express): Promise<void> {
     } catch (error) {
       console.error("Error creating journey:", error);
       res.status(400).json({ message: "Failed to create journey", error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Saved Journeys routes
+  app.post('/api/saved-journeys', noAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.claims?.sub || req.user.id;
+      
+      // Validate request body
+      const validatedData = insertSavedJourneySchema.parse({
+        userId,
+        journeyId: req.body.journeyId,
+        notes: req.body.notes,
+      });
+
+      // Check if already saved
+      const alreadySaved = await storage.isJourneySaved(userId, validatedData.journeyId);
+      if (alreadySaved) {
+        return res.status(400).json({ message: "Journey already saved" });
+      }
+
+      const savedJourney = await storage.saveJourney(userId, validatedData.journeyId, validatedData.notes);
+      res.status(201).json(savedJourney);
+    } catch (error) {
+      if (error instanceof Error && error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid request data", error: error.message });
+      }
+      console.error("Error saving journey:", error);
+      res.status(500).json({ message: "Failed to save journey" });
+    }
+  });
+
+  app.get('/api/saved-journeys', noAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.claims?.sub || req.user.id;
+      const savedJourneys = await storage.getUserSavedJourneys(userId);
+      res.json(savedJourneys);
+    } catch (error) {
+      console.error("Error fetching saved journeys:", error);
+      res.status(500).json({ message: "Failed to fetch saved journeys" });
+    }
+  });
+
+  app.get('/api/saved-journeys/check/:journeyId', noAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.claims?.sub || req.user.id;
+      const journeyId = parseInt(req.params.journeyId);
+      
+      if (isNaN(journeyId)) {
+        return res.status(400).json({ message: "Invalid journeyId - must be a number" });
+      }
+      
+      const isSaved = await storage.isJourneySaved(userId, journeyId);
+      res.json({ isSaved });
+    } catch (error) {
+      console.error("Error checking saved journey:", error);
+      res.status(500).json({ message: "Failed to check if journey is saved" });
+    }
+  });
+
+  app.delete('/api/saved-journeys/:id', noAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.claims?.sub || req.user.id;
+      const id = parseInt(req.params.id);
+      
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid saved journey ID - must be a number" });
+      }
+      
+      await storage.removeSavedJourney(id, userId);
+      res.json({ message: "Journey removed from saved list" });
+    } catch (error) {
+      console.error("Error removing saved journey:", error);
+      res.status(500).json({ message: "Failed to remove saved journey" });
     }
   });
 

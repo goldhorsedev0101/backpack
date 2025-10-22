@@ -96,6 +96,15 @@ export const journeys = pgTable("journeys", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Saved Journeys table (user's saved journeys)
+export const savedJourneys = pgTable("saved_journeys", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  journeyId: integer("journey_id").references(() => journeys.id).notNull(),
+  notes: text("notes"), // Optional user notes about this journey
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Enhanced Reviews table for real places
 export const placeReviews = pgTable("place_reviews", {
   id: serial("id").primaryKey(),
@@ -903,6 +912,11 @@ export const insertJourneySchema = createInsertSchema(journeys).omit({
   popularity: true,
 });
 
+export const insertSavedJourneySchema = createInsertSchema(savedJourneys).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertReviewSchema = createInsertSchema(reviews).omit({
   id: true,
   createdAt: true,
@@ -1121,6 +1135,8 @@ export type Trip = typeof trips.$inferSelect;
 export type InsertTrip = z.infer<typeof insertTripSchema>;
 export type Journey = typeof journeys.$inferSelect;
 export type InsertJourney = z.infer<typeof insertJourneySchema>;
+export type SavedJourney = typeof savedJourneys.$inferSelect;
+export type InsertSavedJourney = z.infer<typeof insertSavedJourneySchema>;
 export type Review = typeof reviews.$inferSelect;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Expense = typeof expenses.$inferSelect;

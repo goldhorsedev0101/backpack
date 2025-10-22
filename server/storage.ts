@@ -2,6 +2,7 @@ import {
   users,
   trips,
   journeys,
+  savedJourneys,
   reviews,
   expenses,
   chatRooms,
@@ -75,6 +76,8 @@ import {
   type InsertItineraryItem,
   type Journey,
   type InsertJourney,
+  type SavedJourney,
+  type InsertSavedJourney,
 } from "../shared/schema.js";
 import { db } from "./db.js";
 import { eq, desc, and, or, sql } from "drizzle-orm";
@@ -100,6 +103,12 @@ export interface IStorage {
   createJourney(journey: InsertJourney): Promise<Journey>;
   updateJourney(id: number, journey: Partial<InsertJourney>): Promise<Journey>;
   deleteJourney(id: number): Promise<boolean>;
+  
+  // Saved Journeys operations
+  saveJourney(userId: string, journeyId: number, notes?: string): Promise<SavedJourney>;
+  getUserSavedJourneys(userId: string): Promise<(SavedJourney & { journey: Journey })[]>;
+  removeSavedJourney(id: number, userId: string): Promise<void>;
+  isJourneySaved(userId: string, journeyId: number): Promise<boolean>;
   
   // Review operations
   createReview(review: InsertReview): Promise<Review>;
@@ -423,6 +432,52 @@ export class DatabaseStorage implements IStorage {
   async deleteJourney(id: number): Promise<boolean> {
     const result = await db.delete(journeys).where(eq(journeys.id, id));
     return result.rowCount !== null && result.rowCount > 0;
+  }
+
+  // Saved Journeys operations
+  async saveJourney(userId: string, journeyId: number, notes?: string): Promise<SavedJourney> {
+    const [savedJourney] = await db
+      .insert(savedJourneys)
+      .values({
+        userId,
+        journeyId,
+        notes,
+      })
+      .returning();
+    return savedJourney;
+  }
+
+  async getUserSavedJourneys(userId: string): Promise<(SavedJourney & { journey: Journey })[]> {
+    const results = await db
+      .select({
+        id: savedJourneys.id,
+        userId: savedJourneys.userId,
+        journeyId: savedJourneys.journeyId,
+        notes: savedJourneys.notes,
+        createdAt: savedJourneys.createdAt,
+        journey: journeys,
+      })
+      .from(savedJourneys)
+      .innerJoin(journeys, eq(savedJourneys.journeyId, journeys.id))
+      .where(eq(savedJourneys.userId, userId))
+      .orderBy(desc(savedJourneys.createdAt));
+    
+    return results;
+  }
+
+  async removeSavedJourney(id: number, userId: string): Promise<void> {
+    await db
+      .delete(savedJourneys)
+      .where(and(eq(savedJourneys.id, id), eq(savedJourneys.userId, userId)));
+  }
+
+  async isJourneySaved(userId: string, journeyId: number): Promise<boolean> {
+    const [result] = await db
+      .select()
+      .from(savedJourneys)
+      .where(and(eq(savedJourneys.userId, userId), eq(savedJourneys.journeyId, journeyId)))
+      .limit(1);
+    return !!result;
   }
 
   // Review operations

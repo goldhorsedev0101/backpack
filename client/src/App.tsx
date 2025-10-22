@@ -30,6 +30,7 @@ import Journeys from "./pages/journeys.js";
 import JourneyDetail from "./pages/journey-detail.js";
 import CreateJourney from "./pages/create-journey.js";
 import MyJourney from "./pages/my-journey.js";
+import MyJourneys from "./pages/my-journeys.js";
 import MediaDemo from "./pages/media-demo.js";
 import IntegrationsDemoUnsplash from "./pages/integrations-demo-unsplash.js";
 import HelpCenter from "./pages/help-center.js";
@@ -97,6 +98,7 @@ function Router() {
           <Route path="/journeys/:id" component={JourneyDetail} />
           <Route path="/create-journey" component={CreateJourney} />
           <Route path="/my-journey/:id" component={MyJourney} />
+          <Route path="/my-journeys" component={MyJourneys} />
           <Route path="/integrations-demo/destinations" component={IntegrationsDemoDestinations} />
           <Route path="/integrations-demo/media" component={MediaDemo} />
           <Route path="/integrations-demo/unsplash" component={IntegrationsDemoUnsplash} />
