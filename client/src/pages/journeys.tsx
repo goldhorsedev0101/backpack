@@ -74,7 +74,8 @@ export default function JourneysPage() {
     
     const minNum = isRTL ? Math.round(minVal * 3.5) : minVal;
     const maxNum = isRTL ? Math.round(maxVal * 3.5) : maxVal;
-    return `${currency}${minNum.toLocaleString()} - ${currency}${maxNum.toLocaleString()}`;
+    // Display min first, then max (smaller to larger)
+    return `${currency}${minNum.toLocaleString('he-IL')} - ${currency}${maxNum.toLocaleString('he-IL')}`;
   };
 
   const translateTag = (tag: string) => {
@@ -233,7 +234,7 @@ export default function JourneysPage() {
                     const currency = isRTL ? '₪' : '$';
                     const minNum = isRTL ? Math.round(filters.minBudget * 3.5) : filters.minBudget;
                     const maxNum = isRTL ? Math.round(filters.maxBudget * 3.5) : filters.maxBudget;
-                    return `${currency}${minNum.toLocaleString()} - ${currency}${maxNum.toLocaleString()}`;
+                    return `${currency}${minNum.toLocaleString('he-IL')} - ${currency}${maxNum.toLocaleString('he-IL')}`;
                   })()}
                 </label>
                 <Slider
@@ -257,10 +258,10 @@ export default function JourneysPage() {
 
             {/* Tags Filter */}
             <div className="mt-6" dir={isRTL ? 'rtl' : 'ltr'}>
-              <label className={`block text-sm font-medium mb-3 ${isRTL ? 'text-right' : ''}`}>
+              <label className={`block text-sm font-medium mb-3 ${isRTL ? 'text-left' : 'text-left'}`}>
                 {isRTL ? 'תגיות' : 'Tags'}
               </label>
-              <div className={`flex flex-wrap gap-2 ${isRTL ? 'justify-end' : ''}`}>
+              <div className={`flex flex-wrap gap-2 ${isRTL ? 'justify-start' : 'justify-start'}`}>
                 {tagFilters.map(tag => (
                   <Badge
                     key={tag}

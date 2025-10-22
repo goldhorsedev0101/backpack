@@ -261,7 +261,7 @@ export default function JourneyDetailPage() {
     const currency = isRTL ? '₪' : '$';
     const minNum = isRTL ? Math.round(parseFloat(min.toString()) * 3.5) : parseInt(min.toString());
     const maxNum = isRTL ? Math.round(parseFloat(max.toString()) * 3.5) : parseInt(max.toString());
-    return `${currency}${minNum.toLocaleString()} - ${currency}${maxNum.toLocaleString()}`;
+    return `${currency}${minNum.toLocaleString('he-IL')} - ${currency}${maxNum.toLocaleString('he-IL')}`;
   };
 
   const translateCityName = (cityName: string) => {

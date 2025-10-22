@@ -94,7 +94,7 @@ export default function MyJourneysPage() {
     const maxVal = typeof max === 'string' ? parseFloat(max) : max;
     const minNum = isRTL ? Math.round(minVal * 3.5) : minVal;
     const maxNum = isRTL ? Math.round(maxVal * 3.5) : maxVal;
-    return `${currency}${minNum.toLocaleString()} - ${currency}${maxNum.toLocaleString()}`;
+    return `${currency}${minNum.toLocaleString('he-IL')} - ${currency}${maxNum.toLocaleString('he-IL')}`;
   };
 
   const translateTag = (tag: string) => {
