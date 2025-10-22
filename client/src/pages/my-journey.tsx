@@ -404,7 +404,7 @@ export default function MyJourneyPage() {
                             <div className="flex-shrink-0 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
                               {actIdx + 1}
                             </div>
-                            <p className={`flex-1 text-gray-700 leading-relaxed pt-1 pl-2 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                            <p className={`flex-1 text-gray-700 leading-relaxed pt-1 ${isRTL ? 'pr-2 text-right' : 'pl-4 text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
                               {activity}
                             </p>
                           </div>
@@ -477,7 +477,7 @@ export default function MyJourneyPage() {
                           <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                             <MapPin className="w-6 h-6 text-white" />
                           </div>
-                          <div className={`flex-1 pl-2 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                          <div className={`flex-1 ${isRTL ? 'pr-3 text-right' : 'pl-3 text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
                             <p className="font-bold text-gray-800 text-lg">
                               {translateCityName(dest.name || dest)}
                             </p>
