@@ -183,6 +183,7 @@ export default function Home() {
             description={t('home.ai_planning_desc') || "Get personalized itineraries tailored to your preferences"}
             gradient="from-orange-50 to-orange-100"
             iconColor="text-orange-600"
+            href="/ai-assistant"
           />
           <FeatureCard 
             icon={DollarSign} 
@@ -190,6 +191,7 @@ export default function Home() {
             description={t('home.budget_tracking_desc') || "Track expenses and stay within your budget effortlessly"}
             gradient="from-teal-50 to-teal-100"
             iconColor="text-teal-600"
+            href="/expenses"
           />
           <FeatureCard 
             icon={Users} 
@@ -197,13 +199,15 @@ export default function Home() {
             description={t('home.community_desc') || "Connect with travelers and share experiences"}
             gradient="from-blue-50 to-blue-100"
             iconColor="text-blue-600"
+            href="/community"
           />
           <FeatureCard 
             icon={Plane} 
             title={t('home.verified_places') || "Unbeatable Prices"}
-            description={t('home.verified_places_desc') || "Book hotels, flights and vacation packages at the best prices"}
+            description={t('home.verified_places_desc') || "Book hotels, flights and vacation packages at the best prices with excellent customer service and 24/7 support"}
             gradient="from-purple-50 to-purple-100"
             iconColor="text-purple-600"
+            href="/hotel-deals"
           />
           <FeatureCard 
             icon={Compass} 
@@ -211,6 +215,7 @@ export default function Home() {
             description={t('home.curated_journeys_desc') || "Pre-planned multi-city adventures"}
             gradient="from-pink-50 to-pink-100"
             iconColor="text-pink-600"
+            href="/journeys"
           />
           <FeatureCard 
             icon={Zap} 
@@ -218,6 +223,7 @@ export default function Home() {
             description={t('home.real_time_desc') || "Live weather data and travel recommendations"}
             gradient="from-amber-50 to-amber-100"
             iconColor="text-amber-600"
+            href="/destinations"
           />
         </div>
       </section>
@@ -484,23 +490,26 @@ function StatsCard({ icon: Icon, value, label, gradient }: {
 }
 
 // Feature Card Component
-function FeatureCard({ icon: Icon, title, description, gradient, iconColor }: {
+function FeatureCard({ icon: Icon, title, description, gradient, iconColor, href }: {
   icon: any;
   title: string;
   description: string;
   gradient: string;
   iconColor: string;
+  href: string;
 }) {
   return (
-    <Card className={`bg-gradient-to-br ${gradient} border-0 shadow-md hover:shadow-xl hover:scale-105 transition-all cursor-pointer group`}>
-      <CardContent className="p-6">
-        <div className={`${iconColor} mb-4 group-hover:scale-110 transition-transform`}>
-          <Icon className="w-10 h-10" />
-        </div>
-        <h3 className="text-xl font-bold text-slate-800 mb-2">{title}</h3>
-        <p className="text-gray-600">{description}</p>
-      </CardContent>
-    </Card>
+    <Link href={href}>
+      <Card className={`bg-gradient-to-br ${gradient} border-0 shadow-md hover:shadow-xl hover:scale-105 transition-all cursor-pointer group`}>
+        <CardContent className="p-6">
+          <div className={`${iconColor} mb-4 group-hover:scale-110 transition-transform`}>
+            <Icon className="w-10 h-10" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">{title}</h3>
+          <p className="text-gray-600">{description}</p>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }
 
