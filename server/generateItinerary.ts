@@ -119,15 +119,19 @@ Return the itinerary as a JSON object with an itinerary array, like this:
     }
     
     console.log('OpenAI response content length:', content.length);
+    console.log('OpenAI raw response (first 500 chars):', content.substring(0, 500));
 
     // Parse the JSON response
     let itinerary: ItineraryDay[];
     try {
       const parsed = JSON.parse(content);
+      console.log('Successfully parsed JSON. Keys:', Object.keys(parsed));
       // Handle both direct array and object with array property
       itinerary = Array.isArray(parsed) ? parsed : parsed.itinerary || parsed.days || [];
     } catch (parseError) {
-      console.error("Failed to parse OpenAI response:", content);
+      console.error("❌ Failed to parse OpenAI response.");
+      console.error("Raw content:", content);
+      console.error("Parse error:", parseError);
       throw new Error("Invalid JSON response from OpenAI");
     }
 
