@@ -49,27 +49,22 @@ import { ErrorBoundary } from "./components/error-boundary.js";
 function ScrollToTop() {
   const [location] = useLocation();
   
+  // Scroll on initial mount AND on location change
   React.useLayoutEffect(() => {
-    // Scroll to top immediately before paint when route changes
+    window.scrollTo(0, 0);
+  }, [location]);
+  
+  // Additional scroll after render to catch any late updates
+  React.useEffect(() => {
     window.scrollTo(0, 0);
     
-    // Also scroll after a tiny delay to catch any late renders
+    // Also do it again after a tiny delay for safety
     const timeoutId = setTimeout(() => {
       window.scrollTo(0, 0);
-    }, 0);
+    }, 10);
     
     return () => clearTimeout(timeoutId);
   }, [location]);
-  
-  // Also handle browser back/forward buttons
-  React.useEffect(() => {
-    const handlePopState = () => {
-      window.scrollTo(0, 0);
-    };
-    
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
   
   return null;
 }
