@@ -267,34 +267,42 @@ export default function JourneyDetailPage() {
     return translations[country]?.[isRTL ? 'he' : 'en'] || country;
   };
 
-  const translateDescription = (title: string) => {
+  const translateDescription = (description: string) => {
     const descriptions: Record<string, { he: string; en: string }> = {
-      'Classic Japan Circuit': { 
-        he: 'גלה את היופי של יפן המסורתית והמודרנית - ממקדשים עתיקים למסעדות רובוטים', 
-        en: 'Discover the beauty of traditional and modern Japan - from ancient temples to robot restaurants' 
+      'Discover the perfect blend of ancient traditions and modern innovation across Japan\'s most iconic cities': { 
+        he: 'גלה את השילוב המושלם בין מסורות עתיקות לחדשנות מודרנית בערי יפן האייקוניות ביותר', 
+        en: 'Discover the perfect blend of ancient traditions and modern innovation across Japan\'s most iconic cities' 
       },
-      'European Capital Tour': { 
-        he: 'בקר בשלוש מהערים היפות ביותר באירופה - פריז, אמסטרדם וברלין', 
-        en: 'Visit three of Europe\'s most beautiful cities - Paris, Amsterdam and Berlin' 
+      'Experience the art, culture, and history of three magnificent European capitals in one unforgettable journey': { 
+        he: 'חווה את האמנות, התרבות וההיסטוריה של שלוש בירות אירופאיות מרהיבות במסע בלתי נשכח אחד', 
+        en: 'Experience the art, culture, and history of three magnificent European capitals in one unforgettable journey' 
       },
-      'European Highlights Tour': { 
-        he: 'חווה את הטוב שבים התיכון - מחופי ברצלונה לרומא העתיקה', 
-        en: 'Experience the best of the Mediterranean - from Barcelona\'s beaches to ancient Rome' 
-      },
-      'Southeast Asia Adventure': { 
-        he: 'מבנגקוק התוססת למקדשים שלווים וחופים גן עדן - החוויה התאילנדית האולטימטיבית', 
+      'From bustling Bangkok to serene temples and paradise beaches - the ultimate Thai experience': { 
+        he: 'מבנגקוק התוססת ועד מקדשים שלווים וחופים גן עדן - החוויה התאילנדית האולטימטיבית', 
         en: 'From bustling Bangkok to serene temples and paradise beaches - the ultimate Thai experience' 
       },
-      'Mediterranean Dream': { 
-        he: 'חקור את הריביירה הצרפתית ואת רומא ההיסטורית במסע ים תיכוני בלתי נשכח', 
-        en: 'Explore the French Riviera and historic Rome in an unforgettable Mediterranean journey' 
+      'Sun-soaked coastlines, world-class cuisine, and timeless culture across three Mediterranean gems': { 
+        he: 'חופים מוארי שמש, מטבח ברמה עולמית ותרבות נצחית בשלושה אוצרות ים תיכוניים', 
+        en: 'Sun-soaked coastlines, world-class cuisine, and timeless culture across three Mediterranean gems' 
       },
-      'East Coast USA Explorer': { 
-        he: 'גלה את הערים האייקוניות של החוף המזרחי - מניו יורק לבוסטון', 
-        en: 'Discover the iconic cities of the East Coast - from New York to Boston' 
+      'From the Big Apple to historic Boston - explore America\'s most iconic East Coast cities': { 
+        he: 'מהתפוח הגדול ועד בוסטון ההיסטורית - חקור את הערים האייקוניות ביותר בחוף המזרחי של אמריקה', 
+        en: 'From the Big Apple to historic Boston - explore America\'s most iconic East Coast cities' 
+      },
+      'An immersive journey through Japan\'s most iconic cities, from Tokyo\'s neon lights to Hiroshima\'s powerful history': { 
+        he: 'מסע סוחף דרך הערים האייקוניות ביותר של יפן, מאורות הניאון של טוקיו להיסטוריה המרגשת של הירושימה', 
+        en: 'An immersive journey through Japan\'s most iconic cities, from Tokyo\'s neon lights to Hiroshima\'s powerful history' 
+      },
+      'A comprehensive European experience through five legendary cities, from the romance of Paris to Berlin\'s cutting-edge culture': { 
+        he: 'חוויה אירופאית מקיפה דרך חמש ערים אגדיות, מהרומנטיקה של פריז לתרבות החדשנית של ברלין', 
+        en: 'A comprehensive European experience through five legendary cities, from the romance of Paris to Berlin\'s cutting-edge culture' 
+      },
+      'An epic journey through Thailand, Indonesia, and Singapore, experiencing beaches, temples, jungles, and modern Asian culture': { 
+        he: 'מסע אפי דרך תאילנד, אינדונזיה וסינגפור, חוויה של חופים, מקדשים, ג\'ונגלים ותרבות אסיאתית מודרנית', 
+        en: 'An epic journey through Thailand, Indonesia, and Singapore, experiencing beaches, temples, jungles, and modern Asian culture' 
       },
     };
-    return descriptions[title]?.[isRTL ? 'he' : 'en'] || '';
+    return descriptions[description]?.[isRTL ? 'he' : 'en'] || description;
   };
 
   const formatCost = (cost: number) => {
@@ -446,7 +454,7 @@ export default function JourneyDetailPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Description */}
-        <p className="text-lg text-gray-700 mb-8" dir={isRTL ? 'rtl' : 'ltr'}>{translateDescription(journey.title)}</p>
+        <p className="text-lg text-gray-700 mb-8" dir={isRTL ? 'rtl' : 'ltr'}>{translateDescription(journey.description)}</p>
 
         {/* Tags */}
         <div className="mb-8 space-y-3">
