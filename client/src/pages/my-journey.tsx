@@ -398,13 +398,13 @@ export default function MyJourneyPage() {
                         {day.activities && day.activities.map((activity: string, actIdx: number) => (
                           <div 
                             key={actIdx} 
-                            className={`flex items-start p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl hover:shadow-md transition-shadow ${isRTL ? 'flex-row-reverse' : ''}`}
+                            className="flex items-start p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl hover:shadow-md transition-shadow"
                             data-testid={`activity-${index}-${actIdx}`}
                           >
                             <div className="flex-shrink-0 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
                               {actIdx + 1}
                             </div>
-                            <p className={`flex-1 text-gray-700 leading-relaxed pt-1 px-2 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                            <p className={`flex-1 text-gray-700 leading-relaxed pt-1 pl-2 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
                               {activity}
                             </p>
                           </div>
@@ -473,11 +473,11 @@ export default function MyJourneyPage() {
                         className="group relative bg-gradient-to-br from-orange-50 to-amber-50 p-6 rounded-xl hover:shadow-lg transition-all cursor-pointer border-2 border-transparent hover:border-orange-300"
                         data-testid={`destination-${index}`}
                       >
-                        <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className="flex items-center">
                           <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                             <MapPin className="w-6 h-6 text-white" />
                           </div>
-                          <div className={`flex-1 px-2 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                          <div className={`flex-1 pl-2 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
                             <p className="font-bold text-gray-800 text-lg">
                               {translateCityName(dest.name || dest)}
                             </p>
