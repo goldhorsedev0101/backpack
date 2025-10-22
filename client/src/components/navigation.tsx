@@ -335,13 +335,11 @@ export default function Navigation() {
             <div className="space-y-2">
               <Button
                 onClick={() => setAuthModalOpen(true)}
-                className={`w-full ${isHebrew ? 'justify-end' : 'justify-start'}`}
+                className="w-full"
                 disabled={isLoading}
               >
-                <span className={`flex items-center gap-2 ${isHebrew ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <User className="w-5 h-5 flex-shrink-0" />
-                  <span>{t('auth.sign_in')}</span>
-                </span>
+                <User className="w-5 h-5 mr-2" />
+                {t('auth.sign_in')}
               </Button>
               <Button
                 onClick={() => setAuthModalOpen(true)}
