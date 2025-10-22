@@ -49,7 +49,8 @@ import { ErrorBoundary } from "./components/error-boundary.js";
 function ScrollToTop() {
   const [location] = useLocation();
   
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
+    // Scroll to top immediately before paint when route changes
     window.scrollTo(0, 0);
   }, [location]);
   
