@@ -301,12 +301,12 @@ export default function MyJourneyPage() {
                           <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
                             <Sun className="w-6 h-6 text-white" />
                           </div>
-                          <div dir={isRTL ? 'rtl' : 'ltr'}>
+                          <div className={isRTL ? 'text-right' : 'text-left'} dir={isRTL ? 'rtl' : 'ltr'}>
                             <h3 className="text-2xl font-bold text-white">
                               {isRTL ? `יום ${index + 1}` : `Day ${index + 1}`}
                             </h3>
                             {day.location && (
-                              <p className="text-white/80 text-sm flex items-center gap-1 mt-1">
+                              <p className={`text-white/80 text-sm flex items-center gap-1 mt-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                 <MapPin className="w-3 h-3" />
                                 {day.location}
                               </p>
@@ -320,7 +320,7 @@ export default function MyJourneyPage() {
                     </div>
                     
                     <CardContent className="p-6">
-                      <div className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
+                      <div className="space-y-4">
                         {day.activities && day.activities.map((activity: string, actIdx: number) => (
                           <div 
                             key={actIdx} 
@@ -330,7 +330,9 @@ export default function MyJourneyPage() {
                             <div className="flex-shrink-0 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
                               {actIdx + 1}
                             </div>
-                            <p className="flex-1 text-gray-700 leading-relaxed pt-1">{activity}</p>
+                            <p className={`flex-1 text-gray-700 leading-relaxed pt-1 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                              {activity}
+                            </p>
                           </div>
                         ))}
                         
