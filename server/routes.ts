@@ -1786,16 +1786,26 @@ export async function registerRoutes(app: Express): Promise<void> {
         customRequest: customRequest || undefined
       });
       
-      // Create trip title based on language
+      // Create trip title and description based on language
       const tripTitle = finalLanguage === 'he' 
         ? `מסע מותאם אישית מבוסס על ${journey.title}`
         : `Custom Journey inspired by ${journey.title}`;
+      
+      // Generate description in the correct language
+      let tripDescription = customRequest || '';
+      if (!customRequest) {
+        if (finalLanguage === 'he') {
+          tripDescription = `מסע מותאם אישית ${tripType === 'couple' ? 'לזוג' : tripType === 'family' ? 'למשפחה' : tripType === 'solo' ? 'לטיול סולו' : 'לחברים'} המבוסס על ${journey.title}. ${itinerary.length} ימים של חוויות בלתי נשכחות ב-${destinations}.`;
+        } else {
+          tripDescription = `A custom ${tripType} journey inspired by ${journey.title}. ${itinerary.length} days of unforgettable experiences in ${destinations}.`;
+        }
+      }
       
       // Create new trip in database
       const newTrip = await storage.createTrip({
         userId,
         title: tripTitle,
-        description: customRequest || journey.description,
+        description: tripDescription,
         destinations: journey.destinations,
         startDate: startDate ? new Date(startDate) : null,
         budget: budget || null,
