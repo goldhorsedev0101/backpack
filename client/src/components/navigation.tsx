@@ -293,7 +293,7 @@ export default function Navigation() {
                     : "text-slate-700 hover:bg-gray-100 hover:text-slate-900"
                 } ${isHebrew ? 'justify-end' : 'justify-start'}`}
               >
-                <Link href={item.href} className={`flex items-center gap-3 ${isHebrew ? 'flex-row-reverse' : 'flex-row'}`}>
+                <Link href={item.href} className="flex items-center gap-3">
                   {item.icon && (
                     <item.icon className="w-5 h-5 flex-shrink-0" />
                   )}
@@ -325,10 +325,8 @@ export default function Navigation() {
                 disabled={isLoading}
                 className={`w-full px-4 py-3 text-slate-700 border-gray-300 hover:bg-red-50 hover:text-red-700 hover:border-red-300 ${isHebrew ? 'justify-end' : 'justify-start'}`}
               >
-                <span className={`flex items-center gap-3 ${isHebrew ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <LogOut className="w-5 h-5 flex-shrink-0" />
-                  <span>{isLoading ? t('common.loading') : t('auth.sign_out')}</span>
-                </span>
+                <LogOut className="w-5 h-5 mr-3" />
+                {isLoading ? t('common.loading') : t('auth.sign_out')}
               </Button>
             </>
           ) : (
