@@ -294,8 +294,7 @@ export default function CreateJourneyPage() {
               }
               value={customRequest}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCustomRequest(e.target.value)}
-              className="min-h-32"
-              dir={isRTL ? 'rtl' : 'ltr'}
+              className="min-h-32 ltr-field"
             />
           </CardContent>
         </Card>
