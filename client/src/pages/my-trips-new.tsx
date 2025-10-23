@@ -871,7 +871,7 @@ export default function MyTripsNew() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* Trip Type */}
                   <div className="space-y-2">
-                    <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-left' : ''}`}>
+                    <Label className="text-sm font-semibold text-slate-700" style={{ textAlign: 'left' }}>
                       <Users className="w-4 h-4 inline mr-2" />
                       {t('trips.trip_type')}
                     </Label>
@@ -903,7 +903,7 @@ export default function MyTripsNew() {
 
                   {/* Adults */}
                   <div className="space-y-2">
-                    <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-left' : ''}`}>
+                    <Label className="text-sm font-semibold text-slate-700" style={{ textAlign: 'left' }}>
                       {t('trips.adults')}
                     </Label>
                     <div className="flex items-center gap-3">
@@ -939,7 +939,7 @@ export default function MyTripsNew() {
 
                   {/* Children */}
                   <div className="space-y-2">
-                    <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-left' : ''}`}>
+                    <Label className="text-sm font-semibold text-slate-700" style={{ textAlign: 'left' }}>
                       {t('trips.children')}
                     </Label>
                     <div className="flex items-center gap-3">
@@ -990,7 +990,7 @@ export default function MyTripsNew() {
               <CardContent className="space-y-6 p-6">
                 {/* Continent Selection */}
                 <div>
-                  <Label htmlFor="continent" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
+                  <Label htmlFor="continent" className="text-sm font-medium text-slate-700 mb-2 block" style={{ textAlign: 'left' }}>
                     {t('trips.select_continent')}
                   </Label>
                   <Select onValueChange={handleContinentChange} value={selectedContinent}>
@@ -1009,7 +1009,7 @@ export default function MyTripsNew() {
 
                 {/* Country Selection (Dependent on Continent) */}
                 <div>
-                  <Label htmlFor="destination" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
+                  <Label htmlFor="destination" className="text-sm font-medium text-slate-700 mb-2 block" style={{ textAlign: 'left' }}>
                     {t('trips.select_country')}
                   </Label>
                   <Select 
@@ -1039,7 +1039,7 @@ export default function MyTripsNew() {
 
                 {/* City Selection (Dependent on Country) */}
                 <div>
-                  <Label htmlFor="specificCity" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
+                  <Label htmlFor="specificCity" className="text-sm font-medium text-slate-700 mb-2 block" style={{ textAlign: 'left' }}>
                     {t('trips.select_specific_city')}
                   </Label>
                   <Select 
@@ -1068,7 +1068,7 @@ export default function MyTripsNew() {
 
                 {/* Duration */}
                 <div>
-                  <Label htmlFor="duration" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
+                  <Label htmlFor="duration" className="text-sm font-medium text-slate-700 mb-2 block" style={{ textAlign: 'left' }}>
                     {t('trips.trip_duration')}
                   </Label>
                   <Select onValueChange={(value) => {
@@ -1090,7 +1090,7 @@ export default function MyTripsNew() {
 
                 {/* Budget */}
                 <div>
-                  <Label className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
+                  <Label className="text-sm font-medium text-slate-700 mb-2 block" style={{ textAlign: 'left' }}>
                     {t('trips.budget_range')}
                   </Label>
                   <div className="px-4">
