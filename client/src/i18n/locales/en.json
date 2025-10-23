@@ -206,7 +206,12 @@
     "subtitle": "Ask me anything about travel and I'll help you plan the perfect vacation",
     "viewing_history": "Viewing conversation history. Start a new chat to continue planning.",
     "badge": "AI-Powered",
-    "trip_suggestions": "Trip Suggestions"
+    "trip_suggestions": "Trip Suggestions",
+    "more_ideas": "More Ideas",
+    "best_time": "Best Time",
+    "budget": "Budget",
+    "highlights": "Highlights",
+    "save_trip": "Save Trip"
   },
   "chat_history": {
     "title": "Chat History",

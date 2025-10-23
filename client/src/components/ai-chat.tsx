@@ -321,15 +321,15 @@ export default function AiChat({ className, initialMessage, disableAutoScroll = 
       
       <div className="grid grid-cols-2 gap-2 text-xs">
         <div>
-          <span className="font-medium">Budget:</span> ${suggestion.estimatedBudget.low}-${suggestion.estimatedBudget.high}
+          <span className="font-medium">{t('ai_assistant.budget')}:</span> ${suggestion.estimatedBudget.low}-${suggestion.estimatedBudget.high}
         </div>
         <div>
-          <span className="font-medium">Best Time:</span> {suggestion.bestTimeToVisit}
+          <span className="font-medium">{t('ai_assistant.best_time')}:</span> {suggestion.bestTimeToVisit}
         </div>
       </div>
       
       <div>
-        <span className="font-medium text-xs">Highlights:</span>
+        <span className="font-medium text-xs">{t('ai_assistant.highlights')}:</span>
         <div className="flex flex-wrap gap-1 mt-1">
           {suggestion.highlights.slice(0, 3).map((highlight, idx) => (
             <Badge key={idx} variant="secondary" className="text-xs break-words max-w-full">
@@ -350,7 +350,7 @@ export default function AiChat({ className, initialMessage, disableAutoScroll = 
           className="flex-1"
         >
           <Save className="w-3 h-3 mr-1" />
-          Save Trip
+          {t('ai_assistant.save_trip')}
         </Button>
       </div>
     </div>
