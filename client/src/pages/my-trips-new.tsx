@@ -990,7 +990,7 @@ export default function MyTripsNew() {
               <CardContent className="space-y-6 p-6">
                 {/* Continent Selection */}
                 <div>
-                  <Label htmlFor="continent" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                  <Label htmlFor="continent" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
                     {t('trips.select_continent')}
                   </Label>
                   <Select onValueChange={handleContinentChange} value={selectedContinent}>
@@ -1009,7 +1009,7 @@ export default function MyTripsNew() {
 
                 {/* Country Selection (Dependent on Continent) */}
                 <div>
-                  <Label htmlFor="destination" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                  <Label htmlFor="destination" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
                     {t('trips.select_country')}
                   </Label>
                   <Select 
@@ -1039,7 +1039,7 @@ export default function MyTripsNew() {
 
                 {/* City Selection (Dependent on Country) */}
                 <div>
-                  <Label htmlFor="specificCity" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                  <Label htmlFor="specificCity" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
                     {t('trips.select_specific_city')}
                   </Label>
                   <Select 
@@ -1068,7 +1068,7 @@ export default function MyTripsNew() {
 
                 {/* Duration */}
                 <div>
-                  <Label htmlFor="duration" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                  <Label htmlFor="duration" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
                     {t('trips.trip_duration')}
                   </Label>
                   <Select onValueChange={(value) => {
@@ -1090,7 +1090,7 @@ export default function MyTripsNew() {
 
                 {/* Budget */}
                 <div>
-                  <Label className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                  <Label className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
                     {t('trips.budget_range')}
                   </Label>
                   <div className="px-4">
