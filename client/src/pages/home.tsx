@@ -458,6 +458,9 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
+            {/* Personalized Recommendations / Welcome Card */}
+            <PersonalizedRecommendations className="mb-8" />
+
             {/* My Trips */}
             <section>
               <div className="flex items-center justify-between mb-6">
@@ -565,9 +568,6 @@ export default function Home() {
                 </Card>
               )}
             </section>
-
-            {/* Personalized Recommendations */}
-            <PersonalizedRecommendations className="mb-12" />
 
             {/* Popular Journeys */}
             <PopularJourneysSection />
