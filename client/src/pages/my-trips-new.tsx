@@ -871,7 +871,7 @@ export default function MyTripsNew() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* Trip Type */}
                   <div className="space-y-2">
-                    <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                    <Label className="text-sm font-semibold text-slate-700 text-left">
                       <Users className="w-4 h-4 inline mr-2" />
                       {t('trips.trip_type')}
                     </Label>
@@ -903,7 +903,7 @@ export default function MyTripsNew() {
 
                   {/* Adults */}
                   <div className="space-y-2">
-                    <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                    <Label className="text-sm font-semibold text-slate-700 text-left">
                       {t('trips.adults')}
                     </Label>
                     <div className="flex items-center gap-3">
@@ -939,7 +939,7 @@ export default function MyTripsNew() {
 
                   {/* Children */}
                   <div className="space-y-2">
-                    <Label className={`text-sm font-semibold text-slate-700 ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                    <Label className="text-sm font-semibold text-slate-700 text-left">
                       {t('trips.children')}
                     </Label>
                     <div className="flex items-center gap-3">
