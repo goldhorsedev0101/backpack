@@ -2,22 +2,27 @@ import { createRoot } from "react-dom/client";
 import App from "./App.js";
 import "./index.css";
 
-// Force scroll to top on page load/refresh
-window.scrollTo(0, 0);
-
-// Disable browser's scroll restoration to allow manual control
+// Disable browser's scroll restoration FIRST - before anything else
 if ('scrollRestoration' in history) {
   history.scrollRestoration = 'manual';
 }
 
+// Immediate scroll to top - runs before any DOM rendering
+window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
 // Force scroll on page show (handles back/forward cache)
-window.addEventListener('pageshow', () => {
-  window.scrollTo(0, 0);
+window.addEventListener('pageshow', (event) => {
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 });
 
 // Force scroll on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
-  window.scrollTo(0, 0);
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+});
+
+// Force scroll after everything loads
+window.addEventListener('load', () => {
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 });
 
 // Add global error handler for unhandled promise rejections
