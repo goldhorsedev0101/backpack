@@ -80,10 +80,12 @@ export default function AiChat({ className, initialMessage }: AiChatProps) {
   const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
   const [hasProcessedInitialMessage, setHasProcessedInitialMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isInitialMount = useRef(true);
   const { toast } = useToast();
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Only scroll within the chat container, not the whole window
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   };
 
   // Update welcome message when language changes
@@ -104,6 +106,11 @@ export default function AiChat({ className, initialMessage }: AiChatProps) {
   }, [i18n.language, t]);
 
   useEffect(() => {
+    // Skip scroll on initial mount to prevent page from jumping
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     scrollToBottom();
   }, [messages]);
 
