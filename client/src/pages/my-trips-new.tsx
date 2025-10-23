@@ -1119,7 +1119,7 @@ export default function MyTripsNew() {
 
                 {/* Interests (Combined Travel Styles + Interests) */}
                 <div>
-                  <Label className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                  <Label className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
                     {t('trips.interests')} <span className="text-xs text-gray-500">({t('trips.select_multiple')})</span>
                   </Label>
                   <div className="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto pr-2">
