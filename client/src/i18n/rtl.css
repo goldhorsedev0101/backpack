@@ -238,6 +238,38 @@
   text-align: right;
 }
 
+/* LTR Field Override - For inputs that must stay left-aligned even in RTL */
+.ltr-field,
+[dir="rtl"] .ltr-field {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+}
+
+.ltr-field::placeholder,
+[dir="rtl"] .ltr-field::placeholder {
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+.ltr-field::-webkit-input-placeholder,
+[dir="rtl"] .ltr-field::-webkit-input-placeholder {
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+.ltr-field::-moz-placeholder,
+[dir="rtl"] .ltr-field::-moz-placeholder {
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+.ltr-field:-ms-input-placeholder,
+[dir="rtl"] .ltr-field:-ms-input-placeholder {
+  text-align: left !important;
+  direction: ltr !important;
+}
+
 /* Button text alignment */
 [dir="rtl"] .justify-start {
   text-align: right;

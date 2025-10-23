@@ -102,9 +102,7 @@ export default function Community() {
             placeholder={t('community.search_placeholder')}
             value={searchTerm}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-            className="pl-10 h-11"
-            dir="ltr"
-            style={{ textAlign: 'left', direction: 'ltr' } as React.CSSProperties}
+            className="pl-10 h-11 ltr-field"
           />
         </div>
         <Select value={selectedLocation} onValueChange={setSelectedLocation}>
