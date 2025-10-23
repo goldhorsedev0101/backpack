@@ -27,9 +27,132 @@ import {
   Compass,
   Award,
   TrendingDown,
-  Plane
+  Plane,
+  Trash2,
+  BookmarkCheck
 } from "lucide-react";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useTranslation } from 'react-i18next';
+
+// SavedJourneyCard component
+function SavedJourneyCard({ savedJourney, onRemove, formatPrice }: { 
+  savedJourney: any; 
+  onRemove: (id: number) => void;
+  formatPrice: (min: number | string | undefined, max: number | string | undefined) => string;
+}) {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'he';
+  const journey = savedJourney.journey;
+
+  const translateCityName = (cityName: string) => {
+    const cityTranslations: Record<string, { he: string; en: string }> = {
+      'Tokyo': { he: 'טוקיו', en: 'Tokyo' },
+      'Kyoto': { he: 'קיוטו', en: 'Kyoto' },
+      'Osaka': { he: 'אוסקה', en: 'Osaka' },
+      'Paris': { he: 'פריז', en: 'Paris' },
+      'Rome': { he: 'רומא', en: 'Rome' },
+      'Barcelona': { he: 'ברצלונה', en: 'Barcelona' },
+      'London': { he: 'לונדון', en: 'London' },
+      'Amsterdam': { he: 'אמסטרדם', en: 'Amsterdam' },
+      'Berlin': { he: 'ברלין', en: 'Berlin' },
+      'New York': { he: 'ניו יורק', en: 'New York' },
+      'San Francisco': { he: 'סן פרנסיסקו', en: 'San Francisco' },
+      'Los Angeles': { he: 'לוס אנג\'לס', en: 'Los Angeles' },
+    };
+    return cityTranslations[cityName]?.[isRTL ? 'he' : 'en'] || cityName;
+  };
+
+  const formatDestinationChain = (destinations: any[]) => {
+    const arrow = '←';
+    const cities = destinations.map((d: any) => translateCityName(d.name));
+    return cities.join(` ${arrow} `);
+  };
+
+  return (
+    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 border-2 border-purple-100">
+      <CardContent className="p-0">
+        <div className="p-6">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-slate-800 mb-2 line-clamp-1">
+                {journey.title}
+              </h3>
+              <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                {journey.description}
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <MapPin className="w-4 h-4 text-purple-600 flex-shrink-0" />
+              <span className="truncate">{formatDestinationChain(journey.destinations)}</span>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <Calendar className="w-4 h-4 text-purple-600 flex-shrink-0" />
+              <span>{journey.totalNights} {isRTL ? 'לילות' : 'nights'}</span>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <DollarSign className="w-4 h-4 text-purple-600 flex-shrink-0" />
+              <span className="font-semibold">{formatPrice(journey.priceMin, journey.priceMax)}</span>
+            </div>
+
+            {journey.rating && (
+              <div className="flex items-center gap-2 text-sm text-gray-700">
+                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                <span>{journey.rating.toFixed(1)}</span>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-4 flex gap-2">
+            <Button asChild className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700" data-testid={`button-view-journey-${journey.id}`}>
+              <Link href={`/journeys/${journey.id}`}>
+                {isRTL ? 'צפה במסע' : 'View Journey'}
+              </Link>
+            </Button>
+            
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="icon" className="border-red-200 hover:bg-red-50 hover:border-red-300" data-testid={`button-remove-journey-${savedJourney.id}`}>
+                  <Trash2 className="w-4 h-4 text-red-600" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{isRTL ? 'הסר מסע מהרשימה' : 'Remove Journey'}</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {isRTL 
+                      ? 'האם אתה בטוח שברצונך להסיר את המסע מהרשימה השמורה שלך?' 
+                      : 'Are you sure you want to remove this journey from your saved list?'}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{isRTL ? 'ביטול' : 'Cancel'}</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => onRemove(savedJourney.id)} className="bg-red-600 hover:bg-red-700">
+                    {isRTL ? 'הסר' : 'Remove'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function Home() {
   const { t } = useTranslation();
@@ -44,6 +167,10 @@ export default function Home() {
     queryKey: ["/api/trips/user"]
   });
 
+  const { data: savedJourneys = [], isLoading: savedJourneysLoading } = useQuery<any[]>({
+    queryKey: ["/api/saved-journeys"]
+  });
+
   const { data: reviews = [], isLoading: reviewsLoading } = useQuery<any[]>({
     queryKey: ["/api/reviews"]
   });
@@ -56,6 +183,55 @@ export default function Home() {
     journeys: number;
   }>({
     queryKey: ["/api/stats"]
+  });
+
+  const removeSavedJourneyMutation = useMutation({
+    mutationFn: async (savedJourneyId: number) => {
+      console.log('Removing saved journey:', savedJourneyId);
+      const result = await apiRequest(`/api/saved-journeys/${savedJourneyId}`, {
+        method: 'DELETE',
+      });
+      console.log('Remove result:', result);
+      return result;
+    },
+    onMutate: async (savedJourneyId: number) => {
+      console.log('onMutate - Removing saved journey optimistically:', savedJourneyId);
+      await queryClient.cancelQueries({ queryKey: ['/api/saved-journeys'] });
+      
+      const previousSavedJourneys = queryClient.getQueryData(['/api/saved-journeys']);
+      console.log('Previous saved journeys:', previousSavedJourneys);
+      
+      queryClient.setQueryData(['/api/saved-journeys'], (old: any[]) => {
+        console.log('Old saved journeys data:', old);
+        const filtered = old ? old.filter((sj: any) => sj.id !== savedJourneyId) : [];
+        console.log('Filtered saved journeys:', filtered);
+        return filtered;
+      });
+      
+      return { previousSavedJourneys };
+    },
+    onSuccess: () => {
+      console.log('onSuccess - Saved journey removed successfully');
+      toast({
+        title: t('my_journeys.journey_removed'),
+        description: t('my_journeys.journey_removed_desc'),
+      });
+    },
+    onError: (err, savedJourneyId, context: any) => {
+      console.error('onError - Remove failed:', err);
+      if (context?.previousSavedJourneys) {
+        queryClient.setQueryData(['/api/saved-journeys'], context.previousSavedJourneys);
+      }
+      toast({
+        title: "Error",
+        description: "Failed to remove saved journey. Please try again.",
+        variant: "destructive",
+      });
+    },
+    onSettled: async () => {
+      console.log('onSettled - Refetching saved journeys queries');
+      await queryClient.refetchQueries({ queryKey: ['/api/saved-journeys'] });
+    },
   });
 
   const deleteTripMutation = useMutation({
@@ -115,6 +291,23 @@ export default function Home() {
 
   const handleDeleteTrip = (tripId: number) => {
     deleteTripMutation.mutate(tripId);
+  };
+
+  const handleRemoveSavedJourney = (savedJourneyId: number) => {
+    removeSavedJourneyMutation.mutate(savedJourneyId);
+  };
+
+  const formatPrice = (min: number | string | undefined, max: number | string | undefined) => {
+    const isRTL = i18n.language === 'he';
+    if (!min || !max) return 'N/A';
+    const currency = isRTL ? '₪' : '$';
+    const minVal = typeof min === 'string' ? parseFloat(min) : min;
+    const maxVal = typeof max === 'string' ? parseFloat(max) : max;
+    const minNum = isRTL ? Math.round(minVal * 3.5) : minVal;
+    const maxNum = isRTL ? Math.round(maxVal * 3.5) : maxVal;
+    return isRTL 
+      ? `${currency}${maxNum.toLocaleString('he-IL')} - ${currency}${minNum.toLocaleString('he-IL')}`
+      : `${currency}${minNum.toLocaleString('he-IL')} - ${currency}${maxNum.toLocaleString('he-IL')}`;
   };
 
   const welcomeMessage = t('home.welcome_title');
@@ -310,6 +503,62 @@ export default function Home() {
                       <Link href="/my-trips">
                         <Plus className="w-4 h-4 mr-2" />
                         {t('home.create_first_trip')}
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </section>
+
+            {/* My Saved Journeys */}
+            <section>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-slate-700 flex items-center gap-2">
+                  <Compass className="w-6 h-6 text-purple-600" />
+                  {t('navigation.my_journeys')}
+                </h2>
+                <Button asChild variant="outline" className="hover:bg-purple-50 hover:border-purple-500 hover:text-purple-700 transition-all">
+                  <Link href="/my-journeys">
+                    {t('home.view_all')}
+                  </Link>
+                </Button>
+              </div>
+              
+              {savedJourneysLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <Card key={i} className="animate-pulse">
+                      <CardContent className="p-6">
+                        <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                        <div className="h-3 bg-gray-200 rounded mb-2"></div>
+                        <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : savedJourneys.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {savedJourneys.slice(0, 2).map((savedJourney: any) => (
+                    <SavedJourneyCard 
+                      key={savedJourney.id} 
+                      savedJourney={savedJourney} 
+                      onRemove={handleRemoveSavedJourney}
+                      formatPrice={formatPrice}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Card className="border-dashed border-2 border-gray-300 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 hover:shadow-lg transition-all">
+                  <CardContent className="p-8 text-center">
+                    <div className="bg-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 shadow-md">
+                      <Compass className="w-10 h-10 text-purple-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('my_journeys.no_saved')}</h3>
+                    <p className="text-gray-600 mb-4">{t('my_journeys.start_exploring')}</p>
+                    <Button asChild className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all">
+                      <Link href="/journeys">
+                        <Compass className="w-4 h-4 mr-2" />
+                        {t('my_journeys.explore_journeys')}
                       </Link>
                     </Button>
                   </CardContent>
