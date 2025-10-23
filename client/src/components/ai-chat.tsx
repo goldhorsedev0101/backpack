@@ -129,7 +129,7 @@ export default function AiChat({ className, initialMessage, disableAutoScroll = 
           message,
           chatHistory,
           previousSuggestions: allSuggestions,
-          language: i18n.language
+          language: i18n.language.startsWith('he') ? 'he' : 'en'
         })
       });
       return response.json();

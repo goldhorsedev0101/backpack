@@ -472,14 +472,14 @@ ${conversationText}
 IMPORTANT: Do not suggest these previously mentioned destinations: ${previousDestinations}
 
 Generate 3 trip suggestions in JSON format. Each suggestion should include:
-- destination: city or region ${isHebrew ? '(English name is OK, but add Hebrew if commonly used)' : ''}
-- country: any country worldwide ${isHebrew ? '(in Hebrew)' : ''}
-- description: 2–3 engaging sentences ${isHebrew ? '(in Hebrew)' : ''}
-- bestTimeToVisit: e.g., ${isHebrew ? '"אפריל עד יוני"' : '"April to June"'}
+- destination: city or region name ${isHebrew ? '(keep in original language/English, like "Paris" or "Tokyo")' : ''}
+- country: country name ${isHebrew ? '(write in Hebrew, e.g., "צרפת", "יפן")' : ''}
+- description: 2–3 engaging sentences ${isHebrew ? '(MUST be in Hebrew)' : ''}
+- bestTimeToVisit: e.g., ${isHebrew ? '"אפריל עד יוני" or "ספטמבר עד נובמבר" (MUST be in Hebrew)' : '"April to June"'}
 - estimatedBudget: {low, high} in USD
-- highlights: 3–5 key places or experiences ${isHebrew ? '(in Hebrew)' : ''}
-- travelStyle: [${isHebrew ? '"הרפתקאות", "רגוע", etc. (in Hebrew)' : '"adventure", "chill", etc.'}]
-- duration: how long to stay ${isHebrew ? '(in Hebrew, e.g., "7-10 ימים")' : '(e.g., "7–10 days")'}
+- highlights: 3–5 key places or experiences ${isHebrew ? '(MUST be in Hebrew)' : ''}
+- travelStyle: array of travel styles ${isHebrew ? '(MUST be in Hebrew, e.g., ["הרפתקאות", "תרבות", "רגוע"])' : '(e.g., ["adventure", "culture", "relaxation"])'}
+- duration: how long to stay ${isHebrew ? '(MUST be in Hebrew, e.g., "7-10 ימים")' : '(e.g., "7–10 days")'}
 
 Make sure the suggestions are diverse — different vibes, locations and experiences. Speak like a local travel buddy, not a formal guide.
 ${isHebrew ? 'Remember: ALL text content must be in Hebrew except for proper nouns.' : ''}
@@ -500,12 +500,16 @@ Return ONLY a JSON object with this exact structure:
   ]
 }`;
 
+    const systemMessage = isHebrew 
+      ? "You are GlobeMate, a smart and friendly travel planner for Gen Z and solo travelers exploring the world. Generate exciting, personalized trip suggestions in JSON format. Be authentic, inspiring, and speak like a travel buddy. IMPORTANT: You MUST write ALL content in Hebrew. Only proper nouns (like city names) can remain in English."
+      : "You are GlobeMate, a smart and friendly travel planner for Gen Z and solo travelers exploring the world. Generate exciting, personalized trip suggestions in JSON format. Be authentic, inspiring, and speak like a travel buddy.";
+    
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "You are GlobeMate, a smart and friendly travel planner for Gen Z and solo travelers exploring the world. Generate exciting, personalized trip suggestions in JSON format. Be authentic, inspiring, and speak like a travel buddy."
+          content: systemMessage
         },
         {
           role: "user",
