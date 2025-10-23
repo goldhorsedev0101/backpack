@@ -503,6 +503,15 @@
     "tags": "תגיות",
     "journeys_available": "מסעות זמינים"
   },
+  "my_journeys": {
+    "title": "המסעות השמורים שלי",
+    "subtitle": "כל המסעות הרב-יעדיים השמורים שלך במקום אחד",
+    "no_saved": "עדיין אין מסעות שמורים",
+    "start_exploring": "התחל לגלות את המסעות המובחרים שלנו",
+    "explore_journeys": "גלה מסעות",
+    "journey_removed": "המסע הוסר",
+    "journey_removed_desc": "המסע הוסר מהרשימה השמורה שלך"
+  },
   "chat": {
     "direct_messages": "הודעות פרטיות",
     "no_conversations_yet": "עדיין אין שיחות",

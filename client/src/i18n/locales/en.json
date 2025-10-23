@@ -264,6 +264,15 @@
     "tags": "Tags",
     "journeys_available": "Journeys Available"
   },
+  "my_journeys": {
+    "title": "My Saved Journeys",
+    "subtitle": "All your saved multi-destination journeys in one place",
+    "no_saved": "No saved journeys yet",
+    "start_exploring": "Start exploring our curated journeys",
+    "explore_journeys": "Explore Journeys",
+    "journey_removed": "Journey Removed",
+    "journey_removed_desc": "The journey was removed from your saved list"
+  },
   "auth": {
     "sign_in": "Sign In",
     "sign_out": "Sign Out",
