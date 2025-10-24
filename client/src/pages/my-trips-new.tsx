@@ -1473,7 +1473,11 @@ export default function MyTripsNew() {
                               <DollarSign className={`w-4 h-4 text-green-600 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
                               <span className="font-semibold text-green-800 text-sm">{t('trips.estimated_cost')}</span>
                             </div>
-                            <p className="text-green-700 font-bold">${day.estimatedCost}</p>
+                            <p className="text-green-700 font-bold text-left">
+                              {i18n.language === 'he' 
+                                ? `₪${day.estimatedCost.toLocaleString('he-IL')}` 
+                                : `$${day.estimatedCost.toLocaleString('en-US')}`}
+                            </p>
                           </div>
 
                           {/* Tips */}
