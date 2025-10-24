@@ -1242,7 +1242,7 @@ export default function MyTripsNew() {
                           </p>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-3 gap-4">
                           <div className="bg-blue-50 p-3 rounded-lg">
                             <div className="flex flex-col gap-2 items-end">
                               <div className="flex items-center">
@@ -1264,15 +1264,15 @@ export default function MyTripsNew() {
                               </p>
                             </div>
                           </div>
-                        </div>
 
-                        <div className="bg-orange-50 p-3 rounded-lg">
-                          <div className="flex flex-col gap-2 items-end">
-                            <div className="flex items-center">
-                              <Calendar className="w-4 h-4 text-orange-600 mr-1" />
-                              <span className="font-semibold text-orange-800 text-sm">{t('trips.best_time_to_visit')}</span>
+                          <div className="bg-orange-50 p-3 rounded-lg">
+                            <div className="flex flex-col gap-2 items-end">
+                              <div className="flex items-center">
+                                <Calendar className="w-4 h-4 text-orange-600 mr-1" />
+                                <span className="font-semibold text-orange-800 text-sm">{t('trips.best_time_to_visit')}</span>
+                              </div>
+                              <p className="text-orange-700 text-sm text-right">{suggestion.bestTimeToVisit}</p>
                             </div>
-                            <p className="text-orange-700 text-sm text-right">{suggestion.bestTimeToVisit}</p>
                           </div>
                         </div>
 
