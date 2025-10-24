@@ -1746,7 +1746,7 @@ export default function MyTripsNew() {
                           data-testid={`card-saved-trip-${trip.id}`}
                         >
                           <CardContent className="p-6">
-                            <div className={`flex flex-col gap-4`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                            <div className="flex flex-col gap-4">
                               {/* Header with title and budget */}
                               <div className="flex items-start justify-between gap-8">
                                 <div className="flex-1 min-w-0 flex flex-col gap-2">
@@ -1769,11 +1769,8 @@ export default function MyTripsNew() {
                               {/* Description */}
                               <div className="flex gap-2">
                                 <MapPin className="w-4 h-4 flex-shrink-0 text-orange-500 invisible" />
-                                <p 
-                                  className={`text-gray-600 leading-relaxed flex-1 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}
-                                  dir={i18n.language === 'he' ? 'rtl' : 'ltr'}
-                                >
-                                  {i18n.language === 'he' ? '\u202B' + trip.description : trip.description}
+                                <p className="text-gray-600 leading-relaxed flex-1 text-right" dir="auto">
+                                  {trip.description}
                                 </p>
                               </div>
 
