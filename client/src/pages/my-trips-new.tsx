@@ -1724,9 +1724,12 @@ export default function MyTripsNew() {
                               </div>
 
                               {/* Description */}
-                              <p className={`text-gray-600 leading-relaxed ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
-                                {trip.description}
-                              </p>
+                              <div className="flex gap-2">
+                                <MapPin className="w-4 h-4 flex-shrink-0 text-orange-500 invisible" />
+                                <p className={`text-gray-600 leading-relaxed ${i18n.language === 'he' ? 'text-right' : 'text-left'} flex-1`}>
+                                  {trip.description}
+                                </p>
+                              </div>
 
                               {/* Info Cards Grid */}
                               <div className="grid grid-cols-2 gap-4">
