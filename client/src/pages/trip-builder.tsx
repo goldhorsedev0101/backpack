@@ -43,11 +43,13 @@ import { WORLD_COUNTRIES } from "@/lib/constants";
 // Currency conversion rate (USD to ILS)
 const USD_TO_ILS = 3.7;
 
-// Fix RTL punctuation by adding RLM after punctuation marks
-const fixHebrewPunctuation = (text: string, isHebrew: boolean) => {
+// Remove problematic Unicode control characters that OpenAI injects into Hebrew text
+const normalizeRtlText = (text: string, isHebrew: boolean) => {
   if (!isHebrew) return text;
-  // Add Right-to-Left Mark (U+200F) after punctuation marks to force them to the right
-  return text.replace(/([.!?,;:])/g, '$1\u200F');
+  // Remove LTR marks and other directional control characters
+  const cleaned = text.replace(/[\u200e\u202a\u202c\u202d\u202e]/g, '').trim();
+  // Optionally add RLM after terminal punctuation
+  return cleaned.replace(/([.!?])(\s|$)/g, '$1\u200F$2');
 };
 
 const getTripFormSchema = (t: any) => z.object({
@@ -707,8 +709,12 @@ export default function TripBuilder() {
                         <h3 className={`text-xl font-bold text-slate-700 mb-1 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
                           {suggestion.destination}, {suggestion.country}
                         </h3>
-                        <p className={`text-gray-600 leading-relaxed ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
-                          {fixHebrewPunctuation(suggestion.description, i18n.language === 'he')}
+                        <p 
+                          className={`text-gray-600 leading-relaxed ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} 
+                          dir={i18n.language === 'he' ? 'rtl' : 'ltr'}
+                          style={i18n.language === 'he' ? { unicodeBidi: 'plaintext' } : undefined}
+                        >
+                          {normalizeRtlText(suggestion.description, i18n.language === 'he')}
                         </p>
                       </div>
 
@@ -871,8 +877,12 @@ export default function TripBuilder() {
                           <h3 className={`text-xl font-bold text-slate-700 mb-1 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
                             {suggestion.destination}, {suggestion.country}
                           </h3>
-                          <p className={`text-gray-600 leading-relaxed ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
-                            {fixHebrewPunctuation(suggestion.description, i18n.language === 'he')}
+                          <p 
+                            className={`text-gray-600 leading-relaxed ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} 
+                            dir={i18n.language === 'he' ? 'rtl' : 'ltr'}
+                            style={i18n.language === 'he' ? { unicodeBidi: 'plaintext' } : undefined}
+                          >
+                            {normalizeRtlText(suggestion.description, i18n.language === 'he')}
                           </p>
                         </div>
 
