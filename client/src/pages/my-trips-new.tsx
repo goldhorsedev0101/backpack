@@ -1707,7 +1707,7 @@ export default function MyTripsNew() {
                               {/* Header with title and budget */}
                               <div className="flex items-start justify-between gap-8">
                                 <div className="flex-1 min-w-0">
-                                  <h3 className={`text-2xl font-bold text-gray-900 mb-2 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                                  <h3 className={`text-2xl font-bold text-gray-900 mb-2 ${i18n.language === 'he' ? 'text-right pr-6' : 'text-left pl-6'}`}>
                                     {trip.title}
                                   </h3>
                                   <div className={`flex items-center gap-2 text-gray-600 ${i18n.language === 'he' ? 'justify-start' : ''}`}>
