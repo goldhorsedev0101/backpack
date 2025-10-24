@@ -832,9 +832,9 @@
       "volunteering": "התנדבות"
     },
     "day_number": "יום {{day}}",
-    "activity_days_count": "{{count}} יום {{count, plural, one {פעילות} other {פעילות}}",
-    "days_count": "{{count}} {{count, plural, one {יום} other {ימים}}",
-    "and_more_days": "ועוד {{count}} {{count, plural, one {יום} other {ימים}}",
+    "activity_days_count": "{{count, plural, one {יום פעילות אחד} other {# ימי פעילויות}}",
+    "days_count": "{{count, plural, one {יום אחד} other {# ימים}}",
+    "and_more_days": "ועוד {{count, plural, one {יום נוסף} other {# ימים נוספים}}",
     "unknown_destination": "יעד לא ידוע",
     "deleted_successfully": "נמחק בהצלחה",
     "itinerary_removed_from_list": "המסלול הוסר מהרשימה שלך",
@@ -843,7 +843,7 @@
     "loading_saved_itineraries": "טוען את המסלולים השמורים שלך...",
     "sign_in_to_save_itinerary": "התחבר כדי לשמור את המסלול",
     "sign_in_to_save_and_access_description": "כדי לשמור ולגשת למסלול שלך מכל מכשיר, התחבר עם Google.",
-    "you_have_count_itineraries": "יש לך {{count}} {{count, plural, one {מסלול שמור} other {מסלולים שמורים}}"
+    "you_have_count_itineraries": "יש לך {{count, plural, one {מסלול שמור אחד} other {# מסלולים שמורים}}"
   },
   "community": {
     "title": "קהילת GlobeMate",
@@ -1433,12 +1433,6 @@
     "loading_saved_itineraries": "טוען את המסלולים השמורים שלך...",
     "sign_in_to_save_itinerary": "התחבר כדי לשמור את המסלול",
     "sign_in_to_save_and_access_description": "כדי לשמור ולגשת למסלול שלך מכל מכשיר, התחבר עם Google.",
-    "you_have_count_itineraries": "יש לך {{count}} {{count, plural, one {מסלול שמור} other {מסלולים שמורים}}}",
-    "days_count": "{{count}} {{count, plural, one {יום} other {ימים}}}",
-    "unknown_destination": "יעד לא ידוע",
-    "activity_days_count": "{{count}} {{count, plural, one {יום פעילות} other {ימי פעילויות}}}",
-    "day_number": "יום {{day}}",
-    "and_more_days": "ועוד {{count}} {{count, plural, one {יום} other {ימים}}}",
     "multiple_destinations": "יעדים מרובים",
     "learn_more": "למידע נוסף",
     "welcome": "ברוכים הבאים!",
