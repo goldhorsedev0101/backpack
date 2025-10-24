@@ -1213,9 +1213,6 @@ export default function MyTripsNew() {
                 {aiSuggestions.length > 0 && !isGenerating && (
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm text-gray-600">
-{t('trips.found_suggestions', { count: aiSuggestions.length })}
-                      </p>
                       <Button 
                         onClick={handleGenerateItinerary}
                         disabled={isGeneratingItinerary}
@@ -1229,6 +1226,9 @@ export default function MyTripsNew() {
                         )}
 {t('trips.generate_itinerary')}
                       </Button>
+                      <p className="text-sm text-gray-600">
+{t('trips.found_suggestions', { count: aiSuggestions.length })}
+                      </p>
                     </div>
 
                     {aiSuggestions.map((suggestion, index) => (
