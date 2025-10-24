@@ -421,6 +421,10 @@ export default function TripBuilder() {
   };
 
   const handleSaveTrip = (suggestion: any) => {
+    console.log('Saving trip with suggestion:', suggestion);
+    console.log('Budget high value:', suggestion.estimatedBudget.high);
+    console.log('Budget type:', typeof suggestion.estimatedBudget.high);
+    
     const tripData = {
       title: `${suggestion.destination}, ${suggestion.country}`,
       description: suggestion.description,
@@ -431,11 +435,12 @@ export default function TripBuilder() {
         bestTimeToVisit: suggestion.bestTimeToVisit || '',
         duration: suggestion.duration || ''
       }),
-      budget: suggestion.estimatedBudget.high,
+      budget: Number(suggestion.estimatedBudget.high),
       travelStyle: suggestion.travelStyle.join(', '),
       isPublic: true,
     };
 
+    console.log('Trip data being sent:', tripData);
     createTripMutation.mutate(tripData);
   };
 
