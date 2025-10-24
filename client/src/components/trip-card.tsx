@@ -121,14 +121,14 @@ export default function TripCard({ trip, showUser = false, onEdit, onView, onDel
           {/* Destination */}
           {destinationNames && (
             <div className="bg-purple-50 p-4 rounded-lg">
-              <div className={`flex flex-col gap-2 ${isRTL ? 'items-end' : 'items-start'}`}>
+              <div className="flex flex-col gap-2 items-start">
                 <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <MapPin className="w-5 h-5 text-purple-600" />
                   <span className={`font-semibold text-purple-800 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
                     {isRTL ? 'יעד' : 'Destination'}
                   </span>
                 </div>
-                <p className={`text-purple-700 font-medium text-sm line-clamp-1 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <p className={`text-purple-700 font-medium text-sm line-clamp-1 w-full ${isRTL ? 'text-right' : 'text-left'}`}>
                   {destinationNames}
                 </p>
               </div>
@@ -138,14 +138,14 @@ export default function TripCard({ trip, showUser = false, onEdit, onView, onDel
           {/* Date */}
           {trip.startDate && (
             <div className="bg-blue-50 p-4 rounded-lg">
-              <div className={`flex flex-col gap-2 ${isRTL ? 'items-end' : 'items-start'}`}>
+              <div className="flex flex-col gap-2 items-start">
                 <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <Calendar className="w-5 h-5 text-blue-600" />
                   <span className={`font-semibold text-blue-800 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
                     {isRTL ? 'תאריך' : 'Date'}
                   </span>
                 </div>
-                <p className={`text-blue-700 font-medium text-sm ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                <p className={`text-blue-700 font-medium text-sm w-full ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
                   {formatDate(trip.startDate)}
                 </p>
               </div>
@@ -155,14 +155,14 @@ export default function TripCard({ trip, showUser = false, onEdit, onView, onDel
           {/* Budget */}
           {budget > 0 && (
             <div className="bg-green-50 p-4 rounded-lg">
-              <div className={`flex flex-col gap-2 ${isRTL ? 'items-end' : 'items-start'}`}>
+              <div className="flex flex-col gap-2 items-start">
                 <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <DollarSign className="w-5 h-5 text-green-600" />
                   <span className={`font-semibold text-green-800 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
                     {isRTL ? 'תקציב' : 'Budget'}
                   </span>
                 </div>
-                <p className={`text-green-700 font-medium text-sm ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                <p className={`text-green-700 font-medium text-sm w-full ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
                   {formatPrice(budget)}
                 </p>
               </div>
@@ -172,14 +172,14 @@ export default function TripCard({ trip, showUser = false, onEdit, onView, onDel
           {/* Duration */}
           {getDuration() && (
             <div className="bg-orange-50 p-4 rounded-lg">
-              <div className={`flex flex-col gap-2 ${isRTL ? 'items-end' : 'items-start'}`}>
+              <div className="flex flex-col gap-2 items-start">
                 <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <Clock className="w-5 h-5 text-orange-600" />
                   <span className={`font-semibold text-orange-800 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
                     {isRTL ? 'משך' : 'Duration'}
                   </span>
                 </div>
-                <p className={`text-orange-700 font-medium text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
+                <p className={`text-orange-700 font-medium text-sm w-full ${isRTL ? 'text-right' : 'text-left'}`}>
                   {getDuration()}
                 </p>
               </div>
