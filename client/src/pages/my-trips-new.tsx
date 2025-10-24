@@ -479,25 +479,40 @@ export default function MyTripsNew() {
   // Save trip suggestion mutation
   const saveTripMutation = useMutation({
     mutationFn: async (suggestion: TripSuggestion) => {
+      if (!isAuthenticated) {
+        throw new Error(t('trips.sign_in_required_save'));
+      }
+      
+      const tripData = {
+        title: `${suggestion.destination}, ${suggestion.country}`,
+        destinations: JSON.stringify([{
+          name: suggestion.destination,
+          country: suggestion.country,
+          description: suggestion.description,
+          highlights: suggestion.highlights,
+          bestTimeToVisit: suggestion.bestTimeToVisit
+        }]),
+        description: suggestion.description,
+        budget: i18n.language === 'he' 
+          ? `₪${Math.round(suggestion.estimatedBudget.low * USD_TO_ILS).toLocaleString('he-IL')} - ₪${Math.round(suggestion.estimatedBudget.high * USD_TO_ILS).toLocaleString('he-IL')}`
+          : `$${suggestion.estimatedBudget.low.toLocaleString('en-US')} - $${suggestion.estimatedBudget.high.toLocaleString('en-US')}`,
+        duration: suggestion.duration,
+        travelStyle: suggestion.travelStyle.join(', '),
+      };
+      
+      console.log('Saving trip with data:', tripData);
+      
       const response = await apiRequest('/api/trips', {
         method: 'POST',
-        body: JSON.stringify({
-          title: `${suggestion.destination}, ${suggestion.country}`,
-          destinations: JSON.stringify([{
-            name: suggestion.destination,
-            country: suggestion.country,
-            description: suggestion.description,
-            highlights: suggestion.highlights,
-            bestTimeToVisit: suggestion.bestTimeToVisit
-          }]),
-          description: suggestion.description,
-          budget: i18n.language === 'he' 
-            ? `₪${Math.round(suggestion.estimatedBudget.low * USD_TO_ILS).toLocaleString('he-IL')} - ₪${Math.round(suggestion.estimatedBudget.high * USD_TO_ILS).toLocaleString('he-IL')}`
-            : `$${suggestion.estimatedBudget.low.toLocaleString('en-US')} - $${suggestion.estimatedBudget.high.toLocaleString('en-US')}`,
-          duration: suggestion.duration,
-          travelStyle: suggestion.travelStyle.join(', '),
-        }),
+        body: JSON.stringify(tripData),
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Server error:', errorData);
+        throw new Error(errorData.message || 'Failed to save trip');
+      }
+      
       return response.json();
     },
     onSuccess: () => {
@@ -512,7 +527,7 @@ export default function MyTripsNew() {
       console.error('Error saving trip:', error);
       toast({
         title: t('common.error'),
-        description: t('trips.error_saving_trip'),
+        description: error.message || t('trips.error_saving_trip'),
         variant: "destructive",
       });
     },
