@@ -266,8 +266,26 @@ export default function MyTripsNew() {
     { id: 'volunteering', icon: Heart, label: t('trips.interests_list.volunteering') }
   ];
   
+  // Logarithmic scale helpers for budget
+  const MIN_BUDGET = 100;
+  const MAX_BUDGET = 1000000;
+  const logToLinear = (logValue: number): number => {
+    const minLog = Math.log(MIN_BUDGET);
+    const maxLog = Math.log(MAX_BUDGET);
+    const scale = (maxLog - minLog) / 100;
+    return Math.round(Math.exp(minLog + scale * logValue));
+  };
+  
+  const linearToLog = (linearValue: number): number => {
+    const minLog = Math.log(MIN_BUDGET);
+    const maxLog = Math.log(MAX_BUDGET);
+    const scale = (maxLog - minLog) / 100;
+    return Math.round((Math.log(linearValue) - minLog) / scale);
+  };
+  
   // Form state
-  const [budget, setBudget] = useState([5000]);
+  const [budgetSliderValue, setBudgetSliderValue] = useState([linearToLog(5000)]);
+  const budget = logToLinear(budgetSliderValue[0]);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [selectedContinent, setSelectedContinent] = useState<Continent | "">("");
   const [specificCity, setSpecificCity] = useState("");
@@ -289,7 +307,7 @@ export default function MyTripsNew() {
       destination: "",
       specificCity: "",
       travelStyle: [],
-      budget: 5000,
+      budget: logToLinear(linearToLog(5000)),
       duration: "",
       interests: [],
       adults: 2,
@@ -417,7 +435,7 @@ export default function MyTripsNew() {
         duration: getDurationInDays(formData.duration || "1-2 weeks"),
         interests: selectedInterests,
         travelStyle: selectedInterests, // Use interests for travel style too
-        budget: budget[0] || 1000,
+        budget: budget || 1000,
         adults: formData.adults || 2,
         children: formData.children || 0,
         tripType: formData.tripType || 'family',
@@ -575,7 +593,7 @@ export default function MyTripsNew() {
       const formData = form.getValues();
       console.log('Form data:', formData);
       console.log('Selected interests:', selectedInterests);
-      console.log('Budget:', budget[0]);
+      console.log('Budget:', budget);
       
       if (!formData.destination || selectedInterests.length === 0) {
         console.log('Missing information check failed:', {
@@ -600,7 +618,7 @@ export default function MyTripsNew() {
         destination: effectiveDestination,
         travelStyle: selectedInterests, // Use interests for both
         interests: selectedInterests,
-        budget: budget[0],
+        budget: budget,
         duration: getDurationInDays(formData.duration || "1-2 weeks"),
       };
 
@@ -1096,24 +1114,25 @@ export default function MyTripsNew() {
                   </Label>
                   <div className="px-4">
                     <Slider
-                      value={budget}
+                      value={budgetSliderValue}
                       onValueChange={(value) => {
-                        setBudget(value);
-                        form.setValue('budget', value[0]);
+                        setBudgetSliderValue(value);
+                        const actualBudget = logToLinear(value[0]);
+                        form.setValue('budget', actualBudget);
                       }}
-                      max={i18n.language === 'he' ? 1000000 : 1000000}
-                      min={i18n.language === 'he' ? 0 : 0}
-                      step={i18n.language === 'he' ? 1000 : 1000}
+                      max={100}
+                      min={0}
+                      step={1}
                       className="mb-4"
                     />
                     <div className="flex justify-between text-sm text-gray-600">
-                      <span>{i18n.language === 'he' ? '₪0' : '$0'}</span>
+                      <span>{i18n.language === 'he' ? `₪${MIN_BUDGET.toLocaleString('he-IL')}` : `$${MIN_BUDGET.toLocaleString('en-US')}`}</span>
                       <span className="text-orange-500 font-bold text-xl">
                         {i18n.language === 'he' 
-                          ? `₪${budget[0].toLocaleString('he-IL')}` 
-                          : `$${budget[0].toLocaleString('en-US')}`}
+                          ? `₪${budget.toLocaleString('he-IL')}` 
+                          : `$${budget.toLocaleString('en-US')}`}
                       </span>
-                      <span>{i18n.language === 'he' ? 'ללא הגבלה' : 'Unlimited'}</span>
+                      <span>{i18n.language === 'he' ? `₪${MAX_BUDGET.toLocaleString('he-IL')}+` : `$${MAX_BUDGET.toLocaleString('en-US')}+`}</span>
                     </div>
                   </div>
                 </div>
