@@ -1705,8 +1705,8 @@ export default function MyTripsNew() {
                           <CardContent className="p-6">
                             <div className={`flex flex-col gap-4`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                               {/* Header with title and budget */}
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="flex-1">
+                              <div className="flex items-start justify-between gap-8">
+                                <div className="flex-1 min-w-0">
                                   <h3 className={`text-2xl font-bold text-gray-900 mb-2 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
                                     {trip.title}
                                   </h3>
@@ -1715,7 +1715,7 @@ export default function MyTripsNew() {
                                     <span>{typeof trip.destinations === 'object' && trip.destinations?.name ? trip.destinations.name : t('trips.multiple_destinations')}</span>
                                   </div>
                                 </div>
-                                <Badge className="bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 shadow-lg text-base px-4 py-2 whitespace-nowrap">
+                                <Badge className="bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 shadow-lg text-base px-4 py-2 whitespace-nowrap flex-shrink-0">
                                   {trip.budget}
                                 </Badge>
                               </div>
