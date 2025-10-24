@@ -1622,20 +1622,8 @@ export default function MyTripsNew() {
                       return (
                         <Card key={itinerary.id} className={`group overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 bg-white shadow-lg ${i18n.language === 'he' ? 'border-r-4 border-r-purple-500' : 'border-l-4 border-l-purple-500'}`}>
                           <CardContent className="p-6">
-                            <div className={`flex items-start justify-between gap-4 ${i18n.language === 'he' ? 'flex-row' : 'flex-row-reverse'}`}>
-                              {/* Title and Date - next to purple bar */}
-                              <div className={`flex-1 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
-                                <Link href={`/itineraries/${itinerary.id}`} className="hover:text-purple-600 transition-colors">
-                                  <h3 className="text-2xl font-bold text-gray-900 hover:text-purple-600 transition-colors">
-                                    {itinerary.title}
-                                  </h3>
-                                </Link>
-                                <p className={`text-sm text-gray-500 mt-1 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
-                                  {t('common.created')} {formatDate(new Date(itinerary.created_at))}
-                                </p>
-                              </div>
-                              
-                              {/* Delete button */}
+                            <div className={`flex items-start justify-between gap-4 ${i18n.language === 'he' ? 'flex-row-reverse' : 'flex-row'}`}>
+                              {/* Delete button - next to purple bar */}
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -1649,6 +1637,18 @@ export default function MyTripsNew() {
                                   <Trash2 className="w-4 h-4" />
                                 )}
                               </Button>
+                              
+                              {/* Title and Date - on opposite side */}
+                              <div className={`flex-1 ${i18n.language === 'he' ? 'text-left' : 'text-right'}`}>
+                                <Link href={`/itineraries/${itinerary.id}`} className="hover:text-purple-600 transition-colors">
+                                  <h3 className="text-2xl font-bold text-gray-900 hover:text-purple-600 transition-colors">
+                                    {itinerary.title}
+                                  </h3>
+                                </Link>
+                                <p className={`text-sm text-gray-500 mt-1 ${i18n.language === 'he' ? 'text-left' : 'text-right'}`}>
+                                  {t('common.created')} {formatDate(new Date(itinerary.created_at))}
+                                </p>
+                              </div>
                             </div>
                             
                             <div className="flex flex-col gap-4 mt-4">
@@ -1709,7 +1709,10 @@ export default function MyTripsNew() {
                               {/* Days Preview */}
                               {planData?.itinerary && planData.itinerary.length > 0 && (
                                 <div className={`bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-lg ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
-                                  <p className={`font-semibold text-gray-800 mb-3 flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                  <p 
+                                    className={`font-semibold text-gray-800 mb-3 flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}
+                                    dir={i18n.language === 'he' ? 'rtl' : 'ltr'}
+                                  >
                                     <Route className="w-4 h-4 text-gray-600" />
                                     {t('trips.activity_days_count', { count: planData.itinerary.length })}
                                   </p>
