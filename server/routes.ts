@@ -518,7 +518,12 @@ export async function registerRoutes(app: Express): Promise<void> {
 
   app.get('/api/trips/user', noAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.claims?.sub || req.user.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
       const trips = await storage.getUserTrips(userId);
       res.json(trips);
     } catch (error) {
@@ -529,13 +534,23 @@ export async function registerRoutes(app: Express): Promise<void> {
 
   app.post('/api/trips', noAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.claims?.sub || req.user.id;
+      
+      console.log('📝 Creating trip - User ID:', userId);
+      console.log('📝 Trip data:', req.body);
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
       const tripData = { ...req.body, userId };
       const trip = await storage.createTrip(tripData);
+      
+      console.log('✅ Trip created successfully:', trip.id);
       res.status(201).json(trip);
     } catch (error) {
       console.error("Error creating trip:", error);
-      res.status(400).json({ message: "Failed to create trip" });
+      res.status(400).json({ message: "Failed to create trip", error: error instanceof Error ? error.message : String(error) });
     }
   });
 
