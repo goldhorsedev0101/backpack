@@ -1232,7 +1232,7 @@ export default function MyTripsNew() {
                     </div>
 
                     {aiSuggestions.map((suggestion, index) => (
-                      <div key={index} className={`border rounded-lg p-4 space-y-4 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                      <div key={index} className={`border rounded-lg p-4 space-y-4 ${i18n.language === 'he' ? 'text-left' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                         <div>
                           <h3 className="text-xl font-bold text-slate-700 mb-1">
                             {translateCity(suggestion.destination)}, {translateCountry(suggestion.country)}

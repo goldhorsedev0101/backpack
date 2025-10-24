@@ -683,7 +683,7 @@ export default function TripBuilder() {
               {aiSuggestions.length > 0 && !isGenerating && (
                 <div className="space-y-6">
                   {aiSuggestions.map((suggestion, index) => (
-                    <div key={index} className={`border rounded-lg p-4 space-y-4 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                    <div key={index} className={`border rounded-lg p-4 space-y-4 ${i18n.language === 'he' ? 'text-left' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                       <div>
                         <h3 className="text-xl font-bold text-slate-700 mb-1">
                           {suggestion.destination}, {suggestion.country}
@@ -841,7 +841,7 @@ export default function TripBuilder() {
                 {aiSuggestions.length > 0 && !isGenerating && (
                   <div className="space-y-6">
                     {aiSuggestions.map((suggestion, index) => (
-                      <div key={index} className={`border rounded-lg p-4 space-y-4 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                      <div key={index} className={`border rounded-lg p-4 space-y-4 ${i18n.language === 'he' ? 'text-left' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                         <div>
                           <h3 className="text-xl font-bold text-slate-700 mb-1">
                             {suggestion.destination}, {suggestion.country}
