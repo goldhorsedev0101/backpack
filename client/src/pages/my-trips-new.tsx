@@ -490,7 +490,10 @@ export default function MyTripsNew() {
             highlights: suggestion.highlights
           }]),
           description: suggestion.description,
-          budget: suggestion.estimatedBudget.low.toString(),
+          budget: i18n.language === 'he' 
+            ? `₪${Math.round(suggestion.estimatedBudget.low * USD_TO_ILS).toLocaleString('he-IL')} - ₪${Math.round(suggestion.estimatedBudget.high * USD_TO_ILS).toLocaleString('he-IL')}`
+            : `$${suggestion.estimatedBudget.low.toLocaleString('en-US')} - $${suggestion.estimatedBudget.high.toLocaleString('en-US')}`,
+          duration: suggestion.duration,
           travelStyle: suggestion.travelStyle.join(', '),
         }),
       });
