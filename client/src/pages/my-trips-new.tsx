@@ -224,6 +224,8 @@ export default function MyTripsNew() {
 
   // Localized constants - defined inside component to access t()
   const DURATIONS = [
+    { value: "2-3 days", label: "2-3 ימים", days: 3 },
+    { value: "4-7 days", label: "4-7 ימים", days: 7 },
     { value: "1-2 weeks", label: t('trips.duration_1_2_weeks'), days: 14 },
     { value: "2-4 weeks", label: t('trips.duration_2_4_weeks'), days: 28 },
     { value: "1-2 months", label: t('trips.duration_1_2_months'), days: 60 },
