@@ -1734,28 +1734,28 @@ export default function MyTripsNew() {
                               {/* Info Cards Grid */}
                               <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-blue-50 p-4 rounded-lg">
-                                  <div className={`flex flex-col gap-2 ${i18n.language === 'he' ? 'items-end' : 'items-start'}`}>
-                                    <div className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                  <div className="flex flex-col gap-2 items-start">
+                                    <div className="flex items-center gap-2">
                                       <Calendar className="w-5 h-5 text-blue-600" />
-                                      <span className={`font-semibold text-blue-800 text-sm ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                                      <span className="font-semibold text-blue-800 text-sm text-left">
                                         {t('trips.duration')}
                                       </span>
                                     </div>
-                                    <p className={`text-blue-700 font-medium ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                                    <p className="text-blue-700 font-medium text-left">
                                       {trip.duration}
                                     </p>
                                   </div>
                                 </div>
 
                                 <div className="bg-green-50 p-4 rounded-lg">
-                                  <div className={`flex flex-col gap-2 ${i18n.language === 'he' ? 'items-end' : 'items-start'}`}>
-                                    <div className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                  <div className="flex flex-col gap-2 items-start">
+                                    <div className="flex items-center gap-2">
                                       <DollarSign className="w-5 h-5 text-green-600" />
-                                      <span className={`font-semibold text-green-800 text-sm ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                                      <span className="font-semibold text-green-800 text-sm text-left">
                                         {t('trips.budget')}
                                       </span>
                                     </div>
-                                    <p className={`text-green-700 font-medium text-sm ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                                    <p className="text-green-700 font-medium text-sm text-left">
                                       {trip.budget}
                                     </p>
                                   </div>
