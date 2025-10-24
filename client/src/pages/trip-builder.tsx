@@ -115,7 +115,7 @@ interface TripItineraryViewProps {
 }
 
 function TripItineraryView({ itinerary, isGenerating, onGenerateItinerary }: TripItineraryViewProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   
   if (isGenerating) {
     return (
@@ -212,7 +212,7 @@ function TripItineraryView({ itinerary, isGenerating, onGenerateItinerary }: Tri
 }
 
 export default function TripBuilder() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [budget, setBudget] = useState([2500]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
@@ -663,8 +663,8 @@ export default function TripBuilder() {
               {isGenerating && (
                 <div className="text-center py-8">
                   <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-primary" />
-                  <p className="text-lg font-medium text-gray-700">Creating your perfect trip suggestions...</p>
-                  <p className="text-sm text-gray-500 mt-2">This may take a few moments</p>
+                  <p className={`text-lg font-medium text-gray-700 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>{t('trips.generating_perfect_trip')}</p>
+                  <p className={`text-sm text-gray-500 mt-2 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>{i18n.language === 'he' ? 'זה עשוי לקחת כמה רגעים' : 'This may take a few moments'}</p>
                 </div>
               )}
 
@@ -809,8 +809,8 @@ export default function TripBuilder() {
                 {isGenerating && (
                   <div className="text-center py-8">
                     <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-primary" />
-                    <p className="text-lg font-medium text-gray-700">Creating your perfect trip suggestions...</p>
-                    <p className="text-sm text-gray-500 mt-2">This may take a few moments</p>
+                    <p className={`text-lg font-medium text-gray-700 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>{t('trips.generating_perfect_trip')}</p>
+                    <p className={`text-sm text-gray-500 mt-2 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>{i18n.language === 'he' ? 'זה עשוי לקחת כמה רגעים' : 'This may take a few moments'}</p>
                   </div>
                 )}
 
