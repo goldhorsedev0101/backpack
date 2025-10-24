@@ -116,34 +116,73 @@ export default function TripCard({ trip, showUser = false, onEdit, onView, onDel
           </p>
         )}
 
-        {/* Destinations */}
-        {destinationNames && (
-          <div className={`flex items-center mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
-            <MapPin className={`w-4 h-4 text-orange-600 flex-shrink-0 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-            <span className={`text-sm text-gray-700 line-clamp-1 ${isRTL ? 'text-right' : 'text-left'}`}>
-              {destinationNames}
-            </span>
-          </div>
-        )}
+        {/* Info Boxes */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {/* Destination */}
+          {destinationNames && (
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <div className={`flex flex-col gap-2 ${isRTL ? 'items-end' : 'items-start'}`}>
+                <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <MapPin className="w-5 h-5 text-purple-600" />
+                  <span className={`font-semibold text-purple-800 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {isRTL ? 'יעד' : 'Destination'}
+                  </span>
+                </div>
+                <p className={`text-purple-700 font-medium text-sm line-clamp-1 ${isRTL ? 'text-right' : 'text-left'}`}>
+                  {destinationNames}
+                </p>
+              </div>
+            </div>
+          )}
 
-        {/* Date and Budget Row */}
-        <div className="flex items-center justify-between mb-4">
           {/* Date */}
           {trip.startDate && (
-            <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <Calendar className={`w-4 h-4 text-gray-400 flex-shrink-0 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-              <span className={`text-sm text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                {formatDate(trip.startDate)}
-              </span>
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <div className={`flex flex-col gap-2 ${isRTL ? 'items-end' : 'items-start'}`}>
+                <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <Calendar className="w-5 h-5 text-blue-600" />
+                  <span className={`font-semibold text-blue-800 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {isRTL ? 'תאריך' : 'Date'}
+                  </span>
+                </div>
+                <p className={`text-blue-700 font-medium text-sm ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                  {formatDate(trip.startDate)}
+                </p>
+              </div>
             </div>
           )}
 
           {/* Budget */}
           {budget > 0 && (
-            <div className="text-right">
-              <span className="text-base font-semibold text-slate-700" dir={isRTL ? 'rtl' : 'ltr'}>
-                {formatPrice(budget)}
-              </span>
+            <div className="bg-green-50 p-4 rounded-lg">
+              <div className={`flex flex-col gap-2 ${isRTL ? 'items-end' : 'items-start'}`}>
+                <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <DollarSign className="w-5 h-5 text-green-600" />
+                  <span className={`font-semibold text-green-800 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {isRTL ? 'תקציב' : 'Budget'}
+                  </span>
+                </div>
+                <p className={`text-green-700 font-medium text-sm ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                  {formatPrice(budget)}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Duration */}
+          {getDuration() && (
+            <div className="bg-orange-50 p-4 rounded-lg">
+              <div className={`flex flex-col gap-2 ${isRTL ? 'items-end' : 'items-start'}`}>
+                <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <Clock className="w-5 h-5 text-orange-600" />
+                  <span className={`font-semibold text-orange-800 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {isRTL ? 'משך' : 'Duration'}
+                  </span>
+                </div>
+                <p className={`text-orange-700 font-medium text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
+                  {getDuration()}
+                </p>
+              </div>
             </div>
           )}
         </div>
