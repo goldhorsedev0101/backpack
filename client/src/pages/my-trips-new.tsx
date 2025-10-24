@@ -260,6 +260,9 @@ export default function MyTripsNew() {
     { id: 'volunteering', icon: Heart, label: t('trips.interests_list.volunteering') }
   ];
   
+  // Currency conversion rate (USD to ILS)
+  const USD_TO_ILS = 3.7; // Average conversion rate
+  
   // Logarithmic scale helpers for budget
   const MIN_BUDGET = 100;
   const MAX_BUDGET = 1000000;
@@ -1280,7 +1283,9 @@ export default function MyTripsNew() {
                                 <span className="font-semibold text-green-800 text-sm">{t('trips.budget')}</span>
                               </div>
                               <p className="text-green-700 text-sm font-bold text-right">
-                                ${suggestion.estimatedBudget.low} - ${suggestion.estimatedBudget.high}
+                                {i18n.language === 'he' 
+                                  ? `₪${Math.round(suggestion.estimatedBudget.low * USD_TO_ILS).toLocaleString('he-IL')} - ₪${Math.round(suggestion.estimatedBudget.high * USD_TO_ILS).toLocaleString('he-IL')}`
+                                  : `$${suggestion.estimatedBudget.low.toLocaleString('en-US')} - $${suggestion.estimatedBudget.high.toLocaleString('en-US')}`}
                               </p>
                             </div>
                           </div>
@@ -1475,7 +1480,7 @@ export default function MyTripsNew() {
                             </div>
                             <p className="text-green-700 font-bold text-left">
                               {i18n.language === 'he' 
-                                ? `₪${day.estimatedCost.toLocaleString('he-IL')}` 
+                                ? `₪${Math.round(day.estimatedCost * USD_TO_ILS).toLocaleString('he-IL')}` 
                                 : `$${day.estimatedCost.toLocaleString('en-US')}`}
                             </p>
                           </div>
