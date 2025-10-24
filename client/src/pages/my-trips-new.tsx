@@ -1181,8 +1181,8 @@ export default function MyTripsNew() {
                     {i18n.language === 'he' ? (
                       <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-center gap-3">
-                          <Loader2 className="w-8 h-8 animate-spin text-primary" />
                           <span className="text-lg font-medium text-gray-700" dir="rtl">{t('trips.generating_perfect_trip')}</span>
+                          <Loader2 className="w-8 h-8 animate-spin text-primary" />
                         </div>
                         <p className="text-sm text-gray-500 text-center">זה עשוי לקחת כמה רגעים</p>
                       </div>
