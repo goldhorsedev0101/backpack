@@ -698,17 +698,17 @@ export default function TripBuilder() {
                         <div className="bg-blue-50 p-3 rounded-lg">
                           <div className={`flex items-center mb-1 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                             <Calendar className={`w-4 h-4 text-blue-600 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-                            <span className={`font-semibold text-blue-800 text-sm ${i18n.language === 'he' ? 'text-left' : ''}`}>Duration</span>
+                            <span className={`font-semibold text-blue-800 text-sm ${i18n.language === 'he' ? 'text-left' : ''}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>Duration</span>
                           </div>
-                          <p className={`text-blue-700 text-sm ${i18n.language === 'he' ? 'text-left' : 'text-left'}`}>{suggestion.duration}</p>
+                          <p className={`text-blue-700 text-sm ${i18n.language === 'he' ? 'text-left' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>{suggestion.duration}</p>
                         </div>
 
                         <div className="bg-green-50 p-3 rounded-lg">
                           <div className={`flex items-center mb-1 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                             <DollarSign className={`w-4 h-4 text-green-600 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-                            <span className={`font-semibold text-green-800 text-sm ${i18n.language === 'he' ? 'text-left' : ''}`}>Budget</span>
+                            <span className={`font-semibold text-green-800 text-sm ${i18n.language === 'he' ? 'text-left' : ''}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>Budget</span>
                           </div>
-                          <p className={`text-green-700 text-sm font-bold ${i18n.language === 'he' ? 'text-left' : 'text-left'}`}>
+                          <p className={`text-green-700 text-sm font-bold ${i18n.language === 'he' ? 'text-left' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                             ${suggestion.estimatedBudget.low} - ${suggestion.estimatedBudget.high}
                           </p>
                         </div>
@@ -717,9 +717,9 @@ export default function TripBuilder() {
                       <div className="bg-orange-50 p-3 rounded-lg">
                         <div className={`flex items-center mb-1 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                           <Calendar className={`w-4 h-4 text-orange-600 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-                          <span className={`font-semibold text-orange-800 text-sm ${i18n.language === 'he' ? 'text-left' : ''}`}>Best Time to Visit</span>
+                          <span className={`font-semibold text-orange-800 text-sm ${i18n.language === 'he' ? 'text-left' : ''}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>Best Time to Visit</span>
                         </div>
-                        <p className={`text-orange-700 text-sm ${i18n.language === 'he' ? 'text-left' : 'text-left'}`}>{suggestion.bestTimeToVisit}</p>
+                        <p className={`text-orange-700 text-sm ${i18n.language === 'he' ? 'text-left' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>{suggestion.bestTimeToVisit}</p>
                       </div>
 
                       <div>
@@ -860,17 +860,17 @@ export default function TripBuilder() {
                           <div className="bg-blue-50 p-3 rounded-lg">
                             <div className={`flex items-center mb-1 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                               <Calendar className={`w-4 h-4 text-blue-600 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-                              <span className={`font-semibold text-blue-800 text-sm ${i18n.language === 'he' ? 'text-left' : ''}`}>{t("trips.duration")}</span>
+                              <span className={`font-semibold text-blue-800 text-sm ${i18n.language === 'he' ? 'text-left' : ''}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>{t("trips.duration")}</span>
                             </div>
-                            <p className={`text-blue-700 text-sm ${i18n.language === 'he' ? 'text-left' : 'text-left'}`}>{suggestion.duration}</p>
+                            <p className={`text-blue-700 text-sm ${i18n.language === 'he' ? 'text-left' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>{suggestion.duration}</p>
                           </div>
 
                           <div className="bg-green-50 p-3 rounded-lg">
                             <div className={`flex items-center mb-1 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                               <DollarSign className={`w-4 h-4 text-green-600 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-                              <span className={`font-semibold text-green-800 text-sm ${i18n.language === 'he' ? 'text-left' : ''}`}>{t("trips.budget")}</span>
+                              <span className={`font-semibold text-green-800 text-sm ${i18n.language === 'he' ? 'text-left' : ''}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>{t("trips.budget")}</span>
                             </div>
-                            <p className={`text-green-700 text-sm font-bold ${i18n.language === 'he' ? 'text-left' : 'text-left'}`}>
+                            <p className={`text-green-700 text-sm font-bold ${i18n.language === 'he' ? 'text-left' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                               ${suggestion.estimatedBudget.low} - ${suggestion.estimatedBudget.high}
                             </p>
                           </div>
@@ -879,9 +879,9 @@ export default function TripBuilder() {
                         <div className="bg-orange-50 p-3 rounded-lg">
                           <div className={`flex items-center mb-1 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                             <Calendar className={`w-4 h-4 text-orange-600 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-                            <span className={`font-semibold text-orange-800 text-sm ${i18n.language === 'he' ? 'text-left' : ''}`}>{t("trips.best_time_to_visit")}</span>
+                            <span className={`font-semibold text-orange-800 text-sm ${i18n.language === 'he' ? 'text-left' : ''}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>{t("trips.best_time_to_visit")}</span>
                           </div>
-                          <p className={`text-orange-700 text-sm ${i18n.language === 'he' ? 'text-left' : 'text-left'}`}>{suggestion.bestTimeToVisit}</p>
+                          <p className={`text-orange-700 text-sm ${i18n.language === 'he' ? 'text-left' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>{suggestion.bestTimeToVisit}</p>
                         </div>
 
                         <div>
