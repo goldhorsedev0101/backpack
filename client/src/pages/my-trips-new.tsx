@@ -1773,16 +1773,13 @@ export default function MyTripsNew() {
                               </div>
 
                               {/* Description */}
-                              <div className="flex gap-2">
-                                <MapPin className="w-4 h-4 flex-shrink-0 text-orange-500 invisible" />
-                                <p 
-                                  className={`text-gray-600 leading-relaxed flex-1 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} 
-                                  dir={i18n.language === 'he' ? 'rtl' : 'ltr'}
-                                  style={i18n.language === 'he' ? { unicodeBidi: 'plaintext' } : undefined}
-                                >
-                                  {normalizeRtlText(trip.description, i18n.language === 'he')}
-                                </p>
-                              </div>
+                              <p 
+                                className={`text-gray-600 leading-relaxed ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} 
+                                dir={i18n.language === 'he' ? 'rtl' : 'ltr'}
+                                style={i18n.language === 'he' ? { unicodeBidi: 'plaintext' } : undefined}
+                              >
+                                {normalizeRtlText(trip.description, i18n.language === 'he')}
+                              </p>
 
                               {/* Info Cards Grid */}
                               <div className="grid grid-cols-3 gap-4">
