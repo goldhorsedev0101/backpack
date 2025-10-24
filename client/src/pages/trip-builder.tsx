@@ -683,12 +683,12 @@ export default function TripBuilder() {
               {aiSuggestions.length > 0 && !isGenerating && (
                 <div className="space-y-6">
                   {aiSuggestions.map((suggestion, index) => (
-                    <div key={index} className="border rounded-lg p-4 space-y-4">
+                    <div key={index} className={`border rounded-lg p-4 space-y-4 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
                       <div>
-                        <h3 className="text-xl font-bold text-slate-700 mb-1">
+                        <h3 className={`text-xl font-bold text-slate-700 mb-1 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                           {suggestion.destination}, {suggestion.country}
                         </h3>
-                        <p className="text-gray-600 leading-relaxed">
+                        <p className={`text-gray-600 leading-relaxed ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                           {suggestion.description}
                         </p>
                       </div>
@@ -841,12 +841,12 @@ export default function TripBuilder() {
                 {aiSuggestions.length > 0 && !isGenerating && (
                   <div className="space-y-6">
                     {aiSuggestions.map((suggestion, index) => (
-                      <div key={index} className="border rounded-lg p-4 space-y-4">
+                      <div key={index} className={`border rounded-lg p-4 space-y-4 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
                         <div>
-                          <h3 className="text-xl font-bold text-slate-700 mb-1">
+                          <h3 className={`text-xl font-bold text-slate-700 mb-1 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                             {suggestion.destination}, {suggestion.country}
                           </h3>
-                          <p className="text-gray-600 leading-relaxed">
+                          <p className={`text-gray-600 leading-relaxed ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                             {suggestion.description}
                           </p>
                         </div>

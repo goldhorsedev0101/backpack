@@ -1234,10 +1234,10 @@ export default function MyTripsNew() {
                     {aiSuggestions.map((suggestion, index) => (
                       <div key={index} className={`border rounded-lg p-4 space-y-4 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
                         <div>
-                          <h3 className="text-xl font-bold text-slate-700 mb-1" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                          <h3 className={`text-xl font-bold text-slate-700 mb-1 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                             {translateCity(suggestion.destination)}, {translateCountry(suggestion.country)}
                           </h3>
-                          <p className="text-gray-600 leading-relaxed" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                          <p className={`text-gray-600 leading-relaxed ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                             {suggestion.description}
                           </p>
                         </div>
