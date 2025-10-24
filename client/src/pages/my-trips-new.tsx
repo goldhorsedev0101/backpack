@@ -1705,14 +1705,14 @@ export default function MyTripsNew() {
                           <CardContent className="p-6">
                             <div className={`flex flex-col gap-4`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                               {/* Header with title and budget */}
-                              <div className={`flex items-start justify-between gap-4 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                              <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1">
                                   <h3 className={`text-2xl font-bold text-gray-900 mb-2 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
                                     {trip.title}
                                   </h3>
-                                  <div className={`flex items-center gap-2 text-gray-600 mb-2 ${i18n.language === 'he' ? 'flex-row-reverse justify-end' : ''}`}>
+                                  <div className={`flex items-center gap-2 text-gray-600 ${i18n.language === 'he' ? 'justify-start' : ''}`}>
                                     <MapPin className="w-4 h-4 flex-shrink-0 text-orange-500" />
-                                    <span className={i18n.language === 'he' ? 'text-right' : 'text-left'}>{typeof trip.destinations === 'object' && trip.destinations?.name ? trip.destinations.name : t('trips.multiple_destinations')}</span>
+                                    <span>{typeof trip.destinations === 'object' && trip.destinations?.name ? trip.destinations.name : t('trips.multiple_destinations')}</span>
                                   </div>
                                 </div>
                                 <Badge className="bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 shadow-lg text-base px-4 py-2 whitespace-nowrap">
