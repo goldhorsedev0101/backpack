@@ -1869,19 +1869,19 @@ export default function MyTripsNew() {
                               <div className={`flex gap-3 pt-4 border-t ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                                 <Button 
                                   variant="outline"
-                                  className="flex-1"
+                                  className="flex-1 bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 border-orange-200"
                                   onClick={() => {
-                                    // Switch to itinerary tab to show trip details
-                                    setActiveTab('itinerary');
+                                    // Switch to preferences tab and populate with trip data
+                                    setActiveTab('preferences');
                                     toast({
-                                      title: t('trips.viewing_trip') || 'Viewing Trip',
-                                      description: trip.title,
+                                      title: t('trips.generate_daily_itinerary') || 'Generate Daily Itinerary',
+                                      description: t('trips.creating_itinerary_for') + ' ' + trip.title,
                                     });
                                   }}
-                                  data-testid={`button-view-trip-${trip.id}`}
+                                  data-testid={`button-generate-itinerary-${trip.id}`}
                                 >
-                                  <ExternalLink className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-                                  {t('common.view')}
+                                  <Calendar className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
+                                  {t('trips.generate_daily_itinerary')}
                                 </Button>
                                 <Button 
                                   variant="outline"
