@@ -1767,7 +1767,7 @@ export default function MyTripsNew() {
                                     <span className={i18n.language === 'he' ? 'text-right' : 'text-left'}>{typeof trip.destinations === 'object' && trip.destinations?.name ? trip.destinations.name : t('trips.multiple_destinations')}</span>
                                   </div>
                                   <p 
-                                    className={`text-gray-600 leading-relaxed ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}
+                                    className={`text-gray-600 leading-relaxed w-full ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}
                                     dir={i18n.language === 'he' ? 'rtl' : 'ltr'}
                                     style={i18n.language === 'he' ? { unicodeBidi: 'plaintext' } : undefined}
                                   >
