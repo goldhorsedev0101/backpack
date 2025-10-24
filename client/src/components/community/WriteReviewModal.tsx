@@ -186,7 +186,7 @@ export function WriteReviewModal({ open, onOpenChange, onReviewCreated }: WriteR
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Entity Type Selection */}
           <div>
-            <Label htmlFor="entity-type">{t('community.reviews.place_type')} *</Label>
+            <Label htmlFor="entity-type" className="block mb-2">{t('community.reviews.place_type')} *</Label>
             <Select value={formData.entityType} onValueChange={handleEntityTypeChange}>
               <SelectTrigger>
                 <SelectValue placeholder={t('community.reviews.select_place_type')} />
@@ -202,7 +202,7 @@ export function WriteReviewModal({ open, onOpenChange, onReviewCreated }: WriteR
 
           {/* Place Selection */}
           <div>
-            <Label htmlFor="place">{t('community.reviews.select_place')} *</Label>
+            <Label htmlFor="place" className="block mb-2">{t('community.reviews.select_place')} *</Label>
             <Popover open={showPlaceCombobox} onOpenChange={setShowPlaceCombobox}>
               <PopoverTrigger asChild>
                 <Button
@@ -268,8 +268,8 @@ export function WriteReviewModal({ open, onOpenChange, onReviewCreated }: WriteR
 
           {/* Rating */}
           <div>
-            <Label>{t('community.reviews.rating')} *</Label>
-            <div className="flex items-center gap-1 mt-2">
+            <Label className="block mb-2">{t('community.reviews.rating')} *</Label>
+            <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
@@ -296,7 +296,7 @@ export function WriteReviewModal({ open, onOpenChange, onReviewCreated }: WriteR
 
           {/* Title */}
           <div>
-            <Label htmlFor="title">{t('community.reviews.review_title')} *</Label>
+            <Label htmlFor="title" className="block mb-2">{t('community.reviews.review_title')} *</Label>
             <Input
               id="title"
               placeholder={t('community.reviews.title_placeholder')}
@@ -311,7 +311,7 @@ export function WriteReviewModal({ open, onOpenChange, onReviewCreated }: WriteR
 
           {/* Review Body */}
           <div>
-            <Label htmlFor="body">{t('community.reviews.your_review')} *</Label>
+            <Label htmlFor="body" className="block mb-2">{t('community.reviews.your_review')} *</Label>
             <Textarea
               id="body"
               placeholder={t('community.reviews.review_placeholder')}
@@ -328,7 +328,7 @@ export function WriteReviewModal({ open, onOpenChange, onReviewCreated }: WriteR
 
           {/* Guest Name */}
           <div>
-            <Label htmlFor="guest-name">{t('community.reviews.your_name')} *</Label>
+            <Label htmlFor="guest-name" className="block mb-2">{t('community.reviews.your_name')} *</Label>
             <Input
               id="guest-name"
               placeholder={t('community.reviews.name_placeholder')}

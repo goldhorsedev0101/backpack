@@ -142,8 +142,8 @@ export function EditReviewModal({ open, onOpenChange, review, onReviewUpdated }:
 
           {/* Rating */}
           <div>
-            <Label>{t('community.reviews.rating')} *</Label>
-            <div className="flex items-center gap-1 mt-2">
+            <Label className="block mb-2">{t('community.reviews.rating')} *</Label>
+            <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
@@ -171,7 +171,7 @@ export function EditReviewModal({ open, onOpenChange, review, onReviewUpdated }:
 
           {/* Title */}
           <div>
-            <Label htmlFor="title">{t('community.reviews.review_title')} *</Label>
+            <Label htmlFor="title" className="block mb-2">{t('community.reviews.review_title')} *</Label>
             <Input
               id="title"
               placeholder={t('community.reviews.title_placeholder')}
@@ -186,7 +186,7 @@ export function EditReviewModal({ open, onOpenChange, review, onReviewUpdated }:
 
           {/* Review Body */}
           <div>
-            <Label htmlFor="body">{t('community.reviews.your_review')} *</Label>
+            <Label htmlFor="body" className="block mb-2">{t('community.reviews.your_review')} *</Label>
             <Textarea
               id="body"
               placeholder={t('community.reviews.review_placeholder')}
