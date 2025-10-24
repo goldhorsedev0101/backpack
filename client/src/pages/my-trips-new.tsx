@@ -1679,104 +1679,137 @@ export default function MyTripsNew() {
                       {t('trips.you_have_trips', { count: savedTrips.length })}
                     </p>
 
-                    {savedTrips.map((trip) => (
-                      <Card 
-                        key={trip.id} 
-                        className={`group overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 bg-white shadow-lg ${i18n.language === 'he' ? 'border-r-4 border-r-orange-500' : 'border-l-4 border-l-orange-500'}`}
-                        data-testid={`card-saved-trip-${trip.id}`}
-                      >
-                        <CardContent className="p-6">
-                          <div className={`flex flex-col gap-4 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
-                            {/* Header with title and budget */}
-                            <div className={`flex items-start justify-between gap-4 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                              <div className="flex-1">
-                                <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                                  {trip.title}
-                                </h3>
-                                <div className={`flex items-center gap-2 text-gray-600 mb-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                                  <MapPin className="w-4 h-4 flex-shrink-0 text-orange-500" />
-                                  <span>{typeof trip.destinations === 'object' && trip.destinations?.name ? trip.destinations.name : t('trips.multiple_destinations')}</span>
-                                </div>
-                              </div>
-                              <Badge className="bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 shadow-lg text-base px-4 py-2 whitespace-nowrap">
-                                {trip.budget}
-                              </Badge>
-                            </div>
+                    {savedTrips.map((trip) => {
+                      // Parse destinations to extract highlights
+                      let highlights: string[] = [];
+                      try {
+                        const destinations = typeof trip.destinations === 'string' 
+                          ? JSON.parse(trip.destinations) 
+                          : trip.destinations;
+                        if (Array.isArray(destinations) && destinations[0]?.highlights) {
+                          highlights = destinations[0].highlights;
+                        }
+                      } catch (e) {
+                        // If parsing fails, highlights will remain empty
+                      }
 
-                            {/* Description */}
-                            <p className="text-gray-600 leading-relaxed">
-                              {trip.description}
-                            </p>
-
-                            {/* Info Cards Grid */}
-                            <div className={`grid grid-cols-2 gap-4 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
-                              <div className="bg-blue-50 p-4 rounded-lg">
-                                <div className={`flex flex-col gap-2 ${i18n.language === 'he' ? 'items-end' : 'items-start'}`}>
-                                  <div className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                                    <Calendar className="w-5 h-5 text-blue-600" />
-                                    <span className="font-semibold text-blue-800 text-sm">
-                                      {t('trips.duration')}
-                                    </span>
+                      return (
+                        <Card 
+                          key={trip.id} 
+                          className={`group overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 bg-white shadow-lg ${i18n.language === 'he' ? 'border-r-4 border-r-orange-500' : 'border-l-4 border-l-orange-500'}`}
+                          data-testid={`card-saved-trip-${trip.id}`}
+                        >
+                          <CardContent className="p-6">
+                            <div className={`flex flex-col gap-4 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                              {/* Header with title and budget */}
+                              <div className={`flex items-start justify-between gap-4 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                <div className="flex-1">
+                                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                                    {trip.title}
+                                  </h3>
+                                  <div className={`flex items-center gap-2 text-gray-600 mb-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                    <MapPin className="w-4 h-4 flex-shrink-0 text-orange-500" />
+                                    <span>{typeof trip.destinations === 'object' && trip.destinations?.name ? trip.destinations.name : t('trips.multiple_destinations')}</span>
                                   </div>
-                                  <p className="text-blue-700 font-medium">
-                                    {trip.duration}
-                                  </p>
                                 </div>
+                                <Badge className="bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 shadow-lg text-base px-4 py-2 whitespace-nowrap">
+                                  {trip.budget}
+                                </Badge>
                               </div>
 
-                              <div className="bg-green-50 p-4 rounded-lg">
-                                <div className={`flex flex-col gap-2 ${i18n.language === 'he' ? 'items-end' : 'items-start'}`}>
-                                  <div className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                                    <DollarSign className="w-5 h-5 text-green-600" />
-                                    <span className="font-semibold text-green-800 text-sm">
-                                      {t('trips.budget')}
-                                    </span>
+                              {/* Description */}
+                              <p className="text-gray-600 leading-relaxed">
+                                {trip.description}
+                              </p>
+
+                              {/* Info Cards Grid */}
+                              <div className={`grid grid-cols-2 gap-4 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                                <div className="bg-blue-50 p-4 rounded-lg">
+                                  <div className={`flex flex-col gap-2 ${i18n.language === 'he' ? 'items-end' : 'items-start'}`}>
+                                    <div className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                      <Calendar className="w-5 h-5 text-blue-600" />
+                                      <span className="font-semibold text-blue-800 text-sm">
+                                        {t('trips.duration')}
+                                      </span>
+                                    </div>
+                                    <p className="text-blue-700 font-medium">
+                                      {trip.duration}
+                                    </p>
                                   </div>
-                                  <p className="text-green-700 font-medium text-sm">
-                                    {trip.budget}
-                                  </p>
+                                </div>
+
+                                <div className="bg-green-50 p-4 rounded-lg">
+                                  <div className={`flex flex-col gap-2 ${i18n.language === 'he' ? 'items-end' : 'items-start'}`}>
+                                    <div className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                      <DollarSign className="w-5 h-5 text-green-600" />
+                                      <span className="font-semibold text-green-800 text-sm">
+                                        {t('trips.budget')}
+                                      </span>
+                                    </div>
+                                    <p className="text-green-700 font-medium text-sm">
+                                      {trip.budget}
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
 
-                            {/* Tags */}
-                            {trip.travelStyle && (
-                              <div className={`flex flex-wrap gap-2 ${i18n.language === 'he' ? 'flex-row-reverse justify-end' : ''}`}>
-                                {trip.travelStyle.split(',').map((style, idx) => {
-                                  const trimmedStyle = style.trim();
-                                  const interestConfig = ALL_INTERESTS.find(int => int.id === trimmedStyle.toLowerCase());
-                                  return (
-                                    <Badge key={idx} variant="secondary" className="bg-gradient-to-r from-orange-100 to-teal-100 text-gray-800 border-0">
-                                      {interestConfig ? interestConfig.label : trimmedStyle}
-                                    </Badge>
-                                  );
-                                })}
+                              {/* Highlights */}
+                              {highlights && highlights.length > 0 && (
+                                <div>
+                                  <div className={`flex items-center gap-2 mb-3 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                    <Star className="w-4 h-4 text-yellow-600" />
+                                    <span className="font-semibold text-gray-800 text-sm">{t('trips.highlights')}</span>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {highlights.map((highlight, idx) => (
+                                      <div key={idx} className={`flex items-center text-sm text-gray-700 gap-2 ${i18n.language === 'he' ? 'flex-row-reverse text-right' : ''}`}>
+                                        <span className="w-2 h-2 bg-yellow-500 rounded-full flex-shrink-0"></span>
+                                        <span>{highlight}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Tags */}
+                              {trip.travelStyle && (
+                                <div className={`flex flex-wrap gap-2 ${i18n.language === 'he' ? 'flex-row-reverse justify-end' : ''}`}>
+                                  {trip.travelStyle.split(',').map((style, idx) => {
+                                    const trimmedStyle = style.trim();
+                                    const interestConfig = ALL_INTERESTS.find(int => int.id === trimmedStyle.toLowerCase());
+                                    return (
+                                      <Badge key={idx} variant="secondary" className="bg-gradient-to-r from-orange-100 to-teal-100 text-gray-800 border-0">
+                                        {interestConfig ? interestConfig.label : trimmedStyle}
+                                      </Badge>
+                                    );
+                                  })}
+                                </div>
+                              )}
+
+                              {/* Action Buttons */}
+                              <div className={`flex gap-3 pt-4 border-t ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                <Button 
+                                  variant="outline"
+                                  className="flex-1"
+                                  data-testid={`button-view-trip-${trip.id}`}
+                                >
+                                  <ExternalLink className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
+                                  {t('common.view')}
+                                </Button>
+                                <Button 
+                                  variant="outline"
+                                  className="border-red-200 hover:bg-red-50 hover:border-red-300 text-red-600"
+                                  data-testid={`button-delete-trip-${trip.id}`}
+                                >
+                                  <Trash2 className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
+                                  {t('common.delete')}
+                                </Button>
                               </div>
-                            )}
-
-                            {/* Action Buttons */}
-                            <div className={`flex gap-3 pt-4 border-t ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                              <Button 
-                                variant="outline"
-                                className="flex-1"
-                                data-testid={`button-view-trip-${trip.id}`}
-                              >
-                                <ExternalLink className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-                                {t('common.view')}
-                              </Button>
-                              <Button 
-                                variant="outline"
-                                className="border-red-200 hover:bg-red-50 hover:border-red-300 text-red-600"
-                                data-testid={`button-delete-trip-${trip.id}`}
-                              >
-                                <Trash2 className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-                                {t('common.delete')}
-                              </Button>
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
