@@ -1177,10 +1177,10 @@ export default function MyTripsNew() {
             <Card className="shadow-lg bg-gradient-to-br from-orange-50 via-teal-50 to-blue-50 border-none">
               <CardContent>
                 {isGenerating && (
-                  <div className={`py-8 ${i18n.language === 'he' ? 'text-right' : 'text-center'}`}>
-                    <Loader2 className={`w-12 h-12 mb-4 animate-spin text-primary ${i18n.language === 'he' ? 'mr-auto' : 'mx-auto'}`} />
-                    <p className={`text-lg font-medium text-gray-700 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>{t('trips.generating_perfect_trip')}</p>
-                    <p className={`text-sm text-gray-500 mt-2 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>{i18n.language === 'he' ? 'זה עשוי לקחת כמה רגעים' : 'This may take a few moments'}</p>
+                  <div className={`py-8 flex flex-col gap-2 ${i18n.language === 'he' ? 'items-end text-right' : 'items-center text-center'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                    <Loader2 className={`w-12 h-12 mb-4 animate-spin text-primary ${i18n.language === 'he' ? 'self-end' : ''}`} />
+                    <p className={`text-lg font-medium text-gray-700 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>{t('trips.generating_perfect_trip')}</p>
+                    <p className={`text-sm text-gray-500 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>{i18n.language === 'he' ? 'זה עשוי לקחת כמה רגעים' : 'This may take a few moments'}</p>
                   </div>
                 )}
 
