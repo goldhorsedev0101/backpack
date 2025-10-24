@@ -1622,63 +1622,36 @@ export default function MyTripsNew() {
                       return (
                         <Card key={itinerary.id} className={`group overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 bg-white shadow-lg ${i18n.language === 'he' ? 'border-r-4 border-r-purple-500' : 'border-l-4 border-l-purple-500'}`}>
                           <CardContent className="p-6">
-                            <div className="flex flex-col gap-4">
-                              {/* Header */}
-                              <div className="flex items-start justify-between gap-4">
-                                {i18n.language === 'he' ? (
-                                  <>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => deleteItineraryMutation.mutate(itinerary.id)}
-                                      disabled={deleteItineraryMutation.isPending}
-                                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                    >
-                                      {deleteItineraryMutation.isPending ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                      ) : (
-                                        <Trash2 className="w-4 h-4" />
-                                      )}
-                                    </Button>
-                                    <div className="flex-1 text-right">
-                                      <Link href={`/itineraries/${itinerary.id}`} className="hover:text-purple-600 transition-colors">
-                                        <h3 className="text-2xl font-bold text-gray-900 hover:text-purple-600 transition-colors">
-                                          {itinerary.title}
-                                        </h3>
-                                      </Link>
-                                      <p className="text-sm text-gray-500 mt-1 text-right">
-                                        {t('common.created')} {formatDate(new Date(itinerary.created_at))}
-                                      </p>
-                                    </div>
-                                  </>
-                                ) : (
-                                  <>
-                                    <div className="flex-1 text-left">
-                                      <Link href={`/itineraries/${itinerary.id}`} className="hover:text-purple-600 transition-colors">
-                                        <h3 className="text-2xl font-bold text-gray-900 hover:text-purple-600 transition-colors">
-                                          {itinerary.title}
-                                        </h3>
-                                      </Link>
-                                      <p className="text-sm text-gray-500 mt-1 text-left">
-                                        {t('common.created')} {formatDate(new Date(itinerary.created_at))}
-                                      </p>
-                                    </div>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => deleteItineraryMutation.mutate(itinerary.id)}
-                                      disabled={deleteItineraryMutation.isPending}
-                                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                    >
-                                      {deleteItineraryMutation.isPending ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                      ) : (
-                                        <Trash2 className="w-4 h-4" />
-                                      )}
-                                    </Button>
-                                  </>
-                                )}
+                            <div className={`flex items-start justify-between gap-4 ${i18n.language === 'he' ? 'flex-row' : 'flex-row-reverse'}`}>
+                              {/* Title and Date - next to purple bar */}
+                              <div className={`flex-1 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                                <Link href={`/itineraries/${itinerary.id}`} className="hover:text-purple-600 transition-colors">
+                                  <h3 className="text-2xl font-bold text-gray-900 hover:text-purple-600 transition-colors">
+                                    {itinerary.title}
+                                  </h3>
+                                </Link>
+                                <p className={`text-sm text-gray-500 mt-1 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                                  {t('common.created')} {formatDate(new Date(itinerary.created_at))}
+                                </p>
                               </div>
+                              
+                              {/* Delete button */}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deleteItineraryMutation.mutate(itinerary.id)}
+                                disabled={deleteItineraryMutation.isPending}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                {deleteItineraryMutation.isPending ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-4 h-4" />
+                                )}
+                              </Button>
+                            </div>
+                            
+                            <div className="flex flex-col gap-4 mt-4">
 
                               {/* Info Grid */}
                               <div className="grid grid-cols-3 gap-4">
@@ -1752,7 +1725,10 @@ export default function MyTripsNew() {
                                     {planData.itinerary.length > 2 && (
                                       <div className={`flex items-center gap-2 text-xs text-gray-500 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                                         <span className="w-2 h-2 bg-purple-400 rounded-full flex-shrink-0"></span>
-                                        <span className={i18n.language === 'he' ? 'text-right' : 'text-left'}>
+                                        <span 
+                                          className={i18n.language === 'he' ? 'text-right' : 'text-left'}
+                                          dir={i18n.language === 'he' ? 'rtl' : 'ltr'}
+                                        >
                                           {t('trips.and_more_days', { count: planData.itinerary.length - 2 })}...
                                         </span>
                                       </div>

@@ -832,9 +832,11 @@
       "volunteering": "התנדבות"
     },
     "day_number": "יום {{day}}",
-    "activity_days_count": "{{count, plural, one {יום פעילות אחד} other {{{count}} ימי פעילויות}}",
-    "days_count": "{{count, plural, one {יום אחד} other {{{count}} ימים}}",
-    "and_more_days": "ועוד {{count, plural, one {יום נוסף} other {{{count}} ימים נוספים}}",
+    "activity_days_count": "{{count}} ימי פעילויות",
+    "activity_days_count_one": "יום פעילות אחד",
+    "days_count": "{{count}} ימים",
+    "days_count_one": "יום אחד",
+    "and_more_days": "ועוד {{count}} ימים נוספים",
     "unknown_destination": "יעד לא ידוע",
     "deleted_successfully": "נמחק בהצלחה",
     "itinerary_removed_from_list": "המסלול הוסר מהרשימה שלך",
@@ -843,7 +845,8 @@
     "loading_saved_itineraries": "טוען את המסלולים השמורים שלך...",
     "sign_in_to_save_itinerary": "התחבר כדי לשמור את המסלול",
     "sign_in_to_save_and_access_description": "כדי לשמור ולגשת למסלול שלך מכל מכשיר, התחבר עם Google.",
-    "you_have_count_itineraries": "יש לך {{count, plural, one {מסלול שמור אחד} other {{{count}} מסלולים שמורים}}"
+    "you_have_count_itineraries": "יש לך {{count}} מסלולים שמורים",
+    "you_have_count_itineraries_one": "יש לך מסלול שמור אחד"
   },
   "community": {
     "title": "קהילת GlobeMate",
