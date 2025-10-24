@@ -1790,7 +1790,7 @@ export default function MyTripsNew() {
                                       </span>
                                     </div>
                                     <p className={`text-blue-700 font-medium ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
-                                      {trip.duration}
+                                      {trip.duration || (i18n.language === 'he' ? '7 ימים' : '7 days')}
                                     </p>
                                   </div>
                                 </div>
