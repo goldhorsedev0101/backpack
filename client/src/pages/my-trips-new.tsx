@@ -1622,20 +1622,20 @@ export default function MyTripsNew() {
                       return (
                         <Card key={itinerary.id} className={`group overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 bg-white shadow-lg ${i18n.language === 'he' ? 'border-r-4 border-r-purple-500' : 'border-l-4 border-l-purple-500'}`}>
                           <CardContent className="p-6">
-                            <div className={`flex items-start justify-between gap-4 ${i18n.language === 'he' ? 'flex-row' : 'flex-row-reverse'}`}>
-                              {/* Title and Date - next to purple bar */}
-                              <div className="flex-1 text-left">
+                            <div className={`flex items-start justify-between gap-4 ${i18n.language === 'he' ? 'flex-row-reverse' : 'flex-row'}`}>
+                              {/* Title and Date - right side with spacing from purple bar */}
+                              <div className={`flex-1 text-right ${i18n.language === 'he' ? 'pr-2' : 'pl-2'}`}>
                                 <Link href={`/itineraries/${itinerary.id}`} className="hover:text-purple-600 transition-colors">
                                   <h3 className="text-2xl font-bold text-gray-900 hover:text-purple-600 transition-colors">
                                     {itinerary.title}
                                   </h3>
                                 </Link>
-                                <p className="text-sm text-gray-500 mt-1 text-left">
+                                <p className="text-sm text-gray-500 mt-1 text-right">
                                   {t('common.created')} {formatDate(new Date(itinerary.created_at))}
                                 </p>
                               </div>
                               
-                              {/* Delete button - on opposite side */}
+                              {/* Delete button - left side */}
                               <Button
                                 variant="ghost"
                                 size="sm"
