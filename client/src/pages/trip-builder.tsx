@@ -685,10 +685,10 @@ export default function TripBuilder() {
                   {aiSuggestions.map((suggestion, index) => (
                     <div key={index} className={`border rounded-lg p-4 space-y-4 ${i18n.language === 'he' ? 'text-left' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                       <div>
-                        <h3 className="text-xl font-bold text-slate-700 mb-1">
+                        <h3 className={`text-xl font-bold text-slate-700 mb-1 ${i18n.language === 'he' ? 'text-left' : 'text-left'}`}>
                           {suggestion.destination}, {suggestion.country}
                         </h3>
-                        <p className="text-gray-600 leading-relaxed">
+                        <p className={`text-gray-600 leading-relaxed ${i18n.language === 'he' ? 'text-left' : 'text-left'}`}>
                           {suggestion.description}
                         </p>
                       </div>
@@ -843,10 +843,10 @@ export default function TripBuilder() {
                     {aiSuggestions.map((suggestion, index) => (
                       <div key={index} className={`border rounded-lg p-4 space-y-4 ${i18n.language === 'he' ? 'text-left' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                         <div>
-                          <h3 className="text-xl font-bold text-slate-700 mb-1">
+                          <h3 className={`text-xl font-bold text-slate-700 mb-1 ${i18n.language === 'he' ? 'text-left' : 'text-left'}`}>
                             {suggestion.destination}, {suggestion.country}
                           </h3>
-                          <p className="text-gray-600 leading-relaxed">
+                          <p className={`text-gray-600 leading-relaxed ${i18n.language === 'he' ? 'text-left' : 'text-left'}`}>
                             {suggestion.description}
                           </p>
                         </div>
