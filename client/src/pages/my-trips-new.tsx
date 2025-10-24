@@ -518,6 +518,31 @@ export default function MyTripsNew() {
     },
   });
 
+  // Delete trip mutation
+  const deleteTripMutation = useMutation({
+    mutationFn: async (tripId: number) => {
+      const response = await apiRequest(`/api/trips/${tripId}`, {
+        method: 'DELETE',
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: t('trips.trip_deleted') || 'Trip deleted',
+        description: t('trips.trip_deleted_desc') || 'Your trip has been deleted successfully',
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/trips/user'] });
+    },
+    onError: (error) => {
+      console.error('Error deleting trip:', error);
+      toast({
+        title: t('common.error'),
+        description: t('trips.error_deleting_trip') || 'Failed to delete trip',
+        variant: "destructive",
+      });
+    },
+  });
+
   // Save itinerary mutation with Supabase
   const saveItineraryMutation = useMutation({
     mutationFn: async () => {
@@ -1820,6 +1845,14 @@ export default function MyTripsNew() {
                                 <Button 
                                   variant="outline"
                                   className="flex-1"
+                                  onClick={() => {
+                                    // Switch to itinerary tab to show trip details
+                                    setActiveTab('itinerary');
+                                    toast({
+                                      title: t('trips.viewing_trip') || 'Viewing Trip',
+                                      description: trip.title,
+                                    });
+                                  }}
                                   data-testid={`button-view-trip-${trip.id}`}
                                 >
                                   <ExternalLink className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
@@ -1828,9 +1861,19 @@ export default function MyTripsNew() {
                                 <Button 
                                   variant="outline"
                                   className="border-red-200 hover:bg-red-50 hover:border-red-300 text-red-600"
+                                  onClick={() => {
+                                    if (confirm(t('trips.confirm_delete') || 'Are you sure you want to delete this trip?')) {
+                                      deleteTripMutation.mutate(trip.id);
+                                    }
+                                  }}
+                                  disabled={deleteTripMutation.isPending}
                                   data-testid={`button-delete-trip-${trip.id}`}
                                 >
-                                  <Trash2 className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
+                                  {deleteTripMutation.isPending ? (
+                                    <Loader2 className={`w-4 h-4 animate-spin ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
+                                  ) : (
+                                    <Trash2 className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
+                                  )}
                                   {t('common.delete')}
                                 </Button>
                               </div>
