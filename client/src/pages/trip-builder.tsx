@@ -43,11 +43,23 @@ import { WORLD_COUNTRIES } from "@/lib/constants";
 // Currency conversion rate (USD to ILS)
 const USD_TO_ILS = 3.7;
 
-// Fix RTL punctuation for Hebrew text
-const fixRTLPunctuation = (text: string, isHebrew: boolean) => {
-  if (!isHebrew) return text;
-  // Wrap the entire text with RLE (Right-to-Left Embedding) and PDF (Pop Directional Formatting)
-  return `\u202B${text}\u202C`;
+// Component to properly display RTL text
+const RTLText = ({ text, isHebrew }: { text: string; isHebrew: boolean }) => {
+  if (!isHebrew) return <>{text}</>;
+  
+  return (
+    <span 
+      style={{ 
+        display: 'inline-block',
+        direction: 'rtl',
+        unicodeBidi: 'embed',
+        textAlign: 'right',
+        width: '100%'
+      }}
+    >
+      {text}
+    </span>
+  );
 };
 
 const getTripFormSchema = (t: any) => z.object({
@@ -708,7 +720,7 @@ export default function TripBuilder() {
                           {suggestion.destination}, {suggestion.country}
                         </h3>
                         <p className={`text-gray-600 leading-relaxed ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
-                          {fixRTLPunctuation(suggestion.description, i18n.language === 'he')}
+                          <RTLText text={suggestion.description} isHebrew={i18n.language === 'he'} />
                         </p>
                       </div>
 
@@ -872,7 +884,7 @@ export default function TripBuilder() {
                             {suggestion.destination}, {suggestion.country}
                           </h3>
                           <p className={`text-gray-600 leading-relaxed ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
-                            {fixRTLPunctuation(suggestion.description, i18n.language === 'he')}
+                            <RTLText text={suggestion.description} isHebrew={i18n.language === 'he'} />
                           </p>
                         </div>
 
