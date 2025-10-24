@@ -1728,8 +1728,8 @@ export default function MyTripsNew() {
 
                 {savedTrips.length > 0 && !isLoadingSavedTrips && (
                   <div className="space-y-6">
-                    <div className={`bg-gradient-to-r from-orange-100 to-amber-100 p-4 rounded-lg mb-6 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
-                      <p className={`text-lg font-semibold text-gray-800 flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse justify-end' : 'justify-start'}`}>
+                    <div className={`bg-gradient-to-r from-orange-100 to-amber-100 p-4 rounded-lg mb-6 ${i18n.language === 'he' ? 'text-left' : 'text-left'}`}>
+                      <p className={`text-lg font-semibold text-gray-800 flex items-center gap-2 ${i18n.language === 'he' ? 'justify-start' : 'justify-start'}`}>
                         <Heart className="w-5 h-5 text-orange-600" />
                         {t('trips.you_have_trips', { count: savedTrips.length })}
                       </p>
