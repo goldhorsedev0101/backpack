@@ -181,7 +181,7 @@ export default function JourneysPage() {
                 </span>
               </Button>
             </Link>
-            <div className={isRTL ? 'text-right' : 'text-left'}>
+            <div className={`flex flex-col ${isRTL ? 'items-end text-right' : 'items-start text-left'}`}>
               <h1 className={`text-4xl font-bold mb-4 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
                 {isRTL ? 'מסעות מתוכננים ברחבי העולם' : 'Multi-Destination Journeys'}
               </h1>
