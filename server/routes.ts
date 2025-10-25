@@ -857,8 +857,15 @@ export async function registerRoutes(app: Express): Promise<void> {
 
   app.post('/api/expenses', noAuth, async (req: any, res) => {
     try {
+      // Check if user is authenticated
+      if (!req.user || !req.user.claims || !req.user.claims.sub) {
+        return res.status(401).json({ message: "יש להתחבר כדי להוסיף הוצאה" });
+      }
+
       const userId = req.user.claims.sub;
       const { tripId, category, amount, description, location } = req.body;
+
+      console.log("Received expense request:", { tripId, category, amount, description, location, userId });
 
       // Validate required fields
       if (!tripId) {
@@ -874,7 +881,20 @@ export async function registerRoutes(app: Express): Promise<void> {
         return res.status(400).json({ message: "אנא הזן תיאור" });
       }
 
-      const expenseData = { tripId: parseInt(tripId), category, amount, description, location, userId };
+      const parsedTripId = parseInt(tripId);
+      
+      // Verify the trip exists and belongs to the user
+      const trip = await storage.getTripById(parsedTripId);
+      if (!trip) {
+        return res.status(400).json({ message: "הטיול שנבחר לא נמצא במערכת" });
+      }
+      if (trip.userId !== userId) {
+        return res.status(403).json({ message: "אין לך הרשאה להוסיף הוצאות לטיול זה" });
+      }
+
+      const expenseData = { tripId: parsedTripId, category, amount, description, location, userId };
+      console.log("Creating expense with data:", expenseData);
+      
       const expense = await storage.createExpense(expenseData);
       res.status(201).json(expense);
     } catch (error: any) {
@@ -882,10 +902,10 @@ export async function registerRoutes(app: Express): Promise<void> {
       
       // Check for specific database errors
       if (error.code === '23503') {
-        return res.status(400).json({ message: "הטיול שנבחר לא נמצא" });
+        return res.status(400).json({ message: "הטיול שנבחר לא קיים במערכת" });
       }
       
-      res.status(400).json({ message: error.message || "שגיאה בהוספת הוצאה" });
+      res.status(400).json({ message: error.message || "שגיאה בהוספת הוצאה, אנא נסה שוב" });
     }
   });
 
