@@ -264,7 +264,7 @@ export function NewBuddyPostModal({ open, onOpenChange }: NewBuddyPostModalProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir={t('direction') === 'rtl' ? 'rtl' : 'ltr'}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('community.find_travel_buddy')}</DialogTitle>
           <DialogDescription>

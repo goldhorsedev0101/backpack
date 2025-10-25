@@ -2080,7 +2080,7 @@ export default function MyTripsNew() {
 
         {/* Auth Modal */}
         <Dialog open={isAuthModalOpen} onOpenChange={setIsAuthModalOpen}>
-          <DialogContent className="max-w-md" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+          <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle className="text-center">{t('trips.sign_in_to_save_itinerary')}</DialogTitle>
               <DialogDescription className="text-center">

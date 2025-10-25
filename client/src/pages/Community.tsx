@@ -516,7 +516,7 @@ function CreateRoomModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto" dir={t('direction') === 'rtl' ? 'rtl' : 'ltr'}>
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('community.create_room.title')}</DialogTitle>
         </DialogHeader>

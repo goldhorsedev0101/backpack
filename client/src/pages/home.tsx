@@ -176,7 +176,7 @@ function SavedJourneyCard({ savedJourney, onRemove, formatPrice }: {
                   <Trash2 className="w-4 h-4 text-red-600" />
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent dir={isRTL ? 'rtl' : 'ltr'}>
+              <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>{isRTL ? 'הסר מסע מהרשימה' : 'Remove Journey'}</AlertDialogTitle>
                   <AlertDialogDescription>

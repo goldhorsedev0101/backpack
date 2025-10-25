@@ -178,7 +178,7 @@ export function WriteReviewModal({ open, onOpenChange, onReviewCreated }: WriteR
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir={t('direction') === 'rtl' ? 'rtl' : 'ltr'}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('community.reviews.write_review')}</DialogTitle>
         </DialogHeader>

@@ -215,7 +215,7 @@ export function ReviewCard({ review, onEdit, onDeleted, onHelpfulToggle }: Revie
                             Delete Review
                           </DropdownMenuItem>
                         </AlertDialogTrigger>
-                        <AlertDialogContent dir={localStorage.getItem('i18nextLng') === 'he' ? 'rtl' : 'ltr'}>
+                        <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>Delete Review</AlertDialogTitle>
                             <AlertDialogDescription>

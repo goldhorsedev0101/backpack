@@ -117,7 +117,7 @@ export function EditReviewModal({ open, onOpenChange, review, onReviewUpdated }:
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir={t('direction') === 'rtl' ? 'rtl' : 'ltr'}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('community.reviews.edit_review')}</DialogTitle>
         </DialogHeader>

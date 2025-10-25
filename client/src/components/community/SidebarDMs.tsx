@@ -202,7 +202,7 @@ export function SidebarDMs({ selectedRoom, onRoomSelect, onNewDM }: SidebarDMsPr
                 <Plus className="w-4 h-4" />
               </Button>
             </DialogTrigger>
-            <DialogContent dir={t('direction') === 'rtl' ? 'rtl' : 'ltr'}>
+            <DialogContent>
               <DialogHeader>
                 <DialogTitle>{t('chat.start_new_conversation_modal')}</DialogTitle>
               </DialogHeader>
