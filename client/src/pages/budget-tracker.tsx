@@ -591,8 +591,8 @@ export default function BudgetTracker() {
                 <>
                   <Card>
                     <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
+                      <div className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                        <div className={i18n.language === 'he' ? 'text-right' : ''}>
                           <p className="text-sm text-gray-600">{t('budget.total_trips')}</p>
                           <p className="text-2xl font-bold">{analytics?.trips?.total || 0}</p>
                         </div>
@@ -603,8 +603,8 @@ export default function BudgetTracker() {
 
                   <Card>
                     <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
+                      <div className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                        <div className={i18n.language === 'he' ? 'text-right' : ''}>
                           <p className="text-sm text-gray-600">{t('budget.countries_visited')}</p>
                           <p className="text-2xl font-bold">{analytics?.trips?.countries || 0}</p>
                         </div>
@@ -615,8 +615,8 @@ export default function BudgetTracker() {
 
                   <Card>
                     <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
+                      <div className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                        <div className={i18n.language === 'he' ? 'text-right' : ''}>
                           <p className="text-sm text-gray-600">{t('budget.total_spent')}</p>
                           <p className="text-2xl font-bold">
                             {i18n.language === 'he' 
@@ -631,9 +631,9 @@ export default function BudgetTracker() {
 
                   <Card>
                     <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-gray-600">Avg per Trip</p>
+                      <div className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                        <div className={i18n.language === 'he' ? 'text-right' : ''}>
+                          <p className="text-sm text-gray-600">{t('budget.avg_per_trip')}</p>
                           <p className="text-2xl font-bold">
                             {i18n.language === 'he' 
                               ? `₪${Math.round((analytics?.expenses?.avgPerTrip || 0) * USD_TO_ILS).toLocaleString('he-IL')}` 

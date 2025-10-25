@@ -1200,6 +1200,7 @@
     "export": "ייצוא",
     "total_trips": "סה\"כ טיולים",
     "countries_visited": "מדינות בהן ביקרת",
+    "avg_per_trip": "ממוצע לטיול",
     "total_reviews": "סה\"כ ביקורות",
     "chat_rooms": "חדרי צ'אט",
     "budget_used_percentage": "{{percentage}}% מהתקציב בשימוש",

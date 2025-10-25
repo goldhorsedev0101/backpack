@@ -992,6 +992,7 @@
     "export": "Export",
     "total_trips": "Total Trips",
     "countries_visited": "Countries Visited",
+    "avg_per_trip": "Avg per Trip",
     "total_reviews": "Total Reviews",
     "chat_rooms": "Chat Rooms",
     "budget_used_percentage": "{{percentage}}% of budget used",
