@@ -5,9 +5,22 @@ async function throwIfResNotOk(res: Response) {
     const text = (await res.text()) || res.statusText;
     try {
       const json = JSON.parse(text);
-      // Extract the message from the JSON response
-      throw new Error(json.message || text);
+      // Extract message from various possible structures
+      const errorMessage = 
+        json.message || 
+        json.error?.message || 
+        json.error || 
+        (typeof json === 'string' ? json : text);
+      
+      // Log for debugging
+      console.error('API Error:', { status: res.status, json, extracted: errorMessage });
+      
+      throw new Error(errorMessage);
     } catch (e) {
+      // If JSON parse fails, check if e is our thrown error
+      if (e instanceof Error && e.message !== text) {
+        throw e; // Re-throw our custom error
+      }
       // If not JSON, throw the text as is
       throw new Error(text);
     }
