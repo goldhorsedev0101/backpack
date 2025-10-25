@@ -35,7 +35,8 @@ import {
   Filter,
   Download,
   BarChart3,
-  Wallet
+  Wallet,
+  ShoppingBag
 } from "lucide-react";
 
 // Currency conversion rate (USD to ILS)
@@ -358,8 +359,8 @@ export default function BudgetTracker() {
                 {/* Quick Stats */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <TrendingUp className="w-5 h-5 mr-2 text-primary" />
+                    <CardTitle className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                      <TrendingUp className="w-5 h-5 text-primary" />
                       {t('budget.quick_stats')}
                     </CardTitle>
                   </CardHeader>
@@ -415,8 +416,8 @@ export default function BudgetTracker() {
                 {/* Category Breakdown */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <PieChart className="w-5 h-5 mr-2 text-primary" />
+                    <CardTitle className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                      <PieChart className="w-5 h-5 text-primary" />
                       {t('budget.categories')}
                     </CardTitle>
                   </CardHeader>
@@ -427,12 +428,12 @@ export default function BudgetTracker() {
                       
                       return (
                         <div key={category.id} className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                              <div className={`p-2 rounded-lg ${category.color} mr-3`}>
+                          <div className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                            <div className={`flex items-center gap-3 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                              <div className={`p-2 rounded-lg ${category.color}`}>
                                 <IconComponent className="w-4 h-4 text-white" />
                               </div>
-                              <span className="font-medium">{t(category.labelKey)}</span>
+                              <span className={`font-medium ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>{t(category.labelKey)}</span>
                             </div>
                             <span className="font-semibold">
                               {i18n.language === 'he' 
@@ -456,12 +457,12 @@ export default function BudgetTracker() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span className="flex items-center">
-                    <DollarSign className="w-5 h-5 mr-2 text-primary" />
+                  <span className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                    <DollarSign className="w-5 h-5 text-primary" />
                     {t('budget.recent_expenses')}
                   </span>
-                  <Button variant="outline" size="sm">
-                    <Download className="w-4 h-4 mr-2" />
+                  <Button variant="outline" size="sm" className={`${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                    <Download className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
                     {t('budget.export')}
                   </Button>
                 </CardTitle>
@@ -594,8 +595,8 @@ export default function BudgetTracker() {
           <TabsContent value="insights" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Lightbulb className="w-5 h-5 mr-2 text-primary" />
+                <CardTitle className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                  <Lightbulb className="w-5 h-5 text-primary" />
                   {t('budget.ai_budget_insights')}
                 </CardTitle>
               </CardHeader>
