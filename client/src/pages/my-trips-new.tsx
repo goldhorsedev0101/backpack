@@ -1954,36 +1954,73 @@ export default function MyTripsNew() {
 
                               {/* Action Buttons */}
                               <div className={`flex gap-3 pt-4 border-t ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                                <Button 
-                                  variant="outline"
-                                  className="flex-1 bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 border-orange-200"
-                                  onClick={async () => {
-                                    // Convert saved trip to suggestion format
-                                    const suggestion = {
-                                      destination: trip.title,
-                                      description: trip.description,
-                                      duration: trip.duration || '7 days',
-                                      estimatedBudget: {
-                                        low: typeof trip.budget === 'string' ? parseFloat(trip.budget.replace(/[^0-9.]/g, '')) : trip.budget,
-                                        high: typeof trip.budget === 'string' ? parseFloat(trip.budget.replace(/[^0-9.]/g, '')) : trip.budget
-                                      },
-                                      highlights: highlights,
-                                      travelStyle: trip.travelStyle ? trip.travelStyle.split(',').map(s => s.trim()) : []
-                                    };
-                                    
-                                    // Generate itinerary
-                                    await handleGenerateItineraryForSuggestion(suggestion);
-                                  }}
-                                  disabled={isGeneratingItinerary}
-                                  data-testid={`button-generate-itinerary-${trip.id}`}
-                                >
-                                  {isGeneratingItinerary ? (
-                                    <Loader2 className={`w-4 h-4 animate-spin ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-                                  ) : (
-                                    <Calendar className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-                                  )}
-                                  {t('trips.generate_daily_itinerary')}
-                                </Button>
+                                {(() => {
+                                  // Check if there's an existing itinerary for this trip
+                                  const existingItinerary = savedItineraries.find((itin: any) => {
+                                    const planData = itin.plan_json as any;
+                                    // Match by title or destination
+                                    return itin.title === trip.title || planData?.mainDestination === trip.title;
+                                  });
+
+                                  if (existingItinerary) {
+                                    // Show "View Itinerary" button if itinerary exists
+                                    return (
+                                      <Button 
+                                        asChild
+                                        className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                                        data-testid={`button-view-itinerary-${trip.id}`}
+                                      >
+                                        <Link href={`/itineraries/${existingItinerary.id}`}>
+                                          {i18n.language === 'he' ? (
+                                            <>
+                                              צפה במסלול היומי
+                                              <Calendar className="w-4 h-4 mr-2" />
+                                            </>
+                                          ) : (
+                                            <>
+                                              <Calendar className="w-4 h-4 mr-2" />
+                                              View Daily Itinerary
+                                            </>
+                                          )}
+                                        </Link>
+                                      </Button>
+                                    );
+                                  } else {
+                                    // Show "Create Itinerary" button if no itinerary exists
+                                    return (
+                                      <Button 
+                                        variant="outline"
+                                        className="flex-1 bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 border-orange-200"
+                                        onClick={async () => {
+                                          // Convert saved trip to suggestion format
+                                          const suggestion = {
+                                            destination: trip.title,
+                                            description: trip.description,
+                                            duration: trip.duration || '7 days',
+                                            estimatedBudget: {
+                                              low: typeof trip.budget === 'string' ? parseFloat(trip.budget.replace(/[^0-9.]/g, '')) : trip.budget,
+                                              high: typeof trip.budget === 'string' ? parseFloat(trip.budget.replace(/[^0-9.]/g, '')) : trip.budget
+                                            },
+                                            highlights: highlights,
+                                            travelStyle: trip.travelStyle ? trip.travelStyle.split(',').map(s => s.trim()) : []
+                                          };
+                                          
+                                          // Generate itinerary
+                                          await handleGenerateItineraryForSuggestion(suggestion);
+                                        }}
+                                        disabled={isGeneratingItinerary}
+                                        data-testid={`button-generate-itinerary-${trip.id}`}
+                                      >
+                                        {isGeneratingItinerary ? (
+                                          <Loader2 className={`w-4 h-4 animate-spin ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
+                                        ) : (
+                                          <Calendar className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
+                                        )}
+                                        {i18n.language === 'he' ? 'צור מסלול יומי' : t('trips.generate_daily_itinerary')}
+                                      </Button>
+                                    );
+                                  }
+                                })()}
                                 <Button 
                                   variant="outline"
                                   className="border-red-200 hover:bg-red-50 hover:border-red-300 text-red-600"
