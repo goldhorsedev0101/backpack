@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "wouter";
 
 interface TripCardProps {
   trip: {
@@ -105,9 +106,11 @@ export default function TripCard({ trip, showUser = false, onEdit, onView, onDel
     <Card className="card-hover overflow-hidden border-gray-200 shadow-sm hover:shadow-md transition-shadow" dir={isRTL ? 'rtl' : 'ltr'}>
       <CardContent className="p-6">
         {/* Title */}
-        <h3 className="text-xl font-bold text-slate-800 mb-3 line-clamp-2 text-left">
-          {trip.title}
-        </h3>
+        <Link href={`/my-trips/${trip.id}`}>
+          <h3 className="text-xl font-bold text-slate-800 mb-3 line-clamp-2 text-left hover:text-purple-600 cursor-pointer transition-colors" data-testid={`link-trip-title-${trip.id}`}>
+            {trip.title}
+          </h3>
+        </Link>
 
         {/* Description */}
         {trip.description && (
