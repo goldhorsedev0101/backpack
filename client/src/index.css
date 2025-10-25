@@ -25,19 +25,6 @@
   right: auto !important;
 }
 
-/* Force scrollbar to left side in RTL dialogs */
-[dir="rtl"][role="dialog"] {
-  overflow-y: auto;
-  direction: ltr; /* Container is LTR so scrollbar goes to right */
-  transform: scaleX(-1); /* Flip the container */
-}
-
-/* Flip content back to normal */
-[dir="rtl"][role="dialog"] > * {
-  transform: scaleX(-1); /* Flip content back */
-  direction: rtl; /* Content is RTL */
-}
-
 /* RTL Support - Essential rules only */
 [dir="rtl"] {
   direction: rtl;
