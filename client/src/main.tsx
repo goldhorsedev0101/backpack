@@ -38,3 +38,4 @@ window.addEventListener('error', (event) => {
 });
 
 createRoot(document.getElementById("root")!).render(<App />);
+console.log('🔥 Cache cleared - Version 1761411184');
