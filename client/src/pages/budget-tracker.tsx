@@ -200,14 +200,14 @@ export default function BudgetTracker() {
 
           <Dialog open={showExpenseForm} onOpenChange={setShowExpenseForm}>
             <DialogTrigger asChild>
-              <Button className="bg-primary hover:bg-orange-600 whitespace-nowrap">
-                <Plus className="w-4 h-4 mr-2" />
+              <Button className={`bg-primary hover:bg-orange-600 whitespace-nowrap ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                <Plus className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
                 {t('budget.add_expense')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>{t('budget.add_new_expense')}</DialogTitle>
+                <DialogTitle className={i18n.language === 'he' ? 'text-right' : 'text-left'}>{t('budget.add_new_expense')}</DialogTitle>
               </DialogHeader>
               <form onSubmit={form.handleSubmit(handleSubmitExpense)} className="space-y-4">
                 <div>
@@ -292,7 +292,7 @@ export default function BudgetTracker() {
                   />
                 </div>
 
-                <div className="flex gap-2 pt-4">
+                <div className={`flex gap-2 pt-4 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                   <Button type="submit" disabled={addExpenseMutation.isPending} className="flex-1">
                     {addExpenseMutation.isPending ? t('budget.adding') : t('budget.add_expense')}
                   </Button>
@@ -456,7 +456,7 @@ export default function BudgetTracker() {
           <TabsContent value="expenses" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
+                <CardTitle className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                   <span className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                     <DollarSign className="w-5 h-5 text-primary" />
                     {t('budget.recent_expenses')}
