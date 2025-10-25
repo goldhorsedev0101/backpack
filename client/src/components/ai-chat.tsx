@@ -270,12 +270,16 @@ export default function AiChat({ className, initialMessage, disableAutoScroll = 
           {
             name: suggestion.destination,
             country: suggestion.country,
-            description: suggestion.description
+            description: suggestion.description,
+            bestTimeToVisit: suggestion.bestTimeToVisit,
+            highlights: suggestion.highlights
           }
         ],
         budget: suggestion.estimatedBudget.high,
         isPublic: false,
-        travelStyle: suggestion.travelStyle || 'adventure'
+        travelStyle: Array.isArray(suggestion.travelStyle) 
+          ? suggestion.travelStyle.join(', ') 
+          : suggestion.travelStyle || 'adventure'
       };
       
       const response = await apiRequest('/api/trips', {

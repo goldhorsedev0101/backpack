@@ -1955,15 +1955,25 @@ export default function MyTripsNew() {
                                     <span className={`font-semibold text-gray-800 text-sm ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>{t('trips.tags')}</span>
                                   </div>
                                   <div className={`flex flex-wrap gap-2 ${i18n.language === 'he' ? 'justify-end' : ''}`}>
-                                    {trip.travelStyle.split(',').map((style, idx) => {
-                                      const trimmedStyle = style.trim();
-                                      const interestConfig = ALL_INTERESTS.find(int => int.id === trimmedStyle.toLowerCase());
-                                      return (
-                                        <Badge key={idx} variant="secondary" className="bg-gradient-to-r from-orange-100 to-teal-100 text-gray-800 border-0">
-                                          {interestConfig ? interestConfig.label : trimmedStyle}
-                                        </Badge>
-                                      );
-                                    })}
+                                    {(() => {
+                                      // Handle both string and array formats
+                                      let styles: string[] = [];
+                                      if (typeof trip.travelStyle === 'string') {
+                                        styles = trip.travelStyle.split(',').map(s => s.trim());
+                                      } else if (Array.isArray(trip.travelStyle)) {
+                                        styles = trip.travelStyle;
+                                      }
+                                      
+                                      return styles.map((style, idx) => {
+                                        const trimmedStyle = style.trim();
+                                        const interestConfig = ALL_INTERESTS.find(int => int.id === trimmedStyle.toLowerCase());
+                                        return (
+                                          <Badge key={idx} variant="secondary" className="bg-gradient-to-r from-orange-100 to-teal-100 text-gray-800 border-0">
+                                            {interestConfig ? interestConfig.label : trimmedStyle}
+                                          </Badge>
+                                        );
+                                      });
+                                    })()}
                                   </div>
                                 </div>
                               )}
