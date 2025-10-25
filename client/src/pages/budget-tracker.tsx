@@ -244,8 +244,8 @@ export default function BudgetTracker() {
                         const IconComponent = category.icon;
                         return (
                           <SelectItem key={category.id} value={category.id}>
-                            <div className="flex items-center">
-                              <IconComponent className="w-4 h-4 mr-2" />
+                            <div className="flex items-center gap-3">
+                              <IconComponent className="w-4 h-4" />
                               {t(category.labelKey)}
                             </div>
                           </SelectItem>
