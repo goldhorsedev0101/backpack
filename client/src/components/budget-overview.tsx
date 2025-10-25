@@ -153,8 +153,8 @@ export default function BudgetOverview({
       {categoryTotals.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <PieChart className="w-5 h-5 mr-2 text-primary" />
+            <CardTitle className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+              <PieChart className="w-5 h-5 text-primary" />
               {t('budget.spending_by_category')}
             </CardTitle>
           </CardHeader>
@@ -166,9 +166,9 @@ export default function BudgetOverview({
                 
                 return (
                   <div key={category.id} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className={`p-2 rounded-lg ${category.color} mr-3`}>
+                    <div className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                      <div className={`flex items-center gap-3 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                        <div className={`p-2 rounded-lg ${category.color}`}>
                           <CategoryIcon className="w-4 h-4 text-white" />
                         </div>
                         <span className="font-medium">{t(category.labelKey)}</span>
@@ -196,8 +196,8 @@ export default function BudgetOverview({
       {recentExpenses.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <TrendingUp className="w-5 h-5 mr-2 text-primary" />
+            <CardTitle className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+              <TrendingUp className="w-5 h-5 text-primary" />
               {t('budget.recent_expenses')}
             </CardTitle>
           </CardHeader>
@@ -209,12 +209,12 @@ export default function BudgetOverview({
                 
                 return (
                   <div key={expense.id}>
-                    <div className="flex items-center justify-between py-2">
-                      <div className="flex items-center">
-                        <div className={`p-2 rounded-lg ${category?.color || 'bg-gray-500'} mr-3`}>
+                    <div className={`flex items-center justify-between py-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                      <div className={`flex items-center gap-3 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                        <div className={`p-2 rounded-lg ${category?.color || 'bg-gray-500'}`}>
                           <CategoryIcon className="w-4 h-4 text-white" />
                         </div>
-                        <div>
+                        <div className={i18n.language === 'he' ? 'text-right' : ''}>
                           <div className="font-medium">{expense.description}</div>
                           <div className="text-sm text-gray-600">
                             {category?.label || t('budget.other')} • {formatShortDate(expense.date)}
