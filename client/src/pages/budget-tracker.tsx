@@ -362,7 +362,6 @@ export default function BudgetTracker() {
                       description: expense.description,
                       date: expense.createdAt || expense.date
                     }))}
-                    currency="USD"
                   />
                 ) : (
                   <Card>

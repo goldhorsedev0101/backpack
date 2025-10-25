@@ -25,20 +25,27 @@ interface BudgetOverviewProps {
     description: string;
     date: string;
   }>;
-  currency?: string;
 }
 
+const USD_TO_ILS = 3.7;
 
 export default function BudgetOverview({ 
   totalBudget = 0, 
   totalSpent = 0, 
-  expenses = [], 
-  currency = "USD" 
+  expenses = []
 }: BudgetOverviewProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { formatCurrency, formatNumber, formatShortDate } = useIntlFormatters();
   const budgetUsed = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
   const remaining = totalBudget - totalSpent;
+  
+  // Format currency based on language
+  const formatAmount = (amount: number) => {
+    if (i18n.language === 'he') {
+      return `₪${Math.round(amount * USD_TO_ILS).toLocaleString('he-IL')}`;
+    }
+    return `$${amount.toFixed(2)}`;
+  };
 
   // Calculate category totals
   const categoryTotals = (EXPENSE_CATEGORIES || []).map(category => ({
@@ -104,7 +111,7 @@ export default function BudgetOverview({
                 <DollarSign className="w-5 h-5 text-gray-600" />
               </div>
               <div className="text-2xl font-bold text-gray-800">
-                {formatCurrency(totalSpent, currency)}
+                {formatAmount(totalSpent)}
               </div>
               <div className="text-sm text-gray-600">{t('budget.total_spent')}</div>
             </div>
@@ -116,7 +123,7 @@ export default function BudgetOverview({
                     <Target className="w-5 h-5 text-gray-600" />
                   </div>
                   <div className="text-2xl font-bold text-gray-800">
-                    {formatCurrency(totalBudget, currency)}
+                    {formatAmount(totalBudget)}
                   </div>
                   <div className="text-sm text-gray-600">{t('budget.budget')}</div>
                 </div>
@@ -130,7 +137,7 @@ export default function BudgetOverview({
                     )}
                   </div>
                   <div className={`text-2xl font-bold ${remaining >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatCurrency(Math.abs(remaining), currency)}
+                    {formatAmount(Math.abs(remaining))}
                   </div>
                   <div className="text-sm text-gray-600">
                     {remaining >= 0 ? t('budget.remaining') : t('budget.over_budget')}
@@ -167,7 +174,7 @@ export default function BudgetOverview({
                         <span className="font-medium">{t(category.labelKey)}</span>
                       </div>
                       <div className="text-right">
-                        <div className="font-semibold">{formatCurrency(category.total, currency)}</div>
+                        <div className="font-semibold">{formatAmount(category.total)}</div>
                         <div className="text-sm text-gray-600">{formatNumber(percentage, { maximumFractionDigits: 1 })}%</div>
                       </div>
                     </div>
@@ -215,7 +222,7 @@ export default function BudgetOverview({
                         </div>
                       </div>
                       <div className="font-semibold text-gray-800">
-                        {formatCurrency(expense.amount, currency)}
+                        {formatAmount(expense.amount)}
                       </div>
                     </div>
                     {index < (recentExpenses || []).length - 1 && <Separator className="mt-2" />}
