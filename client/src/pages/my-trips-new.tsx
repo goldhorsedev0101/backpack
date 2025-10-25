@@ -226,10 +226,22 @@ export default function MyTripsNew() {
   const [activeTab, setActiveTab] = useState("preferences");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  // Check URL hash to open specific tab
+  // Check URL hash to open specific tab and scroll to specific trip
   useEffect(() => {
     const hash = window.location.hash.substring(1); // Remove the # character
-    if (hash && ['preferences', 'suggestions', 'itinerary', 'my-itineraries', 'saved'].includes(hash)) {
+    
+    // Check if hash is a trip ID (format: trip-123)
+    if (hash && hash.startsWith('trip-')) {
+      setActiveTab('saved'); // Open the saved trips tab
+      
+      // Scroll to the specific trip after a short delay to ensure the tab content is rendered
+      setTimeout(() => {
+        const element = document.getElementById(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+    } else if (hash && ['preferences', 'suggestions', 'itinerary', 'my-itineraries', 'saved'].includes(hash)) {
       setActiveTab(hash);
     }
   }, []);
@@ -1820,7 +1832,8 @@ export default function MyTripsNew() {
 
                       return (
                         <Card 
-                          key={trip.id} 
+                          key={trip.id}
+                          id={`trip-${trip.id}`}
                           className={`group overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 bg-white shadow-lg ${i18n.language === 'he' ? 'border-r-4 border-r-orange-500' : 'border-l-4 border-l-orange-500'}`}
                           data-testid={`card-saved-trip-${trip.id}`}
                         >
