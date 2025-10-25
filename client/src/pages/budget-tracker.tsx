@@ -528,8 +528,8 @@ export default function BudgetTracker() {
                       
                       return (
                         <div key={expense.id}>
-                          <div className={`flex items-center justify-between py-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                            <div className={`flex items-center gap-3 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                          <div className={`flex items-start justify-between py-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                            <div className={`flex items-start gap-3 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                               <div className={`p-2 rounded-lg ${category?.color || 'bg-gray-500'}`}>
                                 <IconComponent className="w-4 h-4 text-white" />
                               </div>
