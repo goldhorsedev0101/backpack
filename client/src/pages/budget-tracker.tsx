@@ -36,7 +36,8 @@ import {
   Download,
   BarChart3,
   Wallet,
-  ShoppingBag
+  ShoppingBag,
+  Trash2
 } from "lucide-react";
 
 // Currency conversion rate (USD to ILS)
@@ -520,39 +521,44 @@ export default function BudgetTracker() {
               </CardHeader>
               <CardContent>
                 {filteredExpenses.length > 0 ? (
-                  <div className="space-y-4">
-                    {(filteredExpenses || []).map((expense: any) => {
+                  <div className="space-y-3">
+                    {(filteredExpenses || []).map((expense: any, index: number) => {
                       const category = EXPENSE_CATEGORIES.find(c => c.id === expense.category);
                       const IconComponent = category?.icon || ShoppingBag;
                       
                       return (
-                        <div key={expense.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                          <div className="flex items-center">
-                            <div className={`p-3 rounded-lg ${category?.color || 'bg-gray-500'} mr-4`}>
-                              <IconComponent className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                              <div className="font-medium">{expense.description}</div>
-                              <div className="text-sm text-gray-600 flex items-center gap-2">
-                                <Badge variant="outline">{category?.label || t('budget.other')}</Badge>
-                                {expense.location && (
-                                  <>
-                                    <MapPin className="w-3 h-3" />
-                                    <span>{expense.location}</span>
-                                  </>
-                                )}
-                                <Calendar className="w-3 h-3 ml-2" />
-                                <span>{new Date(expense.createdAt).toLocaleDateString()}</span>
+                        <div key={expense.id}>
+                          <div className={`flex items-center justify-between py-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                            <div className={`flex items-center gap-3 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                              <div className={`p-2 rounded-lg ${category?.color || 'bg-gray-500'}`}>
+                                <IconComponent className="w-4 h-4 text-white" />
+                              </div>
+                              <div className={i18n.language === 'he' ? 'text-right' : ''}>
+                                <div className="font-medium">{expense.description}</div>
+                                <div className="text-sm text-gray-600">
+                                  {t(category?.labelKey || 'budget.other')} • {new Date(expense.createdAt).toLocaleDateString('he-IL')}
+                                  {expense.location && ` • ${expense.location}`}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-lg font-semibold">
-                              {i18n.language === 'he' 
-                                ? `₪${Math.round(parseFloat(expense.amount) * USD_TO_ILS).toLocaleString('he-IL')}` 
-                                : `$${parseFloat(expense.amount).toFixed(2)}`}
+                            <div className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                              <div className="font-semibold text-gray-800">
+                                {i18n.language === 'he' 
+                                  ? `₪${Math.round(parseFloat(expense.amount) * USD_TO_ILS).toLocaleString('he-IL')}` 
+                                  : `$${parseFloat(expense.amount).toFixed(2)}`}
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                onClick={() => handleDeleteExpense(expense.id)}
+                                data-testid={`button-delete-expense-${expense.id}`}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             </div>
                           </div>
+                          {index < filteredExpenses.length - 1 && <Separator className="mt-2" />}
                         </div>
                       );
                     })}
