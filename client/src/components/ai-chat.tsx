@@ -264,13 +264,18 @@ export default function AiChat({ className, initialMessage, disableAutoScroll = 
   const saveTripMutation = useMutation({
     mutationFn: async (suggestion: TripSuggestion) => {
       const tripData = {
-        destination: `${suggestion.destination}, ${suggestion.country}`,
+        title: `${suggestion.destination}, ${suggestion.country}`,
         description: suggestion.description,
+        destinations: [
+          {
+            name: suggestion.destination,
+            country: suggestion.country,
+            description: suggestion.description
+          }
+        ],
         budget: suggestion.estimatedBudget.high,
-        duration: suggestion.duration,
         isPublic: false,
-        highlights: suggestion.highlights,
-        travelStyle: suggestion.travelStyle
+        travelStyle: suggestion.travelStyle || 'adventure'
       };
       
       const response = await apiRequest('/api/trips', {
