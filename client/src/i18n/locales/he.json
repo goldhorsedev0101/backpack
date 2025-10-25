@@ -1194,6 +1194,7 @@
     "please_log_in_to_add_expenses": "אנא התחבר כדי להוסיף הוצאות",
     "failed_to_add_expense": "נכשל בהוספת הוצאה",
     "no_expenses_found": "לא נמצאו הוצאות",
+    "no_trips_found": "לא נמצאו טיולים. אנא צור טיול תחילה.",
     "start_adding_expenses": "התחל להוסיף הוצאות כדי לעקוב אחר התקציב שלך",
     "export": "ייצוא",
     "total_trips": "סה\"כ טיולים",

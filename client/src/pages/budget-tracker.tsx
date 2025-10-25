@@ -216,17 +216,22 @@ export default function BudgetTracker() {
               </DialogHeader>
               <form onSubmit={form.handleSubmit(handleSubmitExpense)} className="space-y-6">
                   <div>
-                    <Label htmlFor="tripId" className="block mb-2">{t('budget.trip')}</Label>
-                  <Select onValueChange={(value) => form.setValue("tripId", parseInt(value))}>
-                    <SelectTrigger>
+                    <Label htmlFor="tripId" className="block mb-2">{t('budget.trip')} <span className="text-red-500">*</span></Label>
+                  <Select 
+                    value={form.watch("tripId") > 0 ? form.watch("tripId").toString() : undefined}
+                    onValueChange={(value) => form.setValue("tripId", parseInt(value), { shouldValidate: true })}
+                  >
+                    <SelectTrigger data-testid="select-trip">
                       <SelectValue placeholder={t('budget.select_a_trip')} />
                     </SelectTrigger>
                     <SelectContent>
-                      {Array.isArray(userTrips) ? userTrips.map((trip: any) => (
+                      {Array.isArray(userTrips) && userTrips.length > 0 ? userTrips.map((trip: any) => (
                         <SelectItem key={trip.id} value={trip.id.toString()}>
                           {trip.title}
                         </SelectItem>
-                      )) : null}
+                      )) : (
+                        <div className="p-2 text-sm text-gray-500">{t('budget.no_trips_found')}</div>
+                      )}
                     </SelectContent>
                   </Select>
                   {form.formState.errors.tripId && (
