@@ -310,7 +310,7 @@ export default function MyTripsNew() {
   };
   
   // Form state
-  const [budgetSliderValue, setBudgetSliderValue] = useState([linearToLog(5000)]);
+  const [budgetSliderValue, setBudgetSliderValue] = useState([linearToLog(MIN_BUDGET)]);
   const budget = logToLinear(budgetSliderValue[0]);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [selectedContinent, setSelectedContinent] = useState<Continent | "">("");
