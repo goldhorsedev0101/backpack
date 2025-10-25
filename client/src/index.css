@@ -25,16 +25,6 @@
   right: auto !important;
 }
 
-/* Fix scrollbar position in RTL */
-[dir="rtl"][role="dialog"] {
-  overflow-y: auto;
-}
-
-[dir="rtl"][role="dialog"]::-webkit-scrollbar {
-  left: 0;
-  right: auto;
-}
-
 /* RTL Support - Essential rules only */
 [dir="rtl"] {
   direction: rtl;
