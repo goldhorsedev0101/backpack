@@ -180,32 +180,46 @@ export default function AiAssistant() {
                       <p className="text-gray-500 text-sm">{t('chat_history.no_sessions')}</p>
                     </div>
                   ) : (
-                    <div className="space-y-2 p-2">
+                    <div className="space-y-2 p-3">
                       {sessions.map((session) => (
                         <div
                           key={session.id}
-                          className={`relative group rounded-lg transition-all border-2 ${
+                          className={`relative group rounded-xl transition-all duration-200 shadow-sm hover:shadow-md ${
                             selectedSession?.id === session.id
-                              ? 'border-orange-500 bg-orange-50'
-                              : 'border-transparent hover:bg-gray-50'
+                              ? 'bg-gradient-to-r from-orange-50 to-teal-50 border-2 border-orange-400 shadow-md'
+                              : 'bg-white border-2 border-gray-100 hover:border-orange-200'
                           }`}
                         >
                           <button
                             onClick={() => setSelectedSession(session)}
-                            className="w-full text-left p-3"
+                            className="w-full text-left p-4"
                           >
-                            <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-start gap-3">
+                              <div className={`p-2 rounded-lg ${
+                                selectedSession?.id === session.id
+                                  ? 'bg-orange-500'
+                                  : 'bg-gradient-to-br from-orange-400 to-teal-400'
+                              }`}>
+                                <MessageCircle className="w-4 h-4 text-white" />
+                              </div>
                               <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold text-sm truncate">
+                                <h3 className={`font-semibold text-sm mb-1 line-clamp-2 ${
+                                  selectedSession?.id === session.id
+                                    ? 'text-orange-900'
+                                    : 'text-gray-800'
+                                }`}>
                                   {session.title}
                                 </h3>
-                                <p className="text-xs text-gray-500 truncate mt-1">
-                                  {session.messages?.length || 0} {t('chat_history.messages')}
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-1 text-xs text-gray-400">
-                                <Clock className="w-3 h-3" />
-                                {formatDate(session.lastMessageAt)}
+                                <div className="flex items-center gap-3 text-xs text-gray-500">
+                                  <div className="flex items-center gap-1">
+                                    <MessageCircle className="w-3 h-3" />
+                                    <span>{session.messages?.length || 0}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    <span>{formatDate(session.lastMessageAt)}</span>
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           </button>
@@ -216,10 +230,10 @@ export default function AiAssistant() {
                               e.stopPropagation();
                               deleteMutation.mutate(session.id);
                             }}
-                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 p-0 hover:bg-red-100 rounded-lg"
                             disabled={deleteMutation.isPending}
                           >
-                            <Trash2 className="w-3 h-3 text-red-500" />
+                            <Trash2 className="w-4 h-4 text-red-500" />
                           </Button>
                         </div>
                       ))}
