@@ -99,7 +99,7 @@ function SavedJourneyCard({ savedJourney, onRemove, formatPrice }: {
           <div className="grid grid-cols-2 gap-3 mb-4">
             {/* Destination */}
             <div className="bg-purple-50 p-4 rounded-lg">
-              <div className={`flex flex-col gap-2 ${isRTL ? 'items-end' : 'items-start'}`}>
+              <div className="flex flex-col gap-2 items-start">
                 <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <MapPin className="w-5 h-5 text-purple-600" />
                   <span className={`font-semibold text-purple-800 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -114,7 +114,7 @@ function SavedJourneyCard({ savedJourney, onRemove, formatPrice }: {
 
             {/* Duration */}
             <div className="bg-blue-50 p-4 rounded-lg">
-              <div className={`flex flex-col gap-2 ${isRTL ? 'items-end' : 'items-start'}`}>
+              <div className="flex flex-col gap-2 items-start">
                 <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <Calendar className="w-5 h-5 text-blue-600" />
                   <span className={`font-semibold text-blue-800 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -129,7 +129,7 @@ function SavedJourneyCard({ savedJourney, onRemove, formatPrice }: {
 
             {/* Price */}
             <div className="bg-green-50 p-4 rounded-lg">
-              <div className={`flex flex-col gap-2 ${isRTL ? 'items-end' : 'items-start'}`}>
+              <div className="flex flex-col gap-2 items-start">
                 <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <DollarSign className="w-5 h-5 text-green-600" />
                   <span className={`font-semibold text-green-800 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -145,7 +145,7 @@ function SavedJourneyCard({ savedJourney, onRemove, formatPrice }: {
             {/* Rating */}
             {journey.rating && (
               <div className="bg-yellow-50 p-4 rounded-lg">
-                <div className={`flex flex-col gap-2 ${isRTL ? 'items-end' : 'items-start'}`}>
+                <div className="flex flex-col gap-2 items-start">
                   <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <Star className="w-5 h-5 text-yellow-600 fill-yellow-600" />
                     <span className={`font-semibold text-yellow-800 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
