@@ -74,9 +74,9 @@ export default function BudgetOverview({
       {/* Budget Summary Card */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span className="flex items-center">
-              <Target className="w-5 h-5 mr-2 text-primary" />
+          <CardTitle className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+            <span className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+              <Target className="w-5 h-5 text-primary" />
               {t('budget.budget_overview')}
             </span>
             <Badge variant={budgetUsed <= 80 ? "default" : budgetUsed <= 100 ? "secondary" : "destructive"}>
