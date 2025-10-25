@@ -527,13 +527,13 @@ export default function BudgetTracker() {
                       const IconComponent = category?.icon || ShoppingBag;
                       
                       return (
-                        <div key={expense.id}>
-                          <div className={`flex items-center justify-between py-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                            <div className={`flex items-center gap-3 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                        <div key={expense.id} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                          <div className="flex items-center justify-between py-2">
+                            <div className="flex items-center gap-3">
                               <div className={`p-2 rounded-lg ${category?.color || 'bg-gray-500'}`}>
                                 <IconComponent className="w-4 h-4 text-white" />
                               </div>
-                              <div className={i18n.language === 'he' ? 'text-right' : 'text-left'}>
+                              <div className="text-start">
                                 <div className="font-medium">{expense.description}</div>
                                 <div className="text-sm text-gray-600">
                                   {t(category?.labelKey || 'budget.other')} • {new Date(expense.createdAt).toLocaleDateString('he-IL')}
@@ -541,7 +541,7 @@ export default function BudgetTracker() {
                                 </div>
                               </div>
                             </div>
-                            <div className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                            <div className="flex items-center gap-2">
                               <div className="font-semibold text-gray-800">
                                 {i18n.language === 'he' 
                                   ? `₪${Math.round(parseFloat(expense.amount) * USD_TO_ILS).toLocaleString('he-IL')}` 
