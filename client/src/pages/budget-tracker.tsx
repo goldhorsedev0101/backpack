@@ -111,7 +111,7 @@ export default function BudgetTracker() {
         description: t('budget.expense_added_successfully'),
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       if (isUnauthorizedError(error)) {
         toast({
           title: t('budget.authentication_required'),
@@ -119,9 +119,10 @@ export default function BudgetTracker() {
           variant: "destructive",
         });
       } else {
+        const errorMessage = error?.message || error?.error || t('budget.failed_to_add_expense');
         toast({
           title: t('common.error'),
-          description: t('budget.failed_to_add_expense'),
+          description: errorMessage,
           variant: "destructive",
         });
       }
