@@ -206,8 +206,9 @@ export default function BudgetTracker() {
               </Button>
             </DialogTrigger>
             <DialogContent 
-              className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto"
+              className={`sm:max-w-[500px] max-h-[90vh] overflow-y-auto ${i18n.language === 'he' ? '[&]:!dir-rtl' : ''}`}
               data-rtl={i18n.language === 'he' ? 'true' : 'false'}
+              dir={i18n.language === 'he' ? 'rtl' : 'ltr'}
             >
               <DialogHeader>
                 <DialogTitle>{t('budget.add_new_expense')}</DialogTitle>

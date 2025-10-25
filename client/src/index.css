@@ -2,12 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-/* RTL Dialog Support */
-[data-rtl="true"] {
+/* RTL Dialog Support - Force RTL on all dialog elements */
+[dir="rtl"][role="dialog"] {
   direction: rtl !important;
 }
 
-[data-rtl="true"] button[aria-label="Close"] {
+[dir="rtl"][role="dialog"] * {
+  direction: rtl !important;
+}
+
+/* Move close button to left side in RTL dialogs */
+[dir="rtl"][role="dialog"] button[class*="absolute"] {
   left: 1rem !important;
   right: auto !important;
 }
