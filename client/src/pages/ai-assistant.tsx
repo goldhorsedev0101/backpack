@@ -180,44 +180,55 @@ export default function AiAssistant() {
                       <p className="text-gray-500 text-sm">{t('chat_history.no_sessions')}</p>
                     </div>
                   ) : (
-                    <div className="space-y-2 p-3">
+                    <div className="space-y-3 p-3">
                       {sessions.map((session) => (
                         <div
                           key={session.id}
-                          className={`relative group rounded-xl transition-all duration-200 shadow-sm hover:shadow-md ${
+                          className={`relative group rounded-2xl transition-all duration-300 overflow-hidden ${
                             selectedSession?.id === session.id
-                              ? 'bg-gradient-to-r from-orange-50 to-teal-50 border-2 border-orange-400 shadow-md'
-                              : 'bg-white border-2 border-gray-100 hover:border-orange-200'
+                              ? 'bg-gradient-to-br from-orange-50 via-orange-100 to-teal-50 border-2 border-orange-500 shadow-lg scale-[1.02]'
+                              : 'bg-white border-2 border-gray-200 hover:border-orange-300 hover:shadow-lg hover:scale-[1.01]'
                           }`}
                         >
                           <button
                             onClick={() => setSelectedSession(session)}
                             className="w-full text-left p-4"
                           >
-                            <div className="flex items-start gap-3">
-                              <div className={`p-2 rounded-lg ${
+                            <div className="flex items-start gap-4">
+                              <div className={`relative p-3 rounded-2xl shadow-sm transition-all duration-300 ${
                                 selectedSession?.id === session.id
-                                  ? 'bg-orange-500'
-                                  : 'bg-gradient-to-br from-orange-400 to-teal-400'
+                                  ? 'bg-gradient-to-br from-orange-500 to-orange-600 shadow-orange-200'
+                                  : 'bg-gradient-to-br from-teal-400 to-teal-500 shadow-teal-200 group-hover:from-orange-400 group-hover:to-orange-500'
                               }`}>
-                                <MessageCircle className="w-4 h-4 text-white" />
+                                <MessageCircle className="w-5 h-5 text-white" />
+                                {selectedSession?.id === session.id && (
+                                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
+                                )}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h3 className={`font-semibold text-sm mb-1 line-clamp-2 ${
+                                <h3 className={`font-bold text-base mb-2 line-clamp-2 transition-colors ${
                                   selectedSession?.id === session.id
                                     ? 'text-orange-900'
-                                    : 'text-gray-800'
+                                    : 'text-gray-900 group-hover:text-orange-700'
                                 }`}>
                                   {session.title}
                                 </h3>
-                                <div className="flex items-center gap-3 text-xs text-gray-500">
-                                  <div className="flex items-center gap-1">
-                                    <MessageCircle className="w-3 h-3" />
-                                    <span>{session.messages?.length || 0}</span>
+                                <div className="flex items-center gap-4 text-xs">
+                                  <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg ${
+                                    selectedSession?.id === session.id
+                                      ? 'bg-orange-200/50 text-orange-800'
+                                      : 'bg-gray-100 text-gray-600 group-hover:bg-orange-100 group-hover:text-orange-700'
+                                  }`}>
+                                    <MessageCircle className="w-3.5 h-3.5" />
+                                    <span className="font-semibold">{session.messages?.length || 0}</span>
                                   </div>
-                                  <div className="flex items-center gap-1">
-                                    <Clock className="w-3 h-3" />
-                                    <span>{formatDate(session.lastMessageAt)}</span>
+                                  <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg ${
+                                    selectedSession?.id === session.id
+                                      ? 'bg-teal-200/50 text-teal-800'
+                                      : 'bg-gray-100 text-gray-600 group-hover:bg-teal-100 group-hover:text-teal-700'
+                                  }`}>
+                                    <Clock className="w-3.5 h-3.5" />
+                                    <span className="font-medium">{formatDate(session.lastMessageAt)}</span>
                                   </div>
                                 </div>
                               </div>
@@ -230,7 +241,7 @@ export default function AiAssistant() {
                               e.stopPropagation();
                               deleteMutation.mutate(session.id);
                             }}
-                            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 p-0 hover:bg-red-100 rounded-lg"
+                            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-200 h-8 w-8 p-0 hover:bg-red-50 rounded-xl border-2 border-transparent hover:border-red-200"
                             disabled={deleteMutation.isPending}
                           >
                             <Trash2 className="w-4 h-4 text-red-500" />
