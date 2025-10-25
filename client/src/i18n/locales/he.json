@@ -577,6 +577,7 @@
     "no_saved_trips": "עדיין אין טיולים שמורים",
     "create_first_trip_ai": "צור את הטיול הראשון שלך באמצעות ההצעות המתקדמות שלנו עם בינה מלאכותית",
     "start_planning": "התחל תכנון",
+    "you_have_trips": "יש לך {{count}} טיולים שמורים",
     "you_have_trips_one": "יש לך טיול שמור אחד",
     "you_have_trips_other": "יש לך {{count}} טיולים שמורים",
     "trip_preferences": "העדפות טיול",

@@ -394,6 +394,7 @@
     "delete_error": "Delete error",
     "failed_to_delete_try_again": "Failed to delete the itinerary, please try again",
     "you_have_count_itineraries": "You have {{count}} saved {{count, plural, one {itinerary} other {itineraries}}}",
+    "you_have_trips": "You have {{count}} saved trips",
     "you_have_trips_one": "You have 1 saved trip",
     "you_have_trips_other": "You have {{count}} saved trips",
     "loading_saved_itineraries": "Loading your saved itineraries...",
