@@ -73,7 +73,14 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(`${API_BASE}${queryKey[0] as string}`, {
+    // Build URL from query key - handle both simple strings and arrays with params
+    let url = queryKey[0] as string;
+    if (queryKey.length > 1 && queryKey[1] !== null && queryKey[1] !== undefined) {
+      // For keys like ["/api/expenses/trip", tripId], append the ID
+      url = `${url}/${queryKey[1]}`;
+    }
+    
+    const res = await fetch(`${API_BASE}${url}`, {
       credentials: "include",
       cache: "no-cache",
       headers: {
