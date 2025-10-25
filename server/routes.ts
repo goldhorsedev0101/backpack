@@ -857,12 +857,7 @@ export async function registerRoutes(app: Express): Promise<void> {
 
   app.post('/api/expenses', noAuth, async (req: any, res) => {
     try {
-      // Check if user is authenticated
-      if (!req.user || !req.user.claims || !req.user.claims.sub) {
-        return res.status(401).json({ message: "יש להתחבר כדי להוסיף הוצאה" });
-      }
-
-      const userId = req.user.claims.sub;
+      const userId = req.user?.claims?.sub || 'anonymous';
       const { tripId, category, amount, description, location } = req.body;
 
       console.log("Received expense request:", { tripId, category, amount, description, location, userId });
@@ -885,10 +880,14 @@ export async function registerRoutes(app: Express): Promise<void> {
       
       // Verify the trip exists and belongs to the user
       const trip = await storage.getTripById(parsedTripId);
+      console.log("Found trip:", trip);
+      
       if (!trip) {
         return res.status(400).json({ message: "הטיול שנבחר לא נמצא במערכת" });
       }
-      if (trip.userId !== userId) {
+      
+      // In demo mode, allow anonymous users to add expenses to anonymous trips
+      if (trip.userId !== userId && !(trip.userId === 'anonymous' && userId === 'anonymous')) {
         return res.status(403).json({ message: "אין לך הרשאה להוסיף הוצאות לטיול זה" });
       }
 
