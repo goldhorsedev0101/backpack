@@ -192,42 +192,42 @@ export default function AiAssistant() {
                         >
                           <button
                             onClick={() => setSelectedSession(session)}
-                            className="w-full text-left p-4"
+                            className="w-full text-left p-3 pr-12"
                           >
-                            <div className="flex items-start gap-4">
-                              <div className={`relative p-3 rounded-2xl shadow-sm transition-all duration-300 ${
+                            <div className="flex items-start gap-3">
+                              <div className={`relative p-2 rounded-xl shadow-sm transition-all duration-300 ${
                                 selectedSession?.id === session.id
                                   ? 'bg-gradient-to-br from-orange-500 to-orange-600 shadow-orange-200'
                                   : 'bg-gradient-to-br from-teal-400 to-teal-500 shadow-teal-200 group-hover:from-orange-400 group-hover:to-orange-500'
                               }`}>
-                                <MessageCircle className="w-5 h-5 text-white" />
+                                <MessageCircle className="w-4 h-4 text-white" />
                                 {selectedSession?.id === session.id && (
-                                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
+                                  <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h3 className={`font-bold text-base mb-2 line-clamp-2 transition-colors ${
+                                <h3 className={`font-semibold text-sm mb-1.5 line-clamp-2 transition-colors ${
                                   selectedSession?.id === session.id
                                     ? 'text-orange-900'
                                     : 'text-gray-900 group-hover:text-orange-700'
                                 }`}>
                                   {session.title}
                                 </h3>
-                                <div className="flex items-center gap-4 text-xs">
-                                  <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg ${
+                                <div className="flex items-center gap-2.5 text-xs">
+                                  <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md ${
                                     selectedSession?.id === session.id
                                       ? 'bg-orange-200/50 text-orange-800'
                                       : 'bg-gray-100 text-gray-600 group-hover:bg-orange-100 group-hover:text-orange-700'
                                   }`}>
-                                    <MessageCircle className="w-3.5 h-3.5" />
-                                    <span className="font-semibold">{session.messages?.length || 0}</span>
+                                    <MessageCircle className="w-3 h-3" />
+                                    <span className="font-medium">{session.messages?.length || 0}</span>
                                   </div>
-                                  <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg ${
+                                  <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md ${
                                     selectedSession?.id === session.id
                                       ? 'bg-teal-200/50 text-teal-800'
                                       : 'bg-gray-100 text-gray-600 group-hover:bg-teal-100 group-hover:text-teal-700'
                                   }`}>
-                                    <Clock className="w-3.5 h-3.5" />
+                                    <Clock className="w-3 h-3" />
                                     <span className="font-medium">{formatDate(session.lastMessageAt)}</span>
                                   </div>
                                 </div>
