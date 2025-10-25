@@ -205,11 +205,11 @@ export default function BudgetTracker() {
                 {t('budget.add_expense')}
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
               <DialogHeader>
-                <DialogTitle className={i18n.language === 'he' ? 'text-right' : 'text-left'}>{t('budget.add_new_expense')}</DialogTitle>
+                <DialogTitle>{t('budget.add_new_expense')}</DialogTitle>
               </DialogHeader>
-              <form onSubmit={form.handleSubmit(handleSubmitExpense)} className="space-y-6" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+              <form onSubmit={form.handleSubmit(handleSubmitExpense)} className="space-y-6">
                 <div>
                   <Label htmlFor="tripId" className="block mb-2">{t('budget.trip')}</Label>
                   <Select onValueChange={(value) => form.setValue("tripId", parseInt(value))}>
