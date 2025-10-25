@@ -190,7 +190,7 @@ export default function TripCard({ trip, showUser = false, onEdit, onView, onDel
         {/* Travel Style Tags */}
         {trip.travelStyle && (
           <div className="mb-4 text-left">
-            <div className={`flex flex-wrap gap-2 items-start ${isRTL ? 'flex-row-reverse justify-start' : ''}`}>
+            <div className="flex flex-wrap gap-2 items-start">
               {trip.travelStyle.split(',').map((style: string, index: number) => (
                 <Badge 
                   key={index} 
