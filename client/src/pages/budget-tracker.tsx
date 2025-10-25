@@ -205,13 +205,13 @@ export default function BudgetTracker() {
                 {t('budget.add_expense')}
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className={i18n.language === 'he' ? 'text-right' : 'text-left'}>{t('budget.add_new_expense')}</DialogTitle>
               </DialogHeader>
-              <form onSubmit={form.handleSubmit(handleSubmitExpense)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(handleSubmitExpense)} className="space-y-6">
                 <div>
-                  <Label htmlFor="tripId">{t('budget.trip')}</Label>
+                  <Label htmlFor="tripId" className={`block mb-2 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>{t('budget.trip')}</Label>
                   <Select onValueChange={(value) => form.setValue("tripId", parseInt(value))}>
                     <SelectTrigger>
                       <SelectValue placeholder={t('budget.select_a_trip')} />
@@ -230,7 +230,7 @@ export default function BudgetTracker() {
                 </div>
 
                 <div>
-                  <Label htmlFor="category">{t('budget.category')}</Label>
+                  <Label htmlFor="category" className={`block mb-2 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>{t('budget.category')}</Label>
                   <Select onValueChange={(value) => form.setValue("category", value)}>
                     <SelectTrigger>
                       <SelectValue placeholder={t('budget.select_category')} />
@@ -255,7 +255,7 @@ export default function BudgetTracker() {
                 </div>
 
                 <div>
-                  <Label htmlFor="amount" className="text-left block">{t('budget.amount_usd')}</Label>
+                  <Label htmlFor="amount" className={`block mb-2 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>{t('budget.amount_usd')}</Label>
                   <Input 
                     id="amount"
                     type="number" 
@@ -270,7 +270,7 @@ export default function BudgetTracker() {
                 </div>
 
                 <div>
-                  <Label htmlFor="description" className="text-left block">{t('budget.description')}</Label>
+                  <Label htmlFor="description" className={`block mb-2 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>{t('budget.description')}</Label>
                   <Input 
                     id="description"
                     placeholder={t('budget.what_did_you_spend_on')}
@@ -283,7 +283,7 @@ export default function BudgetTracker() {
                 </div>
 
                 <div>
-                  <Label htmlFor="location" className="text-left block">{t('budget.location_optional')}</Label>
+                  <Label htmlFor="location" className={`block mb-2 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>{t('budget.location_optional')}</Label>
                   <Input 
                     id="location"
                     placeholder={t('budget.where_did_you_spend_this')}
