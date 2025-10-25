@@ -650,21 +650,149 @@ export default function BudgetTracker() {
           </TabsContent>
 
           <TabsContent value="insights" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                  <Lightbulb className="w-5 h-5 text-primary" />
-                  {t('budget.ai_budget_insights')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
+            {filteredExpenses.length > 0 ? (
+              <>
+                {/* Budget Status */}
+                {selectedTrip && trips.find((t: any) => t.id === selectedTrip)?.budget && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                        <Target className="w-5 h-5 text-primary" />
+                        {i18n.language === 'he' ? 'סטטוס תקציב' : 'Budget Status'}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {budgetUsed <= 80 ? (
+                        <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                          <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                          <div className={i18n.language === 'he' ? 'text-right' : ''}>
+                            <h4 className="font-semibold text-green-900 mb-1">
+                              {i18n.language === 'he' ? 'כל הכבוד! אתם בדרך הנכונה' : 'Great job! You\'re on track'}
+                            </h4>
+                            <p className="text-sm text-green-700">
+                              {i18n.language === 'he' 
+                                ? `השתמשתם רק ב-${budgetUsed.toFixed(1)}% מהתקציב. המשיכו לעקוב אחר ההוצאות ותישארו בגבולות התקציב.`
+                                : `You've used only ${budgetUsed.toFixed(1)}% of your budget. Keep tracking expenses to stay within limits.`}
+                            </p>
+                          </div>
+                        </div>
+                      ) : budgetUsed <= 100 ? (
+                        <div className="flex items-start gap-3 p-4 bg-orange-50 rounded-lg" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                          <AlertTriangle className="w-5 h-5 text-orange-600 mt-0.5" />
+                          <div className={i18n.language === 'he' ? 'text-right' : ''}>
+                            <h4 className="font-semibold text-orange-900 mb-1">
+                              {i18n.language === 'he' ? 'שימו לב - קרוב לתקציב' : 'Attention - Near Budget Limit'}
+                            </h4>
+                            <p className="text-sm text-orange-700">
+                              {i18n.language === 'he' 
+                                ? `השתמשתם ב-${budgetUsed.toFixed(1)}% מהתקציב. שקלו לצמצם הוצאות כדי להישאר בגבולות התקציב.`
+                                : `You've used ${budgetUsed.toFixed(1)}% of your budget. Consider reducing expenses to stay within limits.`}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-start gap-3 p-4 bg-red-50 rounded-lg" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                          <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />
+                          <div className={i18n.language === 'he' ? 'text-right' : ''}>
+                            <h4 className="font-semibold text-red-900 mb-1">
+                              {i18n.language === 'he' ? 'חריגה מהתקציב' : 'Over Budget'}
+                            </h4>
+                            <p className="text-sm text-red-700">
+                              {i18n.language === 'he' 
+                                ? `עברתם את התקציב ב-${(budgetUsed - 100).toFixed(1)}%. נסו לצמצם הוצאות עתידיות.`
+                                : `You're over budget by ${(budgetUsed - 100).toFixed(1)}%. Try to reduce future expenses.`}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Top Spending Category */}
+                {categoryTotals && categoryTotals.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                        <PieChart className="w-5 h-5 text-primary" />
+                        {i18n.language === 'he' ? 'קטגוריה מובילה' : 'Top Spending Category'}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {(() => {
+                        const TopIcon = categoryTotals[0]?.icon;
+                        return (
+                          <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                            <div className={`p-2 rounded-lg ${categoryTotals[0]?.color}`}>
+                              {TopIcon && <TopIcon className="w-5 h-5 text-white" />}
+                            </div>
+                            <div className={i18n.language === 'he' ? 'text-right flex-1' : 'flex-1'}>
+                              <h4 className="font-semibold text-blue-900 mb-1">
+                                {i18n.language === 'he' 
+                                  ? `מרבית ההוצאות: ${t(categoryTotals[0]?.labelKey)}` 
+                                  : `Most spending: ${t(categoryTotals[0]?.labelKey)}`}
+                              </h4>
+                              <p className="text-sm text-blue-700">
+                                {i18n.language === 'he' 
+                                  ? `₪${Math.round((categoryTotals[0]?.total || 0) * USD_TO_ILS).toLocaleString('he-IL')} (${((categoryTotals[0]?.total || 0) / totalSpent * 100).toFixed(1)}% מסך ההוצאות)`
+                                  : `$${categoryTotals[0]?.total?.toFixed(2)} (${((categoryTotals[0]?.total || 0) / totalSpent * 100).toFixed(1)}% of total)`}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Recommendations */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                      <Lightbulb className="w-5 h-5 text-primary" />
+                      {i18n.language === 'he' ? 'המלצות' : 'Recommendations'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="p-3 border-l-4 border-blue-500 bg-blue-50" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                      <p className={`text-sm ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                        💡 {i18n.language === 'he' 
+                          ? 'עקבו אחר ההוצאות היומיות כדי למנוע הפתעות בסוף הטיול'
+                          : 'Track daily expenses to avoid surprises at the end of your trip'}
+                      </p>
+                    </div>
+                    <div className="p-3 border-l-4 border-green-500 bg-green-50" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                      <p className={`text-sm ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                        💡 {i18n.language === 'he' 
+                          ? 'בדקו מחירים מקומיים לפני רכישות גדולות'
+                          : 'Check local prices before making large purchases'}
+                      </p>
+                    </div>
+                    <div className="p-3 border-l-4 border-purple-500 bg-purple-50" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                      <p className={`text-sm ${i18n.language === 'he' ? 'text-right' : ''}`}>
+                        💡 {i18n.language === 'he' 
+                          ? 'שמרו קבלות לכל הוצאה לתיעוד מדויק'
+                          : 'Keep receipts for all expenses for accurate tracking'}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              <Card>
+                <CardContent className="text-center py-8">
                   <Lightbulb className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-600 mb-2">{t('budget.ai_insights_coming_soon')}</h3>
-                  <p className="text-gray-500">{t('budget.ai_budget_description')}</p>
-                </div>
-              </CardContent>
-            </Card>
+                  <h3 className="text-lg font-medium text-gray-600 mb-2">
+                    {i18n.language === 'he' ? 'אין מספיק נתונים' : 'Not Enough Data'}
+                  </h3>
+                  <p className="text-gray-500">
+                    {i18n.language === 'he' 
+                      ? 'הוסיפו הוצאות כדי לקבל תובנות והמלצות מותאמות אישית'
+                      : 'Add expenses to get personalized insights and recommendations'}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </div>
