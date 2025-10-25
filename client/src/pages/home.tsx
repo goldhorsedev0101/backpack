@@ -857,6 +857,10 @@ function PopularJourneysSection() {
       title: 'הרפתקה בדרום מזרח אסיה',
       description: 'מבנגקוק התוססת למקדשים שלווים וחופים גן עדן - חוויית תאילנד האולטימטיבית'
     },
+    'Southeast Asia Multi-Country': {
+      title: 'הרפתקה בדרום מזרח אסיה (מרובת מדינות)',
+      description: 'מסע אפי דרך תאילנד, אינדונזיה וסינגפור, חוויית חופים, תרבות וקולינריה מרהיבה'
+    },
     'Japan Extended Discovery': {
       title: 'מסע מורחב ביפן',
       description: 'מסע סוחף דרך הערים האייקוניות של יפן, מאורות הניאון של טוקיו להירושימה'
@@ -897,6 +901,8 @@ function PopularJourneysSection() {
       'Phuket': { he: 'פוקט', en: 'Phuket' },
       'Chiang Mai': { he: 'צ\'יאנג מאי', en: 'Chiang Mai' },
       'Krabi': { he: 'קראבי', en: 'Krabi' },
+      'Bali': { he: 'באלי', en: 'Bali' },
+      'Singapore': { he: 'סינגפור', en: 'Singapore' },
       'Athens': { he: 'אתונה', en: 'Athens' },
       'Santorini': { he: 'סנטוריני', en: 'Santorini' },
       'Mykonos': { he: 'מיקונוס', en: 'Mykonos' },
