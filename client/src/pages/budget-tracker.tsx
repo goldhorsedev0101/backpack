@@ -591,56 +591,56 @@ export default function BudgetTracker() {
                 <>
                   <Card>
                     <CardContent className="p-6">
-                      <div className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                      <div className="flex items-center justify-between">
+                        <MapPin className="w-8 h-8 text-blue-500" />
                         <div className={i18n.language === 'he' ? 'text-right' : ''}>
-                          <p className="text-sm text-gray-600">{t('budget.total_trips')}</p>
+                          <p className="text-sm text-gray-600 font-bold">{t('budget.total_trips')}</p>
                           <p className="text-2xl font-bold">{analytics?.trips?.total || 0}</p>
                         </div>
-                        <MapPin className="w-8 h-8 text-blue-500" />
                       </div>
                     </CardContent>
                   </Card>
 
                   <Card>
                     <CardContent className="p-6">
-                      <div className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                      <div className="flex items-center justify-between">
+                        <Target className="w-8 h-8 text-green-500" />
                         <div className={i18n.language === 'he' ? 'text-right' : ''}>
-                          <p className="text-sm text-gray-600">{t('budget.countries_visited')}</p>
+                          <p className="text-sm text-gray-600 font-bold">{t('budget.countries_visited')}</p>
                           <p className="text-2xl font-bold">{analytics?.trips?.countries || 0}</p>
                         </div>
-                        <Target className="w-8 h-8 text-green-500" />
                       </div>
                     </CardContent>
                   </Card>
 
                   <Card>
                     <CardContent className="p-6">
-                      <div className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                      <div className="flex items-center justify-between">
+                        <DollarSign className="w-8 h-8 text-orange-500" />
                         <div className={i18n.language === 'he' ? 'text-right' : ''}>
-                          <p className="text-sm text-gray-600">{t('budget.total_spent')}</p>
+                          <p className="text-sm text-gray-600 font-bold">{t('budget.total_spent')}</p>
                           <p className="text-2xl font-bold">
                             {i18n.language === 'he' 
                               ? `₪${Math.round((analytics?.expenses?.total || 0) * USD_TO_ILS).toLocaleString('he-IL')}` 
                               : `$${analytics?.expenses?.total?.toFixed(2) || '0.00'}`}
                           </p>
                         </div>
-                        <DollarSign className="w-8 h-8 text-orange-500" />
                       </div>
                     </CardContent>
                   </Card>
 
                   <Card>
                     <CardContent className="p-6">
-                      <div className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                      <div className="flex items-center justify-between">
+                        <BarChart3 className="w-8 h-8 text-purple-500" />
                         <div className={i18n.language === 'he' ? 'text-right' : ''}>
-                          <p className="text-sm text-gray-600">{t('budget.avg_per_trip')}</p>
+                          <p className="text-sm text-gray-600 font-bold">{t('budget.avg_per_trip')}</p>
                           <p className="text-2xl font-bold">
                             {i18n.language === 'he' 
                               ? `₪${Math.round((analytics?.expenses?.avgPerTrip || 0) * USD_TO_ILS).toLocaleString('he-IL')}` 
                               : `$${analytics?.expenses?.avgPerTrip?.toFixed(2) || '0.00'}`}
                           </p>
                         </div>
-                        <BarChart3 className="w-8 h-8 text-purple-500" />
                       </div>
                     </CardContent>
                   </Card>
