@@ -5,9 +5,17 @@
 /* RTL Dialog Support - Force RTL on all dialog elements */
 [dir="rtl"][role="dialog"] {
   direction: rtl !important;
+  text-align: right !important;
 }
 
 [dir="rtl"][role="dialog"] * {
+  direction: inherit !important;
+}
+
+/* RTL Dialog Header and Title */
+[dir="rtl"][role="dialog"] h2,
+[dir="rtl"][role="dialog"] [class*="DialogTitle"] {
+  text-align: right !important;
   direction: rtl !important;
 }
 
@@ -15,6 +23,16 @@
 [dir="rtl"][role="dialog"] button[class*="absolute"] {
   left: 1rem !important;
   right: auto !important;
+}
+
+/* Fix scrollbar position in RTL */
+[dir="rtl"][role="dialog"] {
+  overflow-y: auto;
+}
+
+[dir="rtl"][role="dialog"]::-webkit-scrollbar {
+  left: 0;
+  right: auto;
 }
 
 /* RTL Support - Essential rules only */
