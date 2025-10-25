@@ -858,12 +858,34 @@ export async function registerRoutes(app: Express): Promise<void> {
   app.post('/api/expenses', noAuth, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const expenseData = { ...req.body, userId };
+      const { tripId, category, amount, description, location } = req.body;
+
+      // Validate required fields
+      if (!tripId) {
+        return res.status(400).json({ message: "אנא בחר טיול" });
+      }
+      if (!category) {
+        return res.status(400).json({ message: "אנא בחר קטגוריה" });
+      }
+      if (!amount || parseFloat(amount) <= 0) {
+        return res.status(400).json({ message: "אנא הזן סכום תקין" });
+      }
+      if (!description || description.trim() === '') {
+        return res.status(400).json({ message: "אנא הזן תיאור" });
+      }
+
+      const expenseData = { tripId: parseInt(tripId), category, amount, description, location, userId };
       const expense = await storage.createExpense(expenseData);
       res.status(201).json(expense);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating expense:", error);
-      res.status(400).json({ message: "Failed to create expense" });
+      
+      // Check for specific database errors
+      if (error.code === '23503') {
+        return res.status(400).json({ message: "הטיול שנבחר לא נמצא" });
+      }
+      
+      res.status(400).json({ message: error.message || "שגיאה בהוספת הוצאה" });
     }
   });
 

@@ -1214,6 +1214,14 @@
       "category_required": "נדרשת קטגוריה",
       "amount_required": "נדרש סכום",
       "description_required": "נדרש תיאור"
+    },
+    "errors": {
+      "trip_not_found": "הטיול שנבחר לא נמצא",
+      "invalid_amount": "אנא הזן סכום תקין",
+      "missing_description": "אנא הזן תיאור",
+      "missing_category": "אנא בחר קטגוריה",
+      "missing_trip": "אנא בחר טיול",
+      "generic_error": "שגיאה בהוספת הוצאה, אנא נסה שוב"
     }
   },
   "achievements": {
