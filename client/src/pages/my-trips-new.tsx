@@ -320,11 +320,27 @@ export default function MyTripsNew() {
   
   const WORLD_DESTINATIONS = getWorldDestinations();
   
-  // Results state
-  const [aiSuggestions, setAiSuggestions] = useState<TripSuggestion[]>([]);
+  // Results state - load from localStorage if available
+  const [aiSuggestions, setAiSuggestions] = useState<TripSuggestion[]>(() => {
+    try {
+      const saved = localStorage.getItem('aiSuggestions');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [itinerary, setItinerary] = useState<ItineraryDay[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratingItinerary, setIsGeneratingItinerary] = useState(false);
+
+  // Save suggestions to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('aiSuggestions', JSON.stringify(aiSuggestions));
+    } catch (error) {
+      console.error('Error saving suggestions to localStorage:', error);
+    }
+  }, [aiSuggestions]);
 
   // Create form with dynamic schema that uses current translations
   const form = useForm<TripFormData>({
