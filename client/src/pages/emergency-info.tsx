@@ -12,8 +12,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { AlertCircle, Shield, Plus, X, Save, Heart, Phone, User } from "lucide-react";
+import { AlertCircle, Shield, Plus, X, Save, Heart, Phone, User, Edit, Mail } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 // Blood types
 const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -30,16 +31,21 @@ export default function EmergencyInfo() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
+  const [viewMode, setViewMode] = useState<boolean>(false);
 
   // Fetch emergency info
   const { data: emergencyInfo, isLoading } = useQuery<any>({
     queryKey: ["/api/emergency-info"],
   });
 
-  // Initialize contacts from fetched data
+  // Initialize contacts from fetched data and set view mode if data exists
   useEffect(() => {
     if (emergencyInfo?.emergencyContacts) {
       setContacts(emergencyInfo.emergencyContacts);
+    }
+    // If there's saved data, show it in view mode
+    if (emergencyInfo && Object.keys(emergencyInfo).length > 2) {
+      setViewMode(true);
     }
   }, [emergencyInfo]);
 
@@ -108,6 +114,7 @@ export default function EmergencyInfo() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/emergency-info"] });
+      setViewMode(true); // Switch to view mode after save
       toast({
         title: t("emergency.saved"),
         description: t("emergency.saved_description"),
@@ -147,6 +154,193 @@ export default function EmergencyInfo() {
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // View Mode Component
+  if (viewMode && emergencyInfo) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-teal-50 to-blue-50 p-6">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="mb-8 text-center">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <Shield className="w-10 h-10 text-orange-500" />
+              <h1 className="text-4xl font-bold text-gray-900">{t("emergency.title")}</h1>
+            </div>
+            <p className="text-gray-600 text-lg">{t("emergency.subtitle")}</p>
+          </div>
+
+          {/* Emergency Info Summary Card */}
+          <Card className="shadow-2xl border-2 border-orange-200">
+            <CardHeader className="bg-gradient-to-r from-orange-100 via-red-50 to-pink-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-8 h-8 text-orange-600" />
+                  <div>
+                    <CardTitle className="text-2xl text-gray-900">{t("emergency.title")}</CardTitle>
+                    <CardDescription className="text-gray-700 mt-1">
+                      {t("emergency.saved_description")}
+                    </CardDescription>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => setViewMode(false)}
+                  variant="outline"
+                  className="border-orange-500 text-orange-600 hover:bg-orange-50"
+                  data-testid="button-edit-info"
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  ערוך
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-8 space-y-8">
+              {/* Emergency Contacts Section */}
+              {contacts && contacts.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Phone className="w-5 h-5 text-red-500" />
+                    <h3 className="text-xl font-bold text-gray-800">{t("emergency.emergency_contacts")}</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {contacts.map((contact, index) => (
+                      <Card key={index} className="border-2 border-red-100 bg-gradient-to-br from-white to-red-50">
+                        <CardContent className="pt-4">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <User className="w-4 h-4 text-gray-500" />
+                              <span className="font-semibold text-gray-900">{contact.name}</span>
+                            </div>
+                            {contact.relationship && (
+                              <Badge variant="outline" className="text-xs">
+                                {contact.relationship}
+                              </Badge>
+                            )}
+                            {contact.phone && (
+                              <div className="flex items-center gap-2 text-gray-700">
+                                <Phone className="w-3 h-3" />
+                                <span className="text-sm" dir="ltr">{contact.phone}</span>
+                              </div>
+                            )}
+                            {contact.email && (
+                              <div className="flex items-center gap-2 text-gray-700">
+                                <Mail className="w-3 h-3" />
+                                <span className="text-sm break-all">{contact.email}</span>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <Separator />
+
+              {/* Medical Information Section */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Heart className="w-5 h-5 text-blue-500" />
+                  <h3 className="text-xl font-bold text-gray-800">{t("emergency.medical_information")}</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {emergencyInfo.bloodType && (
+                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-lg border border-blue-200">
+                      <p className="text-sm text-gray-600 mb-1">{t("emergency.blood_type")}</p>
+                      <p className="text-lg font-bold text-blue-900">{emergencyInfo.bloodType}</p>
+                    </div>
+                  )}
+                  {emergencyInfo.allergies && (
+                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-lg border border-blue-200">
+                      <p className="text-sm text-gray-600 mb-1">{t("emergency.allergies")}</p>
+                      <p className="text-gray-800">{emergencyInfo.allergies}</p>
+                    </div>
+                  )}
+                  {emergencyInfo.medications && (
+                    <div className="md:col-span-2 bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-lg border border-blue-200">
+                      <p className="text-sm text-gray-600 mb-1">{t("emergency.medications")}</p>
+                      <p className="text-gray-800 whitespace-pre-wrap">{emergencyInfo.medications}</p>
+                    </div>
+                  )}
+                  {emergencyInfo.medicalConditions && (
+                    <div className="md:col-span-2 bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-lg border border-blue-200">
+                      <p className="text-sm text-gray-600 mb-1">{t("emergency.medical_conditions")}</p>
+                      <p className="text-gray-800 whitespace-pre-wrap">{emergencyInfo.medicalConditions}</p>
+                    </div>
+                  )}
+                  {(emergencyInfo.doctorName || emergencyInfo.doctorPhone) && (
+                    <div className="md:col-span-2 bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-lg border border-blue-200">
+                      <p className="text-sm text-gray-600 mb-2">{t("emergency.doctor_info")}</p>
+                      <div className="space-y-1">
+                        {emergencyInfo.doctorName && (
+                          <p className="text-gray-800">
+                            <span className="font-semibold">{t("emergency.doctor_name")}:</span> {emergencyInfo.doctorName}
+                          </p>
+                        )}
+                        {emergencyInfo.doctorPhone && (
+                          <p className="text-gray-800" dir="ltr">
+                            <span className="font-semibold">{t("emergency.doctor_phone")}:</span> {emergencyInfo.doctorPhone}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Insurance Information Section */}
+              {(emergencyInfo.insuranceProvider || emergencyInfo.policyNumber || emergencyInfo.insuranceEmergencyPhone) && (
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <AlertCircle className="w-5 h-5 text-green-500" />
+                    <h3 className="text-xl font-bold text-gray-800">{t("emergency.insurance_information")}</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {emergencyInfo.insuranceProvider && (
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg border border-green-200">
+                        <p className="text-sm text-gray-600 mb-1">{t("emergency.insurance_provider")}</p>
+                        <p className="text-lg font-bold text-green-900">{emergencyInfo.insuranceProvider}</p>
+                      </div>
+                    )}
+                    {emergencyInfo.policyNumber && (
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg border border-green-200">
+                        <p className="text-sm text-gray-600 mb-1">{t("emergency.policy_number")}</p>
+                        <p className="text-gray-800 font-mono">{emergencyInfo.policyNumber}</p>
+                      </div>
+                    )}
+                    {emergencyInfo.insuranceEmergencyPhone && (
+                      <div className="md:col-span-2 bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg border border-green-200">
+                        <p className="text-sm text-gray-600 mb-1">{t("emergency.emergency_phone")}</p>
+                        <p className="text-lg font-bold text-green-900" dir="ltr">{emergencyInfo.insuranceEmergencyPhone}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Additional Notes Section */}
+              {emergencyInfo.additionalNotes && (
+                <>
+                  <Separator />
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <AlertCircle className="w-5 h-5 text-gray-500" />
+                      <h3 className="text-xl font-bold text-gray-800">{t("emergency.additional_notes")}</h3>
+                    </div>
+                    <div className="bg-gradient-to-br from-gray-50 to-slate-50 p-4 rounded-lg border border-gray-200">
+                      <p className="text-gray-800 whitespace-pre-wrap">{emergencyInfo.additionalNotes}</p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
