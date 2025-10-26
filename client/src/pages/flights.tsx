@@ -370,9 +370,9 @@ export default function FlightsPage() {
                             </div>
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                               <Plane className="w-4 h-4" />
-                              <span>{slice.segments[0].operating_carrier.name}</span>
+                              <span>{slice.segments[0]?.operating_carrier?.name || 'Airline'}</span>
                               <Separator orientation="vertical" className="h-4" />
-                              <span>{slice.segments[0].aircraft.name}</span>
+                              <span>{slice.segments[0]?.aircraft?.name || 'Aircraft'}</span>
                             </div>
                           </div>
                         ))}
