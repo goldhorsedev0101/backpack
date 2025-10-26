@@ -1614,10 +1614,11 @@ export async function registerRoutes(app: Express): Promise<void> {
       const { callsign } = req.params;
       
       // OpenSky Network API - Free, no API key required
+      // Get all current flights and filter by callsign
       const https = await import('https');
       const options = {
         hostname: 'opensky-network.org',
-        path: `/api/states/all?icao24=${callsign.toLowerCase()}`,
+        path: `/api/states/all`,
         method: 'GET',
         headers: {
           'Accept': 'application/json'
@@ -1648,10 +1649,17 @@ export async function registerRoutes(app: Express): Promise<void> {
       // Parse OpenSky response
       // Response format: { time, states: [[icao24, callsign, origin_country, time_position, last_contact, longitude, latitude, baro_altitude, on_ground, velocity, true_track, vertical_rate, sensors, geo_altitude, squawk, spi, position_source]] }
       
-      if (apiResponse.states && apiResponse.states.length > 0) {
-        const state = apiResponse.states[0];
+      // Filter by callsign (state[1])
+      const targetCallsign = callsign.toUpperCase().trim();
+      const matchingState = apiResponse.states?.find((state: any) => {
+        const stateCallsign = state[1]?.trim().toUpperCase();
+        return stateCallsign === targetCallsign || stateCallsign?.includes(targetCallsign);
+      });
+      
+      if (matchingState) {
+        const state = matchingState;
         const flightData = {
-          callsign: state[1]?.trim() || callsign,
+          callsign: state[1]?.trim() || targetCallsign,
           origin_country: state[2],
           longitude: state[5],
           latitude: state[6],
