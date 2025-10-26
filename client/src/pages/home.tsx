@@ -528,7 +528,7 @@ export default function Home() {
               </div>
               
               {userTripsLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6">
                   {Array.from({ length: 2 }).map((_, i) => (
                     <Card key={i} className="animate-pulse">
                       <CardContent className="p-6">
@@ -540,7 +540,7 @@ export default function Home() {
                   ))}
                 </div>
               ) : userTrips.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6">
                   {userTrips.slice(0, 2).map((trip: any) => (
                     <TripCard key={trip.id} trip={trip} onDelete={handleDeleteTrip} />
                   ))}
