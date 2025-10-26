@@ -283,7 +283,6 @@ const translateText = (text: string, targetLang: string): string => {
       'moderate': 'בינוני',
       'museum': 'מוזיאון',
       'park': 'פארק',
-      'beach': 'חוף',
       'market': 'שוק',
       'restaurant': 'מסעדה',
       'hotel': 'מלון',
@@ -304,28 +303,99 @@ const translateText = (text: string, targetLang: string): string => {
       'חיי לילה': 'Nightlife',
       'קניות': 'Shopping',
       'משפחתי': 'Family',
-      // Common words
-      'יקר': 'Expensive',
-      'יקרה': 'Expensive',
-      'זול': 'Cheap',
-      'בינוני': 'Moderate',
+      // Common nouns and places
       'מוזיאון': 'Museum',
+      'המוזיאון': 'The Museum',
       'פארק': 'Park',
+      'הפארק': 'The Park',
       'שוק': 'Market',
+      'השוק': 'The Market',
       'מסעדה': 'Restaurant',
+      'המסעדה': 'The Restaurant',
       'מלון': 'Hotel',
+      'המלון': 'The Hotel',
+      'קניון': 'Mall',
+      'הקניון': 'The Mall',
       'אטרקציות': 'Attractions',
-      'ציוני דרך': 'Landmarks'
+      'ציוני דרך': 'Landmarks',
+      'כיכר': 'Plaza',
+      'הכיכר': 'The Plaza',
+      'רובע': 'Quarter',
+      'הרובע': 'The Quarter',
+      'נמל': 'Port',
+      'הנמל': 'The Port',
+      'גשר': 'Bridge',
+      'הגשר': 'The Bridge',
+      'מבצר': 'Fortress',
+      'המבצר': 'The Fortress',
+      'ארמון': 'Palace',
+      'הארמון': 'The Palace',
+      'גן': 'Garden',
+      'הגן': 'The Garden',
+      'קתדרלה': 'Cathedral',
+      'הקתדרלה': 'The Cathedral',
+      'כנסייה': 'Church',
+      'הכנסייה': 'The Church',
+      // Common words in descriptions
+      'היא': 'is',
+      'הוא': 'is',
+      'עיר': 'city',
+      'העיר': 'the city',
+      'של': 'of',
+      'עם': 'with',
+      'יפה': 'beautiful',
+      'יפה': 'beautiful',
+      'עתיק': 'ancient',
+      'עתיקה': 'ancient',
+      'מודרני': 'modern',
+      'מודרנית': 'modern',
+      'מרשים': 'impressive',
+      'מרשימה': 'impressive',
+      'גדול': 'large',
+      'גדולה': 'large',
+      'קטן': 'small',
+      'קטנה': 'small',
+      'חדש': 'new',
+      'חדשה': 'new',
+      'ישן': 'old',
+      'ישנה': 'old',
+      'היסטורי': 'historic',
+      'היסטורית': 'historic',
+      'מפורסם': 'famous',
+      'מפורסמת': 'famous',
+      'יקר': 'expensive',
+      'יקרה': 'expensive',
+      'זול': 'cheap',
+      'זולה': 'cheap',
+      'בינוני': 'moderate',
+      'בינונית': 'moderate',
+      // Archaeology-related terms
+      'ארכיאולוגיה': 'Archaeology',
+      'לארכיאולוגיה': 'of Archaeology',
+      'אנתרופולוגיה': 'Anthropology',
+      'ואנתרופולוגיה': 'and Anthropology',
+      // Love Park example
+      'האהבה': 'of Love',
+      'אהבה': 'Love',
+      // Other common words
+      'לארקו': 'Larco',
+      'מרכז': 'center',
+      'המרכז': 'the center',
+      'היסטורי': 'historic',
+      'ההיסטורי': 'the historic'
     }
   };
   
   const mappings = translations[targetLang] || {};
   let result = text;
   
-  // Replace each word
-  Object.entries(mappings).forEach(([key, value]) => {
-    // Use word boundary for exact matches
-    const regex = new RegExp(`\\b${key}\\b`, 'gi');
+  // Sort by length (longest first) to handle phrases before individual words
+  const sortedEntries = Object.entries(mappings).sort((a, b) => b[0].length - a[0].length);
+  
+  // Replace each word/phrase
+  sortedEntries.forEach(([key, value]) => {
+    // Use word boundary for exact matches, but handle Hebrew which doesn't have word boundaries
+    const regex = new RegExp(key, 'g');
     result = result.replace(regex, value);
   });
   
@@ -1466,7 +1536,7 @@ export default function MyTripsNew() {
                             {translateCity(suggestion.destination)}, {translateCountry(suggestion.country)}
                           </h3>
                           <p className="text-gray-600 leading-relaxed text-left">
-                            {suggestion.description}
+                            {translateText(suggestion.description, i18n.language)}
                           </p>
                         </div>
 
@@ -1975,7 +2045,7 @@ export default function MyTripsNew() {
                               <div className={`flex items-start justify-between gap-8 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                                 <div className={`flex-1 min-w-0 flex flex-col gap-2 ${i18n.language === 'he' ? 'items-end' : 'items-start'}`}>
                                   <h3 className={`text-2xl font-bold text-gray-900 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
-                                    {trip.title}
+                                    {translateText(trip.title, i18n.language)}
                                   </h3>
                                   <div className={`flex items-center gap-2 text-gray-600 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                                     <MapPin className="w-4 h-4 flex-shrink-0 text-orange-500" />
@@ -1986,7 +2056,7 @@ export default function MyTripsNew() {
                                     dir={i18n.language === 'he' ? 'rtl' : 'ltr'}
                                     style={i18n.language === 'he' ? { unicodeBidi: 'plaintext', textAlign: 'right', width: '100%' } : undefined}
                                   >
-                                    {normalizeRtlText(trip.description, i18n.language === 'he')}
+                                    {translateText(normalizeRtlText(trip.description, i18n.language === 'he'), i18n.language)}
                                   </p>
                                 </div>
                                 <Badge className="bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 shadow-lg text-base px-4 py-2 whitespace-nowrap flex-shrink-0">

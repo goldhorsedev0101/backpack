@@ -7,13 +7,23 @@ GlobeMate is a full-stack web application for worldwide travel planning and comm
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
-- **Translation Improvements for My Trips Page** (Oct 26, 2025):
+- **Comprehensive Translation System for Trip Content** (Oct 26, 2025):
   - Fixed "Saved Trips" tab translation - now correctly displays "Saved Trips" in English instead of "My Trips"
   - Added translation keys: `trips.tags` ("Tags"/"תגיות") and `trips.highlights` ("Highlights"/"דגשים")
   - Implemented `translateBestTime()` function to translate month names and common words in bestTimeToVisit field
-  - Translation mapping converts Hebrew months to English (דצמבר→December, מרץ→March, etc.) and vice versa
-  - Also translates common words like "עד"→"to" for proper bilingual display of dates
-  - Applied to all trip suggestion cards and saved trips display in my-trips-new.tsx
+    - Translation mapping converts Hebrew months to English (דצמבר→December, מרץ→March, etc.) and vice versa
+    - Also translates common words like "עד"→"to" for proper bilingual display of dates
+  - Implemented `translateText()` function with comprehensive translation dictionary for trip content
+    - Translates travel styles (תרבות→Culture, הרפתקאות→Adventure, etc.)
+    - Translates common nouns (מוזיאון→Museum, פארק→Park, קניון→Mall, etc.)
+    - Translates descriptive words (יפה→beautiful, עתיק→ancient, מפורסם→famous, etc.)
+    - Handles both standalone words and words with Hebrew article prefix (ה-)
+    - Sorts translations by length (longest first) to handle phrases correctly
+  - Applied translations to all trip content:
+    - Trip titles and descriptions in saved trips
+    - Highlights and tags in both suggestions and saved trips
+    - Suggestion descriptions in AI-generated suggestions tab
+  - Enables bilingual display of existing trip data - trips created in Hebrew now show translated content in English and vice versa
 - **Flight Management System with Real-Time Tracking** (Oct 26, 2025):
   - **Flight Search**: Integrated Duffel Flights API for real flight search and booking
     - Backend: POST /api/flights/search and GET /api/flights/offer/:offerId endpoints
