@@ -145,36 +145,42 @@ export default function FlightsPage() {
   const today = new Date().toISOString().split('T')[0];
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
-      <div className="container mx-auto px-4 py-8">
+    <div className={`min-h-screen bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Plane className="w-12 h-12 text-blue-600" />
-            <h1 className="text-4xl font-bold text-gray-900">
+        <div className="text-center mb-10">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <div className="bg-gradient-to-br from-blue-500 to-cyan-500 p-4 rounded-2xl shadow-lg">
+              <Plane className="w-10 h-10 text-white" />
+            </div>
+            <h1 className="text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
               {t('flights.title')}
             </h1>
           </div>
-          <p className="text-lg text-gray-600">
+          <p className="text-xl text-gray-700 font-medium">
             {t('flights.subtitle')}
           </p>
         </div>
 
         {/* Search Form */}
-        <Card className="mb-8 shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="w-5 h-5" />
+        <Card className="mb-8 shadow-2xl border-2 border-blue-100 bg-white/95 backdrop-blur">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-t-lg pb-6">
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <Search className="w-6 h-6" />
               {t('flights.search_flights')}
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-8">
             <div className="space-y-6">
               {/* Trip Type */}
-              <div className="flex gap-4">
+              <div className="flex gap-4 justify-center">
                 <Button
                   variant={tripType === 'round_trip' ? 'default' : 'outline'}
                   onClick={() => setTripType('round_trip')}
+                  className={tripType === 'round_trip' 
+                    ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg px-8 py-6 text-lg font-semibold' 
+                    : 'border-2 border-blue-300 hover:border-blue-500 hover:bg-blue-50 px-8 py-6 text-lg font-semibold'
+                  }
                   data-testid="button-round-trip"
                 >
                   {t('flights.round_trip')}
@@ -182,6 +188,10 @@ export default function FlightsPage() {
                 <Button
                   variant={tripType === 'one_way' ? 'default' : 'outline'}
                   onClick={() => setTripType('one_way')}
+                  className={tripType === 'one_way' 
+                    ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg px-8 py-6 text-lg font-semibold' 
+                    : 'border-2 border-blue-300 hover:border-blue-500 hover:bg-blue-50 px-8 py-6 text-lg font-semibold'
+                  }
                   data-testid="button-one-way"
                 >
                   {t('flights.one_way')}
@@ -189,10 +199,10 @@ export default function FlightsPage() {
               </div>
 
               {/* Origin and Destination */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="origin" className="flex items-center gap-2 h-6">
-                    <MapPin className="w-4 h-4" />
+                  <Label htmlFor="origin" className="flex items-center gap-2 h-6 text-base font-semibold text-gray-700">
+                    <MapPin className="w-5 h-5 text-blue-600" />
                     {t('flights.from')}
                   </Label>
                   <Input
@@ -200,14 +210,14 @@ export default function FlightsPage() {
                     placeholder={t('flights.enter_origin')}
                     value={origin}
                     onChange={(e) => setOrigin(e.target.value)}
-                    className="uppercase h-11"
+                    className="uppercase h-12 text-lg font-semibold border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                     maxLength={3}
                     data-testid="input-origin"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="destination" className="flex items-center gap-2 h-6">
-                    <MapPin className="w-4 h-4" />
+                  <Label htmlFor="destination" className="flex items-center gap-2 h-6 text-base font-semibold text-gray-700">
+                    <MapPin className="w-5 h-5 text-blue-600" />
                     {t('flights.to')}
                   </Label>
                   <Input
@@ -215,7 +225,7 @@ export default function FlightsPage() {
                     placeholder={t('flights.enter_destination')}
                     value={destination}
                     onChange={(e) => setDestination(e.target.value)}
-                    className="uppercase h-11"
+                    className="uppercase h-12 text-lg font-semibold border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                     maxLength={3}
                     data-testid="input-destination"
                   />
@@ -223,10 +233,10 @@ export default function FlightsPage() {
               </div>
 
               {/* Dates */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="departure" className="flex items-center gap-2 h-6">
-                    <Calendar className="w-4 h-4" />
+                  <Label htmlFor="departure" className="flex items-center gap-2 h-6 text-base font-semibold text-gray-700">
+                    <Calendar className="w-5 h-5 text-cyan-600" />
                     {t('flights.departure_date')}
                   </Label>
                   <Input
@@ -235,14 +245,14 @@ export default function FlightsPage() {
                     value={departureDate}
                     onChange={(e) => setDepartureDate(e.target.value)}
                     min={today}
-                    className="h-11"
+                    className="h-12 border-2 border-gray-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-all"
                     data-testid="input-departure-date"
                   />
                 </div>
                 {tripType === 'round_trip' && (
                   <div className="space-y-2">
-                    <Label htmlFor="return" className="flex items-center gap-2 h-6">
-                      <Calendar className="w-4 h-4" />
+                    <Label htmlFor="return" className="flex items-center gap-2 h-6 text-base font-semibold text-gray-700">
+                      <Calendar className="w-5 h-5 text-cyan-600" />
                       {t('flights.return_date')}
                     </Label>
                     <Input
@@ -251,7 +261,7 @@ export default function FlightsPage() {
                       value={returnDate}
                       onChange={(e) => setReturnDate(e.target.value)}
                       min={departureDate || today}
-                      className="h-11"
+                      className="h-12 border-2 border-gray-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-all"
                       data-testid="input-return-date"
                     />
                   </div>
@@ -259,14 +269,14 @@ export default function FlightsPage() {
               </div>
 
               {/* Passengers and Cabin Class */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="adults" className="flex items-center gap-2 h-6">
-                    <Users className="w-4 h-4" />
+                  <Label htmlFor="adults" className="flex items-center gap-2 h-6 text-base font-semibold text-gray-700">
+                    <Users className="w-5 h-5 text-indigo-600" />
                     {t('flights.adults')}
                   </Label>
                   <Select value={String(adults)} onValueChange={(v) => setAdults(Number(v))}>
-                    <SelectTrigger data-testid="select-adults" className="h-11">
+                    <SelectTrigger data-testid="select-adults" className="h-12 border-2 border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -277,9 +287,9 @@ export default function FlightsPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="children" className="h-6 flex items-center">{t('flights.children')}</Label>
+                  <Label htmlFor="children" className="h-6 flex items-center text-base font-semibold text-gray-700">{t('flights.children')}</Label>
                   <Select value={String(children)} onValueChange={(v) => setChildren(Number(v))}>
-                    <SelectTrigger data-testid="select-children" className="h-11">
+                    <SelectTrigger data-testid="select-children" className="h-12 border-2 border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -290,9 +300,9 @@ export default function FlightsPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="cabin" className="h-6 flex items-center">{t('flights.cabin_class')}</Label>
+                  <Label htmlFor="cabin" className="h-6 flex items-center text-base font-semibold text-gray-700">{t('flights.cabin_class')}</Label>
                   <Select value={cabinClass} onValueChange={setCabinClass}>
-                    <SelectTrigger data-testid="select-cabin-class" className="h-11">
+                    <SelectTrigger data-testid="select-cabin-class" className="h-12 border-2 border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -306,25 +316,26 @@ export default function FlightsPage() {
               </div>
 
               {/* Search Button */}
-              <Button
-                onClick={handleSearch}
-                className="w-full"
-                size="lg"
-                disabled={searchFlightsMutation.isPending}
-                data-testid="button-search-flights"
-              >
-                {searchFlightsMutation.isPending ? (
-                  <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    {t('flights.searching')}
-                  </>
-                ) : (
-                  <>
-                    <Search className="w-5 h-5 mr-2" />
-                    {t('flights.search')}
-                  </>
-                )}
-              </Button>
+              <div className="pt-4">
+                <Button
+                  onClick={handleSearch}
+                  className="w-full h-16 text-xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 hover:from-blue-700 hover:via-cyan-700 hover:to-blue-700 text-white shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-[1.02]"
+                  disabled={searchFlightsMutation.isPending}
+                  data-testid="button-search-flights"
+                >
+                  {searchFlightsMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-6 h-6 mr-3 animate-spin" />
+                      {t('flights.searching')}
+                    </>
+                  ) : (
+                    <>
+                      <Search className="w-6 h-6 mr-3" />
+                      {t('flights.search')}
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

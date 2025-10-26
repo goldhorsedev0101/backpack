@@ -17,7 +17,7 @@ Preferred communication style: Simple, everyday language.
   - Navigation: Added "Flights" menu item with Plane icon
   - Duffel API v2 integration verified and tested (56 flight offers returned in test search TLV→ATH)
   - Bug fixes: Corrected API response parsing (.json() method), fixed children passenger format (age instead of type), added comprehensive logging, added null safety checks for operating_carrier and aircraft using optional chaining
-  - UI Enhancements: Premium flight card design with gradient backgrounds, visual flight path with animated plane icon, outbound/return badges, enhanced date/time display, hover effects, improved responsive layout, and standardized form field heights (h-11 for inputs/selects, h-6 for labels) for consistent visual alignment
+  - UI Enhancements: Premium flight card design with gradient backgrounds, visual flight path with animated plane icon, outbound/return badges, enhanced date/time display, hover effects, improved responsive layout, and standardized form field heights (h-11 for inputs/selects, h-6 for labels) for consistent visual alignment. Modern search form design with blue-cyan gradient header, large styled trip type buttons, enhanced input fields with colored icons and thick borders, premium search button with gradient and hover effects
   - Booking Flow: Complete flight booking page (`/flights/booking/:offerId`) with passenger details form, flight summary, and payment flow integration. "Book Now" button navigates to booking page with selected offer. Includes 5% service fee displayed in price breakdown with explanation.
 - **Trip Type Placeholder & Scroll Fix** (Oct 26, 2025): 
   - Added placeholder "בחר אופי טיול" to trip type selector by initializing tripType state to empty string
