@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
-import { Plane, Calendar, Users, Search, Clock, TrendingDown, Loader2, MapPin } from "lucide-react";
+import { Plane, Calendar, Users, Search, Clock, TrendingDown, Loader2, MapPin, Check, ChevronsUpDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,9 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { airports } from "@/data/airports";
+import { cn } from "@/lib/utils";
 
 interface FlightOffer {
   id: string;
@@ -42,6 +46,8 @@ export default function FlightSearchTab() {
 
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
+  const [originOpen, setOriginOpen] = useState(false);
+  const [destinationOpen, setDestinationOpen] = useState(false);
   const [departureDate, setDepartureDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
   const [adults, setAdults] = useState(1);
@@ -159,34 +165,110 @@ export default function FlightSearchTab() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="origin" className="flex items-center gap-2 h-6 text-base font-semibold text-gray-700">
+                <Label className="flex items-center gap-2 h-6 text-base font-semibold text-gray-700">
                   <MapPin className="w-5 h-5 text-blue-600" />
                   {t('flights.from')}
                 </Label>
-                <Input
-                  id="origin"
-                  placeholder={t('flights.enter_origin')}
-                  value={origin}
-                  onChange={(e) => setOrigin(e.target.value)}
-                  className={`uppercase h-12 text-lg font-semibold border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all ${isRTL ? 'text-right' : 'text-left'}`}
-                  maxLength={3}
-                  data-testid="input-origin"
-                />
+                <Popover open={originOpen} onOpenChange={setOriginOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={originOpen}
+                      className={`w-full h-12 justify-between border-2 border-gray-300 hover:border-blue-500 ${isRTL ? 'text-right' : 'text-left'}`}
+                      data-testid="select-origin"
+                    >
+                      {origin
+                        ? airports.find((airport) => airport.code === origin)?.city + " (" + origin + ")"
+                        : t('flights.select_origin')}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[400px] p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder={t('flights.search_airport')} />
+                      <CommandList>
+                        <CommandEmpty>{t('flights.no_airport_found')}</CommandEmpty>
+                        <CommandGroup>
+                          {airports.map((airport) => (
+                            <CommandItem
+                              key={airport.code}
+                              value={`${airport.city} ${airport.name} ${airport.code}`}
+                              onSelect={() => {
+                                setOrigin(airport.code);
+                                setOriginOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  origin === airport.code ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              <div className="flex flex-col">
+                                <span className="font-semibold">{airport.city} ({airport.code})</span>
+                                <span className="text-xs text-gray-500">{airport.name}, {airport.country}</span>
+                              </div>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="destination" className="flex items-center gap-2 h-6 text-base font-semibold text-gray-700">
+                <Label className="flex items-center gap-2 h-6 text-base font-semibold text-gray-700">
                   <MapPin className="w-5 h-5 text-blue-600" />
                   {t('flights.to')}
                 </Label>
-                <Input
-                  id="destination"
-                  placeholder={t('flights.enter_destination')}
-                  value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
-                  className={`uppercase h-12 text-lg font-semibold border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all ${isRTL ? 'text-right' : 'text-left'}`}
-                  maxLength={3}
-                  data-testid="input-destination"
-                />
+                <Popover open={destinationOpen} onOpenChange={setDestinationOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={destinationOpen}
+                      className={`w-full h-12 justify-between border-2 border-gray-300 hover:border-blue-500 ${isRTL ? 'text-right' : 'text-left'}`}
+                      data-testid="select-destination"
+                    >
+                      {destination
+                        ? airports.find((airport) => airport.code === destination)?.city + " (" + destination + ")"
+                        : t('flights.select_destination')}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[400px] p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder={t('flights.search_airport')} />
+                      <CommandList>
+                        <CommandEmpty>{t('flights.no_airport_found')}</CommandEmpty>
+                        <CommandGroup>
+                          {airports.map((airport) => (
+                            <CommandItem
+                              key={airport.code}
+                              value={`${airport.city} ${airport.name} ${airport.code}`}
+                              onSelect={() => {
+                                setDestination(airport.code);
+                                setDestinationOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  destination === airport.code ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              <div className="flex flex-col">
+                                <span className="font-semibold">{airport.city} ({airport.code})</span>
+                                <span className="text-xs text-gray-500">{airport.name}, {airport.country}</span>
+                              </div>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
 
