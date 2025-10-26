@@ -188,11 +188,11 @@ export default function FlightSearchTab() {
                       <ChevronsUpDown className={`h-4 w-4 shrink-0 opacity-50 ${isRTL ? 'mr-2' : 'ml-2'}`} />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-[400px] p-0" align="start">
-                    <Command>
-                      <CommandInput placeholder={t('flights.search_airport')} />
+                  <PopoverContent className="w-[400px] p-0" align="start" dir={isRTL ? 'rtl' : 'ltr'}>
+                    <Command dir={isRTL ? 'rtl' : 'ltr'}>
+                      <CommandInput placeholder={t('flights.search_airport')} className={isRTL ? 'text-right' : ''} />
                       <CommandList>
-                        <CommandEmpty>{t('flights.no_airport_found')}</CommandEmpty>
+                        <CommandEmpty className={isRTL ? 'text-right' : ''}>{t('flights.no_airport_found')}</CommandEmpty>
                         <CommandGroup>
                           {airports.map((airport) => {
                             const displayCity = isRTL && airport.cityHe ? airport.cityHe : airport.city;
@@ -206,7 +206,7 @@ export default function FlightSearchTab() {
                                   setOrigin(airport.code);
                                   setOriginOpen(false);
                                 }}
-                                className={isRTL ? 'text-right' : 'text-left'}
+                                className={`${isRTL ? 'flex-row-reverse' : ''}`}
                               >
                                 <Check
                                   className={cn(
@@ -215,7 +215,7 @@ export default function FlightSearchTab() {
                                     origin === airport.code ? "opacity-100" : "opacity-0"
                                   )}
                                 />
-                                <div className="flex flex-col">
+                                <div className={`flex flex-col w-full ${isRTL ? 'items-end' : 'items-start'}`}>
                                   <span className="font-semibold">{displayCity} ({airport.code})</span>
                                   <span className="text-xs text-gray-500">{displayName}, {displayCountry}</span>
                                 </div>
@@ -252,11 +252,11 @@ export default function FlightSearchTab() {
                       <ChevronsUpDown className={`h-4 w-4 shrink-0 opacity-50 ${isRTL ? 'mr-2' : 'ml-2'}`} />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-[400px] p-0" align="start">
-                    <Command>
-                      <CommandInput placeholder={t('flights.search_airport')} />
+                  <PopoverContent className="w-[400px] p-0" align="start" dir={isRTL ? 'rtl' : 'ltr'}>
+                    <Command dir={isRTL ? 'rtl' : 'ltr'}>
+                      <CommandInput placeholder={t('flights.search_airport')} className={isRTL ? 'text-right' : ''} />
                       <CommandList>
-                        <CommandEmpty>{t('flights.no_airport_found')}</CommandEmpty>
+                        <CommandEmpty className={isRTL ? 'text-right' : ''}>{t('flights.no_airport_found')}</CommandEmpty>
                         <CommandGroup>
                           {airports.map((airport) => {
                             const displayCity = isRTL && airport.cityHe ? airport.cityHe : airport.city;
@@ -270,7 +270,7 @@ export default function FlightSearchTab() {
                                   setDestination(airport.code);
                                   setDestinationOpen(false);
                                 }}
-                                className={isRTL ? 'text-right' : 'text-left'}
+                                className={`${isRTL ? 'flex-row-reverse' : ''}`}
                               >
                                 <Check
                                   className={cn(
@@ -279,7 +279,7 @@ export default function FlightSearchTab() {
                                     destination === airport.code ? "opacity-100" : "opacity-0"
                                   )}
                                 />
-                                <div className="flex flex-col">
+                                <div className={`flex flex-col w-full ${isRTL ? 'items-end' : 'items-start'}`}>
                                   <span className="font-semibold">{displayCity} ({airport.code})</span>
                                   <span className="text-xs text-gray-500">{displayName}, {displayCountry}</span>
                                 </div>
