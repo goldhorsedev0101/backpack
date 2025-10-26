@@ -338,59 +338,107 @@ export default function FlightsPage() {
               </Badge>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               {offers.map((offer) => (
-                <Card key={offer.id} className="hover:shadow-lg transition-shadow" data-testid={`card-flight-${offer.id}`}>
-                  <CardContent className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
+                <Card key={offer.id} className="hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-blue-200" data-testid={`card-flight-${offer.id}`}>
+                  <CardContent className="p-0">
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-0">
                       {/* Flight Info */}
-                      <div className="md:col-span-3 space-y-4">
+                      <div className="lg:col-span-3 p-6 space-y-6">
                         {offer.slices.map((slice, idx) => (
-                          <div key={idx} className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4">
-                                <div className="text-center">
-                                  <div className="text-2xl font-bold">{slice.origin.iata_code}</div>
-                                  <div className="text-xs text-gray-500">
-                                    {formatDateTime(slice.segments[0].departing_at)}
+                          <div key={idx}>
+                            {/* Flight Direction Label */}
+                            <div className="flex items-center gap-2 mb-3">
+                              <Badge variant={idx === 0 ? "default" : "secondary"} className="text-xs">
+                                {idx === 0 ? t('flights.outbound') : t('flights.return')}
+                              </Badge>
+                              <span className="text-xs text-gray-500">
+                                {new Date(slice.segments[0].departing_at).toLocaleDateString('he-IL', { 
+                                  weekday: 'short', 
+                                  day: 'numeric', 
+                                  month: 'short' 
+                                })}
+                              </span>
+                            </div>
+
+                            {/* Flight Route */}
+                            <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg p-4">
+                              <div className="flex items-center justify-between gap-4">
+                                {/* Origin */}
+                                <div className="text-center flex-1">
+                                  <div className="text-3xl font-bold text-gray-900 dark:text-white">{slice.origin.iata_code}</div>
+                                  <div className="text-sm font-medium text-gray-600 dark:text-gray-300 mt-1">
+                                    {new Date(slice.segments[0].departing_at).toLocaleTimeString('he-IL', { 
+                                      hour: '2-digit', 
+                                      minute: '2-digit' 
+                                    })}
                                   </div>
                                 </div>
-                                <div className="flex flex-col items-center">
-                                  <Clock className="w-4 h-4 text-gray-400 mb-1" />
-                                  <div className="text-sm text-gray-600">{formatDuration(slice.duration)}</div>
-                                  <div className="text-xs text-gray-500">{getStopsText(slice.segments)}</div>
+
+                                {/* Flight Path */}
+                                <div className="flex flex-col items-center flex-1 px-4">
+                                  <div className="flex items-center gap-2 w-full">
+                                    <div className="h-0.5 flex-1 bg-gradient-to-r from-blue-400 to-cyan-400"></div>
+                                    <Plane className="w-5 h-5 text-blue-600 transform rotate-90" />
+                                    <div className="h-0.5 flex-1 bg-gradient-to-r from-cyan-400 to-blue-400"></div>
+                                  </div>
+                                  <div className="flex items-center gap-2 mt-2">
+                                    <Clock className="w-4 h-4 text-gray-500" />
+                                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                      {formatDuration(slice.duration)}
+                                    </span>
+                                  </div>
+                                  <Badge variant="outline" className="mt-1 text-xs">
+                                    {getStopsText(slice.segments)}
+                                  </Badge>
                                 </div>
-                                <div className="text-center">
-                                  <div className="text-2xl font-bold">{slice.destination.iata_code}</div>
-                                  <div className="text-xs text-gray-500">
-                                    {formatDateTime(slice.segments[slice.segments.length - 1].arriving_at)}
+
+                                {/* Destination */}
+                                <div className="text-center flex-1">
+                                  <div className="text-3xl font-bold text-gray-900 dark:text-white">{slice.destination.iata_code}</div>
+                                  <div className="text-sm font-medium text-gray-600 dark:text-gray-300 mt-1">
+                                    {new Date(slice.segments[slice.segments.length - 1].arriving_at).toLocaleTimeString('he-IL', { 
+                                      hour: '2-digit', 
+                                      minute: '2-digit' 
+                                    })}
                                   </div>
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <Plane className="w-4 h-4" />
-                              <span>{slice.segments[0]?.operating_carrier?.name || 'Airline'}</span>
+
+                            {/* Airline Info */}
+                            <div className="flex items-center gap-3 mt-3 text-sm text-gray-600 dark:text-gray-400">
+                              <div className="flex items-center gap-1.5">
+                                <Plane className="w-4 h-4" />
+                                <span className="font-medium">{slice.segments[0]?.operating_carrier?.name || 'Airline'}</span>
+                              </div>
                               <Separator orientation="vertical" className="h-4" />
                               <span>{slice.segments[0]?.aircraft?.name || 'Aircraft'}</span>
                             </div>
+
+                            {/* Divider between slices */}
+                            {idx < offer.slices.length - 1 && (
+                              <Separator className="my-4" />
+                            )}
                           </div>
                         ))}
                       </div>
 
                       {/* Price and Action */}
-                      <div className="flex flex-col items-center md:items-end gap-3">
-                        <div className="text-center md:text-right">
-                          <div className="text-3xl font-bold text-blue-600">
+                      <div className="lg:col-span-1 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-6 flex flex-col items-center justify-center gap-4 border-t lg:border-t-0 lg:border-r-0">
+                        <div className="text-center">
+                          <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t('flights.total')}</div>
+                          <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">
                             {offer.total_currency === 'ILS' ? '₪' : '$'}{offer.total_amount}
                           </div>
-                          <div className="text-sm text-gray-500">{t('flights.per_person')}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('flights.per_person')}</div>
                         </div>
-                        <Button className="w-full" data-testid={`button-book-${offer.id}`}>
+                        <Button className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all" size="lg" data-testid={`button-book-${offer.id}`}>
                           {t('flights.book_now')}
                         </Button>
-                        <div className="text-xs text-gray-500 text-center">
-                          {t('flights.operated_by')} {offer.owner.name}
+                        <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                          <div>{t('flights.operated_by')}</div>
+                          <div className="font-medium text-gray-700 dark:text-gray-300">{offer.owner.name}</div>
                         </div>
                       </div>
                     </div>

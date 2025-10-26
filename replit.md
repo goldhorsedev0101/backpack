@@ -17,6 +17,7 @@ Preferred communication style: Simple, everyday language.
   - Navigation: Added "Flights" menu item with Plane icon
   - Duffel API v2 integration verified and tested (56 flight offers returned in test search TLV→ATH)
   - Bug fixes: Corrected API response parsing (.json() method), fixed children passenger format (age instead of type), added comprehensive logging, added null safety checks for operating_carrier and aircraft using optional chaining
+  - UI Enhancements: Premium flight card design with gradient backgrounds, visual flight path with animated plane icon, outbound/return badges, enhanced date/time display, hover effects, and improved responsive layout
 - **Trip Type Placeholder & Scroll Fix** (Oct 26, 2025): 
   - Added placeholder "בחר אופי טיול" to trip type selector by initializing tripType state to empty string
   - Fixed Radix Select scroll-lock issue that prevented page scrolling when dropdown was open
