@@ -1536,7 +1536,7 @@ export default function MyTripsNew() {
                             {translateCity(suggestion.destination)}, {translateCountry(suggestion.country)}
                           </h3>
                           <p className="text-gray-600 leading-relaxed text-left">
-                            {translateText(suggestion.description, i18n.language)}
+                            {suggestion.description}
                           </p>
                         </div>
 
@@ -2045,7 +2045,7 @@ export default function MyTripsNew() {
                               <div className={`flex items-start justify-between gap-8 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                                 <div className={`flex-1 min-w-0 flex flex-col gap-2 ${i18n.language === 'he' ? 'items-end' : 'items-start'}`}>
                                   <h3 className={`text-2xl font-bold text-gray-900 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
-                                    {translateText(trip.title, i18n.language)}
+                                    {trip.title}
                                   </h3>
                                   <div className={`flex items-center gap-2 text-gray-600 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
                                     <MapPin className="w-4 h-4 flex-shrink-0 text-orange-500" />
@@ -2056,7 +2056,7 @@ export default function MyTripsNew() {
                                     dir={i18n.language === 'he' ? 'rtl' : 'ltr'}
                                     style={i18n.language === 'he' ? { unicodeBidi: 'plaintext', textAlign: 'right', width: '100%' } : undefined}
                                   >
-                                    {translateText(normalizeRtlText(trip.description, i18n.language === 'he'), i18n.language)}
+                                    {normalizeRtlText(trip.description, i18n.language === 'he')}
                                   </p>
                                 </div>
                                 <Badge className="bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 shadow-lg text-base px-4 py-2 whitespace-nowrap flex-shrink-0">
