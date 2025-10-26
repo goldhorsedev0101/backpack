@@ -1981,43 +1981,6 @@ export default function MyTripsNew() {
 
                               {/* Action Buttons */}
                               <div className={`flex gap-3 pt-4 border-t ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                                <Button 
-                                  variant="outline"
-                                  className="border-red-200 hover:bg-red-50 hover:border-red-300 text-red-600"
-                                  onClick={() => {
-                                    if (confirm(t('trips.confirm_delete') || 'Are you sure you want to delete this trip?')) {
-                                      deleteTripMutation.mutate(trip.id);
-                                    }
-                                  }}
-                                  disabled={deleteTripMutation.isPending}
-                                  data-testid={`button-delete-trip-${trip.id}`}
-                                >
-                                  {deleteTripMutation.isPending ? (
-                                    <Loader2 className={`w-4 h-4 animate-spin ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-                                  ) : (
-                                    <Trash2 className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-                                  )}
-                                  {t('common.delete')}
-                                </Button>
-                                <Button 
-                                  asChild
-                                  className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
-                                  data-testid={`button-book-flight-${trip.id}`}
-                                >
-                                  <Link href="/flights">
-                                    {i18n.language === 'he' ? (
-                                      <>
-                                        סגור טיסה
-                                        <Plane className="w-4 h-4 mr-2" />
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Plane className="w-4 h-4 mr-2" />
-                                        Book Flight
-                                      </>
-                                    )}
-                                  </Link>
-                                </Button>
                                 {(() => {
                                   // Check if there's an existing itinerary for this trip
                                   const existingItinerary = savedItineraries.find((itin: any) => {
@@ -2085,6 +2048,43 @@ export default function MyTripsNew() {
                                     );
                                   }
                                 })()}
+                                <Button 
+                                  asChild
+                                  className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
+                                  data-testid={`button-book-flight-${trip.id}`}
+                                >
+                                  <Link href="/flights">
+                                    {i18n.language === 'he' ? (
+                                      <>
+                                        סגור טיסה
+                                        <Plane className="w-4 h-4 mr-2" />
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Plane className="w-4 h-4 mr-2" />
+                                        Book Flight
+                                      </>
+                                    )}
+                                  </Link>
+                                </Button>
+                                <Button 
+                                  variant="outline"
+                                  className="border-red-200 hover:bg-red-50 hover:border-red-300 text-red-600"
+                                  onClick={() => {
+                                    if (confirm(t('trips.confirm_delete') || 'Are you sure you want to delete this trip?')) {
+                                      deleteTripMutation.mutate(trip.id);
+                                    }
+                                  }}
+                                  disabled={deleteTripMutation.isPending}
+                                  data-testid={`button-delete-trip-${trip.id}`}
+                                >
+                                  {deleteTripMutation.isPending ? (
+                                    <Loader2 className={`w-4 h-4 animate-spin ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
+                                  ) : (
+                                    <Trash2 className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
+                                  )}
+                                  {t('common.delete')}
+                                </Button>
                               </div>
                             </div>
                           </CardContent>
