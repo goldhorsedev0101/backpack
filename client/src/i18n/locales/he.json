@@ -449,7 +449,8 @@
     "total_price": "מחיר סופי",
     "booking_ref": "מספר הזמנה",
     "booked_on": "הוזמן בתאריך",
-    "completed": "הושלם"
+    "completed": "הושלם",
+    "live_map": "מפה בזמן אמת"
   },
   "booking": {
     "complete_booking": "השלמת הזמנה",

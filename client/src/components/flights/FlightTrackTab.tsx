@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { APIProvider, Map, AdvancedMarker } from "@vis.gl/react-google-maps";
 
 interface FlightData {
   callsign: string;
@@ -199,6 +200,46 @@ export default function FlightTrackTab() {
                   {new Date(flightData.last_contact).toLocaleTimeString()}
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {flightData && (
+        <Card className="shadow-xl border-2 border-blue-100">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <MapPin className="w-5 h-5" />
+              {t('flights.live_map')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="w-full h-[500px] rounded-b-lg overflow-hidden">
+              <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''}>
+                <Map
+                  defaultCenter={{ lat: flightData.latitude, lng: flightData.longitude }}
+                  center={{ lat: flightData.latitude, lng: flightData.longitude }}
+                  defaultZoom={8}
+                  mapId="flight-tracker-map"
+                  gestureHandling="greedy"
+                  disableDefaultUI={false}
+                  zoomControl={true}
+                  fullscreenControl={true}
+                >
+                  <AdvancedMarker
+                    position={{ lat: flightData.latitude, lng: flightData.longitude }}
+                  >
+                    <div 
+                      className="bg-blue-600 rounded-full p-3 shadow-2xl border-4 border-white"
+                      style={{
+                        transform: `rotate(${flightData.heading}deg)`,
+                      }}
+                    >
+                      <Plane className="w-6 h-6 text-white" />
+                    </div>
+                  </AdvancedMarker>
+                </Map>
+              </APIProvider>
             </div>
           </CardContent>
         </Card>

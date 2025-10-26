@@ -305,7 +305,8 @@
     "total_price": "Total Price",
     "booking_ref": "Booking Reference",
     "booked_on": "Booked On",
-    "completed": "Completed"
+    "completed": "Completed",
+    "live_map": "Live Map"
   },
   "booking": {
     "complete_booking": "Complete Booking",
