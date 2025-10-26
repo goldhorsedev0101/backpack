@@ -9,9 +9,10 @@ import { cn } from "@/lib/utils"
 
 interface SelectContextValue {
   value?: string
-  onValueChange?: (value: string) => void
+  onValueChange?: (value: string, label: React.ReactNode) => void
   open: boolean
   onOpenChange: (open: boolean) => void
+  selectedLabel?: React.ReactNode
 }
 
 const SelectContext = React.createContext<SelectContextValue | undefined>(undefined)
@@ -38,14 +39,16 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
   ({ value: controlledValue, defaultValue, onValueChange, open: controlledOpen, defaultOpen, onOpenChange, children }, ref) => {
     const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue)
     const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen ?? false)
+    const [selectedLabel, setSelectedLabel] = React.useState<React.ReactNode>()
 
     const value = controlledValue !== undefined ? controlledValue : uncontrolledValue
     const open = controlledOpen !== undefined ? controlledOpen : uncontrolledOpen
 
-    const handleValueChange = React.useCallback((newValue: string) => {
+    const handleValueChange = React.useCallback((newValue: string, label: React.ReactNode) => {
       if (controlledValue === undefined) {
         setUncontrolledValue(newValue)
       }
+      setSelectedLabel(label)
       onValueChange?.(newValue)
       if (controlledOpen === undefined) {
         setUncontrolledOpen(false)
@@ -61,7 +64,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
     }, [controlledOpen, onOpenChange])
 
     return (
-      <SelectContext.Provider value={{ value, onValueChange: handleValueChange, open, onOpenChange: handleOpenChange }}>
+      <SelectContext.Provider value={{ value, onValueChange: handleValueChange, open, onOpenChange: handleOpenChange, selectedLabel }}>
         <PopoverPrimitive.Root open={open} onOpenChange={handleOpenChange} modal={false}>
           <div ref={ref}>{children}</div>
         </PopoverPrimitive.Root>
@@ -82,10 +85,10 @@ interface SelectValueProps {
 
 const SelectValue = React.forwardRef<HTMLSpanElement, SelectValueProps>(
   ({ placeholder }, ref) => {
-    const { value } = useSelectContext()
+    const { selectedLabel } = useSelectContext()
     return (
       <span ref={ref} className="pointer-events-none">
-        {value || placeholder}
+        {selectedLabel || placeholder}
       </span>
     )
   }
@@ -164,14 +167,13 @@ interface SelectItemProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
   ({ className, children, value, ...props }, ref) => {
-    const { value: selectedValue, onValueChange, onOpenChange } = useSelectContext()
+    const { value: selectedValue, onValueChange } = useSelectContext()
     const { i18n } = useTranslation();
     const isRTL = i18n.language === 'he';
     const isSelected = selectedValue === value
 
     const handleClick = () => {
-      onValueChange?.(value)
-      onOpenChange(false)
+      onValueChange?.(value, children)
     }
 
     return (
