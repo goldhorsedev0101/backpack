@@ -38,6 +38,7 @@ export default function FlightSearchTab() {
   const { t, i18n } = useTranslation();
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const isRTL = i18n.language === 'he';
 
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
@@ -121,7 +122,7 @@ export default function FlightSearchTab() {
   const today = new Date().toISOString().split('T')[0];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8" dir={isRTL ? 'rtl' : 'ltr'}>
       <Card className="shadow-2xl border-2 border-blue-100 bg-white/95 backdrop-blur">
         <CardHeader className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-t-lg pb-6">
           <CardTitle className="flex items-center gap-3 text-2xl">
@@ -167,7 +168,7 @@ export default function FlightSearchTab() {
                   placeholder={t('flights.enter_origin')}
                   value={origin}
                   onChange={(e) => setOrigin(e.target.value)}
-                  className="uppercase h-12 text-lg font-semibold border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  className={`uppercase h-12 text-lg font-semibold border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all ${isRTL ? 'text-right' : 'text-left'}`}
                   maxLength={3}
                   data-testid="input-origin"
                 />
@@ -182,7 +183,7 @@ export default function FlightSearchTab() {
                   placeholder={t('flights.enter_destination')}
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
-                  className="uppercase h-12 text-lg font-semibold border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  className={`uppercase h-12 text-lg font-semibold border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all ${isRTL ? 'text-right' : 'text-left'}`}
                   maxLength={3}
                   data-testid="input-destination"
                 />

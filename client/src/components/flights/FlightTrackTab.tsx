@@ -24,8 +24,9 @@ interface FlightData {
 }
 
 export default function FlightTrackTab() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
+  const isRTL = i18n.language === 'he';
   const [callsign, setCallsign] = useState("");
   const [flightData, setFlightData] = useState<FlightData | null>(null);
 
@@ -72,7 +73,7 @@ export default function FlightTrackTab() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8" dir={isRTL ? 'rtl' : 'ltr'}>
       <Card className="shadow-2xl border-2 border-blue-100 bg-white/95 backdrop-blur">
         <CardHeader className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-t-lg pb-6">
           <CardTitle className="flex items-center gap-3 text-2xl">
@@ -92,7 +93,7 @@ export default function FlightTrackTab() {
                 placeholder={t('flights.enter_callsign_placeholder')}
                 value={callsign}
                 onChange={(e) => setCallsign(e.target.value)}
-                className="uppercase h-12 text-lg font-semibold border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                className={`uppercase h-12 text-lg font-semibold border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all ${isRTL ? 'text-right' : 'text-left'}`}
                 data-testid="input-callsign"
               />
               <p className="text-sm text-gray-500">{t('flights.callsign_example')}</p>

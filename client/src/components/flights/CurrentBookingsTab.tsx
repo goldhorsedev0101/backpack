@@ -24,6 +24,7 @@ interface FlightBooking {
 
 export default function CurrentBookingsTab() {
   const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'he';
 
   const { data: bookingsData, isLoading } = useQuery({
     queryKey: ['/api/flights/bookings/upcoming'],
@@ -51,7 +52,7 @@ export default function CurrentBookingsTab() {
 
   if (isLoading) {
     return (
-      <Card className="text-center py-12">
+      <Card className="text-center py-12" dir={isRTL ? 'rtl' : 'ltr'}>
         <CardContent>
           <Loader2 className="w-16 h-16 text-blue-500 mx-auto mb-4 animate-spin" />
           <p className="text-gray-500">{t('flights.loading_bookings')}</p>
@@ -62,7 +63,7 @@ export default function CurrentBookingsTab() {
 
   if (bookings.length === 0) {
     return (
-      <Card className="text-center py-12 border-2 border-dashed border-gray-300">
+      <Card className="text-center py-12 border-2 border-dashed border-gray-300" dir={isRTL ? 'rtl' : 'ltr'}>
         <CardContent>
           <Plane className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-700 mb-2">{t('flights.no_upcoming_bookings')}</h3>
@@ -73,7 +74,7 @@ export default function CurrentBookingsTab() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">
           {t('flights.upcoming_flights', { count: bookings.length })}
