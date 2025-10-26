@@ -7,18 +7,28 @@ GlobeMate is a full-stack web application for worldwide travel planning and comm
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
-- **Flights Search Feature** (Oct 26, 2025):
-  - Integrated Duffel Flights API for real flight search and booking
-  - Backend: Two new endpoints - POST /api/flights/search and GET /api/flights/offer/:offerId
-  - Frontend: New /flights page with comprehensive search form and results display
-  - Features: Round-trip/one-way flights, multiple passengers (adults/children), cabin class selection, real-time search
-  - UI: Beautiful card-based results with flight details (price, duration, stops, airline, departure/arrival times)
-  - Multilingual: Full Hebrew/English support with 67 new translation keys
-  - Navigation: Added "Flights" menu item with Plane icon
-  - Duffel API v2 integration verified and tested (56 flight offers returned in test search TLV→ATH)
-  - Bug fixes: Corrected API response parsing (.json() method), fixed children passenger format (age instead of type), added comprehensive logging, added null safety checks for operating_carrier and aircraft using optional chaining
-  - UI Enhancements: Premium flight card design with gradient backgrounds, visual flight path with animated plane icon, outbound/return badges, enhanced date/time display, hover effects, improved responsive layout, and standardized form field heights (h-11 for inputs/selects, h-6 for labels) for consistent visual alignment. Modern search form design with blue-cyan gradient header, large styled trip type buttons, enhanced input fields with colored icons and thick borders, premium search button with gradient and hover effects
-  - Booking Flow: Complete flight booking page (`/flights/booking/:offerId`) with passenger details form, flight summary, and payment flow integration. "Book Now" button navigates to booking page with selected offer. Includes 5% service fee displayed in price breakdown with explanation.
+- **Flight Management System with Real-Time Tracking** (Oct 26, 2025):
+  - **Flight Search**: Integrated Duffel Flights API for real flight search and booking
+    - Backend: POST /api/flights/search and GET /api/flights/offer/:offerId endpoints
+    - Frontend: FlightSearchTab component with comprehensive search form
+    - Features: Round-trip/one-way flights, multiple passengers (adults/children), cabin class selection
+    - UI: Premium flight cards with gradient backgrounds, visual flight path, animated plane icon, standardized form heights (h-11 inputs/selects, h-6 labels)
+  - **Real-Time Flight Tracking**: Integrated OpenSky Network API (4000 free daily API calls)
+    - Backend: GET /api/flights/track/:callsign endpoint for real-time flight data
+    - Frontend: FlightTrackTab component with flight position, altitude, speed, heading, vertical rate display
+    - Features: Live flight tracking with comprehensive metrics (latitude/longitude, altitude in meters/feet, speed in km/h and mph, heading degrees, vertical rate)
+  - **Booking Management System**:
+    - Database: Created `flight_bookings` table with userId, offerId, flightData (JSONB), passengerData (JSONB), totalAmount, currency, status, departureDate, returnDate
+    - Backend: POST/GET /api/flights/bookings, GET /bookings/upcoming, GET /bookings/past endpoints
+    - Storage: createFlightBooking, getUserFlightBookings, getUpcomingBookings, getPastBookings methods in IStorage interface
+    - Frontend: CurrentBookingsTab and PastBookingsTab components displaying user's flight history
+  - **Tabbed Flight Interface**: 4-tab navigation system on /flights page:
+    1. Flight Search - Search and book flights (FlightSearchTab)
+    2. Track Flight - Real-time flight tracking by callsign (FlightTrackTab)
+    3. Current Bookings - Upcoming confirmed flights (CurrentBookingsTab)
+    4. Past Bookings - Completed flight history (PastBookingsTab)
+  - **Multilingual Support**: Added 47 new translation keys for flight tracking, booking management, and tab navigation in both Hebrew and English
+  - **UI Standards**: Consistent blue-cyan gradient theme across all tabs, gradient buttons, premium card designs, hover effects, RTL support
 - **Trip Type Placeholder & Scroll Fix** (Oct 26, 2025): 
   - Added placeholder "בחר אופי טיול" to trip type selector by initializing tripType state to empty string
   - Fixed Radix Select scroll-lock issue that prevented page scrolling when dropdown was open
