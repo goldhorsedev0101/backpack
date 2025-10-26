@@ -2,19 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Override Radix Select scroll lock - recommended solution from Radix community */
-body[data-scroll-locked] {
-  margin-right: 0px !important;
-  margin-left: 0px !important;
-  overflow: visible !important;
+/* Force page scroll when Select dropdown is open - override Radix behavior */
+body {
+  overflow: auto !important;
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+  pointer-events: auto !important;
 }
 
-/* More specific override for nested elements */
-html body[data-scroll-locked] {
-  margin-right: 0px !important;
-  margin-left: 0px !important;
-  overflow: visible !important;
-  padding-right: 0px !important;
+/* Prevent any element from locking scroll */
+html, body {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  position: relative !important;
 }
 
 /* Allow Select content to be scrollable while maintaining page scroll */
