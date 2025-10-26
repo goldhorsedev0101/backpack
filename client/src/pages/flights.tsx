@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Plane, Calendar, Users, Search, Clock, TrendingDown, Loader2, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,7 @@ interface FlightOffer {
 
 export default function FlightsPage() {
   const { t, i18n } = useTranslation();
+  const [, navigate] = useLocation();
   const isRTL = i18n.language === "he";
   const { toast } = useToast();
 
@@ -433,7 +435,12 @@ export default function FlightsPage() {
                           </div>
                           <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('flights.per_person')}</div>
                         </div>
-                        <Button className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all" size="lg" data-testid={`button-book-${offer.id}`}>
+                        <Button 
+                          onClick={() => navigate(`/flights/booking/${offer.id}`)}
+                          className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all" 
+                          size="lg" 
+                          data-testid={`button-book-${offer.id}`}
+                        >
                           {t('flights.book_now')}
                         </Button>
                         <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
