@@ -78,6 +78,9 @@ import {
   type InsertJourney,
   type SavedJourney,
   type InsertSavedJourney,
+  flightBookings,
+  type FlightBooking,
+  type InsertFlightBooking,
 } from "../shared/schema.js";
 import { db } from "./db.js";
 import { eq, desc, and, or, sql } from "drizzle-orm";
@@ -238,6 +241,14 @@ export interface IStorage {
   getUserItineraries(userId: string): Promise<Itinerary[]>;
   deleteItinerary(id: string, userId: string): Promise<void>;
   getItineraryById(id: string): Promise<Itinerary | undefined>;
+  
+  // Flight Booking operations
+  createFlightBooking(booking: InsertFlightBooking): Promise<FlightBooking>;
+  getUserFlightBookings(userId: string): Promise<FlightBooking[]>;
+  getUpcomingFlightBookings(userId: string): Promise<FlightBooking[]>;
+  getPastFlightBookings(userId: string): Promise<FlightBooking[]>;
+  getFlightBookingById(id: number): Promise<FlightBooking | undefined>;
+  updateFlightBookingStatus(id: number, status: string): Promise<FlightBooking>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1595,6 +1606,72 @@ export class DatabaseStorage implements IStorage {
       .where(eq(itineraries.id, id));
     return itinerary;
   }
+  
+  // Flight Booking operations
+  async createFlightBooking(booking: InsertFlightBooking): Promise<FlightBooking> {
+    const [newBooking] = await db
+      .insert(flightBookings)
+      .values(booking)
+      .returning();
+    return newBooking;
+  }
+  
+  async getUserFlightBookings(userId: string): Promise<FlightBooking[]> {
+    return db
+      .select()
+      .from(flightBookings)
+      .where(eq(flightBookings.userId, userId))
+      .orderBy(desc(flightBookings.createdAt));
+  }
+  
+  async getUpcomingFlightBookings(userId: string): Promise<FlightBooking[]> {
+    const now = new Date();
+    return db
+      .select()
+      .from(flightBookings)
+      .where(
+        and(
+          eq(flightBookings.userId, userId),
+          eq(flightBookings.status, 'upcoming'),
+          sql`${flightBookings.departureDate} >= ${now}`
+        )
+      )
+      .orderBy(flightBookings.departureDate);
+  }
+  
+  async getPastFlightBookings(userId: string): Promise<FlightBooking[]> {
+    const now = new Date();
+    return db
+      .select()
+      .from(flightBookings)
+      .where(
+        and(
+          eq(flightBookings.userId, userId),
+          or(
+            eq(flightBookings.status, 'completed'),
+            sql`${flightBookings.departureDate} < ${now}`
+          )
+        )
+      )
+      .orderBy(desc(flightBookings.departureDate));
+  }
+  
+  async getFlightBookingById(id: number): Promise<FlightBooking | undefined> {
+    const [booking] = await db
+      .select()
+      .from(flightBookings)
+      .where(eq(flightBookings.id, id));
+    return booking;
+  }
+  
+  async updateFlightBookingStatus(id: number, status: string): Promise<FlightBooking> {
+    const [booking] = await db
+      .update(flightBookings)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(flightBookings.id, id))
+      .returning();
+    return booking;
+  }
 }
 
 // Simple in-memory storage for immediate functionality
@@ -1743,6 +1820,14 @@ class MemStorage implements IStorage {
   async getUserItineraries(userId: string): Promise<Itinerary[]> { return []; }
   async deleteItinerary(id: string, userId: string): Promise<void> {}
   async getItineraryById(id: string): Promise<Itinerary | undefined> { return undefined; }
+  
+  // Flight Booking operations
+  async createFlightBooking(booking: InsertFlightBooking): Promise<FlightBooking> { throw new Error("Not implemented"); }
+  async getUserFlightBookings(userId: string): Promise<FlightBooking[]> { return []; }
+  async getUpcomingFlightBookings(userId: string): Promise<FlightBooking[]> { return []; }
+  async getPastFlightBookings(userId: string): Promise<FlightBooking[]> { return []; }
+  async getFlightBookingById(id: number): Promise<FlightBooking | undefined> { return undefined; }
+  async updateFlightBookingStatus(id: number, status: string): Promise<FlightBooking> { throw new Error("Not implemented"); }
 }
 
 // Use memory storage for immediate functionality

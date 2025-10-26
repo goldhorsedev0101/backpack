@@ -1229,6 +1229,37 @@ export const insertChatSessionSchema = createInsertSchema(chatSessions).omit({
 export type ChatSession = typeof chatSessions.$inferSelect;
 export type InsertChatSession = z.infer<typeof insertChatSessionSchema>;
 
+// Flight Bookings table
+export const flightBookings = pgTable("flight_bookings", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  offerId: varchar("offer_id").notNull(), // Duffel offer ID
+  flightData: jsonb("flight_data").notNull(), // Complete flight offer data {slices, owner, etc}
+  passengerData: jsonb("passenger_data").notNull(), // Passenger details array
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency").notNull(),
+  status: varchar("status").notNull().default("upcoming"), // upcoming, completed, cancelled
+  bookingReference: varchar("booking_reference"), // Confirmation number
+  origin: varchar("origin").notNull(), // IATA code
+  destination: varchar("destination").notNull(), // IATA code
+  departureDate: timestamp("departure_date").notNull(),
+  returnDate: timestamp("return_date"), // Optional for round trips
+  adults: integer("adults").notNull(),
+  children: integer("children").notNull().default(0),
+  cabinClass: varchar("cabin_class").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertFlightBookingSchema = createInsertSchema(flightBookings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type FlightBooking = typeof flightBookings.$inferSelect;
+export type InsertFlightBooking = z.infer<typeof insertFlightBookingSchema>;
+
 // i18n types
 export type DestinationI18n = typeof destinationsI18n.$inferSelect;
 export type InsertDestinationI18n = z.infer<typeof insertDestinationI18nSchema>;
