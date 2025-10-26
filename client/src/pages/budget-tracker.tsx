@@ -419,8 +419,8 @@ export default function BudgetTracker() {
                       {t('budget.quick_stats')}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between" dir="ltr">
+                  <CardContent className="space-y-4" dir="ltr">
+                    <div className="flex items-center justify-between">
                       <span className="text-gray-600 text-left">{t('budget.total_spent')}</span>
                       <span className="text-lg font-semibold text-primary text-right">
                         {i18n.language === 'he' 
@@ -430,7 +430,7 @@ export default function BudgetTracker() {
                     </div>
                     {selectedTrip && budget > 0 && (
                       <>
-                        <div className="flex items-center justify-between" dir="ltr">
+                        <div className="flex items-center justify-between">
                           <span className="text-gray-600 text-left">{t('budget.budget')}</span>
                           <span className="text-lg font-semibold text-slate-700 text-right">
                             {i18n.language === 'he' 
@@ -438,7 +438,7 @@ export default function BudgetTracker() {
                               : `$${budget.toFixed(2)}`}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between" dir="ltr">
+                        <div className="flex items-center justify-between">
                           <span className="text-gray-600 text-left">{t('budget.remaining')}</span>
                           <span className={`text-lg font-semibold text-right ${
                             budget - totalSpent >= 0 ? 'text-green-600' : 'text-red-600'
