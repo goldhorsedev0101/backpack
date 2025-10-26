@@ -1358,6 +1358,8 @@ export async function registerRoutes(app: Express): Promise<void> {
     try {
       const { origin, destination, departureDate, returnDate, passengers, cabinClass } = req.body;
       
+      console.log('Flight search request:', { origin, destination, departureDate, returnDate, passengers, cabinClass });
+      
       if (!origin || !destination || !departureDate || !passengers) {
         return res.status(400).json({ error: 'Missing required fields' });
       }
@@ -1366,6 +1368,7 @@ export async function registerRoutes(app: Express): Promise<void> {
       const baseUrl = process.env.DUFFEL_BASE_URL || 'https://api.duffel.com';
 
       if (!apiKey) {
+        console.error('Duffel API key not configured');
         return res.status(500).json({ error: 'Duffel API key not configured' });
       }
 
@@ -1393,7 +1396,8 @@ export async function registerRoutes(app: Express): Promise<void> {
       }
       if (passengers.children) {
         for (let i = 0; i < passengers.children; i++) {
-          passengersList.push({ type: 'child' });
+          // Children in Duffel API require age instead of type
+          passengersList.push({ age: 10 }); // Using default age 10 for children
         }
       }
 
@@ -1428,22 +1432,31 @@ export async function registerRoutes(app: Express): Promise<void> {
           apiRes.on('data', (chunk) => { data += chunk; });
           apiRes.on('end', () => {
             try {
+              console.log('Duffel API response status:', apiRes.statusCode);
+              console.log('Duffel API response data:', data.substring(0, 500));
               const parsed = JSON.parse(data);
               if (apiRes.statusCode === 200 || apiRes.statusCode === 201) {
                 resolve(parsed);
               } else {
-                reject(new Error(parsed.errors?.[0]?.message || 'Duffel API error'));
+                console.error('Duffel API error:', parsed.errors);
+                reject(new Error(parsed.errors?.[0]?.message || JSON.stringify(parsed.errors) || 'Duffel API error'));
               }
             } catch (e) {
+              console.error('Failed to parse Duffel response:', data);
               reject(new Error('Failed to parse Duffel response'));
             }
           });
         });
-        apiReq.on('error', reject);
+        apiReq.on('error', (error) => {
+          console.error('HTTP request error:', error);
+          reject(error);
+        });
         apiReq.write(postData);
         apiReq.end();
       });
 
+      console.log('Number of offers found:', apiResponse.data?.offers?.length || 0);
+      
       res.json({
         success: true,
         offers: apiResponse.data?.offers || [],
@@ -1452,6 +1465,7 @@ export async function registerRoutes(app: Express): Promise<void> {
 
     } catch (error: any) {
       console.error('Flights search error:', error);
+      console.error('Error stack:', error.stack);
       res.status(500).json({ error: error.message || 'Failed to search flights' });
     }
   });

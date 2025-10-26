@@ -53,14 +53,18 @@ export default function FlightsPage() {
   // Search flights mutation
   const searchFlightsMutation = useMutation({
     mutationFn: async (searchParams: any) => {
+      console.log('Searching flights with params:', searchParams);
       const response = await apiRequest('/api/flights/search', {
         method: 'POST',
         body: JSON.stringify(searchParams),
         headers: { 'Content-Type': 'application/json' }
       });
-      return response;
+      const data = await response.json();
+      console.log('Flight search response:', data);
+      return data;
     },
     onSuccess: (data: any) => {
+      console.log('Flight search success:', data);
       if (data.offers && data.offers.length > 0) {
         setOffers(data.offers);
         toast({
@@ -78,6 +82,7 @@ export default function FlightsPage() {
     },
     onError: (error: any) => {
       console.error('Flight search error:', error);
+      console.error('Error details:', error.stack || error.toString());
       toast({
         title: t('flights.search_error'),
         description: error.message || t('flights.try_again'),
