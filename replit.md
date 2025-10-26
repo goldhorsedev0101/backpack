@@ -7,6 +7,13 @@ GlobeMate is a full-stack web application for worldwide travel planning and comm
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
+- **Translation Improvements for My Trips Page** (Oct 26, 2025):
+  - Fixed "Saved Trips" tab translation - now correctly displays "Saved Trips" in English instead of "My Trips"
+  - Added translation keys: `trips.tags` ("Tags"/"תגיות") and `trips.highlights` ("Highlights"/"דגשים")
+  - Implemented `translateBestTime()` function to translate month names and common words in bestTimeToVisit field
+  - Translation mapping converts Hebrew months to English (דצמבר→December, מרץ→March, etc.) and vice versa
+  - Also translates common words like "עד"→"to" for proper bilingual display of dates
+  - Applied to all trip suggestion cards and saved trips display in my-trips-new.tsx
 - **Flight Management System with Real-Time Tracking** (Oct 26, 2025):
   - **Flight Search**: Integrated Duffel Flights API for real flight search and booking
     - Backend: POST /api/flights/search and GET /api/flights/offer/:offerId endpoints

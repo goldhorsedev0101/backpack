@@ -217,6 +217,47 @@ interface SavedTrip {
   createdAt: string;
 }
 
+// Translation function for bestTimeToVisit field
+const translateBestTime = (text: string, targetLang: string): string => {
+  if (!text) return text;
+  
+  const monthMappings: Record<string, Record<string, string>> = {
+    'he': {
+      'january': 'ינואר', 'february': 'פברואר', 'march': 'מרץ', 'april': 'אפריל',
+      'may': 'מאי', 'june': 'יוני', 'july': 'יולי', 'august': 'אוגוסט',
+      'september': 'ספטמבר', 'october': 'אוקטובר', 'november': 'נובמבר', 'december': 'דצמבר'
+    },
+    'en': {
+      'ינואר': 'January', 'פברואר': 'February', 'מרץ': 'March', 'אפריל': 'April',
+      'מאי': 'May', 'יוני': 'June', 'יולי': 'July', 'אוגוסט': 'August',
+      'ספטמבר': 'September', 'אוקטובר': 'October', 'נובמבר': 'November', 'דצמבר': 'December'
+    }
+  };
+  
+  const wordMappings: Record<string, Record<string, string>> = {
+    'he': { 'to': 'עד', 'until': 'עד', 'and': 'ו' },
+    'en': { 'עד': 'to', 'ו': 'and' }
+  };
+  
+  let result = text;
+  const mappings = monthMappings[targetLang] || {};
+  const words = wordMappings[targetLang] || {};
+  
+  // Replace months
+  Object.entries(mappings).forEach(([key, value]) => {
+    const regex = new RegExp(key, 'gi');
+    result = result.replace(regex, value);
+  });
+  
+  // Replace common words
+  Object.entries(words).forEach(([key, value]) => {
+    const regex = new RegExp(`\\b${key}\\b`, 'gi');
+    result = result.replace(regex, value);
+  });
+  
+  return result;
+};
+
 export default function MyTripsNew() {
   const { t, i18n } = useTranslation();
   const { formatCurrency, formatDate } = useLocalizedFormatting();
@@ -1386,7 +1427,7 @@ export default function MyTripsNew() {
                                 <Calendar className="w-4 h-4 text-orange-600" />
                                 <span className="font-semibold text-orange-800 text-sm">{t('trips.best_time_to_visit')}</span>
                               </div>
-                              <p className="text-orange-700 text-sm text-right">{suggestion.bestTimeToVisit}</p>
+                              <p className="text-orange-700 text-sm text-right">{translateBestTime(suggestion.bestTimeToVisit, i18n.language)}</p>
                             </div>
                           </div>
                         </div>
@@ -1923,7 +1964,7 @@ export default function MyTripsNew() {
                                         </span>
                                       </div>
                                       <p className={`text-orange-700 font-medium text-sm ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
-                                        {bestTimeToVisit}
+                                        {translateBestTime(bestTimeToVisit, i18n.language)}
                                       </p>
                                     </div>
                                   </div>
