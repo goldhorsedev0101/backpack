@@ -65,16 +65,11 @@ export default function FlightBookingPage() {
       return;
     }
 
-    // TODO: Implement actual booking logic with Duffel API
+    // Show info message about demo
     toast({
-      title: t('booking.success'),
-      description: t('booking.booking_confirmed'),
+      title: t('booking.demo_mode'),
+      description: t('booking.demo_message'),
     });
-    
-    // Navigate to confirmation page or home
-    setTimeout(() => {
-      navigate('/');
-    }, 2000);
   };
 
   const formatDateTime = (dateString: string) => {

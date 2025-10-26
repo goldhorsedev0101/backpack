@@ -291,7 +291,9 @@
     "error": "Error",
     "success": "Success",
     "fill_required_fields": "Please fill all required fields",
-    "booking_confirmed": "Booking confirmed successfully"
+    "booking_confirmed": "Booking confirmed successfully",
+    "demo_mode": "Demo Mode",
+    "demo_message": "This is a demo page. In the full version, there will be a complete secure payment integration to complete the booking."
   },
   "ai_assistant": {
     "title": "AI Assistant",
