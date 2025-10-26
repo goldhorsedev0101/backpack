@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plane } from "lucide-react";
+import { Plane, Search, Navigation, Calendar, History } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FlightSearchTab from "@/components/flights/FlightSearchTab";
 import FlightTrackTab from "@/components/flights/FlightTrackTab";
@@ -32,34 +32,38 @@ export default function FlightsPage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8 bg-white/90 p-2 rounded-lg shadow-lg">
+          <TabsList className="grid w-full grid-cols-4 mb-8 bg-gradient-to-r from-white via-blue-50 to-white p-3 rounded-2xl shadow-2xl border-2 border-blue-100 gap-2">
             <TabsTrigger 
               value="search" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white font-semibold"
+              className="data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=inactive]:hover:bg-blue-100 data-[state=inactive]:hover:scale-105 transition-all duration-300 font-bold text-base py-4 px-6 rounded-xl flex items-center justify-center gap-2"
               data-testid="tab-search"
             >
-              {t('flights.tab_search')}
+              <Search className="w-5 h-5" />
+              <span className="hidden sm:inline">{t('flights.tab_search')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="track" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white font-semibold"
+              className="data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=inactive]:hover:bg-blue-100 data-[state=inactive]:hover:scale-105 transition-all duration-300 font-bold text-base py-4 px-6 rounded-xl flex items-center justify-center gap-2"
               data-testid="tab-track"
             >
-              {t('flights.tab_track')}
+              <Navigation className="w-5 h-5" />
+              <span className="hidden sm:inline">{t('flights.tab_track')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="current" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white font-semibold"
+              className="data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=inactive]:hover:bg-blue-100 data-[state=inactive]:hover:scale-105 transition-all duration-300 font-bold text-base py-4 px-6 rounded-xl flex items-center justify-center gap-2"
               data-testid="tab-current"
             >
-              {t('flights.tab_current_bookings')}
+              <Calendar className="w-5 h-5" />
+              <span className="hidden sm:inline">{t('flights.tab_current_bookings')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="past" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white font-semibold"
+              className="data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=inactive]:hover:bg-blue-100 data-[state=inactive]:hover:scale-105 transition-all duration-300 font-bold text-base py-4 px-6 rounded-xl flex items-center justify-center gap-2"
               data-testid="tab-past"
             >
-              {t('flights.tab_past_bookings')}
+              <History className="w-5 h-5" />
+              <span className="hidden sm:inline">{t('flights.tab_past_bookings')}</span>
             </TabsTrigger>
           </TabsList>
 
