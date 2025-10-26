@@ -283,6 +283,8 @@
     "flight_summary": "Flight Summary",
     "base_fare": "Base Fare",
     "taxes_fees": "Taxes & Fees",
+    "service_fee": "Service Fee (5%)",
+    "service_fee_note": "GlobeMate service fee includes 24/7 support and excellent customer service",
     "total": "Total",
     "proceed_payment": "Proceed to Payment",
     "secure_payment": "Secure and protected payment",

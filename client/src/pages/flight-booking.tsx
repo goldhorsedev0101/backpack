@@ -304,11 +304,22 @@ export default function FlightBookingPage() {
                     <span className="text-gray-600">{t('booking.taxes_fees')}</span>
                     <span className="font-medium">{offer.total_currency === 'ILS' ? '₪' : '$'}{offer.tax_amount}</span>
                   </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">{t('booking.service_fee')}</span>
+                    <span className="font-medium text-orange-600">
+                      {offer.total_currency === 'ILS' ? '₪' : '$'}
+                      {(parseFloat(offer.total_amount) * 0.05).toFixed(2)}
+                    </span>
+                  </div>
                   <Separator />
                   <div className="flex justify-between text-lg font-bold">
                     <span>{t('booking.total')}</span>
-                    <span className="text-blue-600">{offer.total_currency === 'ILS' ? '₪' : '$'}{offer.total_amount}</span>
+                    <span className="text-blue-600">
+                      {offer.total_currency === 'ILS' ? '₪' : '$'}
+                      {(parseFloat(offer.total_amount) * 1.05).toFixed(2)}
+                    </span>
                   </div>
+                  <p className="text-xs text-gray-500 italic">{t('booking.service_fee_note')}</p>
                 </div>
 
                 <Button 

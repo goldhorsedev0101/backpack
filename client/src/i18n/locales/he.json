@@ -427,6 +427,8 @@
     "flight_summary": "סיכום טיסה",
     "base_fare": "מחיר בסיסי",
     "taxes_fees": "מסים ועמלות",
+    "service_fee": "עמלת שירות (5%)",
+    "service_fee_note": "עמלת שירות GlobeMate כוללת תמיכה 24/7 ושירות לקוחות מעולה",
     "total": "סה\"כ",
     "proceed_payment": "המשך לתשלום",
     "secure_payment": "תשלום מאובטח ומוגן",
