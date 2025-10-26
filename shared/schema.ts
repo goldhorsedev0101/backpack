@@ -1286,3 +1286,37 @@ export type Itinerary = typeof itineraries.$inferSelect;
 export type InsertItinerary = z.infer<typeof insertItinerarySchema>;
 export type ItineraryItem = typeof itineraryItems.$inferSelect;
 export type InsertItineraryItem = z.infer<typeof insertItineraryItemSchema>;
+
+// Emergency Information table
+export const emergencyInfo = pgTable("emergency_info", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id).notNull().unique(),
+  // Emergency Contacts (JSONB array of contacts)
+  emergencyContacts: jsonb("emergency_contacts"), // [{name, phone, relationship}]
+  // Medical Information
+  bloodType: varchar("blood_type"), // A+, B-, O+, AB-, etc.
+  allergies: text("allergies").array(), // ["Penicillin", "Peanuts", "Shellfish"]
+  medications: text("medications").array(), // ["Insulin", "Aspirin"]
+  medicalConditions: text("medical_conditions").array(), // ["Diabetes", "Asthma"]
+  medicalNotes: text("medical_notes"), // Additional medical information
+  // Travel Insurance
+  insuranceProvider: varchar("insurance_provider"),
+  insurancePolicyNumber: varchar("insurance_policy_number"),
+  insurancePhone: varchar("insurance_phone"),
+  insuranceExpiry: timestamp("insurance_expiry"),
+  // Passport Information
+  passportNumber: varchar("passport_number"),
+  passportExpiry: timestamp("passport_expiry"),
+  passportCountry: varchar("passport_country"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertEmergencyInfoSchema = createInsertSchema(emergencyInfo).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type EmergencyInfo = typeof emergencyInfo.$inferSelect;
+export type InsertEmergencyInfo = z.infer<typeof insertEmergencyInfoSchema>;

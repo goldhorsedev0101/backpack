@@ -1,85 +1,10 @@
 # GlobeMate - Global Travel Platform
 
 ## Overview
-GlobeMate is a full-stack web application for worldwide travel planning and community building. It uses AI to provide personalized trip recommendations, itinerary generation, and expense tracking. The platform integrates advanced AI capabilities with social features to simplify travel logistics and foster a global travel community. It supports over 70 countries with multilingual support (Hebrew/English) and offers detailed destination data, including climate information. The platform aims to be a comprehensive global travel planner.
+GlobeMate is a full-stack web application designed for comprehensive global travel planning and community building. It leverages AI to offer personalized trip recommendations, itinerary generation, and expense tracking. The platform integrates advanced AI capabilities with social features to streamline travel logistics and cultivate a global travel community. It supports over 70 countries with full multilingual support (Hebrew/English) and provides detailed destination data, including climate information, aiming to be a holistic global travel planner.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
-
-## Recent Changes
-- **Comprehensive Translation System for Trip Content** (Oct 26, 2025):
-  - Fixed "Saved Trips" tab translation - now correctly displays "Saved Trips" in English instead of "My Trips"
-  - Added translation keys: `trips.tags` ("Tags"/"תגיות") and `trips.highlights` ("Highlights"/"דגשים")
-  - Implemented `translateBestTime()` function to translate month names and common words in bestTimeToVisit field
-    - Translation mapping converts Hebrew months to English (דצמבר→December, מרץ→March, etc.) and vice versa
-    - Also translates common words like "עד"→"to" for proper bilingual display of dates
-  - Implemented `translateText()` function with comprehensive translation dictionary for trip content
-    - Translates travel styles (תרבות→Culture, הרפתקאות→Adventure, etc.)
-    - Translates common nouns (מוזיאון→Museum, פארק→Park, קניון→Mall, etc.)
-    - Translates descriptive words (יפה→beautiful, עתיק→ancient, מפורסם→famous, etc.)
-    - Handles both standalone words and words with Hebrew article prefix (ה-)
-    - Sorts translations by length (longest first) to handle phrases correctly
-  - Applied translations to all trip content:
-    - Trip titles and descriptions in saved trips
-    - Highlights and tags in both suggestions and saved trips
-    - Suggestion descriptions in AI-generated suggestions tab
-  - Enables bilingual display of existing trip data - trips created in Hebrew now show translated content in English and vice versa
-- **Flight Management System with Real-Time Tracking** (Oct 26, 2025):
-  - **Flight Search**: Integrated Duffel Flights API for real flight search and booking
-    - Backend: POST /api/flights/search and GET /api/flights/offer/:offerId endpoints
-    - Frontend: FlightSearchTab component with comprehensive search form
-    - Features: Round-trip/one-way flights, multiple passengers (adults/children), cabin class selection
-    - UI: Premium flight cards with gradient backgrounds, visual flight path, animated plane icon, standardized form heights (h-11 inputs/selects, h-6 labels)
-  - **Real-Time Flight Tracking**: Integrated OpenSky Network API (4000 free daily API calls)
-    - Backend: GET /api/flights/track/:callsign endpoint for real-time flight data
-    - Frontend: FlightTrackTab component with flight position, altitude, speed, heading, vertical rate display
-    - Features: Live flight tracking with comprehensive metrics (latitude/longitude, altitude in meters/feet, speed in km/h and mph, heading degrees, vertical rate)
-  - **Booking Management System**:
-    - Database: Created `flight_bookings` table with userId, offerId, flightData (JSONB), passengerData (JSONB), totalAmount, currency, status, departureDate, returnDate
-    - Backend: POST/GET /api/flights/bookings, GET /bookings/upcoming, GET /bookings/past endpoints
-    - Storage: createFlightBooking, getUserFlightBookings, getUpcomingBookings, getPastBookings methods in IStorage interface
-    - Frontend: CurrentBookingsTab and PastBookingsTab components displaying user's flight history
-  - **Tabbed Flight Interface**: 4-tab navigation system on /flights page:
-    1. Flight Search - Search and book flights (FlightSearchTab)
-    2. Track Flight - Real-time flight tracking by callsign (FlightTrackTab)
-    3. Current Bookings - Upcoming confirmed flights (CurrentBookingsTab)
-    4. Past Bookings - Completed flight history (PastBookingsTab)
-  - **Multilingual Support**: Added 47 new translation keys for flight tracking, booking management, and tab navigation in both Hebrew and English
-  - **UI Standards**: Consistent blue-cyan gradient theme across all tabs, gradient buttons, premium card designs, hover effects, RTL support
-- **Trip Type Placeholder & Scroll Fix** (Oct 26, 2025): 
-  - Added placeholder "בחר אופי טיול" to trip type selector by initializing tripType state to empty string
-  - Fixed Radix Select scroll-lock issue that prevented page scrolling when dropdown was open
-  - Solution: Patched EventTarget.prototype.addEventListener to block non-passive wheel/touchmove listeners from Radix's react-remove-scroll library
-  - Includes CSS overrides and MutationObserver as additional safeguards
-  - Verified with automated Playwright tests - page now scrollable with dropdown open
-- **Saved Journeys Feature** (Oct 22, 2025): Complete implementation allowing users to save and manage their favorite pre-made journeys:
-  - Database: Created `saved_journeys` table with user-journey relationships
-  - Backend: Four REST endpoints (POST, GET, DELETE, check) with Zod validation and numeric parameter checks
-  - Frontend: My Journeys page (`/my-journeys`) displaying saved journeys with remove functionality
-  - UI: Save/remove button on journey detail page with real-time state updates
-  - Navigation: Added "My Journeys" menu item with Hebrew/English translations
-  - Field naming: All journey data uses camelCase (heroImage, totalNights, priceMin, priceMax, audienceTags, dailyItinerary, costsBreakdown)
-  - Error handling: formatPrice functions handle undefined values and return "N/A" for missing price data
-  - Cache management: Mutations use React Query cache with proper invalidation
-- **Clickable Feature Cards** (Oct 22, 2025): All feature cards on home page are now clickable and navigate to relevant pages:
-  - AI Planning → /ai-assistant
-  - Budget Tracking → /budget-tracker
-  - Community → /community
-  - Unbeatable Prices → /hotel-deals
-  - Curated Journeys → /journeys
-  - Real-Time Updates → /destinations
-- **Enhanced Service Description** (Oct 22, 2025): Updated "Unbeatable Prices" feature card to emphasize customer service quality. Added "with excellent customer service and 24/7 support" to the description in both Hebrew and English.
-- **Real-Time Platform Statistics** (Oct 22, 2025): Statistics cards on home page now display real data from the database instead of hardcoded values.
-  - Backend: Added `/api/stats` endpoint that calculates live statistics (countries, destinations, users, average rating)
-  - Frontend: Updated StatsCard components to fetch and display dynamic data
-  - Stats: Average rating from reviews, destination count, user count, unique countries
-- **Trip Deletion Feature** (Oct 22, 2025): Added delete functionality for user trips with confirmation dialog. Users can now delete their trips from the "My Trips" section on the home page.
-  - Backend: Added DELETE `/api/trips/:id` endpoint with user authorization
-  - Storage: Implemented `deleteTrip` method in both DatabaseStorage and MemStorage
-  - Frontend: Added delete button to TripCard component with AlertDialog confirmation
-  - UX: Toast notifications for success/error feedback
-- **Home Page Trip Limit**: Limited "My Trips" section to display maximum 2 trips (changed from 4)
-- Added price breakdown explanations across all pages (journeys, journey-detail, home) in both Hebrew and English
 
 ## System Architecture
 ### Frontend Architecture
@@ -88,7 +13,7 @@ Preferred communication style: Simple, everyday language.
 - **Routing**: Wouter
 - **State Management**: TanStack Query
 - **Form Handling**: React Hook Form with Zod
-- **UI/UX Decisions**: Responsive design with consistent shadcn/ui components, Tailwind CSS for custom styling, tabbed navigation, and a clean visual style with a white background, colorful gradient cards (orange-50 → teal-50 → blue-50), and orange (orange-500) section titles. Desktop sidebar navigation uses ScrollArea component to display all 11 menu items with proper scrolling. Trip planning interface uses unified "Interests" section that combines travel styles and interests into a single selection experience with icons (24 options total) for simplified user experience.
+- **UI/UX Decisions**: Responsive design, consistent shadcn/ui components, Tailwind CSS for custom styling, tabbed navigation, clean visual style with white background, colorful gradient cards (orange-50 → teal-50 → blue-50), and orange (orange-500) section titles. Desktop sidebar navigation uses ScrollArea for all menu items. Trip planning features a unified "Interests" section combining travel styles and interests with icons for simplified user experience.
 
 ### Backend Architecture
 - **Runtime**: Node.js with TypeScript
@@ -104,24 +29,26 @@ Preferred communication style: Simple, everyday language.
 
 ### Database Design
 - **ORM**: Drizzle with PostgreSQL
-- **Key Tables**: Users, Sessions, Trips, Reviews, Expenses, Chat, User Connections, Journeys. Includes detailed tables for destinations, accommodations, attractions, restaurants, location_reviews, location_photos, location_ancestors.
+- **Key Tables**: Users, Sessions, Trips, Reviews, Expenses, Chat, User Connections, Journeys, Destinations, Accommodations, Attractions, Restaurants, Location Reviews, Location Photos, Location Ancestors.
 
 ### Core Features & Technical Implementations
 - **AI-Powered Trip Planning**: Utilizes OpenAI for personalized recommendations, itinerary generation, and an interactive assistant, considering traveler composition and trip type. Integrates Google Places API for real-world booking suggestions.
-- **AI Assistant Page**: Dedicated full-page AI assistant interface (`/ai-assistant`) that combines active chat with conversation history sidebar. Features include: auto-save of conversations 2 seconds after last message, sidebar with all past conversations, ability to view past chats or start new ones, seamless auto-redirect from home page when user sends first message (message is automatically submitted and answered without re-entry). Users can seamlessly switch between new conversations and viewing history. Uses `chat_sessions` table with JSONB message storage and sessionStorage for cross-page message passing. **Full language support**: AI responds entirely in Hebrew when interface is in Hebrew, including welcome message, questions, and trip suggestions. Language detection is automatic based on UI language setting. Accessible from main navigation and home page sidebar.
-- **Multi-Destination Journeys**: Pre-planned, curated multi-city itineraries with detailed breakdowns (accommodations, daily schedules, transport, cost estimates). Features a filterable list (`/journeys`) and detailed pages, with an option to convert journeys into personalized trips via AI.
+- **AI Assistant Page**: Dedicated full-page AI assistant interface with active chat and conversation history sidebar. Features include: auto-save, view past chats, start new ones, and seamless auto-redirect from the home page. Supports full language (Hebrew/English) based on UI settings.
+- **Multi-Destination Journeys**: Curated multi-city itineraries with detailed breakdowns, filterable lists, detailed pages, and conversion to personalized trips via AI.
 - **Community Features**: Reviews, user connections, real-time chat (WebSockets), content sharing, and gamified achievements.
-- **Budget Tracking**: Expense categorization, trip association, visual analytics, and multi-currency support with dynamic budget ranges.
-- **User Onboarding & Personalization**: Multi-step registration to collect preferences for tailored recommendations. Fully translated with Hebrew/English support, using i18n for all UI text including step titles, descriptions, form labels, placeholders, and button text. Uses translation keys as stable identifiers to preserve backend data integrity.
+- **Budget Tracking**: Expense categorization, trip association, visual analytics, and multi-currency support.
+- **User Onboarding & Personalization**: Multi-step registration for tailored recommendations, fully translated (Hebrew/English) with i18n for all UI elements.
 - **Multi-API Travel Data Integration**: Combines Google Places API for real-time search with a seeded database and TripAdvisor-ready infrastructure.
 - **Weather & Travel Timing System**: Real-time weather data (OpenWeather API) and historical climate analysis for "Best Time to Travel" recommendations.
 - **Real Places Booking Integration**: Enriches AI-generated suggestions with bookable locations from Google Places API.
-- **Destinations Hub**: Comprehensive discovery system with search, filters, sorting, and detailed pages including weather, attractions, and interactive Google Maps integration using real Google Places API data.
-- **Global Expansion & Multilingual Support**: Worldwide destination coverage with full Hebrew/English bilingual support across all features, including instant language toggling and RTL support for content and interactive elements.
+- **Destinations Hub**: Comprehensive discovery system with search, filters, sorting, detailed pages including weather, attractions, and interactive Google Maps integration.
+- **Global Expansion & Multilingual Support**: Worldwide destination coverage with full Hebrew/English bilingual support across all features, including instant language toggling and RTL support.
 - **Support Pages**: Help Center, Contact Us, Privacy Policy, Terms of Service, Accessibility Statement, and About Us pages with full translation and RTL support.
-- **Footer Component**: Comprehensive footer with 4 columns (About, Quick Links, Support, Contact Info), social media links, and legal links. Fully responsive with RTL support and proper sidebar spacing.
 - **Optimized Image Loading**: Custom `OptimizedImage` component with retry, lazy loading, skeleton states, and error handling for galleries.
-- **Hotel Deals Landing Page & Email Notification System**: A landing page (`/hotel-deals`) for capturing hotel quote requests, saving inquiries to a `hotel_inquiries` table in Supabase, and sending email notifications via Gmail SMTP (nodemailer) with a Hebrew RTL template.
+- **Hotel Deals Landing Page & Email Notification System**: Landing page for hotel quote requests, saving inquiries to Supabase, and sending email notifications via Nodemailer with Hebrew RTL template.
+- **Emergency Information Management**: System for storing and managing emergency contacts, medical information, and insurance details.
+- **Comprehensive Translation for Trip Content**: Functions to translate month names, travel styles, common nouns, and descriptive words in trip content for bilingual display.
+- **Flight Management System**: Integrated Duffel Flights API for flight search and booking, OpenSky Network API for real-time flight tracking, and a booking management system with current and past bookings.
 
 ## External Dependencies
 - **PostgreSQL**: Primary database (via Supabase).
@@ -129,6 +56,8 @@ Preferred communication style: Simple, everyday language.
 - **OpenAI API**: For AI trip planning and conversational features.
 - **Google Places API**: For real-world location data and booking suggestions.
 - **OpenWeather API**: For real-time weather data and forecasts.
+- **Duffel Flights API**: For flight search and booking.
+- **OpenSky Network API**: For real-time flight tracking.
 - **drizzle-orm**: ORM for database interaction.
 - **@tanstack/react-query**: Server state management.
 - **wouter**: Client-side routing.
@@ -136,8 +65,8 @@ Preferred communication style: Simple, everyday language.
 - **connect-pg-simple**: PostgreSQL session store.
 - **FastAPI**: Python web framework used in the Collector microservice.
 - **Uvicorn**: ASGI server.
-- **Requests**: HTTP library.
-- **Jinja2**: Template engine.
+- **Requests**: HTTP library (used in Collector).
+- **Jinja2**: Template engine (used in Collector).
 - **SQLAlchemy**: ORM used in Collector microservice.
 - **Google Maps JavaScript API**: For interactive maps.
-- **Nodemailer**: For sending email notifications (e.g., hotel inquiry confirmations).
+- **Nodemailer**: For sending email notifications.

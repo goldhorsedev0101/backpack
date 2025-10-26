@@ -5691,4 +5691,45 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Emergency Information routes
+  app.get('/api/emergency-info', noAuth, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || 'anonymous';
+      const info = await storage.getEmergencyInfo(userId);
+      res.json(info || null);
+    } catch (error) {
+      console.error('Error fetching emergency info:', error);
+      res.status(500).json({ message: 'Failed to fetch emergency info', error: String(error) });
+    }
+  });
+
+  app.post('/api/emergency-info', noAuth, async (req: any, res) => {
+    try {
+      const { insertEmergencyInfoSchema } = await import('@shared/schema');
+      const userId = req.user?.claims?.sub || 'anonymous';
+      
+      const validatedData = insertEmergencyInfoSchema.parse({
+        ...req.body,
+        userId
+      });
+      
+      const info = await storage.upsertEmergencyInfo(validatedData);
+      res.json(info);
+    } catch (error) {
+      console.error('Error saving emergency info:', error);
+      res.status(500).json({ message: 'Failed to save emergency info', error: String(error) });
+    }
+  });
+
+  app.delete('/api/emergency-info', noAuth, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || 'anonymous';
+      await storage.deleteEmergencyInfo(userId);
+      res.json({ message: 'Emergency info deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting emergency info:', error);
+      res.status(500).json({ message: 'Failed to delete emergency info', error: String(error) });
+    }
+  });
+
 }

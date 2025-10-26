@@ -43,6 +43,7 @@ import HotelDeals from "./pages/hotel-deals.js";
 import AiAssistant from "./pages/ai-assistant.js";
 import Flights from "./pages/flights.js";
 import FlightBooking from "./pages/flight-booking.js";
+import EmergencyInfo from "./pages/emergency-info.js";
 import Navigation from "./components/navigation.js";
 import Footer from "./components/footer.js";
 import { ErrorBoundary } from "./components/error-boundary.js";
@@ -176,6 +177,7 @@ function Router() {
           <Route path="/ai-assistant" component={AiAssistant} />
           <Route path="/flights" component={Flights} />
           <Route path="/flights/booking/:offerId" component={FlightBooking} />
+          <Route path="/emergency-info" component={EmergencyInfo} />
           <Route path="/auth/callback" component={Callback} />
           <Route component={NotFound} />
         </Switch>

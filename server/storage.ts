@@ -26,6 +26,7 @@ import {
   travelBuddyApplications,
   itineraries,
   itineraryItems,
+  emergencyInfo,
   type User,
   type UpsertUser,
   type Trip,
@@ -73,6 +74,8 @@ import {
   type Itinerary,
   type InsertItinerary,
   type ItineraryItem,
+  type EmergencyInfo,
+  type InsertEmergencyInfo,
   type InsertItineraryItem,
   type Journey,
   type InsertJourney,
@@ -249,6 +252,11 @@ export interface IStorage {
   getPastFlightBookings(userId: string): Promise<FlightBooking[]>;
   getFlightBookingById(id: number): Promise<FlightBooking | undefined>;
   updateFlightBookingStatus(id: number, status: string): Promise<FlightBooking>;
+  
+  // Emergency Information operations
+  getEmergencyInfo(userId: string): Promise<EmergencyInfo | undefined>;
+  upsertEmergencyInfo(info: InsertEmergencyInfo): Promise<EmergencyInfo>;
+  deleteEmergencyInfo(userId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1672,6 +1680,43 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return booking;
   }
+  
+  // Emergency Information operations
+  async getEmergencyInfo(userId: string): Promise<EmergencyInfo | undefined> {
+    const [info] = await db
+      .select()
+      .from(emergencyInfo)
+      .where(eq(emergencyInfo.userId, userId))
+      .limit(1);
+    return info;
+  }
+  
+  async upsertEmergencyInfo(info: InsertEmergencyInfo): Promise<EmergencyInfo> {
+    const existing = await this.getEmergencyInfo(info.userId);
+    
+    if (existing) {
+      // Update existing
+      const [updated] = await db
+        .update(emergencyInfo)
+        .set({ ...info, updatedAt: new Date() })
+        .where(eq(emergencyInfo.userId, info.userId))
+        .returning();
+      return updated;
+    } else {
+      // Insert new
+      const [newInfo] = await db
+        .insert(emergencyInfo)
+        .values(info)
+        .returning();
+      return newInfo;
+    }
+  }
+  
+  async deleteEmergencyInfo(userId: string): Promise<void> {
+    await db
+      .delete(emergencyInfo)
+      .where(eq(emergencyInfo.userId, userId));
+  }
 }
 
 // Simple in-memory storage for immediate functionality
@@ -1828,6 +1873,11 @@ class MemStorage implements IStorage {
   async getPastFlightBookings(userId: string): Promise<FlightBooking[]> { return []; }
   async getFlightBookingById(id: number): Promise<FlightBooking | undefined> { return undefined; }
   async updateFlightBookingStatus(id: number, status: string): Promise<FlightBooking> { throw new Error("Not implemented"); }
+  
+  // Emergency Information operations
+  async getEmergencyInfo(userId: string): Promise<EmergencyInfo | undefined> { return undefined; }
+  async upsertEmergencyInfo(info: InsertEmergencyInfo): Promise<EmergencyInfo> { throw new Error("Not implemented"); }
+  async deleteEmergencyInfo(userId: string): Promise<void> {}
 }
 
 // Use memory storage for immediate functionality

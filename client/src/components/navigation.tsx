@@ -37,6 +37,7 @@ import {
   Globe,
   Hotel,
   Plane,
+  Shield,
 } from "lucide-react";
 
 // Navigation items will be translated dynamically
@@ -46,6 +47,7 @@ const getNavigationItems = (t: any) => [
   { href: "/journeys", label: t('navigation.journeys'), icon: MapPin },
   { href: "/flights", label: t('navigation.flights'), icon: Plane },
   { href: "/hotel-deals", label: t('navigation.hotel_deals'), icon: Hotel },
+  { href: "/emergency-info", label: t('navigation.emergency_info'), icon: Shield },
   { href: "/ai-assistant", label: t('navigation.chat_history'), icon: MessageCircle },
   { href: "/destinations", label: t('destinations.hub_title'), icon: Globe },
   { href: "/weather", label: t('navigation.weather'), icon: Cloud },
