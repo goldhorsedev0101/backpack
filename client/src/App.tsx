@@ -47,6 +47,37 @@ import { ErrorBoundary } from "./components/error-boundary.js";
 
 // Simplified demo app - no authentication needed
 
+// Force enable page scrolling - override Radix Select scroll lock
+function EnableScrolling() {
+  React.useEffect(() => {
+    const forceScroll = () => {
+      document.body.style.overflow = 'auto';
+      document.body.style.paddingRight = '0';
+      document.documentElement.style.overflow = 'auto';
+    };
+
+    // Run immediately
+    forceScroll();
+
+    // Watch for changes and force scroll
+    const observer = new MutationObserver(forceScroll);
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['style', 'data-scroll-locked'],
+    });
+
+    // Also run periodically as backup
+    const interval = setInterval(forceScroll, 100);
+
+    return () => {
+      observer.disconnect();
+      clearInterval(interval);
+    };
+  }, []);
+
+  return null;
+}
+
 function ScrollToTop() {
   const [location] = useLocation();
   
@@ -68,6 +99,7 @@ function ScrollToTop() {
 function Router() {
   return (
     <div className="min-h-screen flex flex-col">
+      <EnableScrolling />
       <ScrollToTop />
       <Navigation />
       {/* Main content area adjusted for right sidebar on desktop, bottom padding for mobile nav */}
