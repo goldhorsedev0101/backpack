@@ -21,7 +21,8 @@ import {
   Edit,
   Share,
   Clock,
-  Trash2
+  Trash2,
+  Plane
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -222,16 +223,6 @@ export default function TripCard({ trip, showUser = false, onEdit, onView, onDel
 
         {/* Actions */}
         <div className={`flex gap-2 pt-4 border-t border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="hover:bg-gray-50"
-            onClick={() => {}}
-            data-testid={`share-trip-${trip.id}`}
-          >
-            <Share className="w-4 h-4" />
-          </Button>
-          
           {!showUser && (
             <Button 
               variant="outline" 
@@ -244,18 +235,17 @@ export default function TripCard({ trip, showUser = false, onEdit, onView, onDel
             </Button>
           )}
           
-          {!showUser && (
+          <Link href="/flights">
             <Button 
               variant="outline" 
               size="sm" 
-              className="flex-1 hover:bg-gray-50"
-              onClick={() => onEdit?.(trip.id)}
-              data-testid={`edit-trip-${trip.id}`}
+              className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 border-0"
+              data-testid={`book-flight-${trip.id}`}
             >
-              <Edit className={`w-4 h-4 ${isRTL ? 'ml-1' : 'mr-1'}`} />
-              {isRTL ? 'עריכה' : 'Edit'}
+              <Plane className={`w-4 h-4 ${isRTL ? 'ml-1' : 'mr-1'}`} />
+              {isRTL ? 'סגור טיסה' : 'Book Flight'}
             </Button>
-          )}
+          </Link>
           
           <Button 
             variant="outline" 
@@ -265,7 +255,7 @@ export default function TripCard({ trip, showUser = false, onEdit, onView, onDel
             data-testid={`view-trip-${trip.id}`}
           >
             <Eye className={`w-4 h-4 ${isRTL ? 'ml-1' : 'mr-1'}`} />
-            {isRTL ? 'צפייה' : 'View'}
+            {isRTL ? 'צפייה מלאה' : 'View Details'}
           </Button>
         </div>
       </CardContent>
