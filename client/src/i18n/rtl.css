@@ -371,3 +371,12 @@ textarea.ltr-field:-ms-input-placeholder,
 [dir="rtl"] a {
   text-align: right;
 }
+
+/* Budget tracker quick stats - force LTR layout */
+[dir="ltr"] .text-left {
+  text-align: left !important;
+}
+
+[dir="ltr"] .text-right {
+  text-align: right !important;
+}
