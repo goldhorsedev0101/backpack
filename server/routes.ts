@@ -1527,9 +1527,12 @@ export async function registerRoutes(app: Express): Promise<void> {
   // Flight Bookings endpoints
   
   // Create a new flight booking
-  app.post('/api/flights/bookings', isAuth, async (req: any, res) => {
+  app.post('/api/flights/bookings', async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.claims?.sub || req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
       const bookingData = req.body;
       
       // Add userId to booking data
@@ -1549,9 +1552,12 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
   
   // Get all user bookings
-  app.get('/api/flights/bookings', isAuth, async (req: any, res) => {
+  app.get('/api/flights/bookings', async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.claims?.sub || req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
       const bookings = await storage.getUserFlightBookings(userId);
       
       res.json({
@@ -1565,9 +1571,12 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
   
   // Get upcoming bookings
-  app.get('/api/flights/bookings/upcoming', isAuth, async (req: any, res) => {
+  app.get('/api/flights/bookings/upcoming', async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.claims?.sub || req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
       const bookings = await storage.getUpcomingFlightBookings(userId);
       
       res.json({
@@ -1581,9 +1590,12 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
   
   // Get past bookings
-  app.get('/api/flights/bookings/past', isAuth, async (req: any, res) => {
+  app.get('/api/flights/bookings/past', async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.claims?.sub || req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
       const bookings = await storage.getPastFlightBookings(userId);
       
       res.json({
