@@ -222,7 +222,7 @@ export default function TripCard({ trip, showUser = false, onEdit, onView, onDel
         )}
 
         {/* Actions */}
-        <div className={`flex gap-2 pt-4 border-t border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className={`flex flex-wrap gap-2 pt-4 border-t border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
           {!showUser && (
             <Button 
               variant="outline" 
@@ -235,11 +235,11 @@ export default function TripCard({ trip, showUser = false, onEdit, onView, onDel
             </Button>
           )}
           
-          <Link href="/flights">
+          <Link href="/flights" className="flex-1 min-w-[140px]">
             <Button 
               variant="outline" 
               size="sm" 
-              className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 border-0"
+              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 border-0"
               data-testid={`book-flight-${trip.id}`}
             >
               <Plane className={`w-4 h-4 ${isRTL ? 'ml-1' : 'mr-1'}`} />
@@ -250,7 +250,7 @@ export default function TripCard({ trip, showUser = false, onEdit, onView, onDel
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex-1 hover:bg-gray-50"
+            className="flex-1 min-w-[140px] hover:bg-gray-50"
             onClick={() => onView?.(trip.id)}
             data-testid={`view-trip-${trip.id}`}
           >
