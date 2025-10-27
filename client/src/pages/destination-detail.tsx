@@ -371,11 +371,11 @@ export default function DestinationDetail() {
           <div className="lg:col-span-2 space-y-6">
             {/* Overview */}
             <Card>
-              <CardHeader>
-                <CardTitle className={isRTL ? "text-right" : "text-left"}>{t("destinations.detail.overview")}</CardTitle>
+              <CardHeader className={isRTL ? "text-right" : "text-left"}>
+                <CardTitle>{t("destinations.detail.overview")}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className={`text-gray-700 ${isRTL ? "text-right" : "text-left"}`}>{destination.description}</p>
+              <CardContent className={isRTL ? "text-right" : "text-left"}>
+                <p className="text-gray-700 leading-relaxed">{destination.description}</p>
               </CardContent>
             </Card>
 
