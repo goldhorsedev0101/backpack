@@ -191,11 +191,22 @@ export default function DestinationDetail() {
     return `/api/media/proxy?${params}`;
   };
 
-  // Get attraction image URL - using Pexels
-  const getAttractionImageUrl = (attractionName: string, destinationName: string) => {
+  // Get attraction image URL - using Google Places Photo if available
+  const getAttractionImageUrl = (attraction: any) => {
+    // Try Google Places photo first (real photo of the place!)
+    if (attraction.photos && attraction.photos.length > 0) {
+      const params = new URLSearchParams({
+        source: 'googleplaces',
+        ref: attraction.photos[0].photo_reference,
+        maxwidth: '600',
+      });
+      return `/api/media/proxy?${params}`;
+    }
+    
+    // Fallback to Pexels if no photo available
     const params = new URLSearchParams({
       source: 'pexels',
-      query: `${attractionName} ${destinationName}`,
+      query: `${attraction.name} ${destination.name}`,
       maxwidth: '600',
     });
     return `/api/media/proxy?${params}`;
@@ -333,7 +344,7 @@ export default function DestinationDetail() {
                     {attractions.slice(0, 5).map((attraction) => (
                       <div key={attraction.place_id} className="flex items-start gap-4 p-4 hover:bg-gray-50 rounded-lg transition" data-testid={`attraction-${attraction.place_id}`}>
                         <img 
-                          src={getAttractionImageUrl(attraction.name, destination.name)}
+                          src={getAttractionImageUrl(attraction)}
                           alt={attraction.name}
                           className="h-20 w-20 rounded-lg object-cover bg-gray-100"
                           loading="lazy"
@@ -341,19 +352,19 @@ export default function DestinationDetail() {
                             const img = e.target as HTMLImageElement;
                             if (!img.dataset.retried) {
                               img.dataset.retried = 'true';
-                              // Try simpler query - just the destination name
+                              // Fallback to Pexels
                               const params = new URLSearchParams({
                                 source: 'pexels',
-                                query: destination.name,
+                                query: `${attraction.name}`,
                                 maxwidth: '600',
                               });
                               img.src = `/api/media/proxy?${params}`;
                             } else if (!img.dataset.fallback) {
                               img.dataset.fallback = 'true';
-                              // Final fallback - generic travel image
+                              // Final fallback - generic destination image
                               const params = new URLSearchParams({
                                 source: 'pexels',
-                                query: 'travel',
+                                query: destination.name,
                                 maxwidth: '600',
                               });
                               img.src = `/api/media/proxy?${params}`;
