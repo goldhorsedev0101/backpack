@@ -260,6 +260,7 @@
     "found_flights": "Found {{count}} flights",
     "airline": "Airline",
     "layover": "Layover",
+    "layover_in": "Layover in",
     "enter_origin": "Enter origin city (e.g., TLV)",
     "enter_destination": "Enter destination city (e.g., ATH)",
     "select_origin": "Select origin city",

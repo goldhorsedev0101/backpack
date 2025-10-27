@@ -404,6 +404,7 @@
     "found_flights": "נמצאו {{count}} טיסות",
     "airline": "חברת תעופה",
     "layover": "המתנה",
+    "layover_in": "עצירה ב-",
     "enter_origin": "הזן עיר מוצא (למשל: TLV)",
     "enter_destination": "הזן עיר יעד (למשל: ATH)",
     "select_origin": "בחר עיר מוצא",

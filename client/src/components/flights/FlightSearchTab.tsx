@@ -469,7 +469,7 @@ export default function FlightSearchTab() {
                                       <div key={layoverIdx} className="flex items-center justify-center gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-1.5">
                                         <MapPin className="w-3.5 h-3.5 text-amber-600" />
                                         <span className="text-xs font-semibold text-amber-900">
-                                          {isRTL ? 'עצירה ב-' : 'Layover in '}{layover.airport}
+                                          {t('flights.layover_in')} {layover.airport}
                                         </span>
                                         <span className="text-xs text-amber-700">({layover.duration})</span>
                                       </div>

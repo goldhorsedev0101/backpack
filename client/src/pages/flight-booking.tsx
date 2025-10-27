@@ -18,7 +18,8 @@ import {
   CreditCard,
   ArrowLeft,
   CheckCircle2,
-  Calendar
+  Calendar,
+  MapPin
 } from 'lucide-react';
 
 export default function FlightBookingPage() {
@@ -89,6 +90,25 @@ export default function FlightBookingPage() {
     const hours = match[1] ? parseInt(match[1]) : 0;
     const minutes = match[2] ? parseInt(match[2]) : 0;
     return `${hours}${t('flights.hours_short')} ${minutes}${t('flights.minutes_short')}`;
+  };
+
+  const getLayovers = (segments: any[]) => {
+    if (segments.length <= 1) return [];
+    
+    const layovers = [];
+    for (let i = 0; i < segments.length - 1; i++) {
+      const arrival = new Date(segments[i].arriving_at);
+      const departure = new Date(segments[i + 1].departing_at);
+      const layoverMs = departure.getTime() - arrival.getTime();
+      const layoverHours = Math.floor(layoverMs / (1000 * 60 * 60));
+      const layoverMinutes = Math.floor((layoverMs % (1000 * 60 * 60)) / (1000 * 60));
+      
+      layovers.push({
+        airport: segments[i].destination.iata_code,
+        duration: `${layoverHours}h ${layoverMinutes}m`
+      });
+    }
+    return layovers;
   };
 
   if (isLoading) {
@@ -279,6 +299,20 @@ export default function FlightBookingPage() {
                           </div>
                         </div>
                       </div>
+                      
+                      {getLayovers(slice.segments).length > 0 && (
+                        <div className="mt-3 space-y-1.5">
+                          {getLayovers(slice.segments).map((layover, layoverIdx) => (
+                            <div key={layoverIdx} className="flex items-center justify-center gap-2 bg-amber-50 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-700 rounded px-2 py-1">
+                              <MapPin className="w-3 h-3 text-amber-600" />
+                              <span className="text-xs font-semibold text-amber-900 dark:text-amber-300">
+                                {t('flights.layover_in')} {layover.airport}
+                              </span>
+                              <span className="text-xs text-amber-700 dark:text-amber-400">({layover.duration})</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     <div className="text-xs text-gray-600">
