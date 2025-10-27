@@ -118,7 +118,11 @@ export default function DestinationsHub() {
       const params = new URLSearchParams({
         entityType: 'destination',
         entityId: destination.id,
+        entityName: destination.name,
       });
+      if (destination.country) {
+        params.set('country', destination.country);
+      }
       return `/api/media/location-photo?${params}`;
     } else {
       // Use Google Places proxy for live destinations

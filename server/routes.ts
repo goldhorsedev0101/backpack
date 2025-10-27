@@ -5492,7 +5492,12 @@ export async function registerRoutes(app: Express): Promise<void> {
         forceRefresh: forceRefresh === 'true',
       });
 
-      res.json(result);
+      // Redirect to the actual photo URL instead of returning JSON
+      if (result.url) {
+        res.redirect(result.url);
+      } else {
+        res.status(404).json({ error: 'Photo not found' });
+      }
     } catch (error: any) {
       console.error('Location photo error:', error);
       res.status(500).json({ 
