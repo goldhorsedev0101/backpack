@@ -19,7 +19,9 @@ interface Attraction {
   user_ratings_total?: number;
   types: string[];
   photos?: Array<{ photo_reference: string }>;
-  description?: string; // Add description for database attractions
+  description?: string;
+  photoUrl?: string; // Database attraction photo URL
+  id?: string; // Database attraction ID
 }
 
 // Google Map Embed Component
@@ -133,13 +135,15 @@ export default function DestinationDetail() {
             // Map database attractions to Attraction interface
             const mappedAttractions = data.data.map((attr: any) => ({
               place_id: attr.id,
+              id: attr.id, // Keep ID for image lookup
               name: attr.name,
               formatted_address: attr.address || '',
               rating: attr.rating || 0,
               user_ratings_total: attr.userRatingsTotal || 0,
               types: attr.tags || ['tourist_attraction'],
               photos: [], // Database attractions don't have Google Photos
-              description: attr.description, // Add description field
+              description: attr.description,
+              photoUrl: attr.photoUrl, // Include photo URL from database
             }));
             return mappedAttractions;
           }
@@ -241,7 +245,12 @@ export default function DestinationDetail() {
 
   // Get attraction image URL - using intelligent fallback system
   const getAttractionImageUrl = (attraction: any) => {
-    // Check if this is a database attraction with ID
+    // First priority: Use cached photoUrl from database
+    if (attraction.photoUrl) {
+      return attraction.photoUrl;
+    }
+    
+    // Second: Check if this is a database attraction with ID
     if (attraction.id) {
       const params = new URLSearchParams({
         entityType: 'attraction',
@@ -250,7 +259,7 @@ export default function DestinationDetail() {
       return `/api/media/location-photo?${params}`;
     }
     
-    // Fallback to Google Places for live attractions
+    // Third: Fallback to Google Places for live attractions
     if (attraction.photos && attraction.photos.length > 0) {
       const params = new URLSearchParams({
         source: 'googleplaces',
