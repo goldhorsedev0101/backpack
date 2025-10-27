@@ -1304,6 +1304,10 @@ export const emergencyInfo = pgTable("emergency_info", {
   insuranceProvider: varchar("insurance_provider"),
   policyNumber: varchar("policy_number"),
   insuranceEmergencyPhone: varchar("insurance_emergency_phone"),
+  // Passport Information
+  passportNumber: varchar("passport_number"),
+  passportExpiry: timestamp("passport_expiry"),
+  passportCountry: varchar("passport_country"),
   // Additional Notes
   additionalNotes: text("additional_notes"),
   createdAt: timestamp("created_at").defaultNow(),

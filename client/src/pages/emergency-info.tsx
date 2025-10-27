@@ -59,6 +59,9 @@ export default function EmergencyInfo() {
     insuranceProvider: z.string().optional(),
     policyNumber: z.string().optional(),
     insuranceEmergencyPhone: z.string().optional(),
+    passportNumber: z.string().optional(),
+    passportExpiry: z.string().optional(),
+    passportCountry: z.string().optional(),
     additionalNotes: z.string().optional(),
   });
 
@@ -76,6 +79,9 @@ export default function EmergencyInfo() {
       insuranceProvider: emergencyInfo?.insuranceProvider || "",
       policyNumber: emergencyInfo?.policyNumber || "",
       insuranceEmergencyPhone: emergencyInfo?.insuranceEmergencyPhone || "",
+      passportNumber: emergencyInfo?.passportNumber || "",
+      passportExpiry: emergencyInfo?.passportExpiry || "",
+      passportCountry: emergencyInfo?.passportCountry || "",
       additionalNotes: emergencyInfo?.additionalNotes || "",
     },
   });
@@ -93,6 +99,9 @@ export default function EmergencyInfo() {
         insuranceProvider: emergencyInfo.insuranceProvider || "",
         policyNumber: emergencyInfo.policyNumber || "",
         insuranceEmergencyPhone: emergencyInfo.insuranceEmergencyPhone || "",
+        passportNumber: emergencyInfo.passportNumber || "",
+        passportExpiry: emergencyInfo.passportExpiry ? new Date(emergencyInfo.passportExpiry).toISOString().split('T')[0] : "",
+        passportCountry: emergencyInfo.passportCountry || "",
         additionalNotes: emergencyInfo.additionalNotes || "",
       });
       if (emergencyInfo.emergencyContacts) {
@@ -322,6 +331,39 @@ export default function EmergencyInfo() {
                     )}
                   </div>
                 </div>
+              )}
+
+              {/* Passport Information Section */}
+              {(emergencyInfo.passportNumber || emergencyInfo.passportExpiry || emergencyInfo.passportCountry) && (
+                <>
+                  <Separator />
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <User className="w-5 h-5 text-purple-500" />
+                      <h3 className="text-xl font-bold text-gray-800">{t("emergency.passport_information")}</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {emergencyInfo.passportNumber && (
+                        <div className="bg-gradient-to-br from-purple-50 to-indigo-50 p-4 rounded-lg border border-purple-200">
+                          <p className="text-sm text-gray-600 mb-1">{t("emergency.passport_number")}</p>
+                          <p className="text-lg font-bold text-purple-900 font-mono">{emergencyInfo.passportNumber}</p>
+                        </div>
+                      )}
+                      {emergencyInfo.passportExpiry && (
+                        <div className="bg-gradient-to-br from-purple-50 to-indigo-50 p-4 rounded-lg border border-purple-200">
+                          <p className="text-sm text-gray-600 mb-1">{t("emergency.passport_expiry")}</p>
+                          <p className="text-gray-800 font-semibold">{new Date(emergencyInfo.passportExpiry).toLocaleDateString()}</p>
+                        </div>
+                      )}
+                      {emergencyInfo.passportCountry && (
+                        <div className="bg-gradient-to-br from-purple-50 to-indigo-50 p-4 rounded-lg border border-purple-200">
+                          <p className="text-sm text-gray-600 mb-1">{t("emergency.passport_country")}</p>
+                          <p className="text-gray-800 font-semibold">{emergencyInfo.passportCountry}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
 
               {/* Additional Notes Section */}
@@ -584,6 +626,48 @@ export default function EmergencyInfo() {
             </CardContent>
           </Card>
 
+          {/* Passport Information */}
+          <Card className="shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50">
+              <div className="flex items-center gap-2">
+                <User className="w-5 h-5 text-purple-500" />
+                <CardTitle>{t("emergency.passport_information")}</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <Label htmlFor="passportNumber">{t("emergency.passport_number")}</Label>
+                  <Input
+                    id="passportNumber"
+                    {...form.register("passportNumber")}
+                    placeholder={t("emergency.enter_passport_number")}
+                    data-testid="input-passport-number"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="passportExpiry">{t("emergency.passport_expiry")}</Label>
+                  <Input
+                    id="passportExpiry"
+                    type="date"
+                    {...form.register("passportExpiry")}
+                    placeholder={t("emergency.enter_passport_expiry")}
+                    data-testid="input-passport-expiry"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="passportCountry">{t("emergency.passport_country")}</Label>
+                  <Input
+                    id="passportCountry"
+                    {...form.register("passportCountry")}
+                    placeholder={t("emergency.enter_passport_country")}
+                    data-testid="input-passport-country"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Additional Notes */}
           <Card className="shadow-lg">
             <CardHeader>
@@ -594,7 +678,7 @@ export default function EmergencyInfo() {
                 {...form.register("additionalNotes")}
                 placeholder={t("emergency.enter_notes")}
                 rows={4}
-                data-testid="textarea-additional-notes"
+                data-testid="input-additional-notes"
               />
             </CardContent>
           </Card>

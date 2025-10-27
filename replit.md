@@ -46,7 +46,7 @@ Preferred communication style: Simple, everyday language.
 - **Support Pages**: Help Center, Contact Us, Privacy Policy, Terms of Service, Accessibility Statement, and About Us pages with full translation and RTL support.
 - **Optimized Image Loading**: Custom `OptimizedImage` component with retry, lazy loading, skeleton states, and error handling for galleries.
 - **Hotel Deals Landing Page & Email Notification System**: Landing page for hotel quote requests, saving inquiries to Supabase, and sending email notifications via Nodemailer with Hebrew RTL template.
-- **Emergency Information Management**: Comprehensive system with dual view/edit modes for emergency contacts, medical info, and insurance. After save, displays organized summary card with color-coded sections (red for contacts, blue for medical, green for insurance) featuring gradient boxes and badges. Edit button returns to form mode.
+- **Emergency Information Management**: Comprehensive system with dual view/edit modes for emergency contacts, medical info, insurance, and passport details. After save, displays organized summary card with color-coded sections (red for contacts, blue for medical, green for insurance, purple for passport) featuring gradient boxes and badges. Edit button returns to form mode. Includes passport number, expiry date, and issuing country fields.
 - **Comprehensive Translation for Trip Content**: Functions to translate month names, travel styles, common nouns, and descriptive words in trip content for bilingual display.
 - **Flight Management System**: Integrated Duffel Flights API for flight search and booking, OpenSky Network API for real-time flight tracking, and a booking management system with current and past bookings.
 
