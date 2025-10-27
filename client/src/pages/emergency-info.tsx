@@ -288,7 +288,7 @@ export default function EmergencyInfo() {
                         {emergencyInfo.doctorName && (
                           <div className="bg-white/50 p-3 rounded-md">
                             <p className="text-xs text-gray-500 mb-1">{t("emergency.doctor_name")}</p>
-                            <p className="text-gray-800 font-semibold">{emergencyInfo.doctorName}</p>
+                            <p className="text-gray-800 font-semibold text-right">{emergencyInfo.doctorName}</p>
                           </div>
                         )}
                         {emergencyInfo.doctorPhone && (
