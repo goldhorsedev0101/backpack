@@ -50,7 +50,7 @@ import { supabaseAdmin } from './supabase.js';
 //   insertTravelBuddyApplicationSchema,
 //   insertLocationReviewSchema,
 // } from "@shared/schema";
-import { insertJourneySchema, insertSavedJourneySchema, hotelInquiries, destinations as destinationsTable, attractions, attractionsI18n } from "@shared/schema";
+import { insertJourneySchema, insertSavedJourneySchema, hotelInquiries, destinations as destinationsTable, attractions, attractionsI18n, locationPhotos } from "@shared/schema";
 import {
   generateTravelSuggestions,
   generateItinerary,
@@ -303,7 +303,7 @@ export async function registerRoutes(app: Express): Promise<void> {
       const { destinationId } = req.params;
       const { locale = 'en' } = req.query;
 
-      // Query attractions for this destination with translations
+      // Query attractions for this destination with translations and photos
       const attractionsQuery = await db
         .select({
           id: attractions.id,
@@ -319,6 +319,7 @@ export async function registerRoutes(app: Express): Promise<void> {
           userRatingsTotal: attractions.userRatingsTotal,
           translatedName: attractionsI18n.name,
           translatedDescription: attractionsI18n.description,
+          photoUrl: locationPhotos.cachedUrl,
         })
         .from(attractions)
         .leftJoin(
@@ -326,6 +327,14 @@ export async function registerRoutes(app: Express): Promise<void> {
           and(
             eq(attractionsI18n.attractionId, attractions.id),
             eq(attractionsI18n.locale, locale as string)
+          )
+        )
+        .leftJoin(
+          locationPhotos,
+          and(
+            eq(locationPhotos.entityId, attractions.id),
+            eq(locationPhotos.entityType, 'attraction'),
+            eq(locationPhotos.isPrimary, true)
           )
         )
         .where(eq(attractions.destinationId, destinationId))
@@ -345,6 +354,7 @@ export async function registerRoutes(app: Express): Promise<void> {
         rating: attr.rating,
         tags: attr.tags,
         userRatingsTotal: attr.userRatingsTotal,
+        photoUrl: attr.photoUrl,
       }));
 
       res.json({ success: true, data: formattedAttractions });
