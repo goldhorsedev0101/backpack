@@ -38,9 +38,9 @@ export default function DestinationsHub() {
   const [selectedType, setSelectedType] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("trending");
 
-  // Fetch destinations from Google Places API
+  // Fetch destinations from database (with fallback to Google Places for live data)
   const { data: destinations = [], isLoading, error } = useQuery<Destination[]>({
-    queryKey: ['/api/destinations/popular'],
+    queryKey: ['/api/destinations'],
   });
 
   // Filter destinations

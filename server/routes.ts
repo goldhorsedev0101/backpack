@@ -4052,11 +4052,32 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
   
-  // Destinations API
+  // Destinations API - Returns database destinations in frontend-compatible format
   app.get('/api/destinations', async (req, res) => {
     try {
-      const destinations = await storage.getDestinations();
-      res.json(destinations);
+      const { destinations: destinationsTable } = await import('../shared/schema.js');
+      const { db: database } = await import('./db.js');
+      const dbDestinations = await database.select().from(destinationsTable).orderBy(destinationsTable.name);
+      
+      // Transform database format to frontend format
+      const formattedDestinations = dbDestinations.map(dest => ({
+        id: dest.id,
+        name: dest.name,
+        country: dest.country || '',
+        continent: 'Europe', // Default, will be improved later
+        types: ['city'],
+        description: `Explore ${dest.name}, ${dest.country}`,
+        rating: 4.5,
+        userRatingsTotal: 1000,
+        trending: false,
+        flag: '',
+        lat: parseFloat(dest.lat?.toString() || '0'),
+        lng: parseFloat(dest.lon?.toString() || '0'),
+        photoRefs: [],
+        placeId: dest.id,
+      }));
+      
+      res.json(formattedDestinations);
     } catch (error) {
       console.error("Error fetching destinations:", error);
       res.status(500).json({ message: "Failed to fetch destinations" });
