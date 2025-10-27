@@ -9,7 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import DestinationGallery from "@/components/DestinationGallery";
 
 interface Attraction {
   place_id: string;
@@ -601,45 +600,6 @@ export default function DestinationDetail() {
               </CardContent>
             </Card>
 
-            {/* Photo Gallery */}
-            <Card>
-              <CardHeader>
-                <CardTitle className={isRTL ? "text-right" : "text-left"}>{t("destinations.detail.gallery.title")}</CardTitle>
-              </CardHeader>
-              <CardContent className={isRTL ? "text-right" : "text-left"}>
-                <DestinationGallery
-                  destinationName={destination.name}
-                  heroImages={[
-                    { 
-                      source: 'googleplaces' as const, 
-                      query: destination.name,
-                      alt: destination.name
-                    },
-                    { 
-                      source: 'googleplaces' as const, 
-                      query: `${destination.name} landmarks`,
-                      alt: `${destination.name} landmarks`
-                    },
-                    { 
-                      source: 'googleplaces' as const, 
-                      query: `${destination.name} attractions`,
-                      alt: `${destination.name} attractions`
-                    }
-                  ]}
-                  poiImages={
-                    attractions && attractions.length > 0
-                      ? attractions.slice(0, 6).map((attr) => ({
-                          source: 'googleplaces' as const,
-                          ref: attr.photos && attr.photos.length > 0 ? attr.photos[0].photo_reference : undefined,
-                          query: attr.photos && attr.photos.length > 0 ? undefined : attr.name,
-                          alt: attr.name
-                        }))
-                      : []
-                  }
-                  isLoading={attractionsLoading}
-                />
-              </CardContent>
-            </Card>
           </div>
 
           {/* Sidebar */}
