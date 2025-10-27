@@ -198,6 +198,7 @@ export default function DestinationDetail() {
       const params = new URLSearchParams({
         entityType: 'destination',
         entityId: destId,
+        entityName: destination.name || 'Destination',
       });
       return `/api/media/location-photo?${params}`;
     } else {
