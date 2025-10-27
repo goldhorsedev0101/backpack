@@ -31,7 +31,7 @@ import { googlePlaces } from "./googlePlaces.js";
 import { seedSouthAmericanData } from "./dataSeeder.js";
 import { weatherService } from "./weatherService.js";
 import { travelTimingService } from "./travelTimingService.js";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, asc } from "drizzle-orm";
 import { registerCollectorRoutes } from "./collectorRoutes.js";
 import type { Request, Response, Router } from 'express';
 import { supabaseAdmin } from './supabase.js';
@@ -50,7 +50,7 @@ import { supabaseAdmin } from './supabase.js';
 //   insertTravelBuddyApplicationSchema,
 //   insertLocationReviewSchema,
 // } from "@shared/schema";
-import { insertJourneySchema, insertSavedJourneySchema, hotelInquiries } from "@shared/schema";
+import { insertJourneySchema, insertSavedJourneySchema, hotelInquiries, destinations as destinationsTable } from "@shared/schema";
 import {
   generateTravelSuggestions,
   generateItinerary,
@@ -77,7 +77,7 @@ const userItineraries: Record<string, UserItineraryDay[]> = {};
 export async function registerRoutes(app: Express): Promise<void> {
   // Using Supabase Auth only - no server-side auth middleware needed
 
-  // Basic health endpoint
+  // Basic health endpoint  
   app.get('/api/health', (_req, res) => res.json({ ok: true, time: new Date().toISOString() }));
 
   // Database test endpoint
@@ -4055,18 +4055,17 @@ export async function registerRoutes(app: Express): Promise<void> {
   // Destinations API - Returns database destinations in frontend-compatible format
   app.get('/api/destinations', async (req, res) => {
     try {
-      const { destinations: destinationsTable } = await import('../shared/schema.js');
-      const { db: database } = await import('./db.js');
-      const dbDestinations = await database.select().from(destinationsTable).orderBy(destinationsTable.name);
+      // Query database
+      const dbDestinations = await db.select().from(destinationsTable);
       
       // Transform database format to frontend format
       const formattedDestinations = dbDestinations.map(dest => ({
         id: dest.id,
         name: dest.name,
         country: dest.country || '',
-        continent: 'Europe', // Default, will be improved later
+        continent: 'Europe',
         types: ['city'],
-        description: `Explore ${dest.name}, ${dest.country}`,
+        description: `Explore ${dest.name}${dest.country ? ', ' + dest.country : ''}`,
         rating: 4.5,
         userRatingsTotal: 1000,
         trending: false,
@@ -4079,8 +4078,9 @@ export async function registerRoutes(app: Express): Promise<void> {
       
       res.json(formattedDestinations);
     } catch (error) {
-      console.error("Error fetching destinations:", error);
-      res.status(500).json({ message: "Failed to fetch destinations" });
+      console.error("[Destinations API] Error:", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      res.status(500).json({ message: "Failed to fetch destinations", error: errorMessage });
     }
   });
 
