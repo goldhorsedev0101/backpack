@@ -1290,24 +1290,22 @@ export type InsertItineraryItem = z.infer<typeof insertItineraryItemSchema>;
 // Emergency Information table
 export const emergencyInfo = pgTable("emergency_info", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id).notNull().unique(),
+  userId: varchar("user_id").notNull().unique(),
   // Emergency Contacts (JSONB array of contacts)
-  emergencyContacts: jsonb("emergency_contacts"), // [{name, phone, relationship}]
+  emergencyContacts: jsonb("emergency_contacts"), // [{name, phone, relationship, email}]
   // Medical Information
   bloodType: varchar("blood_type"), // A+, B-, O+, AB-, etc.
-  allergies: text("allergies").array(), // ["Penicillin", "Peanuts", "Shellfish"]
-  medications: text("medications").array(), // ["Insulin", "Aspirin"]
-  medicalConditions: text("medical_conditions").array(), // ["Diabetes", "Asthma"]
-  medicalNotes: text("medical_notes"), // Additional medical information
-  // Travel Insurance
+  allergies: text("allergies"), // Free text for allergies
+  medications: text("medications"), // Free text for medications
+  medicalConditions: text("medical_conditions"), // Free text for medical conditions
+  doctorName: varchar("doctor_name"), // Doctor's name
+  doctorPhone: varchar("doctor_phone"), // Doctor's phone
+  // Insurance Information
   insuranceProvider: varchar("insurance_provider"),
-  insurancePolicyNumber: varchar("insurance_policy_number"),
-  insurancePhone: varchar("insurance_phone"),
-  insuranceExpiry: timestamp("insurance_expiry"),
-  // Passport Information
-  passportNumber: varchar("passport_number"),
-  passportExpiry: timestamp("passport_expiry"),
-  passportCountry: varchar("passport_country"),
+  policyNumber: varchar("policy_number"),
+  insuranceEmergencyPhone: varchar("insurance_emergency_phone"),
+  // Additional Notes
+  additionalNotes: text("additional_notes"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
