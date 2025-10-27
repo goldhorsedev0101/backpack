@@ -19,7 +19,7 @@ interface Destination {
   types: string[];
   description: string;
   rating: number;
-  userRatingsTotal: number;
+  userRatingsTotal?: number;
   trending: boolean;
   flag: string;
   lat: number;
@@ -40,8 +40,13 @@ export default function DestinationsHub() {
   const [sortBy, setSortBy] = useState<string>("trending");
 
   // Fetch destinations from database (with fallback to Google Places for live data)
-  const { data: destinations = [], isLoading, error } = useQuery<Destination[]>({
-    queryKey: ['/api/destinations'],
+  const { data: destinations = [], isLoading, error} = useQuery<Destination[]>({
+    queryKey: ['/api/destinations', i18n.language],
+    queryFn: async () => {
+      const response = await fetch(`/api/destinations?lang=${i18n.language}`);
+      if (!response.ok) throw new Error('Failed to fetch destinations');
+      return response.json();
+    },
   });
 
   // Filter destinations

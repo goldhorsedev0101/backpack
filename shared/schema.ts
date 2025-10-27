@@ -361,6 +361,12 @@ export const destinations = pgTable("destinations", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   country: text("country"),
+  continent: text("continent"),
+  description: text("description"),
+  flag: text("flag"),
+  rating: decimal("rating", { precision: 3, scale: 2 }),
+  userRatingsTotal: integer("user_ratings_total"),
+  trending: boolean("trending").default(false),
   lat: decimal("lat", { precision: 10, scale: 8 }),
   lon: decimal("lon", { precision: 11, scale: 8 }),
   source: text("source").notNull().default("nominatim"), // "nominatim", "osm", "tripadvisor"
@@ -506,13 +512,10 @@ export const locationAncestors = pgTable("location_ancestors", {
 
 // i18n translation tables for admin editing
 export const destinationsI18n = pgTable("destinations_i18n", {
-  id: serial("id").primaryKey(),
-  destinationId: integer("destination_id").references(() => destinations.id).notNull(),
-  locale: varchar("locale", { length: 5 }).notNull(), // 'en', 'he'
-  name: varchar("name"),
+  destinationId: uuid("destination_id").references(() => destinations.id, { onDelete: "cascade" }).notNull(),
+  locale: text("locale").notNull(), // 'en', 'he'
+  name: text("name"),
   description: text("description"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
   index("destinations_i18n_destination_locale_idx").on(table.destinationId, table.locale),
 ]);

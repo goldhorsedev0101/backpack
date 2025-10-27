@@ -4055,33 +4055,41 @@ export async function registerRoutes(app: Express): Promise<void> {
   // Destinations API - Returns database destinations in frontend-compatible format
   app.get('/api/destinations', async (req, res) => {
     try {
-      // Import location_photos table
-      const { locationPhotos } = await import('../shared/schema.js');
+      // Import tables
+      const { locationPhotos, destinationsI18n } = await import('../shared/schema.js');
       
-      // Query database with photo join
+      // Get language from query or headers (default to English)
+      const lang = (req.query.lang as string) || req.headers['accept-language']?.split(',')[0]?.split('-')[0] || 'en';
+      
+      // Query database with photo and translation joins
       const dbDestinations = await db
         .select({
           destination: destinationsTable,
           photo: locationPhotos,
+          translation: destinationsI18n,
         })
         .from(destinationsTable)
         .leftJoin(
           locationPhotos,
           sql`${locationPhotos.entityId} = ${destinationsTable.id} AND ${locationPhotos.entityType} = 'destination'`
+        )
+        .leftJoin(
+          destinationsI18n,
+          sql`${destinationsI18n.destinationId} = ${destinationsTable.id} AND ${destinationsI18n.locale} = ${lang}`
         );
       
       // Transform database format to frontend format
       const formattedDestinations = dbDestinations.map(row => ({
         id: row.destination.id,
-        name: row.destination.name,
+        name: row.translation?.name || row.destination.name,
         country: row.destination.country || '',
-        continent: 'Europe',
+        continent: row.destination.continent || 'Unknown',
         types: ['city'],
-        description: `Explore ${row.destination.name}${row.destination.country ? ', ' + row.destination.country : ''}`,
-        rating: 4.5,
-        userRatingsTotal: 1000,
-        trending: false,
-        flag: '',
+        description: row.translation?.description || row.destination.description || `Explore ${row.destination.name}`,
+        rating: parseFloat(row.destination.rating?.toString() || '4.5'),
+        userRatingsTotal: row.destination.userRatingsTotal || undefined, // Hide if null
+        trending: row.destination.trending || false,
+        flag: row.destination.flag || '🌍',
         lat: parseFloat(row.destination.lat?.toString() || '0'),
         lng: parseFloat(row.destination.lon?.toString() || '0'),
         photoRefs: [],

@@ -70,7 +70,12 @@ export default function DestinationDetail() {
 
   // Fetch all destinations from API
   const { data: allDestinations, isLoading: destinationsLoading } = useQuery<any[]>({
-    queryKey: ['/api/destinations'],
+    queryKey: ['/api/destinations', i18n.language],
+    queryFn: async () => {
+      const response = await fetch(`/api/destinations?lang=${i18n.language}`);
+      if (!response.ok) throw new Error('Failed to fetch destinations');
+      return response.json();
+    },
   });
 
   // Find the destination by slug
