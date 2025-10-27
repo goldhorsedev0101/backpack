@@ -1318,6 +1318,12 @@ export const insertEmergencyInfoSchema = createInsertSchema(emergencyInfo).omit(
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  passportExpiry: z.union([z.string(), z.date()]).optional().transform(val => {
+    if (!val) return undefined;
+    if (typeof val === 'string') return new Date(val);
+    return val;
+  }),
 });
 
 export type EmergencyInfo = typeof emergencyInfo.$inferSelect;
