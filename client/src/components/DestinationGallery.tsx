@@ -63,6 +63,11 @@ export default function DestinationGallery({
   const [imageAttributions, setImageAttributions] = useState<Record<string, any>>({});
 
   const getProxyUrl = (image: GalleryImage, maxwidth?: number): string => {
+    // If it's a direct URL, use it directly (no proxy)
+    if (image.url && image.source === 'url') {
+      return image.url;
+    }
+    
     const params = new URLSearchParams({
       source: image.source,
       ...(image.ref && { ref: image.ref }),
