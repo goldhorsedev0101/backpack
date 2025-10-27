@@ -157,6 +157,7 @@ export interface IStorage {
   // Destination operations
   createDestination(destination: InsertDestination): Promise<Destination>;
   getDestinations(): Promise<Destination[]>;
+  getAllDestinations(): Promise<Destination[]>;
   getDestinationByLocationId(locationId: string): Promise<Destination | undefined>;
   updateDestination(locationId: string, destination: Partial<InsertDestination>): Promise<Destination>;
   searchDestinations(query: string): Promise<Destination[]>;
@@ -171,6 +172,7 @@ export interface IStorage {
   // Attraction operations
   createAttraction(attraction: InsertAttraction): Promise<Attraction>;
   getAttractions(destinationId?: number): Promise<Attraction[]>;
+  getAllAttractions(): Promise<Attraction[]>;
   getAttractionByLocationId(locationId: string): Promise<Attraction | undefined>;
   updateAttraction(locationId: string, attraction: Partial<InsertAttraction>): Promise<Attraction>;
   searchAttractions(query: string, filters?: { destinationId?: number; category?: string }): Promise<Attraction[]>;
@@ -955,6 +957,10 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(destinations).orderBy(destinations.name);
   }
 
+  async getAllDestinations(): Promise<Destination[]> {
+    return await db.select().from(destinations).orderBy(destinations.name);
+  }
+
   async getDestinationByLocationId(locationId: string): Promise<Destination | undefined> {
     const [destination] = await db
       .select()
@@ -1059,6 +1065,10 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(attractions)
       .orderBy(desc(attractions.rating));
+  }
+
+  async getAllAttractions(): Promise<Attraction[]> {
+    return await db.select().from(attractions).orderBy(attractions.name);
   }
 
   async getAttractionByLocationId(locationId: string): Promise<Attraction | undefined> {

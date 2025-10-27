@@ -5494,6 +5494,100 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Admin: Populate images for all destinations and attractions
+  app.post('/api/admin/populate-images', requireAdmin, async (req, res) => {
+    try {
+      const results: any = {
+        destinations: { total: 0, success: 0, failed: 0, errors: [] },
+        attractions: { total: 0, success: 0, failed: 0, errors: [] }
+      };
+
+      // Get all destinations
+      const destinations = await storage.getAllDestinations();
+      results.destinations.total = destinations.length;
+
+      console.log(`🖼️ Populating images for ${destinations.length} destinations...`);
+
+      // Populate destination images
+      for (const dest of destinations) {
+        try {
+          // Check if already has cached photo
+          const existing = await storage.getPrimaryLocationPhoto('destination', dest.id);
+          
+          if (!existing) {
+            // Fetch and cache image
+            await mediaOrchestrator.getLocationPhoto({
+              entityType: 'destination',
+              entityId: dest.id,
+              entityName: dest.name,
+              country: dest.country,
+              forceRefresh: false
+            });
+            results.destinations.success++;
+            console.log(`✅ Image cached for destination: ${dest.name}, ${dest.country}`);
+          } else {
+            results.destinations.success++;
+            console.log(`⏭️ Destination already has image: ${dest.name}`);
+          }
+        } catch (error: any) {
+          results.destinations.failed++;
+          results.destinations.errors.push({
+            destination: dest.name,
+            error: error.message
+          });
+          console.error(`❌ Failed for ${dest.name}:`, error.message);
+        }
+      }
+
+      // Get all attractions
+      const attractions = await storage.getAllAttractions();
+      results.attractions.total = attractions.length;
+
+      console.log(`🖼️ Populating images for ${attractions.length} attractions...`);
+
+      // Populate attraction images
+      for (const attr of attractions) {
+        try {
+          // Check if already has cached photo
+          const existing = await storage.getPrimaryLocationPhoto('attraction', attr.id);
+          
+          if (!existing) {
+            // Fetch and cache image
+            await mediaOrchestrator.getLocationPhoto({
+              entityType: 'attraction',
+              entityId: attr.id,
+              entityName: attr.name,
+              country: attr.country,
+              forceRefresh: false
+            });
+            results.attractions.success++;
+            console.log(`✅ Image cached for attraction: ${attr.name}`);
+          } else {
+            results.attractions.success++;
+            console.log(`⏭️ Attraction already has image: ${attr.name}`);
+          }
+        } catch (error: any) {
+          results.attractions.failed++;
+          results.attractions.errors.push({
+            attraction: attr.name,
+            error: error.message
+          });
+          console.error(`❌ Failed for ${attr.name}:`, error.message);
+        }
+      }
+
+      console.log('🎉 Image population completed!');
+      res.json({
+        success: true,
+        message: 'Image population completed',
+        results
+      });
+    } catch (error: any) {
+      console.error('Populate images error:', error);
+      res.status(500).json({ error: 'Failed to populate images', details: error.message });
+    }
+  });
+
   // Geo API middleware - require x-globemate-key header
   const requireGlobeMateKey = (req: any, res: any, next: any) => {
     const apiKey = req.headers['x-globemate-key'];
