@@ -508,18 +508,18 @@ export default function DestinationDetail() {
                   heroImages={[
                     { 
                       source: 'url' as const, 
-                      url: `https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&auto=format&fit=crop&q=80`,
-                      alt: `${destination.name} view 1`
+                      url: `https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200`,
+                      alt: `${destination.name} cityscape`
                     },
                     { 
                       source: 'url' as const, 
-                      url: `https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&auto=format&fit=crop&q=80`,
-                      alt: `${destination.name} view 2`
+                      url: `https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200`,
+                      alt: `${destination.name} travel`
                     },
                     { 
                       source: 'url' as const, 
-                      url: `https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&auto=format&fit=crop&q=80`,
-                      alt: `${destination.name} view 3`
+                      url: `https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200`,
+                      alt: `${destination.name} landscape`
                     }
                   ]}
                   poiImages={
@@ -529,7 +529,7 @@ export default function DestinationDetail() {
                           url: `https://images.unsplash.com/photo-${
                             ['1469854523086-cc02fe5d8800', '1476514525535-07fb3b4ae5f1', '1488646953014-85cb44e25828',
                              '1530789253388-582c481c54b0', '1507525428034-b723cf961d3e', '1501785888041-af3ef285b470'][idx % 6]
-                          }?w=400&auto=format&fit=crop&q=80`,
+                          }?w=400`,
                           alt: attr.name
                         }))
                       : []

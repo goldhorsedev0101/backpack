@@ -69,12 +69,13 @@ export default function OptimizedImage({
       return;
     }
 
-    // Try generic placeholder from Unsplash
-    const genericFallback = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&auto=format&fit=crop';
+    // Try generic placeholder from Unsplash (simpler URL)
+    const genericFallback = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800';
     if (currentSrc !== genericFallback) {
       console.log(`Using generic fallback image`);
       setCurrentSrc(genericFallback);
       setRetryCount(0);
+      setIsLoading(true); // Reset loading state
       return;
     }
 
