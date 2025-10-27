@@ -342,13 +342,13 @@ export default function DestinationsHub() {
                     </div>
                     <CardHeader>
                       <CardTitle className="flex items-center justify-between">
-                        <span>{t(`destinations.cities.${destination.id}`, destination.name)}</span>
+                        <span>{destination.name}</span>
                         <span className="text-sm font-normal text-gray-500">⭐ {destination.rating.toFixed(1)}</span>
                       </CardTitle>
                       <CardDescription>{t(`trips.countries.${destination.country}`, destination.country)}</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-gray-600 mb-3">{t(`destinations.city_descriptions.${destination.id}`, destination.description)}</p>
+                      <p className="text-sm text-gray-600 mb-3">{destination.description}</p>
                       <div className="flex flex-wrap gap-2 mb-3">
                         {destination.types.map((type) => (
                           <Badge key={type} variant="outline" className="text-xs">

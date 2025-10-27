@@ -298,7 +298,7 @@ export default function DestinationDetail() {
             <div className={`flex items-center gap-4 mb-4 ${isRTL ? "flex-row-reverse" : ""}`}>
               <span className="text-8xl">{destination.flag}</span>
               <div className={`flex-1 ${isRTL ? "text-right" : "text-left"}`}>
-                <h1 className="text-5xl font-bold mb-2">{t(`destinations.cities.${slug}`, destination.name)}</h1>
+                <h1 className="text-5xl font-bold mb-2">{destination.name}</h1>
                 <p className="text-xl opacity-90">
                   {t(`trips.countries.${destination.country}`, destination.country)} • {t(`trips.continents.${destination.continent}`, destination.continent)}
                 </p>
@@ -335,7 +335,7 @@ export default function DestinationDetail() {
                 <CardTitle className={isRTL ? "text-right" : "text-left"}>{t("destinations.detail.overview")}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className={`text-gray-700 ${isRTL ? "text-right" : "text-left"}`}>{t(`destinations.city_descriptions.${slug}`)}</p>
+                <p className={`text-gray-700 ${isRTL ? "text-right" : "text-left"}`}>{destination.description}</p>
               </CardContent>
             </Card>
 
