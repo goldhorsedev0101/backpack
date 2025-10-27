@@ -31,7 +31,7 @@ import { googlePlaces } from "./googlePlaces.js";
 import { seedSouthAmericanData } from "./dataSeeder.js";
 import { weatherService } from "./weatherService.js";
 import { travelTimingService } from "./travelTimingService.js";
-import { eq, sql, asc } from "drizzle-orm";
+import { eq, sql, asc, and } from "drizzle-orm";
 import { registerCollectorRoutes } from "./collectorRoutes.js";
 import type { Request, Response, Router } from 'express';
 import { supabaseAdmin } from './supabase.js';
@@ -50,7 +50,7 @@ import { supabaseAdmin } from './supabase.js';
 //   insertTravelBuddyApplicationSchema,
 //   insertLocationReviewSchema,
 // } from "@shared/schema";
-import { insertJourneySchema, insertSavedJourneySchema, hotelInquiries, destinations as destinationsTable } from "@shared/schema";
+import { insertJourneySchema, insertSavedJourneySchema, hotelInquiries, destinations as destinationsTable, attractions, attractionsI18n } from "@shared/schema";
 import {
   generateTravelSuggestions,
   generateItinerary,
@@ -294,6 +294,63 @@ export async function registerRoutes(app: Express): Promise<void> {
     } catch (error) {
       console.error(`Error fetching localized ${req.params.entityType}:`, error);
       res.status(500).json({ error: 'Failed to fetch entity' });
+    }
+  });
+
+  // Get attractions for a specific destination with translations
+  app.get('/api/destinations/:destinationId/attractions', async (req, res) => {
+    try {
+      const { destinationId } = req.params;
+      const { locale = 'en' } = req.query;
+
+      // Query attractions for this destination with translations
+      const attractionsQuery = await db
+        .select({
+          id: attractions.id,
+          destinationId: attractions.destinationId,
+          name: attractions.name,
+          description: attractions.description,
+          lat: attractions.lat,
+          lon: attractions.lon,
+          address: attractions.address,
+          website: attractions.website,
+          rating: attractions.rating,
+          tags: attractions.tags,
+          userRatingsTotal: attractions.userRatingsTotal,
+          translatedName: attractionsI18n.name,
+          translatedDescription: attractionsI18n.description,
+        })
+        .from(attractions)
+        .leftJoin(
+          attractionsI18n,
+          and(
+            eq(attractionsI18n.attractionId, attractions.id),
+            eq(attractionsI18n.locale, locale as string)
+          )
+        )
+        .where(eq(attractions.destinationId, destinationId))
+        .orderBy(attractions.name);
+
+      // Format the response to use translated fields
+      const formattedAttractions = attractionsQuery.map(attr => ({
+        id: attr.id,
+        destinationId: attr.destinationId,
+        name: attr.translatedName || attr.name,
+        description: attr.translatedDescription || attr.description,
+        originalName: attr.name, // Keep original for reference
+        lat: attr.lat,
+        lon: attr.lon,
+        address: attr.address,
+        website: attr.website,
+        rating: attr.rating,
+        tags: attr.tags,
+        userRatingsTotal: attr.userRatingsTotal,
+      }));
+
+      res.json({ success: true, data: formattedAttractions });
+    } catch (error) {
+      console.error('Error fetching destination attractions:', error);
+      res.status(500).json({ error: 'Failed to fetch attractions' });
     }
   });
 

@@ -118,30 +118,45 @@ export default function DestinationDetail() {
     queryKey: ["/api/destinations/feature-flags"],
   });
 
-  // Fetch attractions from Google Places
+  // Fetch attractions from database first, fallback to Google Places
   const { data: attractions, isLoading: attractionsLoading } = useQuery<Attraction[]>({
-    queryKey: ["/api/places/search", destination.name],
+    queryKey: ["/api/destinations/attractions", destination.id || slug, i18n.language],
     queryFn: async () => {
-      // Search for tourist attractions instead of the city itself
-      const searchQuery = `tourist attractions in ${destination.name}`;
-      const response = await fetch(`/api/places/search?query=${encodeURIComponent(searchQuery)}&type=tourist_attraction`);
-      if (!response.ok) throw new Error('Failed to fetch attractions');
-      const data = await response.json();
-      // Filter to show only actual attractions (not the city itself)
-      const filtered = (data.results || [])
-        .filter((place: Attraction) => 
-          !place.types.includes('locality') && 
-          !place.types.includes('political') &&
-          (place.types.includes('tourist_attraction') || 
-           place.types.includes('point_of_interest') ||
-           place.types.includes('museum') ||
-           place.types.includes('art_gallery') ||
-           place.types.includes('park'))
-        )
-        .slice(0, 3);
-      return filtered;
+      // Try to fetch from database first (if we have a UUID destination ID)
+      const destId = slug || destination.id;
+      if (destId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(destId)) {
+        const response = await fetch(`/api/destinations/${destId}/attractions?locale=${i18n.language}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data && data.data.length > 0) {
+            return data.data;
+          }
+        }
+      }
+
+      // Fallback to Google Places if no database attractions found
+      if (featureFlags?.googlePlaces) {
+        const searchQuery = `tourist attractions in ${destination.name}`;
+        const response = await fetch(`/api/places/search?query=${encodeURIComponent(searchQuery)}&type=tourist_attraction`);
+        if (!response.ok) throw new Error('Failed to fetch attractions');
+        const data = await response.json();
+        const filtered = (data.results || [])
+          .filter((place: Attraction) => 
+            !place.types.includes('locality') && 
+            !place.types.includes('political') &&
+            (place.types.includes('tourist_attraction') || 
+             place.types.includes('point_of_interest') ||
+             place.types.includes('museum') ||
+             place.types.includes('art_gallery') ||
+             place.types.includes('park'))
+          )
+          .slice(0, 3);
+        return filtered;
+      }
+
+      return [];
     },
-    enabled: !!destination.name && featureFlags?.googlePlaces === true,
+    enabled: !!destination.name,
   });
 
   // Fetch weather data
@@ -375,48 +390,60 @@ export default function DestinationDetail() {
                   </div>
                 ) : attractions && attractions.length > 0 ? (
                   <div className="space-y-4">
-                    {attractions.slice(0, 5).map((attraction) => (
-                      <div key={attraction.place_id} className="flex items-start gap-4 p-4 hover:bg-gray-50 rounded-lg transition" data-testid={`attraction-${attraction.place_id}`}>
-                        <img 
-                          src={getAttractionImageUrl(attraction)}
-                          alt={attraction.name}
-                          className="h-20 w-20 rounded-lg object-cover bg-gray-100"
-                          loading="lazy"
-                          onError={(e) => {
-                            const img = e.target as HTMLImageElement;
-                            if (!img.dataset.retried) {
-                              img.dataset.retried = 'true';
-                              // Fallback to simpler Google query
-                              const params = new URLSearchParams({
-                                source: 'googleplaces',
-                                query: destination.name,
-                                maxwidth: '600',
-                              });
-                              img.src = `/api/media/proxy?${params}`;
-                            }
-                          }}
-                        />
-                        <div className="flex-1">
-                          <h4 className="font-medium text-lg mb-1">{attraction.name}</h4>
-                          <p className="text-sm text-gray-500 mb-2">{attraction.formatted_address}</p>
-                          {attraction.rating && (
-                            <div className="flex items-center gap-2 text-sm">
-                              <span className="flex items-center gap-1">
-                                ⭐ {attraction.rating}
-                              </span>
-                              {attraction.user_ratings_total && (
-                                <span className="text-gray-400" dir={isRTL ? "rtl" : "ltr"}>
-                                  ({isRTL 
-                                    ? `${attraction.user_ratings_total.toLocaleString()} ${t("destinations.detail.reviews")}`
-                                    : `${attraction.user_ratings_total.toLocaleString()} ${t("destinations.detail.reviews", "reviews")}`
-                                  })
+                    {attractions.slice(0, 5).map((attraction) => {
+                      // Support both database (UUID id) and Google Places (place_id) format
+                      const attractionKey = attraction.id || attraction.place_id;
+                      const attractionAddress = attraction.address || attraction.formatted_address;
+                      const attractionRating = typeof attraction.rating === 'string' ? parseFloat(attraction.rating) : attraction.rating;
+                      
+                      return (
+                        <div key={attractionKey} className="flex items-start gap-4 p-4 hover:bg-gray-50 rounded-lg transition" data-testid={`attraction-${attractionKey}`}>
+                          <img 
+                            src={getAttractionImageUrl(attraction)}
+                            alt={attraction.name}
+                            className="h-20 w-20 rounded-lg object-cover bg-gray-100"
+                            loading="lazy"
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement;
+                              if (!img.dataset.retried) {
+                                img.dataset.retried = 'true';
+                                // Fallback to simpler Google query
+                                const params = new URLSearchParams({
+                                  source: 'googleplaces',
+                                  query: destination.name,
+                                  maxwidth: '600',
+                                });
+                                img.src = `/api/media/proxy?${params}`;
+                              }
+                            }}
+                          />
+                          <div className="flex-1">
+                            <h4 className="font-medium text-lg mb-1">{attraction.name}</h4>
+                            {attraction.description && (
+                              <p className="text-sm text-gray-600 mb-2 line-clamp-2">{attraction.description}</p>
+                            )}
+                            {attractionAddress && (
+                              <p className="text-xs text-gray-400 mb-2">{attractionAddress}</p>
+                            )}
+                            {attractionRating && (
+                              <div className="flex items-center gap-2 text-sm">
+                                <span className="flex items-center gap-1">
+                                  ⭐ {attractionRating.toFixed(1)}
                                 </span>
-                              )}
-                            </div>
-                          )}
+                                {(attraction.userRatingsTotal || attraction.user_ratings_total) && (
+                                  <span className="text-gray-400" dir={isRTL ? "rtl" : "ltr"}>
+                                    ({isRTL 
+                                      ? `${(attraction.userRatingsTotal || attraction.user_ratings_total).toLocaleString()} ${t("destinations.detail.reviews")}`
+                                      : `${(attraction.userRatingsTotal || attraction.user_ratings_total).toLocaleString()} ${t("destinations.detail.reviews", "reviews")}`
+                                    })
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="text-gray-500 text-center py-8">{t("destinations.states.no_results")}</p>
