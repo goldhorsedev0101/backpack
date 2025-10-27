@@ -7,10 +7,18 @@ import { config } from "./config.js";
 
 // Simple middleware that doesn't check auth (client-side auth via Supabase)
 const noAuth = (req: any, res: any, next: any) => {
-  // Mock user for API compatibility - in real app, validate Supabase JWT
+  // In development, use a consistent dev user instead of anonymous
+  // This allows testing features that require user identity
+  const isDevelopment = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+  const devUserId = 'dev-user-12345';
+  
   req.user = { 
-    claims: { sub: 'anonymous' },
-    id: 'anonymous'
+    claims: { 
+      sub: isDevelopment ? devUserId : 'anonymous',
+      email: isDevelopment ? 'dev@globemate.test' : undefined,
+      name: isDevelopment ? 'Dev User' : undefined
+    },
+    id: isDevelopment ? devUserId : 'anonymous'
   };
   next();
 };
