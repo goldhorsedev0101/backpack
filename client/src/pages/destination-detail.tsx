@@ -181,13 +181,12 @@ export default function DestinationDetail() {
     geo: featureFlags?.geo ?? false,
   };
 
-  // Get hero image URL
+  // Get hero image URL - using Pexels
   const getHeroImageUrl = () => {
     const params = new URLSearchParams({
-      source: 'unsplash',
+      source: 'pexels',
       query: `${destination.name} cityscape`,
       maxwidth: '1920',
-      lang: i18n.language,
     });
     return `/api/media/proxy?${params}`;
   };
