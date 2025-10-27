@@ -445,12 +445,12 @@ export default function DestinationDetail() {
                             {attractionAddress && (
                               <p className="text-xs text-gray-400 mb-2 text-left">{attractionAddress}</p>
                             )}
-                            {attractionRating && (
+                            {attractionRating && attractionRating > 0 && (
                               <div className="flex items-center gap-2 text-sm">
                                 <span className="flex items-center gap-1">
                                   ⭐ {attractionRating.toFixed(1)}
                                 </span>
-                                {(attraction.userRatingsTotal || attraction.user_ratings_total) && (
+                                {(attraction.userRatingsTotal || attraction.user_ratings_total) > 0 && (
                                   <span className="text-gray-400">
                                     ({(attraction.userRatingsTotal || attraction.user_ratings_total).toLocaleString()} {t("destinations.detail.reviews", "reviews")})
                                   </span>
