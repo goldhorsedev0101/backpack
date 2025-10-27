@@ -125,6 +125,25 @@ export default function FlightSearchTab() {
     return `${stops} ${t('flights.stops_plural')}`;
   };
 
+  const getLayovers = (segments: any[]) => {
+    if (segments.length <= 1) return [];
+    
+    const layovers = [];
+    for (let i = 0; i < segments.length - 1; i++) {
+      const arrival = new Date(segments[i].arriving_at);
+      const departure = new Date(segments[i + 1].departing_at);
+      const layoverMs = departure.getTime() - arrival.getTime();
+      const layoverHours = Math.floor(layoverMs / (1000 * 60 * 60));
+      const layoverMinutes = Math.floor((layoverMs % (1000 * 60 * 60)) / (1000 * 60));
+      
+      layovers.push({
+        airport: segments[i].destination.iata_code,
+        duration: `${layoverHours}h ${layoverMinutes}m`
+      });
+    }
+    return layovers;
+  };
+
   const today = new Date().toISOString().split('T')[0];
 
   return (
@@ -443,6 +462,20 @@ export default function FlightSearchTab() {
                                   <span className="text-sm font-semibold text-gray-700">{formatDuration(slice.duration)}</span>
                                 </div>
                                 <Badge variant="outline" className="mt-1 text-xs">{getStopsText(slice.segments)}</Badge>
+                                
+                                {getLayovers(slice.segments).length > 0 && (
+                                  <div className="mt-3 space-y-1.5 w-full">
+                                    {getLayovers(slice.segments).map((layover, layoverIdx) => (
+                                      <div key={layoverIdx} className="flex items-center justify-center gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-1.5">
+                                        <MapPin className="w-3.5 h-3.5 text-amber-600" />
+                                        <span className="text-xs font-semibold text-amber-900">
+                                          {isRTL ? 'עצירה ב-' : 'Layover in '}{layover.airport}
+                                        </span>
+                                        <span className="text-xs text-amber-700">({layover.duration})</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                               <div className="text-center flex-1">
                                 <div className="text-3xl font-bold text-gray-900">{slice.destination.iata_code}</div>
