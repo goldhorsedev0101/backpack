@@ -6,6 +6,9 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Get batch size from command line args or use default
+const BATCH_SIZE = parseInt(process.argv[2] || "10");
+
 interface GeneratedAttraction {
   name: string;
   description: string;
@@ -96,8 +99,8 @@ Example format:
   }
 }
 
-async function generateAndInsertAttractions() {
-  console.log("🚀 Starting AI-powered attractions generation...");
+async function generateAttractionsBatch() {
+  console.log(`🚀 Starting AI-powered attractions generation (Batch size: ${BATCH_SIZE})...`);
 
   try {
     // Get all destinations
@@ -118,20 +121,25 @@ async function generateAndInsertAttractions() {
     );
 
     console.log(`✨ Need to generate attractions for ${destinationsNeedingAttractions.length} destinations`);
+    console.log(`📦 Processing ${Math.min(BATCH_SIZE, destinationsNeedingAttractions.length)} destinations in this batch`);
 
     if (destinationsNeedingAttractions.length === 0) {
       console.log("✅ All destinations already have attractions!");
       return;
     }
 
+    // Process only BATCH_SIZE destinations
+    const batch = destinationsNeedingAttractions.slice(0, BATCH_SIZE);
+
     let totalAdded = 0;
     let failedDestinations: string[] = [];
 
-    for (const destination of destinationsNeedingAttractions) {
-      console.log(`\n📍 Processing: ${destination.name}...`);
+    for (let i = 0; i < batch.length; i++) {
+      const destination = batch[i];
+      console.log(`\n📍 [${i + 1}/${batch.length}] Processing: ${destination.name}...`);
 
       try {
-        // Generate attractions using AI (AI will determine realistic coordinates)
+        // Generate attractions using AI
         const attractionsData = await generateAttractionsForDestination(
           destination.name
         );
@@ -184,19 +192,24 @@ async function generateAndInsertAttractions() {
         }
 
         // Add a small delay to avoid rate limiting
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1500));
       } catch (error) {
         console.error(`❌ Failed to generate attractions for ${destination.name}:`, error);
         failedDestinations.push(destination.name);
       }
     }
 
-    console.log(`\n✅ Generation complete!`);
+    console.log(`\n✅ Batch generation complete!`);
     console.log(`   Added: ${totalAdded} attractions`);
-    console.log(`   Processed: ${destinationsNeedingAttractions.length} destinations`);
+    console.log(`   Processed: ${batch.length} destinations`);
+    console.log(`   Remaining: ${destinationsNeedingAttractions.length - batch.length} destinations`);
     if (failedDestinations.length > 0) {
       console.log(`   Failed: ${failedDestinations.length} destinations`);
       console.log(`   Failed destinations: ${failedDestinations.join(", ")}`);
+    }
+
+    if (destinationsNeedingAttractions.length > BATCH_SIZE) {
+      console.log(`\n💡 Run this script again to process the next batch!`);
     }
   } catch (error) {
     console.error("❌ Error in attraction generation:", error);
@@ -205,7 +218,7 @@ async function generateAndInsertAttractions() {
 }
 
 // Run the script
-generateAndInsertAttractions()
+generateAttractionsBatch()
   .then(() => {
     console.log("✅ Script completed successfully");
     process.exit(0);
