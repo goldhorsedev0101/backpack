@@ -78,7 +78,7 @@ export default function DestinationGallery({
 
   const fetchImageWithAttribution = async (image: GalleryImage, imageKey: string) => {
     try {
-      const response = await fetch(getProxyUrl(image, 1200));
+      const response = await fetch(getProxyUrl(image, 800), { method: 'HEAD' });
 
       const attributionHeader = response.headers.get('X-Attribution');
       if (attributionHeader) {
@@ -95,13 +95,13 @@ export default function DestinationGallery({
   };
 
   useEffect(() => {
-    heroImages.forEach((image, index) => {
+    heroImages.slice(0, 3).forEach((image, index) => {
       fetchImageWithAttribution(image, `hero-${index}`);
     });
   }, [heroImages]);
 
   useEffect(() => {
-    poiImages.forEach((image, index) => {
+    poiImages.slice(0, 6).forEach((image, index) => {
       fetchImageWithAttribution(image, `poi-${index}`);
     });
   }, [poiImages]);
@@ -171,12 +171,12 @@ export default function DestinationGallery({
       {heroImages.length > 0 && (
         <div className="relative w-full h-96 rounded-lg overflow-hidden group" data-testid="gallery-hero">
           <OptimizedImage
-            src={getProxyUrl(heroImages[currentHeroIndex], 1600)}
+            src={getProxyUrl(heroImages[currentHeroIndex], 1200)}
             alt={heroImages[currentHeroIndex].alt}
             className="absolute inset-0"
             aspectRatio="h-96"
-            priority={true}
-            maxRetries={3}
+            priority={currentHeroIndex === 0}
+            maxRetries={2}
             testId={`hero-image-${currentHeroIndex}`}
           />
 
@@ -283,11 +283,11 @@ export default function DestinationGallery({
               >
                 <div className="w-full h-full transition-transform group-hover:scale-110">
                   <OptimizedImage
-                    src={getProxyUrl(image, 600)}
+                    src={getProxyUrl(image, 400)}
                     alt={image.alt}
                     aspectRatio="aspect-video"
                     priority={index < 3}
-                    maxRetries={2}
+                    maxRetries={1}
                     testId={`poi-image-${index}`}
                   />
                 </div>
@@ -328,12 +328,12 @@ export default function DestinationGallery({
           {lightboxImage && (
             <div className="relative">
               <OptimizedImage
-                src={getProxyUrl(lightboxImage, 2400)}
+                src={getProxyUrl(lightboxImage, 1800)}
                 alt={lightboxImage.alt}
                 className="w-full"
                 aspectRatio="max-h-[90vh]"
                 priority={true}
-                maxRetries={3}
+                maxRetries={2}
                 testId="lightbox-image"
               />
               <Button
