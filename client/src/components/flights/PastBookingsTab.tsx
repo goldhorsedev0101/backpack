@@ -3,6 +3,7 @@ import { Plane, Calendar, Users, MapPin, Loader2, Receipt, CheckCircle2 } from "
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
+import { airports } from "@/data/airports";
 
 interface FlightBooking {
   id: number;
@@ -39,6 +40,13 @@ export default function PastBookingsTab() {
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  const getAirportDisplay = (iataCode: string) => {
+    const airport = airports.find(a => a.code === iataCode);
+    if (!airport) return iataCode;
+    const cityName = isRTL && airport.cityHe ? airport.cityHe : airport.city;
+    return `${cityName} (${iataCode})`;
   };
 
   if (isLoading) {
@@ -82,7 +90,7 @@ export default function PastBookingsTab() {
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-3 text-xl text-gray-700">
                   <Plane className="w-6 h-6 text-gray-500" />
-                  {booking.origin} → {booking.destination}
+                  {getAirportDisplay(booking.origin)} → {getAirportDisplay(booking.destination)}
                 </CardTitle>
                 <Badge variant="secondary" className="bg-gray-400 text-white">
                   {t('flights.completed')}

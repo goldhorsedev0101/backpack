@@ -144,6 +144,13 @@ export default function FlightSearchTab() {
     return layovers;
   };
 
+  const getAirportDisplay = (iataCode: string) => {
+    const airport = airports.find(a => a.code === iataCode);
+    if (!airport) return iataCode;
+    const cityName = isRTL && airport.cityHe ? airport.cityHe : airport.city;
+    return `${cityName} (${iataCode})`;
+  };
+
   const today = new Date().toISOString().split('T')[0];
 
   return (
@@ -446,7 +453,7 @@ export default function FlightSearchTab() {
                           <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg p-4">
                             <div className="flex items-center justify-between gap-4">
                               <div className="text-center flex-1">
-                                <div className="text-3xl font-bold text-gray-900">{slice.origin.iata_code}</div>
+                                <div className="text-lg font-bold text-gray-900">{getAirportDisplay(slice.origin.iata_code)}</div>
                                 <div className="text-sm font-medium text-gray-600 mt-1">
                                   {new Date(slice.segments[0].departing_at).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
                                 </div>
@@ -469,7 +476,7 @@ export default function FlightSearchTab() {
                                       <div key={layoverIdx} className="flex items-center justify-center gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-1.5">
                                         <MapPin className="w-3.5 h-3.5 text-amber-600" />
                                         <span className="text-xs font-semibold text-amber-900">
-                                          {t('flights.layover_in')} {layover.airport}
+                                          {t('flights.layover_in')} {getAirportDisplay(layover.airport)}
                                         </span>
                                         <span className="text-xs text-amber-700">({layover.duration})</span>
                                       </div>
@@ -478,7 +485,7 @@ export default function FlightSearchTab() {
                                 )}
                               </div>
                               <div className="text-center flex-1">
-                                <div className="text-3xl font-bold text-gray-900">{slice.destination.iata_code}</div>
+                                <div className="text-lg font-bold text-gray-900">{getAirportDisplay(slice.destination.iata_code)}</div>
                                 <div className="text-sm font-medium text-gray-600 mt-1">
                                   {new Date(slice.segments[slice.segments.length - 1].arriving_at).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
                                 </div>

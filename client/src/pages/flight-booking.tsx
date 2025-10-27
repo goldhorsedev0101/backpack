@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { airports } from '@/data/airports';
 import { 
   Plane, 
   Clock, 
@@ -23,10 +24,11 @@ import {
 } from 'lucide-react';
 
 export default function FlightBookingPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [, navigate] = useLocation();
   const [match, params] = useRoute('/flights/booking/:offerId');
   const { toast } = useToast();
+  const isRTL = i18n.language === 'he';
   
   const offerId = params?.offerId;
 
@@ -109,6 +111,13 @@ export default function FlightBookingPage() {
       });
     }
     return layovers;
+  };
+
+  const getAirportDisplay = (iataCode: string) => {
+    const airport = airports.find(a => a.code === iataCode);
+    if (!airport) return iataCode;
+    const cityName = isRTL && airport.cityHe ? airport.cityHe : airport.city;
+    return `${cityName} (${iataCode})`;
   };
 
   if (isLoading) {
@@ -275,7 +284,7 @@ export default function FlightBookingPage() {
                     <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg p-3">
                       <div className="flex items-center justify-between text-sm">
                         <div className="text-center">
-                          <div className="text-xl font-bold">{slice.origin.iata_code}</div>
+                          <div className="text-sm font-bold">{getAirportDisplay(slice.origin.iata_code)}</div>
                           <div className="text-xs text-gray-500">
                             {new Date(slice.segments[0].departing_at).toLocaleTimeString('he-IL', { 
                               hour: '2-digit', 
@@ -290,7 +299,7 @@ export default function FlightBookingPage() {
                         </div>
                         
                         <div className="text-center">
-                          <div className="text-xl font-bold">{slice.destination.iata_code}</div>
+                          <div className="text-sm font-bold">{getAirportDisplay(slice.destination.iata_code)}</div>
                           <div className="text-xs text-gray-500">
                             {new Date(slice.segments[slice.segments.length - 1].arriving_at).toLocaleTimeString('he-IL', { 
                               hour: '2-digit', 
@@ -306,7 +315,7 @@ export default function FlightBookingPage() {
                             <div key={layoverIdx} className="flex items-center justify-center gap-2 bg-amber-50 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-700 rounded px-2 py-1">
                               <MapPin className="w-3 h-3 text-amber-600" />
                               <span className="text-xs font-semibold text-amber-900 dark:text-amber-300">
-                                {t('flights.layover_in')} {layover.airport}
+                                {t('flights.layover_in')} {getAirportDisplay(layover.airport)}
                               </span>
                               <span className="text-xs text-amber-700 dark:text-amber-400">({layover.duration})</span>
                             </div>

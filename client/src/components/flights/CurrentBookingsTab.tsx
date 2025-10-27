@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useQuery } from "@tanstack/react-query";
+import { airports } from "@/data/airports";
 
 interface FlightBooking {
   id: number;
@@ -50,6 +51,13 @@ export default function CurrentBookingsTab() {
     });
   };
 
+  const getAirportDisplay = (iataCode: string) => {
+    const airport = airports.find(a => a.code === iataCode);
+    if (!airport) return iataCode;
+    const cityName = isRTL && airport.cityHe ? airport.cityHe : airport.city;
+    return `${cityName} (${iataCode})`;
+  };
+
   if (isLoading) {
     return (
       <Card className="text-center py-12" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -91,7 +99,7 @@ export default function CurrentBookingsTab() {
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <Plane className="w-6 h-6 text-blue-600" />
-                  {booking.origin} → {booking.destination}
+                  {getAirportDisplay(booking.origin)} → {getAirportDisplay(booking.destination)}
                 </CardTitle>
                 <Badge variant="default" className="bg-green-500">
                   {t('flights.confirmed')}
