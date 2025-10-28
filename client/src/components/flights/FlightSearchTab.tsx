@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Plane, Calendar, Users, Search, Clock, TrendingDown, Loader2, MapPin, Check, ChevronsUpDown } from "lucide-react";
@@ -44,17 +44,45 @@ export default function FlightSearchTab() {
   const { toast } = useToast();
   const isRTL = i18n.language === 'he';
 
-  const [origin, setOrigin] = useState("");
-  const [destination, setDestination] = useState("");
+  // Load saved search state from localStorage
+  const getSavedState = () => {
+    try {
+      const saved = localStorage.getItem('flightSearchState');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const savedState = getSavedState();
+
+  const [origin, setOrigin] = useState(savedState?.origin || "");
+  const [destination, setDestination] = useState(savedState?.destination || "");
   const [originOpen, setOriginOpen] = useState(false);
   const [destinationOpen, setDestinationOpen] = useState(false);
-  const [departureDate, setDepartureDate] = useState("");
-  const [returnDate, setReturnDate] = useState("");
-  const [adults, setAdults] = useState(1);
-  const [children, setChildren] = useState(0);
-  const [cabinClass, setCabinClass] = useState("economy");
-  const [tripType, setTripType] = useState<"round_trip" | "one_way">("round_trip");
-  const [offers, setOffers] = useState<FlightOffer[]>([]);
+  const [departureDate, setDepartureDate] = useState(savedState?.departureDate || "");
+  const [returnDate, setReturnDate] = useState(savedState?.returnDate || "");
+  const [adults, setAdults] = useState(savedState?.adults || 1);
+  const [children, setChildren] = useState(savedState?.children || 0);
+  const [cabinClass, setCabinClass] = useState(savedState?.cabinClass || "economy");
+  const [tripType, setTripType] = useState<"round_trip" | "one_way">(savedState?.tripType || "round_trip");
+  const [offers, setOffers] = useState<FlightOffer[]>(savedState?.offers || []);
+
+  // Save search state to localStorage whenever it changes
+  useEffect(() => {
+    const stateToSave = {
+      origin,
+      destination,
+      departureDate,
+      returnDate,
+      adults,
+      children,
+      cabinClass,
+      tripType,
+      offers
+    };
+    localStorage.setItem('flightSearchState', JSON.stringify(stateToSave));
+  }, [origin, destination, departureDate, returnDate, adults, children, cabinClass, tripType, offers]);
 
   const searchFlightsMutation = useMutation({
     mutationFn: async (searchParams: any) => {
