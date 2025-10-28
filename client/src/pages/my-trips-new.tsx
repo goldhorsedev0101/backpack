@@ -896,31 +896,71 @@ export default function MyTripsNew() {
   });
 
   // State for translated trip content
-  const [translatedTrips, setTranslatedTrips] = useState<Map<number, { title: string; description: string }>>(new Map());
+  const [translatedTrips, setTranslatedTrips] = useState<Map<number, { title: string; description: string; highlights: string[] }>>(new Map());
 
   // Translate saved trips when language or trips change
   useEffect(() => {
     const translateTrips = async () => {
       if (!savedTrips.length) return;
       
-      const newTranslations = new Map<number, { title: string; description: string }>();
+      const newTranslations = new Map<number, { title: string; description: string; highlights: string[] }>();
       
       // Translate all trips
       await Promise.all(
         savedTrips.map(async (trip) => {
           try {
+            // Extract highlights from destinations
+            let highlights: string[] = [];
+            try {
+              const destinations = typeof trip.destinations === 'string' 
+                ? JSON.parse(trip.destinations) 
+                : trip.destinations;
+              if (Array.isArray(destinations) && destinations[0]) {
+                highlights = destinations[0].highlights || [];
+              }
+            } catch (e) {
+              // If parsing fails, highlights will remain empty
+            }
+
+            // Translate title, description, and highlights
             const translatedTitle = await translateFullText(trip.title, i18n.language);
             const translatedDescription = await translateFullText(trip.description, i18n.language);
+            
+            // Translate each highlight
+            const translatedHighlights = await Promise.all(
+              highlights.map(async (highlight) => {
+                try {
+                  return await translateFullText(highlight, i18n.language);
+                } catch (error) {
+                  console.error('Failed to translate highlight:', highlight, error);
+                  return highlight; // Return original if translation fails
+                }
+              })
+            );
+
             newTranslations.set(trip.id, {
               title: translatedTitle,
-              description: translatedDescription
+              description: translatedDescription,
+              highlights: translatedHighlights
             });
           } catch (error) {
             console.error('Failed to translate trip:', trip.id, error);
             // Keep original text if translation fails
+            let highlights: string[] = [];
+            try {
+              const destinations = typeof trip.destinations === 'string' 
+                ? JSON.parse(trip.destinations) 
+                : trip.destinations;
+              if (Array.isArray(destinations) && destinations[0]) {
+                highlights = destinations[0].highlights || [];
+              }
+            } catch (e) {
+              // ignore
+            }
             newTranslations.set(trip.id, {
               title: trip.title,
-              description: trip.description
+              description: trip.description,
+              highlights
             });
           }
         })
@@ -2188,22 +2228,25 @@ export default function MyTripsNew() {
                               </div>
 
                               {/* Highlights */}
-                              {highlights && highlights.length > 0 && (
-                                <div>
-                                  <div className={`flex items-center gap-2 mb-3 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                                    <Star className="w-4 h-4 text-yellow-600" />
-                                    <span className={`font-semibold text-gray-800 text-sm ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>{t('trips.highlights')}</span>
+                              {(() => {
+                                const translatedHighlights = translatedTrips.get(trip.id)?.highlights || highlights;
+                                return translatedHighlights && translatedHighlights.length > 0 && (
+                                  <div>
+                                    <div className={`flex items-center gap-2 mb-3 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                      <Star className="w-4 h-4 text-yellow-600" />
+                                      <span className={`font-semibold text-gray-800 text-sm ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>{t('trips.highlights')}</span>
+                                    </div>
+                                    <div className={`flex flex-col gap-3 md:flex-row md:flex-wrap md:gap-6 ${i18n.language === 'he' ? 'md:flex-row-reverse' : ''}`}>
+                                      {translatedHighlights.map((highlight, idx) => (
+                                        <div key={idx} className={`flex items-center text-sm text-gray-700 gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                          <span className="w-2 h-2 bg-yellow-500 rounded-full flex-shrink-0"></span>
+                                          <span className={i18n.language === 'he' ? 'text-right' : 'text-left'}>{highlight}</span>
+                                        </div>
+                                      ))}
+                                    </div>
                                   </div>
-                                  <div className={`flex flex-col gap-3 md:flex-row md:flex-wrap md:gap-6 ${i18n.language === 'he' ? 'md:flex-row-reverse' : ''}`}>
-                                    {highlights.map((highlight, idx) => (
-                                      <div key={idx} className={`flex items-center text-sm text-gray-700 gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                                        <span className="w-2 h-2 bg-yellow-500 rounded-full flex-shrink-0"></span>
-                                        <span className={i18n.language === 'he' ? 'text-right' : 'text-left'}>{translateText(highlight, i18n.language)}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
+                                );
+                              })()}
 
                               {/* Tags */}
                               {trip.travelStyle && (
