@@ -109,6 +109,18 @@ const getWorldDestinations = () => ({
   'Denmark': ['Copenhagen', 'Aarhus', 'Odense', 'Aalborg', 'Roskilde'],
   'Belgium': ['Brussels', 'Bruges', 'Antwerp', 'Ghent', 'Leuven'],
   'Hungary': ['Budapest', 'Debrecen', 'Szeged', 'Pecs', 'Eger'],
+  'Romania': ['Bucharest', 'Brasov', 'Cluj-Napoca', 'Timisoara', 'Sibiu'],
+  'Bulgaria': ['Sofia', 'Plovdiv', 'Varna', 'Burgas', 'Rila'],
+  'Slovenia': ['Ljubljana', 'Bled', 'Piran', 'Maribor', 'Bohinj'],
+  'Serbia': ['Belgrade', 'Novi Sad', 'Nis', 'Subotica', 'Zlatibor'],
+  'Latvia': ['Riga', 'Jurmala', 'Sigulda', 'Cesis', 'Liepaja'],
+  'Lithuania': ['Vilnius', 'Kaunas', 'Klaipeda', 'Trakai', 'Palanga'],
+  'Estonia': ['Tallinn', 'Tartu', 'Parnu', 'Saaremaa', 'Narva'],
+  'Slovakia': ['Bratislava', 'Kosice', 'Zilina', 'Poprad', 'Trencin'],
+  'Cyprus': ['Nicosia', 'Limassol', 'Paphos', 'Larnaca', 'Ayia Napa'],
+  'Malta': ['Valletta', 'Sliema', 'St. Julians', 'Mdina', 'Gozo'],
+  'Finland': ['Helsinki', 'Rovaniemi', 'Turku', 'Tampere', 'Lapland'],
+  'Luxembourg': ['Luxembourg City', 'Vianden', 'Echternach', 'Remich', 'Clervaux'],
   
   // Asia
   'Japan': ['Tokyo', 'Kyoto', 'Osaka', 'Hiroshima', 'Nara'],
@@ -129,6 +141,22 @@ const getWorldDestinations = () => ({
   'Cambodia': ['Phnom Penh', 'Siem Reap', 'Sihanoukville', 'Battambang', 'Kampot'],
   'Nepal': ['Kathmandu', 'Pokhara', 'Lumbini', 'Chitwan', 'Nagarkot'],
   'Maldives': ['Male', 'Maafushi', 'Hulhumale', 'Thulusdhoo', 'Dhigurah'],
+  'Georgia': ['Tbilisi', 'Batumi', 'Mtskheta', 'Kazbegi', 'Kutaisi'],
+  'Azerbaijan': ['Baku', 'Gabala', 'Sheki', 'Ganja', 'Quba'],
+  'Armenia': ['Yerevan', 'Gyumri', 'Dilijan', 'Sevan', 'Garni'],
+  'Uzbekistan': ['Tashkent', 'Samarkand', 'Bukhara', 'Khiva', 'Fergana'],
+  'Kazakhstan': ['Almaty', 'Nur-Sultan', 'Shymkent', 'Aktau', 'Turkestan'],
+  'Kyrgyzstan': ['Bishkek', 'Osh', 'Issyk-Kul', 'Karakol', 'Jalalabad'],
+  'Mongolia': ['Ulaanbaatar', 'Gobi Desert', 'Terelj', 'Khovsgol', 'Kharkhorin'],
+  'Myanmar': ['Yangon', 'Bagan', 'Mandalay', 'Inle Lake', 'Ngapali'],
+  'Laos': ['Vientiane', 'Luang Prabang', 'Vang Vieng', 'Pakse', '4000 Islands'],
+  'Brunei': ['Bandar Seri Begawan', 'Tutong', 'Seria', 'Kuala Belait', 'Temburong'],
+  'Bangladesh': ['Dhaka', 'Chittagong', 'Coxs Bazar', 'Sylhet', 'Sundarbans'],
+  'Pakistan': ['Islamabad', 'Karachi', 'Lahore', 'Hunza', 'Skardu'],
+  'Oman': ['Muscat', 'Salalah', 'Nizwa', 'Sur', 'Wahiba Sands'],
+  'Qatar': ['Doha', 'Al Wakrah', 'Al Khor', 'Dukhan', 'Mesaieed'],
+  'Bahrain': ['Manama', 'Muharraq', 'Riffa', 'Hamad Town', 'Isa Town'],
+  'Kuwait': ['Kuwait City', 'Salmiya', 'Hawalli', 'Farwaniya', 'Jahra'],
   
   // North America
   'United States': ['New York', 'Los Angeles', 'Miami', 'Las Vegas', 'San Francisco'],
@@ -136,6 +164,11 @@ const getWorldDestinations = () => ({
   'Mexico': ['Cancun', 'Mexico City', 'Playa del Carmen', 'Puerto Vallarta', 'Cabo San Lucas'],
   'Costa Rica': ['San Jose', 'Jaco', 'Tamarindo', 'La Fortuna', 'Puerto Viejo'],
   'Panama': ['Panama City', 'Bocas del Toro', 'San Blas', 'Boquete', 'Coronado'],
+  'Guatemala': ['Guatemala City', 'Antigua', 'Panajachel', 'Flores', 'Quetzaltenango'],
+  'Belize': ['Belize City', 'San Pedro', 'Caye Caulker', 'Placencia', 'Hopkins'],
+  'Honduras': ['Tegucigalpa', 'Roatan', 'Copan', 'La Ceiba', 'Utila'],
+  'Nicaragua': ['Managua', 'Granada', 'Leon', 'San Juan del Sur', 'Ometepe'],
+  'El Salvador': ['San Salvador', 'Santa Ana', 'La Libertad', 'Suchitoto', 'El Tunco'],
   
   // South America
   'Peru': ['Lima', 'Cusco', 'Machu Picchu', 'Arequipa', 'Iquitos'],
@@ -155,6 +188,13 @@ const getWorldDestinations = () => ({
   'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Gold Coast'],
   'New Zealand': ['Auckland', 'Wellington', 'Queenstown', 'Christchurch', 'Rotorua'],
   'Fiji': ['Nadi', 'Suva', 'Coral Coast', 'Mamanuca Islands', 'Yasawa Islands'],
+  'Samoa': ['Apia', 'Savaii', 'Upolu', 'Lalomanu', 'Manono'],
+  'Tonga': ['Nukualofa', 'Vavau', 'Haapai', 'Eua', 'Tongatapu'],
+  'Papua New Guinea': ['Port Moresby', 'Rabaul', 'Madang', 'Mount Hagen', 'Lae'],
+  'Vanuatu': ['Port Vila', 'Luganville', 'Tanna', 'Espiritu Santo', 'Efate'],
+  'New Caledonia': ['Noumea', 'Isle of Pines', 'Bourail', 'Hienghene', 'Mare'],
+  'Solomon Islands': ['Honiara', 'Gizo', 'Munda', 'Auki', 'Guadalcanal'],
+  'French Polynesia': ['Papeete', 'Bora Bora', 'Moorea', 'Tahiti', 'Huahine'],
   
   // Africa
   'Egypt': ['Cairo', 'Luxor', 'Aswan', 'Alexandria', 'Hurghada'],
@@ -164,12 +204,31 @@ const getWorldDestinations = () => ({
   'Tanzania': ['Dar es Salaam', 'Zanzibar', 'Arusha', 'Serengeti', 'Kilimanjaro'],
   'Tunisia': ['Tunis', 'Sousse', 'Djerba', 'Hammamet', 'Carthage'],
   'Mauritius': ['Port Louis', 'Grand Baie', 'Flic en Flac', 'Belle Mare', 'Le Morne'],
+  'Seychelles': ['Victoria', 'Mahe', 'Praslin', 'La Digue', 'Silhouette'],
+  'Madagascar': ['Antananarivo', 'Nosy Be', 'Antsirabe', 'Toliara', 'Morondava'],
+  'Rwanda': ['Kigali', 'Volcanoes National Park', 'Akagera', 'Nyungwe', 'Kibuye'],
+  'Uganda': ['Kampala', 'Entebbe', 'Jinja', 'Murchison Falls', 'Bwindi'],
+  'Botswana': ['Gaborone', 'Maun', 'Kasane', 'Okavango Delta', 'Chobe'],
+  'Namibia': ['Windhoek', 'Swakopmund', 'Sossusvlei', 'Etosha', 'Walvis Bay'],
+  'Zimbabwe': ['Harare', 'Victoria Falls', 'Bulawayo', 'Hwange', 'Kariba'],
+  'Zambia': ['Lusaka', 'Livingstone', 'South Luangwa', 'Lower Zambezi', 'Kafue'],
+  'Ethiopia': ['Addis Ababa', 'Lalibela', 'Gondar', 'Axum', 'Harar'],
+  'Ghana': ['Accra', 'Kumasi', 'Cape Coast', 'Takoradi', 'Tamale'],
+  'Senegal': ['Dakar', 'Saint-Louis', 'Goree Island', 'Saly', 'Casamance'],
+  'Nigeria': ['Lagos', 'Abuja', 'Calabar', 'Port Harcourt', 'Kano'],
   
   // Caribbean
   'Dominican Republic': ['Punta Cana', 'Santo Domingo', 'Puerto Plata', 'La Romana', 'Samana'],
   'Jamaica': ['Kingston', 'Montego Bay', 'Negril', 'Ocho Rios', 'Port Antonio'],
   'Cuba': ['Havana', 'Varadero', 'Trinidad', 'Santiago de Cuba', 'Vinales'],
-  'Bahamas': ['Nassau', 'Paradise Island', 'Freeport', 'Exuma', 'Eleuthera']
+  'Bahamas': ['Nassau', 'Paradise Island', 'Freeport', 'Exuma', 'Eleuthera'],
+  'Barbados': ['Bridgetown', 'Holetown', 'Oistins', 'Bathsheba', 'Speightstown'],
+  'Saint Lucia': ['Castries', 'Soufriere', 'Rodney Bay', 'Vieux Fort', 'Marigot Bay'],
+  'Trinidad and Tobago': ['Port of Spain', 'San Fernando', 'Scarborough', 'Chaguanas', 'Maracas'],
+  'Aruba': ['Oranjestad', 'Palm Beach', 'Eagle Beach', 'San Nicolas', 'Noord'],
+  'Curacao': ['Willemstad', 'Westpunt', 'Punda', 'Mambo Beach', 'Jan Thiel'],
+  'Grenada': ['St. Georges', 'Grand Anse', 'Carriacou', 'Gouyave', 'Grenville'],
+  'Antigua and Barbuda': ['St. Johns', 'English Harbour', 'Jolly Beach', 'Dickenson Bay', 'Codrington']
 });
 
 // Interfaces
