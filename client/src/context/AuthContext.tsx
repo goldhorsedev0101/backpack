@@ -116,42 +116,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true);
       
-      // Test user credentials (must be created in Supabase first)
+      const testEmail = 'support@globemate.co.il';
+      const testPassword = 'GlobeMate2024Test!';
+      
+      // First, try to create the test user via backend endpoint
+      try {
+        const response = await fetch('/api/dev/create-test-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: testEmail, password: testPassword })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.log('Test user creation response:', errorData);
+        }
+      } catch (createError) {
+        console.log('Could not create test user via backend, will try to sign in anyway:', createError);
+      }
+      
+      // Now try to sign in
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: 'test@globemate.com',
-        password: 'testuser123456'
+        email: testEmail,
+        password: testPassword
       });
       
       if (error) {
-        // If test user doesn't exist, try to create it
-        if (error.message.includes('Invalid login credentials')) {
-          const { error: signUpError } = await supabase.auth.signUp({
-            email: 'test@globemate.com',
-            password: 'testuser123456',
-            options: {
-              data: {
-                name: 'Test User',
-                full_name: 'Test User'
-              }
-            }
-          });
-          
-          if (signUpError) {
-            throw signUpError;
-          }
-          
-          // Try signing in again
-          const { error: retryError } = await supabase.auth.signInWithPassword({
-            email: 'test@globemate.com',
-            password: 'testuser123456'
-          });
-          
-          if (retryError) {
-            throw retryError;
-          }
-        } else {
-          throw error;
-        }
+        throw error;
       }
       
       toast({

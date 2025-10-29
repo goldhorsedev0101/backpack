@@ -99,6 +99,50 @@ export async function registerRoutes(app: Express): Promise<void> {
         res.status(500).json({ error: 'Failed to create admin session' });
       }
     });
+
+    // Create test user with auto-confirmed email
+    app.post('/api/dev/create-test-user', async (req, res) => {
+      try {
+        const { email, password } = req.body;
+        
+        if (!email || !password) {
+          return res.status(400).json({ error: 'Email and password required' });
+        }
+
+        // Use Supabase Admin API to create user with confirmed email
+        const { data, error } = await supabaseAdmin.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true, // Auto-confirm email
+          user_metadata: {
+            name: 'Test User',
+            full_name: 'Test User'
+          }
+        });
+
+        if (error) {
+          // If user already exists, that's ok
+          if (error.message.includes('already registered')) {
+            return res.json({ 
+              success: true, 
+              message: 'Test user already exists',
+              email
+            });
+          }
+          throw error;
+        }
+
+        res.json({ 
+          success: true, 
+          message: 'Test user created successfully with confirmed email',
+          email,
+          userId: data.user?.id
+        });
+      } catch (error: any) {
+        console.error('Error creating test user:', error);
+        res.status(500).json({ error: error.message || 'Failed to create test user' });
+      }
+    });
   }
 
   // Admin translation routes
