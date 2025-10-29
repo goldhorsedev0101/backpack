@@ -33,7 +33,19 @@ export const CONTINENT_COUNTRY_MAP: Record<Continent, readonly string[]> = {
     "Sweden",
     "Denmark",
     "Belgium",
-    "Hungary"
+    "Hungary",
+    "Romania",
+    "Bulgaria",
+    "Slovenia",
+    "Serbia",
+    "Latvia",
+    "Lithuania",
+    "Estonia",
+    "Slovakia",
+    "Cyprus",
+    "Malta",
+    "Finland",
+    "Luxembourg"
   ],
   "Asia": [
     "Japan",
@@ -53,14 +65,35 @@ export const CONTINENT_COUNTRY_MAP: Record<Continent, readonly string[]> = {
     "Sri Lanka",
     "Cambodia",
     "Nepal",
-    "Maldives"
+    "Maldives",
+    "Georgia",
+    "Azerbaijan",
+    "Armenia",
+    "Uzbekistan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Mongolia",
+    "Myanmar",
+    "Laos",
+    "Brunei",
+    "Bangladesh",
+    "Pakistan",
+    "Oman",
+    "Qatar",
+    "Bahrain",
+    "Kuwait"
   ],
   "North America": [
     "United States",
     "Canada",
     "Mexico",
     "Costa Rica",
-    "Panama"
+    "Panama",
+    "Guatemala",
+    "Belize",
+    "Honduras",
+    "Nicaragua",
+    "El Salvador"
   ],
   "South America": [
     "Brazil",
@@ -79,7 +112,14 @@ export const CONTINENT_COUNTRY_MAP: Record<Continent, readonly string[]> = {
   "Oceania": [
     "Australia",
     "New Zealand",
-    "Fiji"
+    "Fiji",
+    "Samoa",
+    "Tonga",
+    "Papua New Guinea",
+    "Vanuatu",
+    "New Caledonia",
+    "Solomon Islands",
+    "French Polynesia"
   ],
   "Africa": [
     "South Africa",
@@ -88,13 +128,32 @@ export const CONTINENT_COUNTRY_MAP: Record<Continent, readonly string[]> = {
     "Kenya",
     "Tanzania",
     "Tunisia",
-    "Mauritius"
+    "Mauritius",
+    "Seychelles",
+    "Madagascar",
+    "Rwanda",
+    "Uganda",
+    "Botswana",
+    "Namibia",
+    "Zimbabwe",
+    "Zambia",
+    "Ethiopia",
+    "Ghana",
+    "Senegal",
+    "Nigeria"
   ],
   "Caribbean": [
     "Dominican Republic",
     "Jamaica",
     "Cuba",
-    "Bahamas"
+    "Bahamas",
+    "Barbados",
+    "Saint Lucia",
+    "Trinidad and Tobago",
+    "Aruba",
+    "Curacao",
+    "Grenada",
+    "Antigua and Barbuda"
   ]
 } as const;
 
