@@ -2242,7 +2242,9 @@ export default function MyTripsNew() {
                                   </p>
                                 </div>
                                 <Badge className="bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 shadow-lg text-base px-4 py-2 whitespace-nowrap flex-shrink-0">
-                                  {i18n.language === 'he' ? '₪' : '$'}{trip.budget}
+                                  {i18n.language === 'he' 
+                                    ? `₪${Math.round(parseFloat(trip.budget) * USD_TO_ILS).toLocaleString('he-IL')}`
+                                    : `$${trip.budget}`}
                                 </Badge>
                               </div>
 
@@ -2275,7 +2277,9 @@ export default function MyTripsNew() {
                                       </span>
                                     </div>
                                     <p className={`text-green-700 font-medium text-sm ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
-                                      {i18n.language === 'he' ? '₪' : '$'}{trip.budget}
+                                      {i18n.language === 'he' 
+                                        ? `₪${Math.round(parseFloat(trip.budget) * USD_TO_ILS).toLocaleString('he-IL')}`
+                                        : `$${trip.budget}`}
                                     </p>
                                   </div>
                                 </div>
