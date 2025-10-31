@@ -1569,7 +1569,7 @@ export default function MyTripsNew() {
                           data-testid="select-start-date"
                         >
                           <Calendar className="mr-2 h-4 w-4" />
-                          {startDate ? format(startDate, "PPP", { locale: i18n.language === 'he' ? he : enUS }) : <span>{t('trips.select_start_date')}</span>}
+                          {startDate ? format(startDate, i18n.language === 'he' ? "dd/MM/yyyy" : "PPP", { locale: i18n.language === 'he' ? he : enUS }) : <span>{t('trips.select_start_date')}</span>}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
@@ -1600,7 +1600,7 @@ export default function MyTripsNew() {
                           data-testid="select-end-date"
                         >
                           <Calendar className="mr-2 h-4 w-4" />
-                          {endDate ? format(endDate, "PPP", { locale: i18n.language === 'he' ? he : enUS }) : <span>{t('trips.select_end_date')}</span>}
+                          {endDate ? format(endDate, i18n.language === 'he' ? "dd/MM/yyyy" : "PPP", { locale: i18n.language === 'he' ? he : enUS }) : <span>{t('trips.select_end_date')}</span>}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
