@@ -1556,8 +1556,8 @@ export default function MyTripsNew() {
                 </div>
 
                 {/* Travel Dates */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
+                <div className={`gap-4 ${i18n.language === 'he' ? 'flex flex-row-reverse' : 'grid grid-cols-2'}`}>
+                  <div className={i18n.language === 'he' ? 'flex-1' : ''}>
                     <Label className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
                       {t('trips.start_date')}
                     </Label>
@@ -1588,7 +1588,7 @@ export default function MyTripsNew() {
                     </Popover>
                   </div>
 
-                  <div>
+                  <div className={i18n.language === 'he' ? 'flex-1' : ''}>
                     <Label className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
                       {t('trips.end_date')}
                     </Label>
