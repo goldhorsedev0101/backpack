@@ -2169,15 +2169,15 @@ export default function MyTripsNew() {
                             {suggestion.transportation.map((transport, idx) => (
                               <div key={idx} className="bg-blue-50 p-4 rounded-lg space-y-2" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                                 <div>
-                                  <h5 className="font-bold text-blue-900">
+                                  <h5 className="font-bold text-blue-900" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                                     {translateCity(transport.from)} → {translateCity(transport.to)}
                                   </h5>
-                                  <div className={`flex gap-4 text-sm text-blue-700 mt-1 ${i18n.language === 'he' ? 'justify-end' : 'justify-start'}`}>
+                                  <div className="space-y-1 mt-2">
                                     {transport.estimatedCost && (
-                                      <span>{t('trips.cost')}: {transport.estimatedCost}</span>
+                                      <p className="text-sm text-blue-700">{t('trips.cost')}: {transport.estimatedCost}</p>
                                     )}
                                     {transport.estimatedTime && (
-                                      <span>{t('trips.time')}: {transport.estimatedTime}</span>
+                                      <p className="text-sm text-blue-700">{t('trips.time')}: {transport.estimatedTime}</p>
                                     )}
                                   </div>
                                 </div>
