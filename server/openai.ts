@@ -234,7 +234,7 @@ REQUIRED JSON STRUCTURE FOR MULTI-CITY:
   "suggestions": [
     {
       "destination": "Creative multi-city journey name",
-      "country": "Primary starting country",
+      "country": "All countries separated by ' & ' (e.g., 'Italy & United Kingdom' or 'France & Spain & Germany')",
       "description": "2-3 sentence overview of full journey",
       "bestTimeToVisit": "Best season",
       "estimatedBudget": {"low": number, "high": number},
@@ -265,6 +265,10 @@ REQUIRED JSON STRUCTURE FOR MULTI-CITY:
     }
   ]
 }
+
+CRITICAL: The "country" field for multi-city trips MUST include ALL countries visited, separated by " & ".
+Example: If trip goes to Rome (Italy) → London (UK), country should be "Italy & United Kingdom"
+Example: If trip goes to Paris (France) → Rome (Italy) → Barcelona (Spain), country should be "France & Italy & Spain"
 
 ${preferences.language === 'he' ? 'LANGUAGE: Respond in Hebrew - all text fields must be in Hebrew.' : 'LANGUAGE: Respond in English'}
 
