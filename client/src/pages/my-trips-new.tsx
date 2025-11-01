@@ -2214,11 +2214,24 @@ export default function MyTripsNew() {
                       </p>
                     </div>
 
-                    {aiSuggestions.map((suggestion, index) => (
+                    {aiSuggestions.map((suggestion, index) => {
+                      // Helper function to translate multi-city titles
+                      const translateTitle = () => {
+                        // For multi-city trips, translate each part separately
+                        if (suggestion.destination.includes(' & ')) {
+                          const cities = suggestion.destination.split(' & ').map(city => translateCity(city.trim()));
+                          const countries = suggestion.country.split(' & ').map(country => translateCountry(country.trim()));
+                          return `${cities.join(' & ')}, ${countries.join(' & ')}`;
+                        }
+                        // For single destination, use normal translation
+                        return `${translateCity(suggestion.destination)}, ${translateCountry(suggestion.country)}`;
+                      };
+                      
+                      return (
                       <div key={index} className="border rounded-lg p-4 space-y-4 text-left" dir="ltr" data-testid={`suggestion-card-${index}`}>
                         <div>
                           <h3 className="text-xl font-bold text-slate-700 mb-1 text-left">
-                            {translateCity(suggestion.destination)}, {translateCountry(suggestion.country)}
+                            {translateTitle()}
                           </h3>
                           <p className="text-gray-600 leading-relaxed text-left">
                             {suggestion.description}
@@ -2404,7 +2417,8 @@ export default function MyTripsNew() {
                           </Button>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
