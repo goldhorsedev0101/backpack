@@ -27,6 +27,21 @@ export interface TripSuggestion {
   travelStyle: string[];
   duration: string;
   realPlaces?: RealPlace[];
+  destinationBreakdown?: {
+    destination: string;
+    country: string;
+    description: string;
+    highlights: string[];
+    duration: string;
+    dateRange?: string;
+  }[];
+  transportation?: {
+    from: string;
+    to: string;
+    recommendations: string[];
+    estimatedCost?: string;
+    estimatedTime?: string;
+  }[];
 }
 
 export interface TripItinerary {
@@ -78,6 +93,12 @@ export async function generateTravelSuggestions(
     adults?: number;
     children?: number;
     tripType?: string;
+    destinations?: Array<{
+      country: string;
+      city?: string;
+      startDate?: Date;
+      endDate?: Date;
+    }>;
   }
 ): Promise<TripSuggestion[]> {
   try {
@@ -106,12 +127,45 @@ export async function generateTravelSuggestions(
     
     console.log('Countries string for OpenAI prompt:', countriesStr);
     console.log('Specific city for OpenAI prompt:', specificCity);
+    console.log('Multi-city destinations:', preferences.destinations);
     
-    // Build the location constraint based on whether a specific city was provided
-    const locationConstraint = specificCity 
-      ? `CRITICAL: The user has selected a SPECIFIC CITY: ${specificCity} in ${countriesStr}
+    // Check if this is a multi-city trip
+    const isMultiCity = preferences.destinations && preferences.destinations.length > 1;
+    
+    // Build multi-city destinations string with date ranges
+    const multiCityStr = isMultiCity 
+      ? preferences.destinations!.map((dest, idx) => {
+          const cityPart = dest.city ? `${dest.city}, ` : '';
+          let datesPart = '';
+          if (dest.startDate && dest.endDate) {
+            const formatDate = (date: Date) => {
+              const d = new Date(date);
+              return d.toLocaleDateString(isHebrew ? 'he-IL' : 'en-US', { 
+                month: 'short', 
+                day: 'numeric' 
+              });
+            };
+            datesPart = ` (${formatDate(dest.startDate)} - ${formatDate(dest.endDate)})`;
+          }
+          return `${idx + 1}. ${cityPart}${dest.country}${datesPart}`;
+        }).join('\n')
+      : '';
+    
+    // Build the location constraint based on trip type
+    const locationConstraint = isMultiCity
+      ? `CRITICAL: This is a MULTI-CITY trip across these destinations:
+${multiCityStr}
+
+You MUST create trip suggestions that cover ALL these destinations in the order listed. Each suggestion should include:
+1. A destinationBreakdown array with details for EACH destination (city/country, description, highlights, recommended duration)
+2. A transportation array with specific recommendations for traveling BETWEEN each consecutive destination (flights, trains, buses, etc.)
+3. Overall trip description that connects all destinations into a cohesive journey
+
+The suggestions should differ in themes/styles (adventure, cultural, luxury, etc.) but must include all ${preferences.destinations!.length} destinations.`
+      : specificCity 
+        ? `CRITICAL: The user has selected a SPECIFIC CITY: ${specificCity} in ${countriesStr}
 You MUST provide 3 trip suggestions ONLY for ${specificCity} specifically. All suggestions must be about ${specificCity}, not other cities in ${countriesStr}.`
-      : `CRITICAL: The user has selected these specific countries: ${countriesStr}
+        : `CRITICAL: The user has selected these specific countries: ${countriesStr}
 You MUST provide trip suggestions ONLY for destinations within these countries. Do NOT suggest destinations in other countries.`;
     
     const travelerComposition = children > 0 
@@ -145,7 +199,41 @@ ${specificCity ? `- Specific City (REQUIRED): ${specificCity}` : `- Target Count
 Provide 3 trip suggestions in a JSON format.  
 Each suggestion should feel exciting and tailored, not generic.
 
-For each suggestion, include:
+${isMultiCity ? `
+For MULTI-CITY trips, each suggestion MUST include:
+- destination: Overall trip title (e.g., "European Adventure" or "Southeast Asia Explorer")
+- country: Primary/starting country
+- description: 2–3 sentence overview connecting all destinations (inspiring and clear)
+- bestTimeToVisit: e.g., "April to June"
+- estimatedBudget: {low, high} in USD for the ENTIRE multi-city trip
+- highlights: 3–5 key highlights across ALL destinations
+- travelStyle: relevant styles (e.g., adventure, culture, relax)
+- duration: total trip duration (e.g., "14 days")
+- destinationBreakdown: ARRAY with one object per destination:
+  [
+    {
+      "destination": "City/Region name",
+      "country": "Country name",
+      "description": "What makes this destination special in 1-2 sentences",
+      "highlights": ["Activity 1", "Activity 2", "Activity 3"],
+      "duration": "Recommended days here",
+      "dateRange": "Date range from user's input (e.g., 'Dec 1 - Dec 3')"
+    }
+  ]
+- transportation: ARRAY with recommendations for traveling BETWEEN destinations:
+  [
+    {
+      "from": "Starting city",
+      "to": "Destination city",
+      "recommendations": ["Flight via Ryanair (~$50)", "High-speed train (~4 hours, $80)", "Budget bus (~6 hours, $25)"],
+      "estimatedCost": "$50-80",
+      "estimatedTime": "1-4 hours"
+    }
+  ]
+
+CRITICAL: Include transportation between EVERY pair of consecutive destinations!
+` : `
+For single-destination trips, each suggestion includes:
 - destination (${specificCity ? `must be ${specificCity}` : 'city or region name'})
 - country
 - description: 2–3 sentence overview (inspiring and clear)
@@ -156,6 +244,7 @@ For each suggestion, include:
 - duration: how long to stay (e.g., "7–10 days")
 
 ${specificCity ? `IMPORTANT: All 3 suggestions must be about ${specificCity}. Provide different aspects, neighborhoods, or themes of ${specificCity}, but the destination field must always be ${specificCity}.` : 'Make sure the suggestions are diverse — different vibes, locations and experiences.'}
+`}
 
 Speak like a local travel buddy, not a formal guide.
 
@@ -170,7 +259,26 @@ Return ONLY a JSON object with this exact structure:
       "estimatedBudget": {"low": number, "high": number},
       "highlights": ["string", "string", "string"],
       "travelStyle": ["string", "string"],
-      "duration": "string"
+      "duration": "string"${isMultiCity ? `,
+      "destinationBreakdown": [
+        {
+          "destination": "string",
+          "country": "string",
+          "description": "string",
+          "highlights": ["string", "string", "string"],
+          "duration": "string",
+          "dateRange": "string"
+        }
+      ],
+      "transportation": [
+        {
+          "from": "string",
+          "to": "string",
+          "recommendations": ["string", "string"],
+          "estimatedCost": "string",
+          "estimatedTime": "string"
+        }
+      ]` : ''}
     }
   ]
 }`;

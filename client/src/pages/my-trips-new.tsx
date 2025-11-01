@@ -280,6 +280,21 @@ interface TripSuggestion {
   startDate?: string;
   endDate?: string;
   realPlaces?: RealPlace[];
+  destinationBreakdown?: {
+    destination: string;
+    country: string;
+    description: string;
+    highlights: string[];
+    duration: string;
+    dateRange?: string;
+  }[];
+  transportation?: {
+    from: string;
+    to: string;
+    recommendations: string[];
+    estimatedCost?: string;
+    estimatedTime?: string;
+  }[];
 }
 
 interface ItineraryDay {
@@ -2092,6 +2107,75 @@ export default function MyTripsNew() {
                             </div>
                           </div>
                         </div>
+
+                        {/* Multi-City Destination Breakdown */}
+                        {suggestion.destinationBreakdown && suggestion.destinationBreakdown.length > 0 && (
+                          <div className="space-y-4 border-t pt-4">
+                            <div className="flex items-center gap-2 flex-row-reverse">
+                              <MapPin className="w-5 h-5 text-purple-600" />
+                              <h4 className="font-semibold text-gray-800">{t('trips.destination_breakdown')}</h4>
+                            </div>
+                            {suggestion.destinationBreakdown.map((dest, idx) => (
+                              <div key={idx} className="bg-purple-50 p-4 rounded-lg space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <div className="text-right flex-1">
+                                    <h5 className="font-bold text-purple-900">
+                                      {translateCity(dest.destination)}, {translateCountry(dest.country)}
+                                    </h5>
+                                    {dest.dateRange && (
+                                      <p className="text-sm text-purple-700">{dest.dateRange}</p>
+                                    )}
+                                    <p className="text-sm text-purple-600">{dest.duration}</p>
+                                  </div>
+                                </div>
+                                <p className="text-sm text-gray-700 text-right">{dest.description}</p>
+                                <div className="space-y-1">
+                                  {dest.highlights.map((highlight, hIdx) => (
+                                    <div key={hIdx} className="flex items-center text-sm text-gray-700 text-right flex-row-reverse gap-2">
+                                      <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                                      <span>{translateText(highlight, i18n.language)}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Transportation Recommendations */}
+                        {suggestion.transportation && suggestion.transportation.length > 0 && (
+                          <div className="space-y-4 border-t pt-4">
+                            <div className="flex items-center gap-2 flex-row-reverse">
+                              <Plane className="w-5 h-5 text-blue-600" />
+                              <h4 className="font-semibold text-gray-800">{t('trips.transportation')}</h4>
+                            </div>
+                            {suggestion.transportation.map((transport, idx) => (
+                              <div key={idx} className="bg-blue-50 p-4 rounded-lg space-y-2">
+                                <div className="text-right">
+                                  <h5 className="font-bold text-blue-900">
+                                    {translateCity(transport.from)} → {translateCity(transport.to)}
+                                  </h5>
+                                  <div className="flex gap-4 justify-end text-sm text-blue-700 mt-1">
+                                    {transport.estimatedCost && (
+                                      <span>{t('trips.cost')}: {transport.estimatedCost}</span>
+                                    )}
+                                    {transport.estimatedTime && (
+                                      <span>{t('trips.time')}: {transport.estimatedTime}</span>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="space-y-1">
+                                  {transport.recommendations.map((rec, rIdx) => (
+                                    <div key={rIdx} className="flex items-center text-sm text-gray-700 text-right flex-row-reverse gap-2">
+                                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                      <span>{rec}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
 
 {/* Temporarily disabled RealPlaceLinks to debug
                         {suggestion.realPlaces && suggestion.realPlaces.length > 0 && (
