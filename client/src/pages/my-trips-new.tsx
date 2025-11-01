@@ -657,6 +657,10 @@ export default function MyTripsNew() {
     { country: "", city: "", days: 3 }
   ]);
 
+  // State for search functionality in Select components
+  const [countrySearchValues, setCountrySearchValues] = useState<string[]>([""]);
+  const [citySearchValues, setCitySearchValues] = useState<string[]>([""]);
+
   // Create form with dynamic schema that uses current translations
   const form = useForm<TripFormData>({
     resolver: zodResolver(createTripFormSchema(t)),
@@ -678,6 +682,8 @@ export default function MyTripsNew() {
     const newDestinations = [...destinations, { country: "", city: "", days: 3 }];
     setDestinations(newDestinations);
     form.setValue('destinations', newDestinations);
+    setCountrySearchValues([...countrySearchValues, ""]);
+    setCitySearchValues([...citySearchValues, ""]);
   };
 
   const removeDestination = (index: number) => {
@@ -685,6 +691,8 @@ export default function MyTripsNew() {
       const newDestinations = destinations.filter((_, i) => i !== index);
       setDestinations(newDestinations);
       form.setValue('destinations', newDestinations);
+      setCountrySearchValues(countrySearchValues.filter((_, i) => i !== index));
+      setCitySearchValues(citySearchValues.filter((_, i) => i !== index));
     }
   };
 
@@ -1586,31 +1594,44 @@ export default function MyTripsNew() {
                           </Label>
                           <Select
                             value={destination.country}
-                            onValueChange={(value) => updateDestination(index, 'country', value)}
+                            onValueChange={(value) => {
+                              updateDestination(index, 'country', value);
+                              // Reset search when country is selected
+                              const newSearchValues = [...countrySearchValues];
+                              newSearchValues[index] = "";
+                              setCountrySearchValues(newSearchValues);
+                            }}
                           >
                             <SelectTrigger data-testid={`select-country-${index}`} className="flex-1">
                               <SelectValue placeholder={t('trips.select_country')} />
                             </SelectTrigger>
                             <SelectContent position="popper" className="max-h-[300px]">
-                              <div className="px-2 pb-2">
+                              <div className="px-2 pb-2 sticky top-0 bg-white z-10">
                                 <Input
                                   placeholder={t('common.search')}
                                   className="h-8"
+                                  value={countrySearchValues[index] || ""}
                                   onChange={(e) => {
-                                    const searchValue = e.target.value.toLowerCase();
-                                    const items = document.querySelectorAll(`[data-testid="select-country-${index}"] + * [role="option"]`);
-                                    items.forEach((item: any) => {
-                                      const text = item.textContent?.toLowerCase() || '';
-                                      item.style.display = text.includes(searchValue) ? '' : 'none';
-                                    });
+                                    const newSearchValues = [...countrySearchValues];
+                                    newSearchValues[index] = e.target.value;
+                                    setCountrySearchValues(newSearchValues);
                                   }}
+                                  onClick={(e) => e.stopPropagation()}
                                 />
                               </div>
-                              {Object.keys(getWorldDestinations()).map((country) => (
-                                <SelectItem key={country} value={country}>
-                                  {t(`trips.countries.${country}`) || country}
-                                </SelectItem>
-                              ))}
+                              {Object.keys(getWorldDestinations())
+                                .filter((country) => {
+                                  const searchValue = (countrySearchValues[index] || "").toLowerCase();
+                                  if (!searchValue) return true;
+                                  const translatedCountry = t(`trips.countries.${country}`) || country;
+                                  return translatedCountry.toLowerCase().includes(searchValue) || 
+                                         country.toLowerCase().includes(searchValue);
+                                })
+                                .map((country) => (
+                                  <SelectItem key={country} value={country}>
+                                    {t(`trips.countries.${country}`) || country}
+                                  </SelectItem>
+                                ))}
                             </SelectContent>
                           </Select>
                         </div>
@@ -1622,32 +1643,45 @@ export default function MyTripsNew() {
                           </Label>
                           <Select
                             value={destination.city || ""}
-                            onValueChange={(value) => updateDestination(index, 'city', value)}
+                            onValueChange={(value) => {
+                              updateDestination(index, 'city', value);
+                              // Reset search when city is selected
+                              const newSearchValues = [...citySearchValues];
+                              newSearchValues[index] = "";
+                              setCitySearchValues(newSearchValues);
+                            }}
                             disabled={!destination.country}
                           >
                             <SelectTrigger data-testid={`select-city-${index}`} className="flex-1">
                               <SelectValue placeholder={t('trips.choose_city')} />
                             </SelectTrigger>
                             <SelectContent position="popper" className="max-h-[300px]">
-                              <div className="px-2 pb-2">
+                              <div className="px-2 pb-2 sticky top-0 bg-white z-10">
                                 <Input
                                   placeholder={t('common.search')}
                                   className="h-8"
+                                  value={citySearchValues[index] || ""}
                                   onChange={(e) => {
-                                    const searchValue = e.target.value.toLowerCase();
-                                    const items = document.querySelectorAll(`[data-testid="select-city-${index}"] + * [role="option"]`);
-                                    items.forEach((item: any) => {
-                                      const text = item.textContent?.toLowerCase() || '';
-                                      item.style.display = text.includes(searchValue) ? '' : 'none';
-                                    });
+                                    const newSearchValues = [...citySearchValues];
+                                    newSearchValues[index] = e.target.value;
+                                    setCitySearchValues(newSearchValues);
                                   }}
+                                  onClick={(e) => e.stopPropagation()}
                                 />
                               </div>
-                              {destination.country && getWorldDestinations()[destination.country]?.map((city: string) => (
-                                <SelectItem key={city} value={city}>
-                                  {translateCity(city)}
-                                </SelectItem>
-                              ))}
+                              {destination.country && getWorldDestinations()[destination.country]
+                                ?.filter((city: string) => {
+                                  const searchValue = (citySearchValues[index] || "").toLowerCase();
+                                  if (!searchValue) return true;
+                                  const translatedCity = translateCity(city);
+                                  return translatedCity.toLowerCase().includes(searchValue) || 
+                                         city.toLowerCase().includes(searchValue);
+                                })
+                                .map((city: string) => (
+                                  <SelectItem key={city} value={city}>
+                                    {translateCity(city)}
+                                  </SelectItem>
+                                ))}
                             </SelectContent>
                           </Select>
                         </div>
