@@ -2597,18 +2597,22 @@ export default function MyTripsNew() {
                         <div key={stableKey}>
                           {/* Show destination header for multi-city trips */}
                           {isNewDestination && day.destinationName && !day.isTransitDay && (
-                            <div className="bg-purple-100 p-4 rounded-lg mb-4" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
-                              <div className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                                <MapPin className="w-6 h-6 text-purple-600" />
-                                <h4 className="text-xl font-bold text-purple-900">
-                                  {translateCity(day.destinationName)}, {translateCountry(day.countryName)}
-                                </h4>
+                            <div className="bg-gradient-to-r from-purple-50 via-pink-50 to-purple-50 border-2 border-purple-200 p-5 rounded-xl mb-4 shadow-sm" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                              <div className={`flex items-center gap-3 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                <div className="bg-purple-500 p-2 rounded-full">
+                                  <MapPin className="w-5 h-5 text-white" />
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="text-xl font-bold text-purple-900 mb-1">
+                                    {translateCity(day.destinationName)}, {translateCountry(day.countryName)}
+                                  </h4>
+                                  {day.dateRange && (
+                                    <p className="text-sm text-purple-700 font-medium">
+                                      {formatDateRange(day.dateRange, i18n.language)}
+                                    </p>
+                                  )}
+                                </div>
                               </div>
-                              {day.dateRange && (
-                                <p className="text-sm text-purple-700 mt-1" dir="ltr">
-                                  {formatDateRange(day.dateRange, i18n.language)}
-                                </p>
-                              )}
                             </div>
                           )}
                           
