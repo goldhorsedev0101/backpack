@@ -1606,7 +1606,7 @@ export default function MyTripsNew() {
                               <SelectValue placeholder={t('trips.select_country')} />
                             </SelectTrigger>
                             <SelectContent position="popper" className="max-h-[300px]">
-                              <div className="px-2 pb-2 sticky top-0 bg-white z-10">
+                              <div className="px-2 pb-2 sticky top-0 bg-white z-10 border-b">
                                 <Input
                                   placeholder={t('common.search')}
                                   className="h-8"
@@ -1616,7 +1616,11 @@ export default function MyTripsNew() {
                                     newSearchValues[index] = e.target.value;
                                     setCountrySearchValues(newSearchValues);
                                   }}
+                                  onKeyDown={(e) => {
+                                    e.stopPropagation();
+                                  }}
                                   onClick={(e) => e.stopPropagation()}
+                                  autoFocus
                                 />
                               </div>
                               {Object.keys(getWorldDestinations())
@@ -1656,7 +1660,7 @@ export default function MyTripsNew() {
                               <SelectValue placeholder={t('trips.choose_city')} />
                             </SelectTrigger>
                             <SelectContent position="popper" className="max-h-[300px]">
-                              <div className="px-2 pb-2 sticky top-0 bg-white z-10">
+                              <div className="px-2 pb-2 sticky top-0 bg-white z-10 border-b">
                                 <Input
                                   placeholder={t('common.search')}
                                   className="h-8"
@@ -1666,7 +1670,11 @@ export default function MyTripsNew() {
                                     newSearchValues[index] = e.target.value;
                                     setCitySearchValues(newSearchValues);
                                   }}
+                                  onKeyDown={(e) => {
+                                    e.stopPropagation();
+                                  }}
                                   onClick={(e) => e.stopPropagation()}
+                                  autoFocus
                                 />
                               </div>
                               {destination.country && getWorldDestinations()[destination.country]
