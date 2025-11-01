@@ -58,7 +58,8 @@ import {
   Music,
   ShoppingBag,
   Globe,
-  Plane
+  Plane,
+  Plus
 } from "lucide-react";
 
 // Remove problematic Unicode control characters that OpenAI injects into Hebrew text
@@ -75,6 +76,7 @@ const createTripFormSchema = (t: any) => z.object({
   destinations: z.array(z.object({
     country: z.string().min(1, t('trips.select_destination')),
     city: z.string().optional(),
+    days: z.number().int().min(1, t('trips.days_required')).max(30, t('trips.days_max')),
   })).min(1, t('trips.select_at_least_one_destination')),
   travelStyle: z.array(z.string()).optional(), // Keep for backward compatibility but optional
   budget: z.number().min(100, t('trips.budget_required')),
@@ -86,6 +88,7 @@ const createTripFormSchema = (t: any) => z.object({
 type Destination = {
   country: string;
   city?: string;
+  days: number;
 };
 
 type TripFormData = {
@@ -649,21 +652,53 @@ export default function MyTripsNew() {
     }
   }, [aiSuggestions]);
 
+  // State for multi-city destinations
+  const [destinations, setDestinations] = useState<Destination[]>([
+    { country: "", city: "", days: 3 }
+  ]);
+
   // Create form with dynamic schema that uses current translations
   const form = useForm<TripFormData>({
     resolver: zodResolver(createTripFormSchema(t)),
     defaultValues: {
+      destinations: [{ country: "", city: "", days: 3 }],
       destination: "",
       specificCity: "",
       travelStyle: [],
       budget: logToLinear(linearToLog(5000)),
-      duration: "",
       interests: [],
       adults: 2,
       children: 0,
       tripType: "",
     },
   });
+
+  // Helper functions for managing destinations
+  const addDestination = () => {
+    const newDestinations = [...destinations, { country: "", city: "", days: 3 }];
+    setDestinations(newDestinations);
+    form.setValue('destinations', newDestinations);
+  };
+
+  const removeDestination = (index: number) => {
+    if (destinations.length > 1) {
+      const newDestinations = destinations.filter((_, i) => i !== index);
+      setDestinations(newDestinations);
+      form.setValue('destinations', newDestinations);
+    }
+  };
+
+  const updateDestination = (index: number, field: keyof Destination, value: string | number) => {
+    const newDestinations = [...destinations];
+    newDestinations[index] = { ...newDestinations[index], [field]: value };
+    setDestinations(newDestinations);
+    form.setValue('destinations', newDestinations);
+  };
+
+  // Calculate total days from all destinations
+  const getTotalDays = () => {
+    return destinations.reduce((sum, dest) => sum + (dest.days || 0), 0);
+  };
 
   // Helper function for toggling interests
   const toggleInterest = (interestId: string) => {
@@ -1079,10 +1114,14 @@ export default function MyTripsNew() {
       console.log('Form data:', formData);
       console.log('Selected interests:', selectedInterests);
       console.log('Budget:', budget);
+      console.log('Destinations:', destinations);
       
-      if (!formData.destination || selectedInterests.length === 0) {
+      // Validate at least one destination with country selected
+      const validDestinations = destinations.filter(d => d.country);
+      
+      if (validDestinations.length === 0 || selectedInterests.length === 0) {
         console.log('Missing information check failed:', {
-          destination: formData.destination,
+          validDestinations: validDestinations.length,
           interestsLength: selectedInterests.length
         });
         toast({
@@ -1093,18 +1132,24 @@ export default function MyTripsNew() {
         return;
       }
 
-      // If a specific city is selected, use it instead of the country
-      const effectiveDestination = formData.specificCity && formData.specificCity !== "ANY"
-        ? `${formData.specificCity}, ${formData.destination}`
-        : formData.destination;
+      // Build destination string with all stops
+      // Example: "Paris, France (3 days) → Rome, Italy (4 days) → Barcelona, Spain (3 days)"
+      const destinationString = validDestinations.map(dest => {
+        const cityPart = dest.city ? `${dest.city}, ` : '';
+        return `${cityPart}${dest.country} (${dest.days} ${t('trips.days')})`;
+      }).join(' → ');
+
+      // Calculate total duration from all destinations
+      const totalDays = getTotalDays();
 
       const data = {
         ...formData,
-        destination: effectiveDestination,
-        travelStyle: selectedInterests, // Use interests for both
+        destinations: validDestinations,
+        destination: destinationString, // Keep for backward compatibility
+        travelStyle: selectedInterests,
         interests: selectedInterests,
         budget: budget,
-        duration: calculateDurationInDays(startDate, endDate),
+        duration: totalDays,
         startDate: startDate?.toISOString(),
         endDate: endDate?.toISOString(),
       };
@@ -1494,82 +1539,119 @@ export default function MyTripsNew() {
             </div>
             <Card className="shadow-lg bg-gradient-to-br from-orange-50 via-teal-50 to-blue-50 border-none">
               <CardContent className="space-y-6 p-6">
-                {/* Continent Selection */}
-                <div>
-                  <Label htmlFor="continent" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
-                    {t('trips.select_continent')}
-                  </Label>
-                  <Select onValueChange={handleContinentChange} value={selectedContinent}>
-                    <SelectTrigger className="w-full p-3" data-testid="select-continent">
-                      <SelectValue placeholder={t('trips.select_continent')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CONTINENTS.map((continent) => (
-                        <SelectItem key={continent} value={continent}>
-                          {t(`trips.continents.${continent}`) || continent}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                {/* Multi-City Destinations */}
+                <div className="space-y-4">
+                  <div className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                    <Label className="text-sm font-medium text-slate-700">
+                      {t('trips.select_destination')}
+                    </Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addDestination}
+                      className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}
+                      data-testid="add-destination"
+                    >
+                      <Plus className="w-4 h-4" />
+                      {t('trips.add_destination')}
+                    </Button>
+                  </div>
 
-                {/* Country Selection (Dependent on Continent) */}
-                <div>
-                  <Label htmlFor="destination" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
-                    {t('trips.select_country')}
-                  </Label>
-                  <Select 
-                    onValueChange={(value) => {
-                      form.setValue('destination', value);
-                      form.setValue('specificCity', ""); // Reset city when country changes
-                      setSpecificCity("");
-                      setSelectedCountry(value);
-                      console.log('Destination set to:', value);
-                    }}
-                    value={form.watch('destination')}
-                    disabled={!selectedContinent}
-                    key={`country-${i18n.language}`}
-                  >
-                    <SelectTrigger className="w-full p-3" data-testid="select-country">
-                      <SelectValue placeholder={selectedContinent ? t('trips.select_country') : t('trips.select_continent')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableCountries.map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {t(`trips.countries.${country}`) || country}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                  {destinations.map((destination, index) => (
+                    <Card key={index} className="p-4 bg-white border-2 border-blue-100">
+                      <div className="space-y-4">
+                        <div className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                          <h3 className="font-semibold text-blue-700">
+                            {t('trips.destination_number', { number: index + 1 })}
+                          </h3>
+                          {destinations.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeDestination(index)}
+                              className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                              data-testid={`remove-destination-${index}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
 
-                {/* City Selection (Dependent on Country) */}
-                <div>
-                  <Label htmlFor="specificCity" className={`text-sm font-medium text-slate-700 mb-2 block ${i18n.language === 'he' ? 'text-left' : ''}`}>
-                    {t('trips.select_specific_city')}
-                  </Label>
-                  <Select 
-                    onValueChange={(value) => {
-                      form.setValue('specificCity', value);
-                      setSpecificCity(value);
-                      console.log('Selected city:', value);
-                    }}
-                    value={specificCity}
-                    disabled={!selectedCountry || availableCities.length === 0}
-                    key={`city-${i18n.language}-${selectedCountry}`}
-                  >
-                    <SelectTrigger className="w-full p-3" data-testid="select-city">
-                      <SelectValue placeholder={selectedCountry ? t('trips.choose_city') : t('trips.select_country_first')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ANY">{t('trips.any_city_in_country')}</SelectItem>
-                      {availableCities.map((city: string) => (
-                        <SelectItem key={city} value={city}>
-                          {translateCity(city)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                        <div className="grid grid-cols-2 gap-4">
+                          {/* Country */}
+                          <div>
+                            <Label className="text-sm text-slate-600 mb-2 block">
+                              {t('trips.select_country')}
+                            </Label>
+                            <Select
+                              value={destination.country}
+                              onValueChange={(value) => updateDestination(index, 'country', value)}
+                            >
+                              <SelectTrigger data-testid={`select-country-${index}`}>
+                                <SelectValue placeholder={t('trips.select_country')} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Object.keys(getWorldDestinations()).map((country) => (
+                                  <SelectItem key={country} value={country}>
+                                    {t(`trips.countries.${country}`) || country}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* City */}
+                          <div>
+                            <Label className="text-sm text-slate-600 mb-2 block">
+                              {t('trips.select_specific_city')} ({t('trips.optional')})
+                            </Label>
+                            <Select
+                              value={destination.city || ""}
+                              onValueChange={(value) => updateDestination(index, 'city', value)}
+                              disabled={!destination.country}
+                            >
+                              <SelectTrigger data-testid={`select-city-${index}`}>
+                                <SelectValue placeholder={t('trips.choose_city')} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="">{t('trips.any_city_in_country')}</SelectItem>
+                                {destination.country && getWorldDestinations()[destination.country]?.map((city: string) => (
+                                  <SelectItem key={city} value={city}>
+                                    {translateCity(city)}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+
+                        {/* Days */}
+                        <div>
+                          <Label className="text-sm text-slate-600 mb-2 block">
+                            {t('trips.days_in_destination')}
+                          </Label>
+                          <Input
+                            type="number"
+                            min="1"
+                            max="30"
+                            value={destination.days}
+                            onChange={(e) => updateDestination(index, 'days', parseInt(e.target.value) || 1)}
+                            className="w-full"
+                            data-testid={`days-input-${index}`}
+                          />
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+
+                  {/* Total Days Summary */}
+                  <div className={`p-3 bg-blue-50 rounded-lg ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                    <p className="text-sm font-semibold text-blue-800">
+                      {t('trips.total_trip_duration')}: {getTotalDays()} {t('trips.days')}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Travel Dates */}

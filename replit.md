@@ -33,6 +33,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Core Features & Technical Implementations
 - **AI-Powered Trip Planning**: Utilizes OpenAI for personalized recommendations, itinerary generation, and an interactive assistant, considering traveler composition and trip type. Integrates Google Places API for real-world booking suggestions.
+- **Multi-City Trip Planning**: Users can plan complex trips with multiple destinations. Each stop includes country, city (optional), and number of days. The system builds comprehensive itineraries like "Paris, France (3 days) → Rome, Italy (4 days) → Barcelona, Spain (3 days)" with automatic total duration calculation. UI features add/remove destination buttons, individual stop configuration, and real-time trip duration summary. Backend API accepts both multi-city format (destinations array) and legacy single-destination format for backward compatibility.
 - **AI Assistant Page**: Dedicated full-page AI assistant interface with active chat and conversation history sidebar. Features include: auto-save, view past chats, start new ones, and seamless auto-redirect from the home page. Supports full language (Hebrew/English) based on UI settings.
 - **Multi-Destination Journeys**: Curated multi-city itineraries with detailed breakdowns, filterable lists, detailed pages, and conversion to personalized trips via AI.
 - **Community Features**: Reviews, user connections, real-time chat (WebSockets), content sharing, and gamified achievements.

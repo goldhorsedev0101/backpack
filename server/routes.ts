@@ -2264,7 +2264,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   // AI-powered travel suggestions (guest-friendly)
   app.post('/api/ai/travel-suggestions', async (req, res) => {
     try {
-      const { destination, travelStyle, budget, duration, interests, preferredCountries, language, adults, children, tripType, startDate, endDate } = req.body;
+      const { destination, destinations, travelStyle, budget, duration, interests, preferredCountries, language, adults, children, tripType, startDate, endDate } = req.body;
       
       // Normalize language parameter
       const normalizedLanguage = (language || req.headers['accept-language'] || 'en').toString().toLowerCase();
@@ -2272,6 +2272,7 @@ export async function registerRoutes(app: Express): Promise<void> {
       const finalLanguage = isHebrew ? 'he' : 'en';
       
       console.log('Travel suggestions request - Language:', language, 'Normalized:', finalLanguage);
+      console.log('Destinations array:', destinations);
       
       // Validate required inputs
       if (!travelStyle || !budget || !duration || !interests) {
@@ -2280,20 +2281,30 @@ export async function registerRoutes(app: Express): Promise<void> {
         });
       }
 
-      // Parse destination to separate city and country if provided as "City, Country"
+      // Handle multi-city destinations (new format) or legacy single destination
       let specificCity: string | undefined;
       let country: string;
+      let multiCityDestinations: any[] = [];
       
-      if (destination && typeof destination === 'string' && destination.includes(',')) {
+      if (destinations && Array.isArray(destinations) && destinations.length > 0) {
+        // New multi-city format
+        multiCityDestinations = destinations;
+        // Use first destination as primary for AI context
+        country = destinations[0].country;
+        specificCity = destinations[0].city || undefined;
+        
+        console.log("Multi-city trip with destinations:", multiCityDestinations);
+      } else if (destination && typeof destination === 'string' && destination.includes(',')) {
+        // Legacy format: "City, Country"
         const parts = destination.split(',').map(part => part.trim());
-        specificCity = parts[0]; // e.g., "Rome"
-        country = parts[1]; // e.g., "Italy"
+        specificCity = parts[0];
+        country = parts[1];
       } else {
         country = destination;
       }
 
       console.log("Generating travel suggestions with data:", {
-        specificCity, country, travelStyle, budget, duration, interests, preferredCountries, adults, children, tripType
+        specificCity, country, travelStyle, budget, duration, interests, preferredCountries, adults, children, tripType, multiCityDestinations
       });
 
       const suggestions = await generateTravelSuggestions({
@@ -2306,7 +2317,8 @@ export async function registerRoutes(app: Express): Promise<void> {
         language: finalLanguage,
         adults: adults || 2,
         children: children || 0,
-        tripType: tripType || 'family'
+        tripType: tripType || 'family',
+        destinations: multiCityDestinations.length > 0 ? multiCityDestinations : undefined
       });
       
       console.log("Generated suggestions:", suggestions);
