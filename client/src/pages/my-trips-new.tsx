@@ -72,7 +72,10 @@ const normalizeRtlText = (text: string | null | undefined, isHebrew: boolean) =>
 
 // Create form schema function that uses translations
 const createTripFormSchema = (t: any) => z.object({
-  destination: z.string().min(1, t('trips.select_destination')),
+  destinations: z.array(z.object({
+    country: z.string().min(1, t('trips.select_destination')),
+    city: z.string().optional(),
+  })).min(1, t('trips.select_at_least_one_destination')),
   travelStyle: z.array(z.string()).optional(), // Keep for backward compatibility but optional
   budget: z.number().min(100, t('trips.budget_required')),
   startDate: z.date().optional(),
@@ -80,8 +83,14 @@ const createTripFormSchema = (t: any) => z.object({
   interests: z.array(z.string()).min(1, t('trips.select_interests')),
 });
 
+type Destination = {
+  country: string;
+  city?: string;
+};
+
 type TripFormData = {
-  destination: string;
+  destinations: Destination[];
+  destination: string; // Keep for backward compatibility
   specificCity: string;
   travelStyle: string[];
   budget: number;
