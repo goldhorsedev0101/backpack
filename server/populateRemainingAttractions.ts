@@ -1907,4 +1907,12 @@ const attractionsData: Record<string, AttractionData[]> = {
     {
       name: "Nairobi National Park",
       description: "Unique wildlife park within city limits, home to lions, rhinos, giraffes with Nairobi skyline backdrop.",
-      nameHe: "הפארק הלאומי נייר
+      nameHe: "הפארק הלאומי ניירובי",
+      descriptionHe: "פארק חיות בר ייחודי בתחומי העיר, ביתם של אריות, קרנפים וג'ירפות עם רקע קו הרקיע של ניירובי.",
+      lat: "-1.3733",
+      lon: "36.8582",
+      rating: "4.5",
+      tags: ["wildlife", "nature", "safari"]
+    }
+  ]
+};
