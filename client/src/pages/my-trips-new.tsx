@@ -400,7 +400,10 @@ const formatDateRange = (dateRange: string, lang: string): string => {
   const dateRangeRegex = /(\w+)\s+(\d+)\s*-\s*(\w+)\s+(\d+),?\s*(\d{4})/;
   const match = dateRange.match(dateRangeRegex);
   
-  if (!match) return dateRange;
+  if (!match) {
+    console.log('[formatDateRange] No match for:', dateRange);
+    return dateRange;
+  }
   
   const [, startMonth, startDay, endMonth, endDay, year] = match;
   
@@ -425,7 +428,10 @@ const formatDateRange = (dateRange: string, lang: string): string => {
   const startFormatted = `${startDay.padStart(2, '0')}/${startMonthNum}/${year}`;
   const endFormatted = `${endDay.padStart(2, '0')}/${endMonthNum}/${year}`;
   
-  return `${startFormatted} - ${endFormatted}`;
+  const result = `${startFormatted} - ${endFormatted}`;
+  console.log('[formatDateRange] Input:', dateRange, '→ Output:', result);
+  
+  return result;
 };
 
 // Translation function for travel style tags and highlights
