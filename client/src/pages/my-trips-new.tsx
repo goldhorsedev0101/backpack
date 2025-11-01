@@ -2310,7 +2310,9 @@ export default function MyTripsNew() {
                               <div key={idx} className="bg-purple-50 p-4 rounded-lg space-y-2" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                                 <div>
                                   <h5 className="font-bold text-purple-900">
-                                    {translateCity(dest.destination)}, {translateCountry(dest.country)}
+                                    {translateCity(dest.destination)}, {dest.country.includes(' & ') 
+                                      ? dest.country.split(' & ').map(c => translateCountry(c.trim())).join(' & ')
+                                      : translateCountry(dest.country)}
                                   </h5>
                                   {dest.dateRange && (
                                     <p className="text-sm text-purple-700" dir="ltr">{formatDateRange(dest.dateRange, i18n.language)}</p>
