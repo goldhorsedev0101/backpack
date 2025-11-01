@@ -179,6 +179,51 @@ ${isHebrew ? 'IMPORTANT: Respond in Hebrew. All text fields (destination, countr
 
 ${locationConstraint}
 
+${isMultiCity ? `
+EXAMPLE MULTI-CITY RESPONSE (for reference - adapt to user's actual destinations):
+{
+  "suggestions": [
+    {
+      "destination": "European Adventure",
+      "country": "France",
+      "description": "Experience the magic of three iconic European cities...",
+      "bestTimeToVisit": "April to June",
+      "estimatedBudget": {"low": 2500, "high": 4000},
+      "highlights": ["Eiffel Tower in Paris", "Colosseum in Rome", "Sagrada Familia in Barcelona"],
+      "travelStyle": ["cultural", "adventure"],
+      "duration": "14 days",
+      "destinationBreakdown": [
+        {
+          "destination": "Paris",
+          "country": "France",
+          "description": "The City of Light offers world-class museums, charming cafes, and iconic landmarks.",
+          "highlights": ["Visit the Louvre Museum", "Climb the Eiffel Tower", "Stroll along the Seine"],
+          "duration": "4 days",
+          "dateRange": "Dec 1 - Dec 4"
+        },
+        {
+          "destination": "Rome",
+          "country": "Italy",
+          "description": "Ancient history meets modern Italian culture in the Eternal City.",
+          "highlights": ["Explore the Colosseum", "Visit Vatican Museums", "Toss a coin in Trevi Fountain"],
+          "duration": "5 days",
+          "dateRange": "Dec 5 - Dec 9"
+        }
+      ],
+      "transportation": [
+        {
+          "from": "Paris",
+          "to": "Rome",
+          "recommendations": ["Direct flight via Ryanair or EasyJet (~$60-100)", "Night train for a scenic journey (~$120-180)", "FlixBus budget option (~$80, 18 hours)"],
+          "estimatedCost": "$60-180",
+          "estimatedTime": "2-18 hours depending on option"
+        }
+      ]
+    }
+  ]
+}
+` : ''}
+
 CRITICAL: This trip is for ${travelerComposition} as a ${tripType} trip. 
 ${children > 0 ? 'IMPORTANT: This is a family trip with children. All suggestions MUST be family-friendly with child-appropriate activities, accommodations, and safety considerations.' : ''}
 ${tripType === 'honeymoon' ? 'IMPORTANT: This is a honeymoon trip. Focus on romantic destinations, couple activities, and intimate experiences.' : ''}
