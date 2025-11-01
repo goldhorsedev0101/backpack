@@ -1313,12 +1313,20 @@ export default function MyTripsNew() {
   const handleGenerateItinerary = async () => {
     try {
       setIsGeneratingItinerary(true);
-      try {
+      
+      // Check if this is a multi-city trip by looking at the first AI suggestion
+      const firstSuggestion = aiSuggestions[0];
+      
+      if (firstSuggestion?.destinationBreakdown && firstSuggestion.destinationBreakdown.length > 0) {
+        // Multi-city trip: generate itinerary for each destination
+        console.log('Generating multi-city itinerary for', firstSuggestion.destinationBreakdown.length, 'destinations');
+        
+        // Call handleGenerateItineraryForSuggestion which will handle multi-city logic
+        await handleGenerateItineraryForSuggestion(firstSuggestion);
+      } else {
+        // Single destination trip: use the regular mutation
         const result = await generateItineraryMutation.mutateAsync();
         console.log('Itinerary generation completed:', result);
-      } catch (mutationError) {
-        console.error('Itinerary mutation failed:', mutationError);
-        // Error is handled in onError callback
       }
     } catch (error) {
       console.error('Error in handleGenerateItinerary:', error);
@@ -1331,77 +1339,138 @@ export default function MyTripsNew() {
     try {
       setIsGeneratingItinerary(true);
       
-      // Parse duration to get number of days
-      const durationText = suggestion.duration.toLowerCase();
-      let durationDays = 7; // default
-      
-      console.log('Parsing suggestion duration:', suggestion.duration);
-      
-      // Handle ranges like "20-25 days" or "2-3 weeks" (supports all dash types: - – —)
-      const rangeMatch = durationText.match(/(\d+)\s*[-–—]\s*(\d+)/);
-      if (rangeMatch) {
-        const min = parseInt(rangeMatch[1]);
-        const max = parseInt(rangeMatch[2]);
-        
-        console.log(`Found range: ${min}-${max}`);
-        
-        if (durationText.includes('week') || durationText.includes('שבוע')) {
-          // Use the maximum number of weeks
-          durationDays = max * 7;
-          console.log(`Parsed as weeks: ${max} weeks = ${durationDays} days`);
-        } else {
-          // Use the maximum number of days
-          durationDays = max;
-          console.log(`Parsed as days: ${max} days`);
-        }
-      } else if (durationText.includes('week') || durationText.includes('שבוע')) {
-        const weeks = parseInt(durationText) || 1;
-        durationDays = weeks * 7;
-        console.log(`Parsed single week value: ${weeks} weeks = ${durationDays} days`);
-      } else if (durationText.includes('day') || durationText.includes('יום')) {
-        durationDays = parseInt(durationText) || 7;
-        console.log(`Parsed single day value: ${durationDays} days`);
-      }
-      
-      console.log('Final duration in days:', durationDays);
-      
-      console.log('Generating itinerary for suggestion:', {
-        destination: suggestion.destination,
-        duration: durationDays,
-        travelStyle: suggestion.travelStyle
-      });
-      
       const formData = form.getValues();
-      const response = await apiRequest('/api/ai/itinerary', {
-        method: 'POST',
-        body: JSON.stringify({
-          destination: suggestion.destination,
-          duration: durationDays,
-          interests: suggestion.highlights || [], // Use highlights as interests
-          language: i18n.language,
-          travelStyle: suggestion.travelStyle,
-          budget: suggestion.estimatedBudget.low || 1000,
-          adults: formData.adults || 2,
-          children: formData.children || 0,
-          tripType: formData.tripType || 'family',
-        }),
-      });
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Itinerary API error:', errorData);
-        throw new Error(errorData.message || `API Error: ${response.status}`);
+      // Check if this is a multi-city trip
+      if (suggestion.destinationBreakdown && suggestion.destinationBreakdown.length > 0) {
+        console.log('Generating multi-city itinerary for', suggestion.destinationBreakdown.length, 'destinations');
+        
+        // Helper function to calculate days from dateRange
+        const calculateDaysFromDateRange = (dateRange: string): number => {
+          // Parse "MM/DD/YYYY - MM/DD/YYYY" format
+          const match = dateRange.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s*-\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+          if (match) {
+            const [, startMonth, startDay, startYear, endMonth, endDay, endYear] = match;
+            const start = new Date(parseInt(startYear), parseInt(startMonth) - 1, parseInt(startDay));
+            const end = new Date(parseInt(endYear), parseInt(endMonth) - 1, parseInt(endDay));
+            const diffTime = Math.abs(end.getTime() - start.getTime());
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays + 1; // Include both start and end dates
+          }
+          return 7; // default
+        };
+        
+        // Generate itinerary for each destination
+        const allItineraries: any[] = [];
+        
+        for (const dest of suggestion.destinationBreakdown) {
+          const daysForDestination = calculateDaysFromDateRange(dest.dateRange);
+          console.log(`Generating ${daysForDestination}-day itinerary for ${dest.destination}, ${dest.country}`);
+          
+          const response = await apiRequest('/api/ai/itinerary', {
+            method: 'POST',
+            body: JSON.stringify({
+              destination: `${dest.destination}, ${dest.country}`,
+              duration: daysForDestination,
+              interests: dest.highlights || suggestion.highlights || [],
+              language: i18n.language,
+              travelStyle: suggestion.travelStyle,
+              budget: suggestion.estimatedBudget?.low || 1000,
+              adults: formData.adults || 2,
+              children: formData.children || 0,
+              tripType: formData.tripType || 'family',
+            }),
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Itinerary API error for', dest.destination, ':', errorData);
+            throw new Error(errorData.message || `API Error: ${response.status}`);
+          }
+          
+          const itineraryData = await response.json();
+          
+          // Add destination info to each day in the itinerary
+          const enrichedItinerary = itineraryData.map((day: any) => ({
+            ...day,
+            destinationName: dest.destination,
+            countryName: dest.country,
+            dateRange: dest.dateRange
+          }));
+          
+          allItineraries.push(...enrichedItinerary);
+        }
+        
+        console.log('Generated complete multi-city itinerary:', allItineraries);
+        setItinerary(allItineraries);
+        setActiveTab('itinerary');
+        
+        toast({
+          title: i18n.language === 'he' ? "הצלחה!" : "Success!",
+          description: i18n.language === 'he' 
+            ? `נוצר מסלול יומי עבור ${suggestion.destinationBreakdown.length} יעדים`
+            : `Generated daily itinerary for ${suggestion.destinationBreakdown.length} destinations`,
+        });
+        
+      } else {
+        // Single destination trip
+        const durationText = suggestion.duration.toLowerCase();
+        let durationDays = 7; // default
+        
+        console.log('Parsing suggestion duration:', suggestion.duration);
+        
+        const rangeMatch = durationText.match(/(\d+)\s*[-–—]\s*(\d+)/);
+        if (rangeMatch) {
+          const min = parseInt(rangeMatch[1]);
+          const max = parseInt(rangeMatch[2]);
+          
+          if (durationText.includes('week') || durationText.includes('שבוע')) {
+            durationDays = max * 7;
+          } else {
+            durationDays = max;
+          }
+        } else if (durationText.includes('week') || durationText.includes('שבוע')) {
+          const weeks = parseInt(durationText) || 1;
+          durationDays = weeks * 7;
+        } else if (durationText.includes('day') || durationText.includes('יום')) {
+          durationDays = parseInt(durationText) || 7;
+        }
+        
+        console.log('Generating single destination itinerary for', suggestion.destination);
+        
+        const response = await apiRequest('/api/ai/itinerary', {
+          method: 'POST',
+          body: JSON.stringify({
+            destination: suggestion.destination,
+            duration: durationDays,
+            interests: suggestion.highlights || [],
+            language: i18n.language,
+            travelStyle: suggestion.travelStyle,
+            budget: suggestion.estimatedBudget?.low || 1000,
+            adults: formData.adults || 2,
+            children: formData.children || 0,
+            tripType: formData.tripType || 'family',
+          }),
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Itinerary API error:', errorData);
+          throw new Error(errorData.message || `API Error: ${response.status}`);
+        }
+        
+        const jsonData = await response.json();
+        console.log('Received itinerary response:', jsonData);
+        setItinerary(jsonData);
+        setActiveTab('itinerary');
+        
+        toast({
+          title: i18n.language === 'he' ? "הצלחה!" : "Success!",
+          description: i18n.language === 'he'
+            ? `נוצר מסלול של ${durationDays} ימים עבור ${suggestion.destination}`
+            : `Generated ${durationDays}-day itinerary for ${suggestion.destination}`,
+        });
       }
-      
-      const jsonData = await response.json();
-      console.log('Received itinerary response:', jsonData);
-      setItinerary(jsonData);
-      setActiveTab('itinerary'); // Switch to itinerary tab
-      
-      toast({
-        title: "Success!",
-        description: `Generated ${durationDays}-day itinerary for ${suggestion.destination}`,
-      });
       
     } catch (error) {
       console.error('Error generating itinerary for suggestion:', error);
@@ -2372,14 +2441,37 @@ export default function MyTripsNew() {
                       </div>
                     </div>
                     
-                    {itinerary.map((day) => (
-                      <Card key={day.day} className={`${i18n.language === 'he' ? 'border-r-4 border-r-primary' : 'border-l-4 border-l-primary'} ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
-                        <CardHeader className="pb-3">
-                          <CardTitle className={`flex items-center text-lg ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                            <Calendar className={`w-5 h-5 text-primary ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-{t('trips.day')} {day.day} – {translateCity(day.location)}
-                          </CardTitle>
-                        </CardHeader>
+                    {itinerary.map((day, dayIndex) => {
+                      // Check if this is the first day of a new destination
+                      const isNewDestination = dayIndex === 0 || 
+                        (day.destinationName && itinerary[dayIndex - 1].destinationName !== day.destinationName);
+                      
+                      return (
+                        <div key={day.day}>
+                          {/* Show destination header for multi-city trips */}
+                          {isNewDestination && day.destinationName && (
+                            <div className="bg-purple-100 p-4 rounded-lg mb-4" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                              <div className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                <MapPin className="w-6 h-6 text-purple-600" />
+                                <h4 className="text-xl font-bold text-purple-900">
+                                  {translateCity(day.destinationName)}, {translateCountry(day.countryName)}
+                                </h4>
+                              </div>
+                              {day.dateRange && (
+                                <p className="text-sm text-purple-700 mt-1" dir="ltr">
+                                  {formatDateRange(day.dateRange, i18n.language)}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                          
+                          <Card className={`${i18n.language === 'he' ? 'border-r-4 border-r-primary' : 'border-l-4 border-l-primary'} ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                            <CardHeader className="pb-3">
+                              <CardTitle className={`flex items-center text-lg ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                <Calendar className={`w-5 h-5 text-primary ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
+                                {t('trips.day')} {day.day} – {translateCity(day.location)}
+                              </CardTitle>
+                            </CardHeader>
                         <CardContent className="space-y-4">
                           {/* Activities */}
                           <div>
@@ -2426,8 +2518,10 @@ export default function MyTripsNew() {
                             </ul>
                           </div>
                         </CardContent>
-                      </Card>
-                    ))}
+                          </Card>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
