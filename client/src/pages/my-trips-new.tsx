@@ -2148,8 +2148,8 @@ export default function MyTripsNew() {
                                 <p className="text-sm text-gray-700">{dest.description}</p>
                                 <div className="space-y-1">
                                   {dest.highlights.map((highlight, hIdx) => (
-                                    <div key={hIdx} className={`flex items-center text-sm text-gray-700 gap-2 ${i18n.language === 'he' ? 'text-right flex-row-reverse' : 'text-left'}`}>
-                                      <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                                    <div key={hIdx} className="flex items-center text-sm text-gray-700 gap-2">
+                                      <span className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0"></span>
                                       <span>{translateText(highlight, i18n.language)}</span>
                                     </div>
                                   ))}
