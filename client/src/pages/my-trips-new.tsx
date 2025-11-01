@@ -2165,7 +2165,7 @@ export default function MyTripsNew() {
                               <Star className="w-4 h-4 text-yellow-600" />
                               <span className="font-semibold text-gray-800 text-sm">{t('trips.highlights')}</span>
                             </div>
-                            <div className="flex flex-wrap gap-2 w-full justify-end">
+                            <div className="flex flex-wrap gap-4 w-full justify-end">
                               {suggestion.highlights.map((highlight, idx) => (
                                 <div key={idx} className="flex items-center text-sm text-gray-700 text-right flex-row-reverse gap-2">
                                   <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
