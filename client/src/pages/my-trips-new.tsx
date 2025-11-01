@@ -814,21 +814,25 @@ export default function MyTripsNew() {
           }),
         });
         const jsonData = await response.json();
-        console.log('API response received:', jsonData);
+        console.log('API response received (original):', jsonData);
         
         // Fix country field for multi-city trips - should include all countries
         const fixedData = jsonData.map((suggestion: any) => {
           if (suggestion.destinationBreakdown && suggestion.destinationBreakdown.length > 1) {
             // Extract unique countries from destinationBreakdown
             const countries = [...new Set(suggestion.destinationBreakdown.map((dest: any) => dest.country))];
-            return {
+            const updatedSuggestion = {
               ...suggestion,
               country: countries.join(' & ') // Join with " & "
             };
+            console.log('Fixed country field:', suggestion.country, '→', updatedSuggestion.country);
+            return updatedSuggestion;
           }
+          console.log('Not multi-city or single destination:', suggestion.destination);
           return suggestion;
         });
         
+        console.log('API response received (fixed):', fixedData);
         return fixedData as TripSuggestion[];
       } catch (error) {
         console.error('API request failed:', error);
