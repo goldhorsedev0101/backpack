@@ -2513,10 +2513,10 @@ export default function MyTripsNew() {
                       // Transit day - special rendering
                       if (day.isTransitDay && day.transitInfo) {
                         return (
-                          <div key={stableKey}>
-                            <Card className={`bg-gradient-to-r from-orange-50 to-yellow-50 ${i18n.language === 'he' ? 'border-r-4 border-r-orange-500' : 'border-l-4 border-l-orange-500'} ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                          <div key={stableKey} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                            <Card className={`bg-gradient-to-r from-orange-50 to-yellow-50 ${i18n.language === 'he' ? 'border-r-4 border-r-orange-500' : 'border-l-4 border-l-orange-500'}`}>
                               <CardHeader className="pb-3">
-                                <CardTitle className={`flex items-center text-lg ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                <CardTitle className="flex items-center text-lg">
                                   <Plane className={`w-5 h-5 text-orange-600 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
                                   {t('trips.day')} {day.day} – {i18n.language === 'he' ? 'יום מעבר' : 'Transit Day'}
                                 </CardTitle>
@@ -2574,26 +2574,26 @@ export default function MyTripsNew() {
                                 {/* Transportation Details */}
                                 <div className="grid grid-cols-2 gap-3">
                                   <div className="bg-white p-3 rounded-lg">
-                                    <p className={`text-xs text-gray-500 mb-1 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                                    <p className="text-xs text-gray-500 mb-1">
                                       {i18n.language === 'he' ? 'אמצעי תחבורה' : 'Method'}
                                     </p>
-                                    <p className={`font-semibold text-gray-800 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                                    <p className="font-semibold text-gray-800">
                                       {day.transitInfo.method}
                                     </p>
                                   </div>
                                   <div className="bg-white p-3 rounded-lg">
-                                    <p className={`text-xs text-gray-500 mb-1 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                                    <p className="text-xs text-gray-500 mb-1">
                                       {i18n.language === 'he' ? 'זמן נסיעה' : 'Duration'}
                                     </p>
-                                    <p className={`font-semibold text-gray-800 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                                    <p className="font-semibold text-gray-800">
                                       {day.transitInfo.duration}
                                     </p>
                                   </div>
                                   <div className="bg-white p-3 rounded-lg col-span-2">
-                                    <p className={`text-xs text-gray-500 mb-1 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                                    <p className="text-xs text-gray-500 mb-1">
                                       {i18n.language === 'he' ? 'עלות משוערת' : 'Estimated Cost'}
                                     </p>
-                                    <p className={`font-semibold text-green-700 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>
+                                    <p className="font-semibold text-green-700">
                                       {day.transitInfo.estimatedCost}
                                     </p>
                                   </div>
@@ -2602,9 +2602,9 @@ export default function MyTripsNew() {
                                 {/* Additional Details */}
                                 {day.transitInfo.details && (
                                   <div className="bg-blue-50 p-3 rounded-lg">
-                                    <div className={`flex items-start gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                                    <div className="flex items-start gap-2">
                                       <Lightbulb className={`w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-                                      <p className={`text-sm text-blue-800 ${i18n.language === 'he' ? 'text-right' : 'text-left'}`} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                                      <p className="text-sm text-blue-800">
                                         {day.transitInfo.details}
                                       </p>
                                     </div>
