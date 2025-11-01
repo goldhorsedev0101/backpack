@@ -1713,9 +1713,9 @@ export default function MyTripsNew() {
                         </div>
 
                         {/* Date Range */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className={`grid grid-cols-2 gap-4 ${i18n.language === 'he' ? 'flex flex-row-reverse' : ''}`}>
                           {/* Start Date */}
-                          <div className={`flex items-center gap-4 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                          <div className={`flex items-center gap-4 ${i18n.language === 'he' ? 'flex-row-reverse flex-1' : ''}`}>
                             <Label className={`text-sm text-slate-600 min-w-[100px] ${i18n.language === 'he' ? 'text-left' : 'text-right'}`}>
                               {t('trips.start_date')}
                             </Label>
@@ -1744,7 +1744,7 @@ export default function MyTripsNew() {
                           </div>
 
                           {/* End Date */}
-                          <div className={`flex items-center gap-4 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                          <div className={`flex items-center gap-4 ${i18n.language === 'he' ? 'flex-row-reverse flex-1' : ''}`}>
                             <Label className={`text-sm text-slate-600 min-w-[100px] ${i18n.language === 'he' ? 'text-left' : 'text-right'}`}>
                               {t('trips.end_date')}
                             </Label>
