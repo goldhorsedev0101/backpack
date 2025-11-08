@@ -477,10 +477,10 @@ export default function Home() {
               </span>
             </div>
 
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in-up">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in-up text-center">
               {welcomeMessage}
             </h1>
-            <p className="text-xl md:text-2xl opacity-95 mb-8 max-w-3xl mx-auto animate-fade-in-up delay-100">
+            <p className="text-xl md:text-2xl opacity-95 mb-8 max-w-3xl mx-auto animate-fade-in-up delay-100 text-center">
               {t("home.welcome_message")}
             </p>
 
@@ -1039,8 +1039,8 @@ function StatsCard({
     >
       <CardContent className="p-6 text-center">
         <Icon className="w-8 h-8 mx-auto mb-3 opacity-90" />
-        <div className="text-3xl font-bold mb-1">{value}</div>
-        <div className="text-sm opacity-90">{label}</div>
+        <div className="text-3xl font-bold mb-1 text-center">{value}</div>
+        <div className="text-sm opacity-90 text-center">{label}</div>
       </CardContent>
     </Card>
   );

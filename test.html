@@ -1,0 +1,181 @@
+<section class="donation-section">
+    <style>
+      /* ===== Overall Section ===== */
+      .donation-section {
+        background-color: #fffdf8;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        padding: 24px 40px;
+        max-width: 1100px;
+        margin: 0 auto;
+        font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+        background-image: url('http://localhost/wordpress/wp-content/uploads/2023/11/donation-d-bg-1.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        transition: all 0.3s ease-in-out;
+      }
+  
+      /* ===== Layout ===== */
+      .donation-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        justify-items: center;
+        align-items: center;
+        gap: 24px;
+        width:100%;
+        
+      }
+  
+      /* ===== Card (Raised + Goal) ===== */
+      .donation-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: all 0.3s ease;
+      }
+  
+      .donation-icon {
+        background-color: #8e4f88;
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+  
+      .donation-icon svg {
+        width: 30px;
+        height: 30px;
+        fill: #fff;
+        transition: all 0.3s ease;
+      }
+  
+      /* Hover: turn icon yellow */
+      .donation-card:hover .donation-icon {
+        background-color: #f3c04a;
+      }
+  
+      .donation-card:hover .donation-icon svg {
+        fill: #2b1330;
+      }
+  
+      .donation-text {
+        display: flex;
+        flex-direction: column;
+        color: #2b1330;
+      }
+  
+      .donation-text span:first-child {
+        font-size: 14px;
+        font-weight: 500;
+        opacity: 0.8;
+      }
+  
+      .donation-text span:last-child {
+        font-size: 20px;
+        font-weight: 700;
+        margin-top: 4px;
+      }
+  
+      /* ===== Button ===== */
+      .donate-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background-color: #f3c04a;
+        color: #2b1330;
+        padding: 14px 28px;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        transition: all 0.3s ease;
+      }
+  
+      .donate-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+        background-color: #8e4f88;
+        color: #fff;
+      }
+  
+      .donate-icon {
+        background-color: #2b1330;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+  
+      .donate-icon svg {
+        width: 14px;
+        height: 14px;
+        fill: #f3c04a;
+        transition: all 0.3s ease;
+      }
+  
+      /* Hover: button inner icon turns yellow background + dark arrow */
+      .donate-btn:hover .donate-icon {
+        background-color: #f3c04a;
+      }
+  
+      .donate-btn:hover .donate-icon svg {
+        fill: #2b1330;
+      }
+  
+      /* ===== Responsive ===== */
+      @media (max-width: 768px) {
+        .donation-container {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .donate-btn {
+          align-self: flex-start;
+        }
+      }
+    </style>
+  
+    <div class="donation-container">
+      <!-- Raised -->
+      <div class="donation-card">
+        <div class="donation-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2C7.58 2 4 4.69 4 8v8c0 3.31 3.58 6 8 6s8-2.69 8-6V8c0-3.31-3.58-6-8-6zm1 15.5h-2v-1.5h2v1.5zm2-3.5H9v-1h6v1z"/>
+          </svg>
+        </div>
+        <div class="donation-text">
+          <span>Raised</span>
+          <span>$5,510</span>
+        </div>
+      </div>
+  
+      <!-- Goal -->
+      <div class="donation-card">
+        <div class="donation-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 14.5v-3.6l2.3-2.3a5 5 0 01-2.3 5.9zM12 7.3a4.7 4.7 0 010 9.4 4.7 4.7 0 010-9.4z"/>
+          </svg>
+        </div>
+        <div class="donation-text">
+          <span>Goal</span>
+          <span>$10,000</span>
+        </div>
+      </div>
+  
+      <!-- Donate Button -->
+      <a href="#" class="donate-btn" aria-label="Donate Now">
+        <div class="donate-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M6 6l6 6-6 6M12 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+        Donate Now
+      </a>
+    </div>
+  </section>
