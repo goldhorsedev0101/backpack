@@ -2153,8 +2153,8 @@ export default function MyTripsNew() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="w-full pb-2 overflow-x-auto">
-            <TabsList className="flex w-full justify-evenly h-auto sm:h-10 gap-0.5 sm:gap-2 p-1" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+          <div className="w-full pb-2 overflow-x-auto flex justify-center">
+            <TabsList className="flex w-full justify-evenly h-auto sm:h-10 gap-0.5 sm:gap-2 p-1" data-center-tabs="true">
               <TabsTrigger
                 value="preferences"
                 className="flex flex-col sm:flex-row items-center justify-center px-1 sm:px-4 py-1.5 sm:py-0 w-[19%] sm:w-auto h-auto sm:h-10"

@@ -82,6 +82,20 @@
   justify-content: center !important;
 }
 
+/* Force center tabs in both directions */
+[data-center-tabs="true"] {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  justify-content: space-evenly !important;
+}
+
+[dir="rtl"] [data-center-tabs="true"],
+[dir="ltr"] [data-center-tabs="true"] {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  justify-content: space-evenly !important;
+}
+
 /* Specific adjustments for card content */
 [dir="rtl"] .card-content,
 [dir="rtl"] .card-description {
