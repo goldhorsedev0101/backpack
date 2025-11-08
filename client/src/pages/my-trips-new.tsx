@@ -2147,12 +2147,14 @@ export default function MyTripsNew() {
           <h1 className="text-3xl md:text-4xl font-bold text-slate-700 mb-4 text-center">
             {t("trips.my_trip_planner")}
           </h1>
-          <p className="text-lg text-gray-600 text-center">{t("trips.planner_subtitle")}</p>
+          <p className="text-lg text-gray-600 text-center">
+            {t("trips.planner_subtitle")}
+          </p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 flex justify-center items-center">
-            <TabsList className="inline-flex w-auto min-w-full sm:w-full justify-evenly h-auto sm:h-10 gap-0.5 sm:gap-2 p-1">
+          <div className="w-full flex justify-center pb-2">
+            <TabsList className="inline-flex w-full justify-evenly h-auto sm:h-10 gap-0.5 sm:gap-2 p-1">
               <TabsTrigger
                 value="preferences"
                 className="flex flex-col sm:flex-row items-center justify-center px-1 sm:px-4 py-1.5 sm:py-0 w-[19%] sm:w-auto h-auto sm:h-10"
