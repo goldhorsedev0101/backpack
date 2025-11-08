@@ -3081,25 +3081,25 @@ export default function MyTripsNew() {
                           data-testid={`suggestion-card-${index}`}
                         >
                           <div>
-                            <h3 className="text-xl font-bold text-slate-700 mb-1 text-left">
+                            <h3 className="text-xl font-bold text-slate-700 mb-1 text-center">
                               {translateTitle()}
                             </h3>
-                            <p className="text-gray-600 leading-relaxed text-left">
+                            <p className="text-gray-600 leading-relaxed text-center">
                               {suggestion.description}
                             </p>
                           </div>
 
                           <div className="grid grid-cols-3 gap-4">
                             <div className="bg-blue-50 p-3 rounded-lg">
-                              <div className="flex flex-col gap-2 items-end">
-                                <div className="flex items-center flex-row-reverse gap-1">
+                              <div className="flex flex-col gap-2 items-center">
+                                <div className="flex items-center gap-1">
                                   <Calendar className="w-4 h-4 text-blue-600" />
                                   <span className="font-semibold text-blue-800 text-sm">
                                     {t("trips.duration")}
                                   </span>
                                 </div>
                                 {suggestion.startDate && suggestion.endDate ? (
-                                  <p className="text-blue-700 text-sm text-right">
+                                  <p className="text-blue-700 text-sm text-center">
                                     {format(
                                       new Date(suggestion.startDate),
                                       i18n.language === "he"
@@ -3123,7 +3123,7 @@ export default function MyTripsNew() {
                                     )}
                                   </p>
                                 ) : (
-                                  <p className="text-blue-700 text-sm text-right">
+                                  <p className="text-blue-700 text-sm text-center">
                                     {suggestion.duration}
                                   </p>
                                 )}
@@ -3131,14 +3131,14 @@ export default function MyTripsNew() {
                             </div>
 
                             <div className="bg-green-50 p-3 rounded-lg">
-                              <div className="flex flex-col gap-2 items-end">
-                                <div className="flex items-center flex-row-reverse gap-1">
+                              <div className="flex flex-col gap-2 items-center">
+                                <div className="flex items-center gap-1">
                                   <DollarSign className="w-4 h-4 text-green-600" />
                                   <span className="font-semibold text-green-800 text-sm">
                                     {t("trips.budget")}
                                   </span>
                                 </div>
-                                <p className="text-green-700 text-sm font-bold text-right">
+                                <p className="text-green-700 text-sm font-bold text-center">
                                   {formatCurrencyRange(
                                     suggestion.estimatedBudget.low,
                                     suggestion.estimatedBudget.high,
@@ -3149,14 +3149,14 @@ export default function MyTripsNew() {
                             </div>
 
                             <div className="bg-orange-50 p-3 rounded-lg">
-                              <div className="flex flex-col gap-2 items-end">
-                                <div className="flex items-center flex-row-reverse gap-1">
+                              <div className="flex flex-col gap-2 items-center">
+                                <div className="flex items-center gap-1">
                                   <Calendar className="w-4 h-4 text-orange-600" />
                                   <span className="font-semibold text-orange-800 text-sm">
                                     {t("trips.best_time_to_visit")}
                                   </span>
                                 </div>
-                                <p className="text-orange-700 text-sm text-right">
+                                <p className="text-orange-700 text-sm text-center">
                                   {translateBestTime(
                                     suggestion.bestTimeToVisit,
                                     i18n.language
@@ -3167,18 +3167,18 @@ export default function MyTripsNew() {
                           </div>
 
                           <div>
-                            <div className="flex flex-col gap-2 items-end">
-                              <div className="flex items-center flex-row-reverse gap-2">
+                            <div className="flex flex-col gap-2 items-center">
+                              <div className="flex items-center gap-2">
                                 <Star className="w-4 h-4 text-yellow-600" />
                                 <span className="font-semibold text-gray-800 text-sm">
                                   {t("trips.highlights")}
                                 </span>
                               </div>
-                              <div className="flex flex-wrap gap-6 w-full justify-end">
+                              <div className="flex flex-wrap gap-6 w-full justify-center">
                                 {suggestion.highlights.map((highlight, idx) => (
                                   <div
                                     key={idx}
-                                    className="flex items-center text-sm text-gray-700 text-right flex-row-reverse gap-2"
+                                    className="flex items-center text-sm text-gray-700 gap-2"
                                   >
                                     <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
                                     <span>

@@ -150,7 +150,7 @@ export default function HotelDeals() {
               className="bg-orange-500 hover:bg-orange-600 text-white text-xl px-8 py-6 h-auto"
               data-testid="button-scroll-to-form"
             >
-              <Search className={`${isRTL ? 'ml-2' : 'mr-2'} h-6 w-6`} />
+              <Search className="mr-2 h-6 w-6" />
               {t('hotel_deals.quick_check_button')}
             </Button>
           </div>
@@ -447,12 +447,12 @@ export default function HotelDeals() {
                 >
                   {submitInquiry.isPending ? (
                     <>
-                      <Clock className={`${isRTL ? 'ml-2' : 'mr-2'} h-5 w-5 animate-spin`} />
+                      <Clock className="mr-2 h-5 w-5 animate-spin" />
                       {t('hotel_deals.form_submitting')}
                     </>
                   ) : (
                     <>
-                      <Send className={`${isRTL ? 'ml-2' : 'mr-2'} h-5 w-5`} />
+                      <Send className="mr-2 h-5 w-5" />
                       {t('hotel_deals.form_submit_button')}
                     </>
                   )}

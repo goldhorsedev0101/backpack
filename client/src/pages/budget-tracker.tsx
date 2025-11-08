@@ -244,8 +244,8 @@ export default function BudgetTracker() {
 
           <Dialog open={showExpenseForm} onOpenChange={setShowExpenseForm}>
             <DialogTrigger asChild>
-              <Button className={`bg-primary hover:bg-orange-600 whitespace-nowrap ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                <Plus className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
+              <Button className="bg-primary hover:bg-orange-600 whitespace-nowrap">
+                <Plus className="w-4 h-4 mr-2" />
                 {t('budget.add_expense')}
               </Button>
             </DialogTrigger>

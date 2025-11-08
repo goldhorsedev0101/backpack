@@ -352,7 +352,7 @@ export default function JourneysPage() {
 
                     <Button className="w-full mt-auto bg-orange-500 hover:bg-orange-600" data-testid={`view-journey-${journey.id}`}>
                       <span dir={isRTL ? 'rtl' : 'ltr'}>{isRTL ? 'הצג מסלול' : 'View Journey'}</span>
-                      <ArrowLeft className={`w-4 h-4 ${isRTL ? 'ml-2' : 'ml-2'}`} />
+                      <ArrowLeft className={`w-4 h-4 ${isRTL ? 'mr-2' : 'ml-2'}`} />
                     </Button>
                   </CardContent>
                 </Card>
