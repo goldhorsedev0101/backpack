@@ -127,8 +127,8 @@
   justify-content: flex-end !important;
 }
 
-/* CATCH-ALL FOR ANY REMAINING FLEX TITLES */
-[dir="rtl"] [class*="flex"][class*="items-center"] {
+/* CATCH-ALL FOR ANY REMAINING FLEX TITLES - BUT NOT CENTERED ONES */
+[dir="rtl"] [class*="flex"][class*="items-center"]:not(.justify-center):not([class*="justify-center"]) {
   justify-content: flex-end !important;
   direction: rtl !important;
 }
