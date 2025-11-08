@@ -82,18 +82,11 @@
   justify-content: center !important;
 }
 
-/* Force center tabs in both directions */
-[data-center-tabs="true"] {
-  margin-left: auto !important;
-  margin-right: auto !important;
-  justify-content: space-evenly !important;
-}
-
-[dir="rtl"] [data-center-tabs="true"],
-[dir="ltr"] [data-center-tabs="true"] {
-  margin-left: auto !important;
-  margin-right: auto !important;
-  justify-content: space-evenly !important;
+/* Force center tabs in both directions - ensure tabs are evenly distributed */
+[dir="rtl"] .flex.justify-center,
+[dir="ltr"] .flex.justify-center {
+  justify-content: center !important;
+  align-items: center !important;
 }
 
 /* Specific adjustments for card content */

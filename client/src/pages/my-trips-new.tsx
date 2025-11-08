@@ -2141,9 +2141,12 @@ export default function MyTripsNew() {
   });
 
   return (
-    <div className="min-h-screen bg-white py-8 px-4 sm:px-6 lg:px-8" dir={i18n.language === "he" ? "rtl" : "ltr"}>
+    <div
+      className="min-h-screen bg-white py-8 px-4 sm:px-6 lg:px-8"
+      dir={i18n.language === "he" ? "rtl" : "ltr"}
+    >
       <div className="max-w-6xl mx-auto pb-20 md:pb-8">
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 w-full">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-700 mb-4 text-center">
             {t("trips.my_trip_planner")}
           </h1>
@@ -2153,8 +2156,8 @@ export default function MyTripsNew() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="w-full pb-2 overflow-x-auto flex justify-center">
-            <TabsList className="flex w-full justify-evenly h-auto sm:h-10 gap-0.5 sm:gap-2 p-1" data-center-tabs="true">
+          <div className="w-full flex justify-center items-center pb-2">
+            <TabsList className="flex items-center justify-center w-full h-auto sm:h-10 gap-10 sm:gap-4 p-1">
               <TabsTrigger
                 value="preferences"
                 className="flex flex-col sm:flex-row items-center justify-center px-1 sm:px-4 py-1.5 sm:py-0 w-[19%] sm:w-auto h-auto sm:h-10"
@@ -3135,7 +3138,13 @@ export default function MyTripsNew() {
                             <div className="bg-green-50 p-3 rounded-lg">
                               <div className="flex flex-col gap-2 items-center">
                                 <div className="flex items-center gap-1">
-                                  <DollarSign className="w-4 h-4 text-green-600" />
+                                  {i18n.language === "he" ? (
+                                    <span className="w-4 h-4 text-green-600 font-bold flex items-center justify-center">
+                                      ₪
+                                    </span>
+                                  ) : (
+                                    <DollarSign className="w-4 h-4 text-green-600" />
+                                  )}
                                   <span className="font-semibold text-green-800 text-sm">
                                     {t("trips.budget")}
                                   </span>
@@ -3798,11 +3807,21 @@ export default function MyTripsNew() {
                                       : ""
                                   }`}
                                 >
-                                  <DollarSign
-                                    className={`w-4 h-4 text-green-600 ${
-                                      i18n.language === "he" ? "ml-2" : "mr-2"
-                                    }`}
-                                  />
+                                  {i18n.language === "he" ? (
+                                    <span
+                                      className={`w-4 h-4 text-green-600 font-bold flex items-center justify-center ${
+                                        i18n.language === "he" ? "ml-2" : "mr-2"
+                                      }`}
+                                    >
+                                      ₪
+                                    </span>
+                                  ) : (
+                                    <DollarSign
+                                      className={`w-4 h-4 text-green-600 ${
+                                        i18n.language === "he" ? "ml-2" : "mr-2"
+                                      }`}
+                                    />
+                                  )}
                                   <span className="font-semibold text-green-800 text-sm">
                                     {t("trips.estimated_cost")}
                                   </span>
@@ -4136,7 +4155,13 @@ export default function MyTripsNew() {
                                             : ""
                                         }`}
                                       >
-                                        <DollarSign className="w-5 h-5 text-green-600" />
+                                        {i18n.language === "he" ? (
+                                          <span className="w-5 h-5 text-green-600 font-bold flex items-center justify-center">
+                                            ₪
+                                          </span>
+                                        ) : (
+                                          <DollarSign className="w-5 h-5 text-green-600" />
+                                        )}
                                         <span
                                           className={`font-semibold text-green-800 text-sm ${
                                             i18n.language === "he"
@@ -4516,13 +4541,25 @@ export default function MyTripsNew() {
                                           : ""
                                       }`}
                                     >
-                                      <DollarSign
-                                        className={`w-5 h-5 text-green-600 ${
-                                          i18n.language === "he"
-                                            ? "ml-1"
-                                            : "mr-1"
-                                        }`}
-                                      />
+                                      {i18n.language === "he" ? (
+                                        <span
+                                          className={`w-5 h-5 text-green-600 font-bold flex items-center justify-center ${
+                                            i18n.language === "he"
+                                              ? "ml-1"
+                                              : "mr-1"
+                                          }`}
+                                        >
+                                          ₪
+                                        </span>
+                                      ) : (
+                                        <DollarSign
+                                          className={`w-5 h-5 text-green-600 ${
+                                            i18n.language === "he"
+                                              ? "ml-1"
+                                              : "mr-1"
+                                          }`}
+                                        />
+                                      )}
                                       <span
                                         className={`font-semibold text-green-800 text-sm ${
                                           i18n.language === "he"
