@@ -309,13 +309,13 @@ export default function Navigation() {
                 key={item.href}
                 asChild
                 variant="ghost"
-                className={`w-full justify-start px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+                className={`w-full ${isHebrew ? 'justify-end' : 'justify-start'} px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
                   location === item.href
                     ? "bg-orange-100 text-orange-800 hover:bg-orange-200"
                     : "text-slate-700 hover:bg-gray-100 hover:text-slate-900"
                 }`}
               >
-                <Link href={item.href} className={`flex items-center gap-3 ${isHebrew ? 'flex-row-reverse' : ''}`}>
+                <Link href={item.href} className={`flex items-center gap-3 ${isHebrew ? 'flex-row-reverse text-right' : 'text-left'}`}>
                   {item.icon && (
                     <item.icon className="w-5 h-5 flex-shrink-0" />
                   )}
@@ -335,7 +335,7 @@ export default function Navigation() {
                   <AvatarImage src={user.user_metadata?.avatar_url} />
                   <AvatarFallback className="bg-orange-200 text-orange-800">{userInitials}</AvatarFallback>
                 </Avatar>
-                <div className="flex-1 min-w-0">
+                <div className={`flex-1 min-w-0 ${isHebrew ? 'text-right' : 'text-left'}`}>
                   <p className="text-sm font-medium text-slate-900 truncate">{userName}</p>
                   <p className="text-xs text-gray-500 truncate">{user.email}</p>
                 </div>
@@ -345,7 +345,7 @@ export default function Navigation() {
                 onClick={handleLogout}
                 variant="outline"
                 disabled={isLoading}
-                className={`w-full justify-start px-4 py-3 text-slate-700 border-gray-300 hover:bg-red-50 hover:text-red-700 hover:border-red-300 ${isHebrew ? 'flex-row-reverse' : ''}`}
+                className={`w-full ${isHebrew ? 'justify-end' : 'justify-start'} px-4 py-3 text-slate-700 border-gray-300 hover:bg-red-50 hover:text-red-700 hover:border-red-300 ${isHebrew ? 'flex-row-reverse' : ''}`}
               >
                 <LogOut className={`w-5 h-5 ${isHebrew ? 'ml-3' : 'mr-3'}`} />
                 {isLoading ? t('common.loading') : t('auth.sign_out')}
@@ -355,7 +355,7 @@ export default function Navigation() {
             <div className="space-y-2">
               <Button
                 onClick={() => setAuthModalOpen(true)}
-                className={`w-full ${isHebrew ? 'flex-row-reverse' : ''}`}
+                className={`w-full ${isHebrew ? 'flex-row-reverse justify-end' : 'justify-start'}`}
                 disabled={isLoading}
               >
                 <User className={`w-5 h-5 ${isHebrew ? 'ml-2' : 'mr-2'}`} />
@@ -364,7 +364,7 @@ export default function Navigation() {
               <Button
                 onClick={() => setAuthModalOpen(true)}
                 variant="outline"
-                className="w-full"
+                className={`w-full ${isHebrew ? 'text-right' : 'text-left'}`}
                 disabled={isLoading}
               >
                 {t('auth.create_account')}
