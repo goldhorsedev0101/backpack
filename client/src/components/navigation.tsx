@@ -114,22 +114,22 @@ export default function Navigation() {
                   <Button
                     onClick={handleLogout}
                     variant="outline"
-                    className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white whitespace-nowrap min-h-[44px] min-w-[44px] h-auto px-3 py-2"
+                    className={`border-red-500 text-red-500 hover:bg-red-500 hover:text-white whitespace-nowrap min-h-[44px] min-w-[44px] h-auto px-3 py-2 ${isHebrew ? 'flex-row-reverse' : ''}`}
                     disabled={isLoading}
                     data-testid="button-sign-out-top"
                   >
-                    <LogOut className="w-6 h-6 mr-1" />
+                    <LogOut className={`w-6 h-6 ${isHebrew ? 'ml-1' : 'mr-1'}`} />
                     <span className="text-sm">{t('auth.sign_out')}</span>
                   </Button>
                 ) : (
                   <Button
                     onClick={() => setAuthModalOpen(true)}
                     variant="outline" 
-                    className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white whitespace-nowrap min-h-[44px] min-w-[44px] h-auto px-3 py-2"
+                    className={`border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white whitespace-nowrap min-h-[44px] min-w-[44px] h-auto px-3 py-2 ${isHebrew ? 'flex-row-reverse' : ''}`}
                     disabled={isLoading}
                     data-testid="button-sign-in-top"
                   >
-                    <User className="w-6 h-6 mr-1" />
+                    <User className={`w-6 h-6 ${isHebrew ? 'ml-1' : 'mr-1'}`} />
                     <span className="text-sm">{t('auth.sign_in')}</span>
                   </Button>
                 )}
@@ -161,16 +161,16 @@ export default function Navigation() {
                     asChild
                     variant="ghost"
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`w-full flex items-center px-3 py-3 min-h-[48px] rounded-lg text-left justify-start ${
+                    className={`w-full flex items-center px-3 py-3 min-h-[48px] rounded-lg ${isHebrew ? 'text-right justify-end' : 'text-left justify-start'} ${
                       location === item.href
                         ? "bg-primary text-white"
                         : "text-slate-600 hover:bg-gray-100"
                     }`}
                   >
-                    <Link href={item.href}>
+                    <Link href={item.href} className={isHebrew ? 'flex flex-row-reverse items-center w-full' : 'flex items-center w-full'}>
                       {item.icon ? (
                         <>
-                          <span className="mr-3"><item.icon className="w-6 h-6" /></span>
+                          <span className={isHebrew ? 'ml-3' : 'mr-3'}><item.icon className="w-6 h-6" /></span>
                           <span className="text-base font-medium">{item.label}</span>
                         </>
                       ) : item.label}
@@ -181,12 +181,12 @@ export default function Navigation() {
                 <div className="border-t border-gray-200 pt-4">
                   {user ? (
                     <>
-                      <div className="flex items-center px-3 py-2 mb-4">
-                        <Avatar className="w-8 h-8 mr-3">
+                      <div className={`flex items-center px-3 py-2 mb-4 ${isHebrew ? 'flex-row-reverse' : ''}`}>
+                        <Avatar className={`w-8 h-8 ${isHebrew ? 'ml-3' : 'mr-3'}`}>
                           <AvatarImage src={user.user_metadata?.avatar_url} />
                           <AvatarFallback>{userInitials}</AvatarFallback>
                         </Avatar>
-                        <div>
+                        <div className={isHebrew ? 'text-right' : 'text-left'}>
                           <p className="text-sm font-medium text-slate-700">{userName}</p>
                           <p className="text-xs text-gray-500">{user.email}</p>
                         </div>
@@ -195,9 +195,9 @@ export default function Navigation() {
                       <button
                         onClick={handleLogout}
                         disabled={isLoading}
-                        className="w-full flex items-center px-3 py-3 min-h-[48px] text-slate-600 hover:bg-gray-100 rounded-lg disabled:opacity-50"
+                        className={`w-full flex items-center px-3 py-3 min-h-[48px] text-slate-600 hover:bg-gray-100 rounded-lg disabled:opacity-50 ${isHebrew ? 'flex-row-reverse justify-end' : 'justify-start'}`}
                       >
-                        <LogOut className="w-6 h-6 mr-3" />
+                        <LogOut className={`w-6 h-6 ${isHebrew ? 'ml-3' : 'mr-3'}`} />
                         <span className="text-base">{isLoading ? t('common.loading') : t('auth.sign_out')}</span>
                       </button>
                     </>
@@ -208,11 +208,11 @@ export default function Navigation() {
                           setAuthModalOpen(true);
                           setMobileMenuOpen(false);
                         }}
-                        className="w-full min-h-[48px] h-auto py-3"
+                        className={`w-full min-h-[48px] h-auto py-3 ${isHebrew ? 'flex-row-reverse' : ''}`}
                         disabled={isLoading}
                         data-testid="button-sign-in"
                       >
-                        <User className="w-6 h-6 mr-2" />
+                        <User className={`w-6 h-6 ${isHebrew ? 'ml-2' : 'mr-2'}`} />
                         <span className="text-base">{t('auth.sign_in')}</span>
                       </Button>
                       <Button
@@ -221,7 +221,7 @@ export default function Navigation() {
                           setMobileMenuOpen(false);
                         }}
                         variant="outline"
-                        className="w-full min-h-[48px] h-auto py-3"
+                        className={`w-full min-h-[48px] h-auto py-3 ${isHebrew ? 'text-right' : 'text-left'}`}
                         disabled={isLoading}
                         data-testid="button-create-account"
                       >
