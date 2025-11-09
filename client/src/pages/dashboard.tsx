@@ -130,10 +130,12 @@ export default function Dashboard() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-700 mb-4 flex items-center justify-center gap-3">
-            <Database className="w-10 h-10 text-primary" />
+            <Database className="w-10 h-10 text-center text-primary" />
             {t("dashboard.title")}
           </h1>
-          <p className="text-lg text-gray-600">{t("dashboard.subtitle")}</p>
+          <p className="text-lg text-center text-gray-600">
+            {t("dashboard.subtitle")}
+          </p>
           {error && (
             <div className="mt-4 p-4 bg-yellow-100 border border-yellow-400 rounded-md">
               <p className="text-yellow-800">

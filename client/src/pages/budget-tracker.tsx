@@ -8,21 +8,33 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import BudgetOverview from "@/components/budget-overview";
 import { EXPENSE_CATEGORIES } from "@/lib/expense-categories";
-import { 
-  DollarSign, 
-  Plus, 
-  TrendingUp, 
+import {
+  DollarSign,
+  Plus,
+  TrendingUp,
   TrendingDown,
   PieChart,
   Calendar,
@@ -37,12 +49,11 @@ import {
   BarChart3,
   Wallet,
   ShoppingBag,
-  Trash2
+  Trash2,
 } from "lucide-react";
-import { formatCurrency } from '@/utils/currency';
+import { formatCurrency } from "@/utils/currency";
 
 // Note: expenseSchema moved inside component to access t() function
-
 
 type ExpenseFormData = z.infer<typeof expenseSchema>;
 
@@ -56,10 +67,10 @@ export default function BudgetTracker() {
   const queryClient = useQueryClient();
 
   const expenseSchema = z.object({
-    tripId: z.number().min(1, t('budget.validation.please_select_trip')),
-    category: z.string().min(1, t('budget.validation.category_required')),
-    amount: z.string().min(1, t('budget.validation.amount_required')),
-    description: z.string().min(1, t('budget.validation.description_required')),
+    tripId: z.number().min(1, t("budget.validation.please_select_trip")),
+    category: z.string().min(1, t("budget.validation.category_required")),
+    amount: z.string().min(1, t("budget.validation.amount_required")),
+    description: z.string().min(1, t("budget.validation.description_required")),
     location: z.string().optional(),
   });
 
@@ -75,20 +86,22 @@ export default function BudgetTracker() {
   });
 
   const { data: userTrips = [], isLoading: tripsLoading } = useQuery<any[]>({
-    queryKey: ["/api/trips/user"]
+    queryKey: ["/api/trips/user"],
   });
 
   const { data: expenses = [], isLoading: expensesLoading } = useQuery<any[]>({
     queryKey: ["/api/expenses/user"],
   });
 
-  const { data: tripExpenses = [], isLoading: tripExpensesLoading } = useQuery<any[]>({
+  const { data: tripExpenses = [], isLoading: tripExpensesLoading } = useQuery<
+    any[]
+  >({
     queryKey: ["/api/expenses/trip", selectedTrip],
     enabled: !!selectedTrip,
   });
 
   const { data: analytics, isLoading: analyticsLoading } = useQuery<any>({
-    queryKey: ["/api/analytics/dashboard"]
+    queryKey: ["/api/analytics/dashboard"],
   });
 
   const addExpenseMutation = useMutation({
@@ -103,34 +116,41 @@ export default function BudgetTracker() {
       // Refetch all relevant queries to ensure data is updated
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["/api/expenses/user"] }),
-        queryClient.invalidateQueries({ queryKey: ["/api/expenses/trip", selectedTrip] }),
-        queryClient.invalidateQueries({ queryKey: ["/api/analytics/dashboard"] })
+        queryClient.invalidateQueries({
+          queryKey: ["/api/expenses/trip", selectedTrip],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["/api/analytics/dashboard"],
+        }),
       ]);
-      
+
       // Force refetch to ensure fresh data
       if (selectedTrip) {
-        await queryClient.refetchQueries({ queryKey: ["/api/expenses/trip", selectedTrip] });
+        await queryClient.refetchQueries({
+          queryKey: ["/api/expenses/trip", selectedTrip],
+        });
       }
       await queryClient.refetchQueries({ queryKey: ["/api/expenses/user"] });
-      
+
       setShowExpenseForm(false);
       form.reset();
       toast({
-        title: t('budget.success'),
-        description: t('budget.expense_added_successfully'),
+        title: t("budget.success"),
+        description: t("budget.expense_added_successfully"),
       });
     },
     onError: (error: any) => {
       if (isUnauthorizedError(error)) {
         toast({
-          title: t('budget.authentication_required'),
-          description: t('budget.please_log_in_to_add_expenses'),
+          title: t("budget.authentication_required"),
+          description: t("budget.please_log_in_to_add_expenses"),
           variant: "destructive",
         });
       } else {
-        const errorMessage = error?.message || error?.error || t('budget.failed_to_add_expense');
+        const errorMessage =
+          error?.message || error?.error || t("budget.failed_to_add_expense");
         toast({
-          title: t('common.error'),
+          title: t("common.error"),
           description: errorMessage,
           variant: "destructive",
         });
@@ -146,23 +166,25 @@ export default function BudgetTracker() {
   const deleteExpenseMutation = useMutation({
     mutationFn: async (expenseId: number) => {
       await apiRequest(`/api/expenses/${expenseId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses/user"] });
       if (selectedTrip) {
-        queryClient.invalidateQueries({ queryKey: ["/api/expenses/trip", selectedTrip] });
+        queryClient.invalidateQueries({
+          queryKey: ["/api/expenses/trip", selectedTrip],
+        });
       }
       queryClient.invalidateQueries({ queryKey: ["/api/analytics/dashboard"] });
       toast({
-        title: t('budget.success'),
-        description: t('budget.expense_deleted_successfully'),
+        title: t("budget.success"),
+        description: t("budget.expense_deleted_successfully"),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: t('common.error'),
+        title: t("common.error"),
         description: error.message,
         variant: "destructive",
       });
@@ -174,28 +196,45 @@ export default function BudgetTracker() {
   };
 
   const getCategoryColor = (category: string) => {
-    const categoryData = EXPENSE_CATEGORIES.find(c => c.id === category);
-    return categoryData ? categoryData.color : 'bg-gray-500';
+    const categoryData = EXPENSE_CATEGORIES.find((c) => c.id === category);
+    return categoryData ? categoryData.color : "bg-gray-500";
   };
 
-  const currentTripExpenses = selectedTrip ? (tripExpenses || []) : (expenses || []);
-  const filteredExpenses = selectedCategory === "all" 
-    ? (currentTripExpenses || []) 
-    : (currentTripExpenses || []).filter((expense: any) => expense.category === selectedCategory);
+  const currentTripExpenses = selectedTrip
+    ? tripExpenses || []
+    : expenses || [];
+  const filteredExpenses =
+    selectedCategory === "all"
+      ? currentTripExpenses || []
+      : (currentTripExpenses || []).filter(
+          (expense: any) => expense.category === selectedCategory
+        );
 
-  const totalSpent = (currentTripExpenses || []).reduce((sum: number, expense: any) => sum + parseFloat(expense.amount), 0);
+  const totalSpent = (currentTripExpenses || []).reduce(
+    (sum: number, expense: any) => sum + parseFloat(expense.amount),
+    0
+  );
   const categoryTotals = (EXPENSE_CATEGORIES || [])
-    .map(category => ({
+    .map((category) => ({
       ...category,
       total: (currentTripExpenses || [])
         .filter((expense: any) => expense.category === category.id)
-        .reduce((sum: number, expense: any) => sum + parseFloat(expense.amount), 0)
+        .reduce(
+          (sum: number, expense: any) => sum + parseFloat(expense.amount),
+          0
+        ),
     }))
     .sort((a, b) => b.total - a.total)
-    .filter(cat => cat.total > 0);
+    .filter((cat) => cat.total > 0);
 
-  const selectedTripData = selectedTrip ? (Array.isArray(userTrips) ? userTrips.find((trip: any) => trip.id === selectedTrip) : null) : null;
-  const budget = selectedTripData ? parseFloat(selectedTripData.budget || 0) : 0;
+  const selectedTripData = selectedTrip
+    ? Array.isArray(userTrips)
+      ? userTrips.find((trip: any) => trip.id === selectedTrip)
+      : null
+    : null;
+  const budget = selectedTripData
+    ? parseFloat(selectedTripData.budget || 0)
+    : 0;
   const budgetUsed = budget > 0 ? (totalSpent / budget) * 100 : 0;
 
   return (
@@ -204,35 +243,49 @@ export default function BudgetTracker() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-700 mb-4 flex items-center justify-center gap-3">
-            <Wallet className="w-10 h-10 text-primary" />
-            {t('budget.title')}
+            <Wallet className="w-10 h-10 text-center text-primary" />
+            {t("budget.title")}
           </h1>
-          <p className="text-lg text-gray-600">{t('budget.subtitle')}</p>
+          <p className="text-lg text-center text-gray-600">
+            {t("budget.subtitle")}
+          </p>
         </div>
 
         {/* Controls */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8 items-start sm:items-center justify-between">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <Select value={selectedTrip?.toString() || "all"} onValueChange={(value) => setSelectedTrip(value === "all" ? null : parseInt(value))}>
+            <Select
+              value={selectedTrip?.toString() || "all"}
+              onValueChange={(value) =>
+                setSelectedTrip(value === "all" ? null : parseInt(value))
+              }
+            >
               <SelectTrigger className="w-64">
-                <SelectValue placeholder={t('budget.select_a_trip')} />
+                <SelectValue placeholder={t("budget.select_a_trip")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t('budget.all_expenses')}</SelectItem>
-                {Array.isArray(userTrips) ? userTrips.map((trip: any) => (
-                  <SelectItem key={trip.id} value={trip.id.toString()}>
-                    {trip.title}
-                  </SelectItem>
-                )) : null}
+                <SelectItem value="all">{t("budget.all_expenses")}</SelectItem>
+                {Array.isArray(userTrips)
+                  ? userTrips.map((trip: any) => (
+                      <SelectItem key={trip.id} value={trip.id.toString()}>
+                        {trip.title}
+                      </SelectItem>
+                    ))
+                  : null}
               </SelectContent>
             </Select>
 
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <Select
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+            >
               <SelectTrigger className="w-48">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t('budget.all_categories')}</SelectItem>
+                <SelectItem value="all">
+                  {t("budget.all_categories")}
+                </SelectItem>
                 {(EXPENSE_CATEGORIES || []).map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {t(category.labelKey)}
@@ -246,47 +299,72 @@ export default function BudgetTracker() {
             <DialogTrigger asChild>
               <Button className="bg-primary hover:bg-orange-600 whitespace-nowrap">
                 <Plus className="w-4 h-4 mr-2" />
-                {t('budget.add_expense')}
+                {t("budget.add_expense")}
               </Button>
             </DialogTrigger>
-            <DialogContent 
-              className={`sm:max-w-[500px] max-h-[90vh] overflow-y-auto ${i18n.language === 'he' ? '[&]:!dir-rtl' : ''}`}
-              data-rtl={i18n.language === 'he' ? 'true' : 'false'}
-              dir={i18n.language === 'he' ? 'rtl' : 'ltr'}
+            <DialogContent
+              className={`sm:max-w-[500px] max-h-[90vh] overflow-y-auto ${
+                i18n.language === "he" ? "[&]:!dir-rtl" : ""
+              }`}
+              data-rtl={i18n.language === "he" ? "true" : "false"}
+              dir={i18n.language === "he" ? "rtl" : "ltr"}
             >
               <DialogHeader>
-                <DialogTitle>{t('budget.add_new_expense')}</DialogTitle>
+                <DialogTitle>{t("budget.add_new_expense")}</DialogTitle>
               </DialogHeader>
-              <form onSubmit={form.handleSubmit(handleSubmitExpense)} className="space-y-6">
-                  <div>
-                    <Label htmlFor="tripId" className="block mb-2">{t('budget.trip')} <span className="text-red-500">*</span></Label>
-                  <Select 
-                    value={form.watch("tripId") > 0 ? form.watch("tripId").toString() : undefined}
-                    onValueChange={(value) => form.setValue("tripId", parseInt(value), { shouldValidate: true })}
+              <form
+                onSubmit={form.handleSubmit(handleSubmitExpense)}
+                className="space-y-6"
+              >
+                <div>
+                  <Label htmlFor="tripId" className="block mb-2">
+                    {t("budget.trip")} <span className="text-red-500">*</span>
+                  </Label>
+                  <Select
+                    value={
+                      form.watch("tripId") > 0
+                        ? form.watch("tripId").toString()
+                        : undefined
+                    }
+                    onValueChange={(value) =>
+                      form.setValue("tripId", parseInt(value), {
+                        shouldValidate: true,
+                      })
+                    }
                   >
                     <SelectTrigger data-testid="select-trip">
-                      <SelectValue placeholder={t('budget.select_a_trip')} />
+                      <SelectValue placeholder={t("budget.select_a_trip")} />
                     </SelectTrigger>
                     <SelectContent>
-                      {Array.isArray(userTrips) && userTrips.length > 0 ? userTrips.map((trip: any) => (
-                        <SelectItem key={trip.id} value={trip.id.toString()}>
-                          {trip.title}
-                        </SelectItem>
-                      )) : (
-                        <div className="p-2 text-sm text-gray-500">{t('budget.no_trips_found')}</div>
+                      {Array.isArray(userTrips) && userTrips.length > 0 ? (
+                        userTrips.map((trip: any) => (
+                          <SelectItem key={trip.id} value={trip.id.toString()}>
+                            {trip.title}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="p-2 text-sm text-gray-500">
+                          {t("budget.no_trips_found")}
+                        </div>
                       )}
                     </SelectContent>
                   </Select>
                   {form.formState.errors.tripId && (
-                    <p className="text-sm text-destructive">{form.formState.errors.tripId.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.tripId.message}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <Label htmlFor="category" className="block mb-2">{t('budget.category')}</Label>
-                  <Select onValueChange={(value) => form.setValue("category", value)}>
+                  <Label htmlFor="category" className="block mb-2">
+                    {t("budget.category")}
+                  </Label>
+                  <Select
+                    onValueChange={(value) => form.setValue("category", value)}
+                  >
                     <SelectTrigger>
-                      <SelectValue placeholder={t('budget.select_category')} />
+                      <SelectValue placeholder={t("budget.select_category")} />
                     </SelectTrigger>
                     <SelectContent>
                       {(EXPENSE_CATEGORIES || []).map((category) => {
@@ -303,54 +381,76 @@ export default function BudgetTracker() {
                     </SelectContent>
                   </Select>
                   {form.formState.errors.category && (
-                    <p className="text-sm text-destructive">{form.formState.errors.category.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.category.message}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <Label htmlFor="amount" className="block mb-2">{t('budget.amount_usd')}</Label>
-                  <Input 
+                  <Label htmlFor="amount" className="block mb-2">
+                    {t("budget.amount_usd")}
+                  </Label>
+                  <Input
                     id="amount"
-                    type="number" 
+                    type="number"
                     step="0.5"
-                    placeholder={t('budget.amount_placeholder')}
+                    placeholder={t("budget.amount_placeholder")}
                     dir="ltr"
-                    {...form.register("amount")} 
+                    {...form.register("amount")}
                   />
                   {form.formState.errors.amount && (
-                    <p className="text-sm text-destructive">{form.formState.errors.amount.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.amount.message}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <Label htmlFor="description" className="block mb-2">{t('budget.description')}</Label>
-                  <Input 
+                  <Label htmlFor="description" className="block mb-2">
+                    {t("budget.description")}
+                  </Label>
+                  <Input
                     id="description"
-                    placeholder={t('budget.what_did_you_spend_on')}
+                    placeholder={t("budget.what_did_you_spend_on")}
                     dir="ltr"
-                    {...form.register("description")} 
+                    {...form.register("description")}
                   />
                   {form.formState.errors.description && (
-                    <p className="text-sm text-destructive">{form.formState.errors.description.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.description.message}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <Label htmlFor="location" className="block mb-2">{t('budget.location_optional')}</Label>
-                  <Input 
+                  <Label htmlFor="location" className="block mb-2">
+                    {t("budget.location_optional")}
+                  </Label>
+                  <Input
                     id="location"
-                    placeholder={t('budget.where_did_you_spend_this')}
+                    placeholder={t("budget.where_did_you_spend_this")}
                     dir="ltr"
-                    {...form.register("location")} 
+                    {...form.register("location")}
                   />
                 </div>
 
                 <div className="flex gap-2 pt-4">
-                  <Button type="submit" disabled={addExpenseMutation.isPending} className="flex-1">
-                    {addExpenseMutation.isPending ? t('budget.adding') : t('budget.add_expense')}
+                  <Button
+                    type="submit"
+                    disabled={addExpenseMutation.isPending}
+                    className="flex-1"
+                  >
+                    {addExpenseMutation.isPending
+                      ? t("budget.adding")
+                      : t("budget.add_expense")}
                   </Button>
-                  <Button type="button" variant="outline" onClick={() => setShowExpenseForm(false)}>
-                    {t('common.cancel')}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowExpenseForm(false)}
+                  >
+                    {t("common.cancel")}
                   </Button>
                 </div>
               </form>
@@ -362,21 +462,45 @@ export default function BudgetTracker() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
             <TabsList className="inline-flex w-auto min-w-full sm:w-full justify-start sm:justify-evenly h-auto sm:h-10 gap-0.5 sm:gap-2 p-1">
-              <TabsTrigger value="overview" className="flex flex-col sm:flex-row items-center justify-center px-1 sm:px-4 py-1.5 sm:py-0 w-[24%] sm:w-auto h-auto sm:h-10" data-testid="tab-overview">
+              <TabsTrigger
+                value="overview"
+                className="flex flex-col sm:flex-row items-center justify-center px-1 sm:px-4 py-1.5 sm:py-0 w-[24%] sm:w-auto h-auto sm:h-10"
+                data-testid="tab-overview"
+              >
                 <BarChart3 className="w-4 h-4 sm:mr-2 mb-0.5 sm:mb-0 flex-shrink-0" />
-                <span className="text-[8px] sm:text-sm leading-[1.1] text-center w-full whitespace-normal break-words overflow-wrap-anywhere">{t('budget.overview')}</span>
+                <span className="text-[8px] sm:text-sm leading-[1.1] text-center w-full whitespace-normal break-words overflow-wrap-anywhere">
+                  {t("budget.overview")}
+                </span>
               </TabsTrigger>
-              <TabsTrigger value="expenses" className="flex flex-col sm:flex-row items-center justify-center px-1 sm:px-4 py-1.5 sm:py-0 w-[24%] sm:w-auto h-auto sm:h-10" data-testid="tab-expenses">
+              <TabsTrigger
+                value="expenses"
+                className="flex flex-col sm:flex-row items-center justify-center px-1 sm:px-4 py-1.5 sm:py-0 w-[24%] sm:w-auto h-auto sm:h-10"
+                data-testid="tab-expenses"
+              >
                 <DollarSign className="w-4 h-4 sm:mr-2 mb-0.5 sm:mb-0 flex-shrink-0" />
-                <span className="text-[8px] sm:text-sm leading-[1.1] text-center w-full whitespace-normal break-words overflow-wrap-anywhere">{t('budget.expenses')}</span>
+                <span className="text-[8px] sm:text-sm leading-[1.1] text-center w-full whitespace-normal break-words overflow-wrap-anywhere">
+                  {t("budget.expenses")}
+                </span>
               </TabsTrigger>
-              <TabsTrigger value="analytics" className="flex flex-col sm:flex-row items-center justify-center px-1 sm:px-4 py-1.5 sm:py-0 w-[24%] sm:w-auto h-auto sm:h-10" data-testid="tab-analytics">
+              <TabsTrigger
+                value="analytics"
+                className="flex flex-col sm:flex-row items-center justify-center px-1 sm:px-4 py-1.5 sm:py-0 w-[24%] sm:w-auto h-auto sm:h-10"
+                data-testid="tab-analytics"
+              >
                 <PieChart className="w-4 h-4 sm:mr-2 mb-0.5 sm:mb-0 flex-shrink-0" />
-                <span className="text-[8px] sm:text-sm leading-[1.1] text-center w-full whitespace-normal break-words overflow-wrap-anywhere">{t('budget.analytics')}</span>
+                <span className="text-[8px] sm:text-sm leading-[1.1] text-center w-full whitespace-normal break-words overflow-wrap-anywhere">
+                  {t("budget.analytics")}
+                </span>
               </TabsTrigger>
-              <TabsTrigger value="insights" className="flex flex-col sm:flex-row items-center justify-center px-1 sm:px-4 py-1.5 sm:py-0 w-[24%] sm:w-auto h-auto sm:h-10" data-testid="tab-insights">
+              <TabsTrigger
+                value="insights"
+                className="flex flex-col sm:flex-row items-center justify-center px-1 sm:px-4 py-1.5 sm:py-0 w-[24%] sm:w-auto h-auto sm:h-10"
+                data-testid="tab-insights"
+              >
                 <Lightbulb className="w-4 h-4 sm:mr-2 mb-0.5 sm:mb-0 flex-shrink-0" />
-                <span className="text-[8px] sm:text-sm leading-[1.1] text-center w-full whitespace-normal break-words overflow-wrap-anywhere">{t('budget.ai_insights')}</span>
+                <span className="text-[8px] sm:text-sm leading-[1.1] text-center w-full whitespace-normal break-words overflow-wrap-anywhere">
+                  {t("budget.ai_insights")}
+                </span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -385,7 +509,7 @@ export default function BudgetTracker() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
                 {selectedTrip && selectedTripData ? (
-                  <BudgetOverview 
+                  <BudgetOverview
                     totalBudget={budget}
                     totalSpent={totalSpent}
                     expenses={(tripExpenses || []).map((expense: any) => ({
@@ -393,7 +517,7 @@ export default function BudgetTracker() {
                       amount: parseFloat(expense.amount),
                       category: expense.category,
                       description: expense.description,
-                      date: expense.createdAt || expense.date
+                      date: expense.createdAt || expense.date,
                     }))}
                     onDeleteExpense={handleDeleteExpense}
                   />
@@ -401,8 +525,12 @@ export default function BudgetTracker() {
                   <Card>
                     <CardContent className="text-center py-8">
                       <Target className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-600 mb-2">{t('budget.select_a_trip')}</h3>
-                      <p className="text-gray-500">{t('budget.choose_trip_to_see_overview')}</p>
+                      <h3 className="text-lg font-medium text-gray-600 mb-2">
+                        {t("budget.select_a_trip")}
+                      </h3>
+                      <p className="text-gray-500">
+                        {t("budget.choose_trip_to_see_overview")}
+                      </p>
                     </CardContent>
                   </Card>
                 )}
@@ -412,47 +540,88 @@ export default function BudgetTracker() {
                 {/* Quick Stats */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                    <CardTitle
+                      className={`flex items-center gap-2 ${
+                        i18n.language === "he" ? "flex-row-reverse" : ""
+                      }`}
+                    >
                       <TrendingUp className="w-5 h-5 text-primary" />
-                      {t('budget.quick_stats')}
+                      {t("budget.quick_stats")}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
+                  <CardContent
+                    className="space-y-4"
+                    dir={i18n.language === "he" ? "rtl" : "ltr"}
+                  >
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600">{t('budget.total_spent')}</span>
+                      <span className="text-gray-600">
+                        {t("budget.total_spent")}
+                      </span>
                       <span className="text-lg font-semibold text-primary">
-                        {formatCurrency(totalSpent, i18n.language as 'en' | 'he', { decimals: 2 })}
+                        {formatCurrency(
+                          totalSpent,
+                          i18n.language as "en" | "he",
+                          { decimals: 2 }
+                        )}
                       </span>
                     </div>
                     {selectedTrip && budget > 0 && (
                       <>
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600">{t('budget.budget')}</span>
+                          <span className="text-gray-600">
+                            {t("budget.budget")}
+                          </span>
                           <span className="text-lg font-semibold text-slate-700">
-                            {formatCurrency(budget, i18n.language as 'en' | 'he', { decimals: 2 })}
+                            {formatCurrency(
+                              budget,
+                              i18n.language as "en" | "he",
+                              { decimals: 2 }
+                            )}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600">{t('budget.remaining')}</span>
-                          <span className={`text-lg font-semibold ${
-                            budget - totalSpent >= 0 ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {formatCurrency(budget - totalSpent, i18n.language as 'en' | 'he', { decimals: 2 })}
+                          <span className="text-gray-600">
+                            {t("budget.remaining")}
+                          </span>
+                          <span
+                            className={`text-lg font-semibold ${
+                              budget - totalSpent >= 0
+                                ? "text-green-600"
+                                : "text-red-600"
+                            }`}
+                          >
+                            {formatCurrency(
+                              budget - totalSpent,
+                              i18n.language as "en" | "he",
+                              { decimals: 2 }
+                            )}
                           </span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-3">
-                          <div 
+                          <div
                             className={`h-3 rounded-full ${
-                              budgetUsed <= 80 ? 'bg-green-500' : budgetUsed <= 100 ? 'bg-orange-500' : 'bg-red-500'
+                              budgetUsed <= 80
+                                ? "bg-green-500"
+                                : budgetUsed <= 100
+                                ? "bg-orange-500"
+                                : "bg-red-500"
                             }`}
                             style={{ width: `${Math.min(budgetUsed, 100)}%` }}
                           />
                         </div>
                         <div className="text-center">
-                          <span className={`text-sm ${
-                            budgetUsed <= 80 ? 'text-green-600' : budgetUsed <= 100 ? 'text-orange-600' : 'text-red-600'
-                          }`}>
-                            {t('budget.budget_used_percentage', { percentage: budgetUsed.toFixed(1) })}
+                          <span
+                            className={`text-sm ${
+                              budgetUsed <= 80
+                                ? "text-green-600"
+                                : budgetUsed <= 100
+                                ? "text-orange-600"
+                                : "text-red-600"
+                            }`}
+                          >
+                            {t("budget.budget_used_percentage", {
+                              percentage: budgetUsed.toFixed(1),
+                            })}
                           </span>
                         </div>
                       </>
@@ -463,27 +632,56 @@ export default function BudgetTracker() {
                 {/* Category Breakdown */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                    <CardTitle
+                      className={`flex items-center gap-2 ${
+                        i18n.language === "he" ? "flex-row-reverse" : ""
+                      }`}
+                    >
                       <PieChart className="w-5 h-5 text-primary" />
-                      {t('budget.categories')}
+                      {t("budget.categories")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {(categoryTotals || []).map((category) => {
                       const IconComponent = category.icon;
-                      const percentage = totalSpent > 0 ? (category.total / totalSpent) * 100 : 0;
-                      
+                      const percentage =
+                        totalSpent > 0
+                          ? (category.total / totalSpent) * 100
+                          : 0;
+
                       return (
                         <div key={category.id} className="space-y-2">
-                          <div className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                            <div className={`flex items-center gap-3 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                              <div className={`p-2 rounded-lg ${category.color}`}>
+                          <div
+                            className={`flex items-center justify-between ${
+                              i18n.language === "he" ? "flex-row-reverse" : ""
+                            }`}
+                          >
+                            <div
+                              className={`flex items-center gap-3 ${
+                                i18n.language === "he" ? "flex-row-reverse" : ""
+                              }`}
+                            >
+                              <div
+                                className={`p-2 rounded-lg ${category.color}`}
+                              >
                                 <IconComponent className="w-4 h-4 text-white" />
                               </div>
-                              <span className={`font-medium ${i18n.language === 'he' ? 'text-right' : 'text-left'}`}>{t(category.labelKey)}</span>
+                              <span
+                                className={`font-medium ${
+                                  i18n.language === "he"
+                                    ? "text-right"
+                                    : "text-left"
+                                }`}
+                              >
+                                {t(category.labelKey)}
+                              </span>
                             </div>
                             <span className="font-semibold">
-                              {formatCurrency(category.total, i18n.language as 'en' | 'he', { decimals: 2 })}
+                              {formatCurrency(
+                                category.total,
+                                i18n.language as "en" | "he",
+                                { decimals: 2 }
+                              )}
                             </span>
                           </div>
                           {category.total > 0 && (
@@ -501,64 +699,111 @@ export default function BudgetTracker() {
           <TabsContent value="expenses" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className={`flex items-center justify-between ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                  <span className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                <CardTitle
+                  className={`flex items-center justify-between ${
+                    i18n.language === "he" ? "flex-row-reverse" : ""
+                  }`}
+                >
+                  <span
+                    className={`flex items-center gap-2 ${
+                      i18n.language === "he" ? "flex-row-reverse" : ""
+                    }`}
+                  >
                     <DollarSign className="w-5 h-5 text-primary" />
-                    {t('budget.recent_expenses')}
+                    {t("budget.recent_expenses")}
                   </span>
-                  <Button variant="outline" size="sm" className={`${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                    <Download className={`w-4 h-4 ${i18n.language === 'he' ? 'ml-2' : 'mr-2'}`} />
-                    {t('budget.export')}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`${
+                      i18n.language === "he" ? "flex-row-reverse" : ""
+                    }`}
+                  >
+                    <Download
+                      className={`w-4 h-4 ${
+                        i18n.language === "he" ? "ml-2" : "mr-2"
+                      }`}
+                    />
+                    {t("budget.export")}
                   </Button>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {filteredExpenses.length > 0 ? (
                   <div className="space-y-3">
-                    {(filteredExpenses || []).map((expense: any, index: number) => {
-                      const category = EXPENSE_CATEGORIES.find(c => c.id === expense.category);
-                      const IconComponent = category?.icon || ShoppingBag;
-                      
-                      return (
-                        <div key={expense.id} dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
-                          <div className="flex items-center justify-between py-2">
-                            <div className="flex items-center gap-3">
-                              <div className={`p-2 rounded-lg ${category?.color || 'bg-gray-500'}`}>
-                                <IconComponent className="w-4 h-4 text-white" />
-                              </div>
-                              <div className="text-start">
-                                <div className="font-medium">{expense.description}</div>
-                                <div className="text-sm text-gray-600">
-                                  {t(category?.labelKey || 'budget.other')} • {new Date(expense.createdAt).toLocaleDateString('he-IL')}
-                                  {expense.location && ` • ${expense.location}`}
+                    {(filteredExpenses || []).map(
+                      (expense: any, index: number) => {
+                        const category = EXPENSE_CATEGORIES.find(
+                          (c) => c.id === expense.category
+                        );
+                        const IconComponent = category?.icon || ShoppingBag;
+
+                        return (
+                          <div
+                            key={expense.id}
+                            dir={i18n.language === "he" ? "rtl" : "ltr"}
+                          >
+                            <div className="flex items-center justify-between py-2">
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className={`p-2 rounded-lg ${
+                                    category?.color || "bg-gray-500"
+                                  }`}
+                                >
+                                  <IconComponent className="w-4 h-4 text-white" />
+                                </div>
+                                <div className="text-start">
+                                  <div className="font-medium">
+                                    {expense.description}
+                                  </div>
+                                  <div className="text-sm text-gray-600">
+                                    {t(category?.labelKey || "budget.other")} •{" "}
+                                    {new Date(
+                                      expense.createdAt
+                                    ).toLocaleDateString("he-IL")}
+                                    {expense.location &&
+                                      ` • ${expense.location}`}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="font-semibold text-gray-800">
-                                {formatCurrency(parseFloat(expense.amount), i18n.language as 'en' | 'he', { decimals: 2 })}
+                              <div className="flex items-center gap-2">
+                                <div className="font-semibold text-gray-800">
+                                  {formatCurrency(
+                                    parseFloat(expense.amount),
+                                    i18n.language as "en" | "he",
+                                    { decimals: 2 }
+                                  )}
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  onClick={() =>
+                                    handleDeleteExpense(expense.id)
+                                  }
+                                  data-testid={`button-delete-expense-${expense.id}`}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                onClick={() => handleDeleteExpense(expense.id)}
-                                data-testid={`button-delete-expense-${expense.id}`}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
                             </div>
+                            {index < filteredExpenses.length - 1 && (
+                              <Separator className="mt-2" />
+                            )}
                           </div>
-                          {index < filteredExpenses.length - 1 && <Separator className="mt-2" />}
-                        </div>
-                      );
-                    })}
+                        );
+                      }
+                    )}
                   </div>
                 ) : (
                   <div className="text-center py-8">
                     <DollarSign className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-600 mb-2">{t('budget.no_expenses_found')}</h3>
-                    <p className="text-gray-500">{t('budget.start_adding_expenses')}</p>
+                    <h3 className="text-lg font-medium text-gray-600 mb-2">
+                      {t("budget.no_expenses_found")}
+                    </h3>
+                    <p className="text-gray-500">
+                      {t("budget.start_adding_expenses")}
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -583,9 +828,15 @@ export default function BudgetTracker() {
                   <Card>
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between">
-                        <div className={i18n.language === 'he' ? 'text-right' : ''}>
-                          <p className="text-sm text-gray-600 font-bold">{t('budget.total_trips')}</p>
-                          <p className="text-2xl font-bold">{analytics?.trips?.total || 0}</p>
+                        <div
+                          className={i18n.language === "he" ? "text-right" : ""}
+                        >
+                          <p className="text-sm text-gray-600 font-bold">
+                            {t("budget.total_trips")}
+                          </p>
+                          <p className="text-2xl font-bold">
+                            {analytics?.trips?.total || 0}
+                          </p>
                         </div>
                         <MapPin className="w-8 h-8 text-blue-500" />
                       </div>
@@ -595,9 +846,15 @@ export default function BudgetTracker() {
                   <Card>
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between">
-                        <div className={i18n.language === 'he' ? 'text-right' : ''}>
-                          <p className="text-sm text-gray-600 font-bold">{t('budget.countries_visited')}</p>
-                          <p className="text-2xl font-bold">{analytics?.trips?.countries || 0}</p>
+                        <div
+                          className={i18n.language === "he" ? "text-right" : ""}
+                        >
+                          <p className="text-sm text-gray-600 font-bold">
+                            {t("budget.countries_visited")}
+                          </p>
+                          <p className="text-2xl font-bold">
+                            {analytics?.trips?.countries || 0}
+                          </p>
                         </div>
                         <Target className="w-8 h-8 text-green-500" />
                       </div>
@@ -607,10 +864,18 @@ export default function BudgetTracker() {
                   <Card>
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between">
-                        <div className={i18n.language === 'he' ? 'text-right' : ''}>
-                          <p className="text-sm text-gray-600 font-bold">{t('budget.total_spent')}</p>
+                        <div
+                          className={i18n.language === "he" ? "text-right" : ""}
+                        >
+                          <p className="text-sm text-gray-600 font-bold">
+                            {t("budget.total_spent")}
+                          </p>
                           <p className="text-2xl font-bold">
-                            {formatCurrency(analytics?.expenses?.total || 0, i18n.language as 'en' | 'he', { decimals: 2 })}
+                            {formatCurrency(
+                              analytics?.expenses?.total || 0,
+                              i18n.language as "en" | "he",
+                              { decimals: 2 }
+                            )}
                           </p>
                         </div>
                         <DollarSign className="w-8 h-8 text-orange-500" />
@@ -621,10 +886,18 @@ export default function BudgetTracker() {
                   <Card>
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between">
-                        <div className={i18n.language === 'he' ? 'text-right' : ''}>
-                          <p className="text-sm text-gray-600 font-bold">{t('budget.avg_per_trip')}</p>
+                        <div
+                          className={i18n.language === "he" ? "text-right" : ""}
+                        >
+                          <p className="text-sm text-gray-600 font-bold">
+                            {t("budget.avg_per_trip")}
+                          </p>
                           <p className="text-2xl font-bold">
-                            {formatCurrency(analytics?.expenses?.avgPerTrip || 0, i18n.language as 'en' | 'he', { decimals: 2 })}
+                            {formatCurrency(
+                              analytics?.expenses?.avgPerTrip || 0,
+                              i18n.language as "en" | "he",
+                              { decimals: 2 }
+                            )}
                           </p>
                         </div>
                         <BarChart3 className="w-8 h-8 text-purple-500" />
@@ -640,87 +913,155 @@ export default function BudgetTracker() {
             {filteredExpenses.length > 0 ? (
               <>
                 {/* Budget Status */}
-                {selectedTrip && userTrips.find((t: any) => t.id === selectedTrip)?.budget && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
-                        <Target className="w-5 h-5 text-primary" />
-                        {i18n.language === 'he' ? 'סטטוס תקציב' : 'Budget Status'}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      {budgetUsed <= 80 ? (
-                        <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
-                          <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-green-900 mb-1">
-                              {i18n.language === 'he' ? 'כל הכבוד! אתם בדרך הנכונה' : 'Great job! You\'re on track'}
-                            </h4>
-                            <p className="text-sm text-green-700">
-                              {i18n.language === 'he' 
-                                ? `השתמשתם רק ב-${budgetUsed.toFixed(1)}% מהתקציב. המשיכו לעקוב אחר ההוצאות ותישארו בגבולות התקציב.`
-                                : `You've used only ${budgetUsed.toFixed(1)}% of your budget. Keep tracking expenses to stay within limits.`}
-                            </p>
+                {selectedTrip &&
+                  userTrips.find((t: any) => t.id === selectedTrip)?.budget && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle
+                          className={`flex items-center gap-2 ${
+                            i18n.language === "he" ? "flex-row-reverse" : ""
+                          }`}
+                        >
+                          <Target className="w-5 h-5 text-primary" />
+                          {i18n.language === "he"
+                            ? "סטטוס תקציב"
+                            : "Budget Status"}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {budgetUsed <= 80 ? (
+                          <div
+                            className="flex items-start gap-3 p-4 bg-green-50 rounded-lg"
+                            dir={i18n.language === "he" ? "rtl" : "ltr"}
+                          >
+                            <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-green-900 mb-1">
+                                {i18n.language === "he"
+                                  ? "כל הכבוד! אתם בדרך הנכונה"
+                                  : "Great job! You're on track"}
+                              </h4>
+                              <p className="text-sm text-green-700">
+                                {i18n.language === "he"
+                                  ? `השתמשתם רק ב-${budgetUsed.toFixed(
+                                      1
+                                    )}% מהתקציב. המשיכו לעקוב אחר ההוצאות ותישארו בגבולות התקציב.`
+                                  : `You've used only ${budgetUsed.toFixed(
+                                      1
+                                    )}% of your budget. Keep tracking expenses to stay within limits.`}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      ) : budgetUsed <= 100 ? (
-                        <div className="flex items-start gap-3 p-4 bg-orange-50 rounded-lg" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
-                          <AlertTriangle className="w-5 h-5 text-orange-600 mt-0.5" />
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-orange-900 mb-1">
-                              {i18n.language === 'he' ? 'שימו לב - קרוב לתקציב' : 'Attention - Near Budget Limit'}
-                            </h4>
-                            <p className="text-sm text-orange-700">
-                              {i18n.language === 'he' 
-                                ? `השתמשתם ב-${budgetUsed.toFixed(1)}% מהתקציב. שקלו לצמצם הוצאות כדי להישאר בגבולות התקציב.`
-                                : `You've used ${budgetUsed.toFixed(1)}% of your budget. Consider reducing expenses to stay within limits.`}
-                            </p>
+                        ) : budgetUsed <= 100 ? (
+                          <div
+                            className="flex items-start gap-3 p-4 bg-orange-50 rounded-lg"
+                            dir={i18n.language === "he" ? "rtl" : "ltr"}
+                          >
+                            <AlertTriangle className="w-5 h-5 text-orange-600 mt-0.5" />
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-orange-900 mb-1">
+                                {i18n.language === "he"
+                                  ? "שימו לב - קרוב לתקציב"
+                                  : "Attention - Near Budget Limit"}
+                              </h4>
+                              <p className="text-sm text-orange-700">
+                                {i18n.language === "he"
+                                  ? `השתמשתם ב-${budgetUsed.toFixed(
+                                      1
+                                    )}% מהתקציב. שקלו לצמצם הוצאות כדי להישאר בגבולות התקציב.`
+                                  : `You've used ${budgetUsed.toFixed(
+                                      1
+                                    )}% of your budget. Consider reducing expenses to stay within limits.`}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      ) : (
-                        <div className="flex items-start gap-3 p-4 bg-red-50 rounded-lg" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
-                          <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-red-900 mb-1">
-                              {i18n.language === 'he' ? 'חריגה מהתקציב' : 'Over Budget'}
-                            </h4>
-                            <p className="text-sm text-red-700">
-                              {i18n.language === 'he' 
-                                ? `עברתם את התקציב ב-${(budgetUsed - 100).toFixed(1)}%. נסו לצמצם הוצאות עתידיות.`
-                                : `You're over budget by ${(budgetUsed - 100).toFixed(1)}%. Try to reduce future expenses.`}
-                            </p>
+                        ) : (
+                          <div
+                            className="flex items-start gap-3 p-4 bg-red-50 rounded-lg"
+                            dir={i18n.language === "he" ? "rtl" : "ltr"}
+                          >
+                            <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-red-900 mb-1">
+                                {i18n.language === "he"
+                                  ? "חריגה מהתקציב"
+                                  : "Over Budget"}
+                              </h4>
+                              <p className="text-sm text-red-700">
+                                {i18n.language === "he"
+                                  ? `עברתם את התקציב ב-${(
+                                      budgetUsed - 100
+                                    ).toFixed(1)}%. נסו לצמצם הוצאות עתידיות.`
+                                  : `You're over budget by ${(
+                                      budgetUsed - 100
+                                    ).toFixed(
+                                      1
+                                    )}%. Try to reduce future expenses.`}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                )}
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
 
                 {/* Top Spending Category */}
                 {categoryTotals && categoryTotals.length > 0 && (
                   <Card>
                     <CardHeader>
-                      <CardTitle className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                      <CardTitle
+                        className={`flex items-center gap-2 ${
+                          i18n.language === "he" ? "flex-row-reverse" : ""
+                        }`}
+                      >
                         <PieChart className="w-5 h-5 text-primary" />
-                        {i18n.language === 'he' ? 'קטגוריה מובילה' : 'Top Spending Category'}
+                        {i18n.language === "he"
+                          ? "קטגוריה מובילה"
+                          : "Top Spending Category"}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       {(() => {
                         const TopIcon = categoryTotals[0]?.icon;
                         return (
-                          <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg" dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
-                            <div className={`p-2 rounded-lg ${categoryTotals[0]?.color}`}>
-                              {TopIcon && <TopIcon className="w-5 h-5 text-white" />}
+                          <div
+                            className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg"
+                            dir={i18n.language === "he" ? "rtl" : "ltr"}
+                          >
+                            <div
+                              className={`p-2 rounded-lg ${categoryTotals[0]?.color}`}
+                            >
+                              {TopIcon && (
+                                <TopIcon className="w-5 h-5 text-white" />
+                              )}
                             </div>
                             <div className="flex-1">
                               <h4 className="font-semibold text-blue-900 mb-1">
-                                {i18n.language === 'he' 
-                                  ? `מרבית ההוצאות: ${t(categoryTotals[0]?.labelKey)}` 
-                                  : `Most spending: ${t(categoryTotals[0]?.labelKey)}`}
+                                {i18n.language === "he"
+                                  ? `מרבית ההוצאות: ${t(
+                                      categoryTotals[0]?.labelKey
+                                    )}`
+                                  : `Most spending: ${t(
+                                      categoryTotals[0]?.labelKey
+                                    )}`}
                               </h4>
                               <p className="text-sm text-blue-700">
-                                {formatCurrency(categoryTotals[0]?.total || 0, i18n.language as 'en' | 'he', { decimals: 2 })} ({((categoryTotals[0]?.total || 0) / totalSpent * 100).toFixed(1)}% {i18n.language === 'he' ? 'מסך ההוצאות' : 'of total'})
+                                {formatCurrency(
+                                  categoryTotals[0]?.total || 0,
+                                  i18n.language as "en" | "he",
+                                  { decimals: 2 }
+                                )}{" "}
+                                (
+                                {(
+                                  ((categoryTotals[0]?.total || 0) /
+                                    totalSpent) *
+                                  100
+                                ).toFixed(1)}
+                                %{" "}
+                                {i18n.language === "he"
+                                  ? "מסך ההוצאות"
+                                  : "of total"}
+                                )
                               </p>
                             </div>
                           </div>
@@ -733,40 +1074,59 @@ export default function BudgetTracker() {
                 {/* Recommendations */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className={`flex items-center gap-2 ${i18n.language === 'he' ? 'flex-row-reverse' : ''}`}>
+                    <CardTitle
+                      className={`flex items-center gap-2 ${
+                        i18n.language === "he" ? "flex-row-reverse" : ""
+                      }`}
+                    >
                       <Lightbulb className="w-5 h-5 text-primary" />
-                      {i18n.language === 'he' ? 'המלצות' : 'Recommendations'}
+                      {i18n.language === "he" ? "המלצות" : "Recommendations"}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <div 
-                      className={`p-3 bg-blue-50 ${i18n.language === 'he' ? 'border-r-4 border-blue-500' : 'border-l-4 border-blue-500'}`} 
-                      dir={i18n.language === 'he' ? 'rtl' : 'ltr'}
+                    <div
+                      className={`p-3 bg-blue-50 ${
+                        i18n.language === "he"
+                          ? "border-r-4 border-blue-500"
+                          : "border-l-4 border-blue-500"
+                      }`}
+                      dir={i18n.language === "he" ? "rtl" : "ltr"}
                     >
                       <p className="text-sm">
-                        💡 {i18n.language === 'he' 
-                          ? 'עקבו אחר ההוצאות היומיות כדי למנוע הפתעות בסוף הטיול'
-                          : 'Track daily expenses to avoid surprises at the end of your trip'}
+                        💡{" "}
+                        {i18n.language === "he"
+                          ? "עקבו אחר ההוצאות היומיות כדי למנוע הפתעות בסוף הטיול"
+                          : "Track daily expenses to avoid surprises at the end of your trip"}
                       </p>
                     </div>
-                    <div 
-                      className={`p-3 bg-green-50 ${i18n.language === 'he' ? 'border-r-4 border-green-500' : 'border-l-4 border-green-500'}`} 
-                      dir={i18n.language === 'he' ? 'rtl' : 'ltr'}
+                    <div
+                      className={`p-3 bg-green-50 ${
+                        i18n.language === "he"
+                          ? "border-r-4 border-green-500"
+                          : "border-l-4 border-green-500"
+                      }`}
+                      dir={i18n.language === "he" ? "rtl" : "ltr"}
                     >
                       <p className="text-sm">
-                        💡 {i18n.language === 'he' 
-                          ? 'בדקו מחירים מקומיים לפני רכישות גדולות'
-                          : 'Check local prices before making large purchases'}
+                        💡{" "}
+                        {i18n.language === "he"
+                          ? "בדקו מחירים מקומיים לפני רכישות גדולות"
+                          : "Check local prices before making large purchases"}
                       </p>
                     </div>
-                    <div 
-                      className={`p-3 bg-purple-50 ${i18n.language === 'he' ? 'border-r-4 border-purple-500' : 'border-l-4 border-purple-500'}`} 
-                      dir={i18n.language === 'he' ? 'rtl' : 'ltr'}
+                    <div
+                      className={`p-3 bg-purple-50 ${
+                        i18n.language === "he"
+                          ? "border-r-4 border-purple-500"
+                          : "border-l-4 border-purple-500"
+                      }`}
+                      dir={i18n.language === "he" ? "rtl" : "ltr"}
                     >
                       <p className="text-sm">
-                        💡 {i18n.language === 'he' 
-                          ? 'שמרו קבלות לכל הוצאה לתיעוד מדויק'
-                          : 'Keep receipts for all expenses for accurate tracking'}
+                        💡{" "}
+                        {i18n.language === "he"
+                          ? "שמרו קבלות לכל הוצאה לתיעוד מדויק"
+                          : "Keep receipts for all expenses for accurate tracking"}
                       </p>
                     </div>
                   </CardContent>
@@ -777,12 +1137,14 @@ export default function BudgetTracker() {
                 <CardContent className="text-center py-8">
                   <Lightbulb className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-600 mb-2">
-                    {i18n.language === 'he' ? 'אין מספיק נתונים' : 'Not Enough Data'}
+                    {i18n.language === "he"
+                      ? "אין מספיק נתונים"
+                      : "Not Enough Data"}
                   </h3>
                   <p className="text-gray-500">
-                    {i18n.language === 'he' 
-                      ? 'הוסיפו הוצאות כדי לקבל תובנות והמלצות מותאמות אישית'
-                      : 'Add expenses to get personalized insights and recommendations'}
+                    {i18n.language === "he"
+                      ? "הוסיפו הוצאות כדי לקבל תובנות והמלצות מותאמות אישית"
+                      : "Add expenses to get personalized insights and recommendations"}
                   </p>
                 </CardContent>
               </Card>
