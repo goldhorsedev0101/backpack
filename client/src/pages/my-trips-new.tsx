@@ -99,6 +99,7 @@ import {
   Plane,
   Plus,
 } from "lucide-react";
+import { cn } from "@/lib/utils.js";
 
 // Remove problematic Unicode control characters that OpenAI injects into Hebrew text
 const normalizeRtlText = (
@@ -2236,10 +2237,20 @@ export default function MyTripsNew() {
               </div>
               <Card className="shadow-lg bg-gradient-to-r from-orange-50 to-teal-50 border-none">
                 <CardContent className="p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="flex justify-evenly flex-wrap items-center gap-6">
                     {/* Trip Type */}
-                    <div className="space-y-2">
-                      <Label className="text-sm font-semibold text-slate-700 text-left block">
+                    <div
+                      className={`flex items-center gap-4 ${
+                        i18n.language === "he" ? " flex-row-reverse" : ""
+                      }`}
+                    >
+                      <Label
+                        className={`text-sm font-semibold text-nowrap text-slate-700 ${
+                          i18n.language === "he"
+                            ? "min-w-[120px] text-right"
+                            : "block text-left"
+                        }`}
+                      >
                         {t("trips.trip_type")}
                       </Label>
                       <Select
@@ -2250,7 +2261,11 @@ export default function MyTripsNew() {
                         }}
                       >
                         <SelectTrigger
-                          className="w-full bg-white"
+                          className={`${
+                            i18n.language === "he" ? "flex-1" : "w-full"
+                          } bg-white ${
+                            i18n.language === "he" ? "text-right" : "text-left"
+                          }`}
                           data-testid="select-trip-type"
                         >
                           <SelectValue
@@ -2296,82 +2311,114 @@ export default function MyTripsNew() {
                     </div>
 
                     {/* Adults */}
-                    <div className="space-y-2">
-                      <Label className="text-sm font-semibold text-slate-700 text-left block">
-                        {t("trips.adults")}
-                      </Label>
-                      <div className="flex items-center gap-3">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className="h-10 w-10"
-                          onClick={() => {
-                            const current = form.watch("adults") || 2;
-                            if (current > 1)
-                              form.setValue("adults", current - 1);
-                          }}
+                    <div className={`${i18n.language === "he" ? "" : ""}`}>
+                      <div
+                        className={`flex items-center gap-3 ${
+                          i18n.language === "he" ? "flex-row-reverse" : ""
+                        }`}
+                      >
+                        <Label
+                          className={`text-sm font-semibold text-slate-700 ${
+                            i18n.language === "he"
+                              ? "min-w-[120px] text-right"
+                              : "block text-left"
+                          }`}
                         >
-                          -
-                        </Button>
-                        <div className="flex-1 text-center">
-                          <span className="text-2xl font-bold text-orange-600">
-                            {form.watch("adults") || 2}
-                          </span>
+                          {t("trips.adults")}
+                        </Label>
+                        <div
+                          className={`flex items-center gap-3 ${
+                            i18n.language === "he" ? "flex-1" : ""
+                          }`}
+                        >
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-10 w-10"
+                            onClick={() => {
+                              const current = form.watch("adults") || 2;
+                              if (current > 1)
+                                form.setValue("adults", current - 1);
+                            }}
+                          >
+                            -
+                          </Button>
+                          <div className="flex-1 text-center">
+                            <span className="text-2xl font-bold text-orange-600">
+                              {form.watch("adults") || 2}
+                            </span>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-10 w-10"
+                            onClick={() => {
+                              const current = form.watch("adults") || 2;
+                              if (current < 8)
+                                form.setValue("adults", current + 1);
+                            }}
+                          >
+                            +
+                          </Button>
                         </div>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className="h-10 w-10"
-                          onClick={() => {
-                            const current = form.watch("adults") || 2;
-                            if (current < 8)
-                              form.setValue("adults", current + 1);
-                          }}
-                        >
-                          +
-                        </Button>
                       </div>
                     </div>
 
                     {/* Children */}
-                    <div className="space-y-2">
-                      <Label className="text-sm font-semibold text-slate-700 text-left block">
-                        {t("trips.children")}
-                      </Label>
-                      <div className="flex items-center gap-3">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className="h-10 w-10"
-                          onClick={() => {
-                            const current = form.watch("children") || 0;
-                            if (current > 0)
-                              form.setValue("children", current - 1);
-                          }}
+                    <div className={`${i18n.language === "he" ? "" : ""}`}>
+                      <div
+                        className={`flex items-center gap-3 ${
+                          i18n.language === "he" ? "flex-row-reverse" : ""
+                        }`}
+                      >
+                        <Label
+                          className={`text-sm font-semibold text-slate-700 ${
+                            i18n.language === "he"
+                              ? "min-w-[120px] text-right"
+                              : "block text-left"
+                          }`}
                         >
-                          -
-                        </Button>
-                        <div className="flex-1 text-center">
-                          <span className="text-2xl font-bold text-teal-600">
-                            {form.watch("children") || 0}
-                          </span>
+                          {t("trips.children")}
+                        </Label>
+                        <div
+                          className={`flex items-center gap-3 ${
+                            i18n.language === "he" ? "flex-1" : ""
+                          }`}
+                        >
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-10 w-10"
+                            onClick={() => {
+                              const current = form.watch("children") || 0;
+                              if (current > 0)
+                                form.setValue("children", current - 1);
+                            }}
+                          >
+                            -
+                          </Button>
+                          <div className="flex-1 text-center">
+                            <span className="text-2xl font-bold text-teal-600">
+                              {form.watch("children") || 0}
+                            </span>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-10 w-10"
+                            onClick={() => {
+                              const current = form.watch("children") || 0;
+                              if (current < 10)
+                                form.setValue("children", current + 1);
+                            }}
+                          >
+                            +
+                          </Button>
                         </div>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className="h-10 w-10"
-                          onClick={() => {
-                            const current = form.watch("children") || 0;
-                            if (current < 10)
-                              form.setValue("children", current + 1);
-                          }}
-                        >
-                          +
-                        </Button>
                       </div>
                     </div>
                   </div>
@@ -2379,9 +2426,13 @@ export default function MyTripsNew() {
               </Card>
             </div>
 
-            <div className="text-center mb-4">
+            <div
+              className={`text-center mb-4 ${
+                i18n.language === "he" ? "md:pr-4" : ""
+              }`}
+            >
               <h2
-                className={`text-2xl font-bold text-orange-500 mb-2 flex items-center gap-2 ${
+                className={`text-2xl font-bold text-orange-500 mb-2 flex items-center gap-2 text-center ${
                   i18n.language === "he"
                     ? "justify-center flex-row-reverse"
                     : "justify-center"
@@ -2390,20 +2441,35 @@ export default function MyTripsNew() {
                 <Bot className="w-6 h-6" />
                 {t("trips.trip_preferences")}
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 text-center">
                 {t("trips.tell_us_preferences")}
               </p>
             </div>
-            <Card className="shadow-lg bg-gradient-to-br from-orange-50 via-teal-50 to-blue-50 border-none">
-              <CardContent className="space-y-6 p-6">
+            <Card
+              className={`shadow-lg bg-gradient-to-br from-orange-50 via-teal-50 to-blue-50 border-none ${
+                i18n.language === "he" ? "md:mr-4" : ""
+              }`}
+            >
+              <CardContent
+                className="space-y-6 p-6"
+                dir={i18n.language === "he" ? "rtl" : "ltr"}
+              >
                 {/* Multi-City Destinations */}
-                <div className="space-y-4">
+                <div
+                  className={`space-y-4 ${
+                    i18n.language === "he" ? "text-right" : "text-left"
+                  }`}
+                >
                   <div
                     className={`flex items-center justify-between ${
                       i18n.language === "he" ? "flex-row-reverse" : ""
                     }`}
                   >
-                    <Label className="text-sm font-medium text-slate-700">
+                    <Label
+                      className={`text-sm font-medium text-slate-700 ${
+                        i18n.language === "he" ? "text-right" : "text-left"
+                      }`}
+                    >
                       {t("trips.select_destination")}
                     </Label>
                     <Button
@@ -2426,13 +2492,23 @@ export default function MyTripsNew() {
                       key={index}
                       className="p-4 bg-white border-2 border-blue-100"
                     >
-                      <div className="space-y-4">
+                      <div
+                        className={`space-y-4 ${
+                          i18n.language === "he" ? "text-right" : "text-left"
+                        }`}
+                      >
                         <div
                           className={`flex items-center justify-between ${
                             i18n.language === "he" ? "flex-row-reverse" : ""
                           }`}
                         >
-                          <h3 className="font-semibold text-blue-700">
+                          <h3
+                            className={`font-semibold text-blue-700 ${
+                              i18n.language === "he"
+                                ? "text-right"
+                                : "text-left"
+                            }`}
+                          >
                             {t("trips.destination_number", {
                               number: index + 1,
                             })}
@@ -2452,17 +2528,14 @@ export default function MyTripsNew() {
                         </div>
 
                         {/* Country */}
-                        <div
-                          className={`flex items-center gap-4 ${
-                            i18n.language === "he" ? "flex-row-reverse" : ""
-                          }`}
-                        >
+                        <div className="flex items-center gap-4">
                           <Label
-                            className={`text-sm text-slate-600 min-w-[180px] ${
+                            className={cn(
+                              "text-sm text-slate-600 min-w-[180px]",
                               i18n.language === "he"
-                                ? "text-left"
-                                : "text-right"
-                            }`}
+                                ? "text-right"
+                                : "text-left"
+                            )}
                           >
                             {t("trips.select_country")}
                           </Label>
@@ -2478,7 +2551,11 @@ export default function MyTripsNew() {
                           >
                             <SelectTrigger
                               data-testid={`select-country-${index}`}
-                              className="flex-1"
+                              className={`flex-1 ${
+                                i18n.language === "he"
+                                  ? "text-right"
+                                  : "text-left"
+                              }`}
                             >
                               <SelectValue
                                 placeholder={t("trips.select_country")}
@@ -2532,17 +2609,14 @@ export default function MyTripsNew() {
                         </div>
 
                         {/* City */}
-                        <div
-                          className={`flex items-center gap-4 ${
-                            i18n.language === "he" ? "flex-row-reverse" : ""
-                          }`}
-                        >
+                        <div className="flex items-center gap-4">
                           <Label
-                            className={`text-sm text-slate-600 min-w-[180px] ${
+                            className={cn(
+                              "text-sm text-slate-600 min-w-[180px]",
                               i18n.language === "he"
-                                ? "text-left"
-                                : "text-right"
-                            }`}
+                                ? "text-right"
+                                : "text-left"
+                            )}
                           >
                             {t("trips.select_specific_city")} (
                             {t("trips.optional")})
@@ -2560,7 +2634,11 @@ export default function MyTripsNew() {
                           >
                             <SelectTrigger
                               data-testid={`select-city-${index}`}
-                              className="flex-1"
+                              className={`flex-1 ${
+                                i18n.language === "he"
+                                  ? "text-right"
+                                  : "text-left"
+                              }`}
                             >
                               <SelectValue
                                 placeholder={t("trips.choose_city")}
@@ -2622,8 +2700,15 @@ export default function MyTripsNew() {
                           {i18n.language === "he" ? (
                             <>
                               {/* End Date */}
-                              <div className="flex items-center gap-4 flex-row-reverse">
-                                <Label className="text-sm text-slate-600 min-w-[100px] text-left">
+                              <div className="flex items-center gap-4">
+                                <Label
+                                  className={cn(
+                                    "text-sm text-slate-600 min-w-[100px]",
+                                    i18n.language === "he"
+                                      ? "text-right"
+                                      : "text-left"
+                                  )}
+                                >
                                   {t("trips.end_date")}
                                 </Label>
                                 <Popover>
@@ -2676,7 +2761,7 @@ export default function MyTripsNew() {
                                 </Popover>
                               </div>
                               {/* Start Date */}
-                              <div className="flex items-center gap-4 flex-row-reverse">
+                              <div className="flex items-center gap-4">
                                 <Label className="text-sm text-slate-600 min-w-[100px] text-left">
                                   {t("trips.start_date")}
                                 </Label>
@@ -2734,7 +2819,14 @@ export default function MyTripsNew() {
                             <>
                               {/* Start Date */}
                               <div className="flex items-center gap-4">
-                                <Label className="text-sm text-slate-600 min-w-[100px] text-right">
+                                <Label
+                                  className={cn(
+                                    "text-sm text-slate-600 min-w-[100px]",
+                                    i18n.language === "he"
+                                      ? "text-right"
+                                      : "text-left"
+                                  )}
+                                >
                                   {t("trips.start_date")}
                                 </Label>
                                 <Popover>
@@ -2786,7 +2878,7 @@ export default function MyTripsNew() {
                               </div>
                               {/* End Date */}
                               <div className="flex items-center gap-4">
-                                <Label className="text-sm text-slate-600 min-w-[100px] text-right">
+                                <Label className="text-sm text-slate-600 min-w-[100px] text-left">
                                   {t("trips.end_date")}
                                 </Label>
                                 <Popover>
@@ -2860,12 +2952,16 @@ export default function MyTripsNew() {
                 <div>
                   <Label
                     className={`text-sm font-medium text-slate-700 mb-2 block ${
-                      i18n.language === "he" ? "text-left" : ""
+                      i18n.language === "he" ? "text-right" : "text-left"
                     }`}
                   >
                     {t("trips.budget_range")}
                   </Label>
-                  <p className="text-xs text-gray-500 mb-3 text-left">
+                  <p
+                    className={`text-xs text-gray-500 mb-3 ${
+                      i18n.language === "he" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {i18n.language === "he"
                       ? "כולל טיסות, לינה, אוכל, פעילויות ותחבורה"
                       : "Includes flights, accommodation, food, activities and transportation"}
@@ -2904,10 +3000,14 @@ export default function MyTripsNew() {
                 </div>
 
                 {/* Interests (Combined Travel Styles + Interests) */}
-                <div>
+                <div
+                  className={
+                    i18n.language === "he" ? "text-right w-full" : "text-left"
+                  }
+                >
                   <Label
                     className={`text-sm font-medium text-slate-700 mb-2 block ${
-                      i18n.language === "he" ? "text-left" : ""
+                      i18n.language === "he" ? "text-right" : "text-left"
                     }`}
                   >
                     {t("trips.interests")}{" "}
@@ -2915,29 +3015,45 @@ export default function MyTripsNew() {
                       ({t("trips.select_multiple")})
                     </span>
                   </Label>
-                  <div className="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto pr-2">
+                  <div
+                    className={`grid grid-cols-2 gap-3 max-h-80 overflow-y-auto ${
+                      i18n.language === "he"
+                        ? "pl-2 justify-items-end"
+                        : "pr-2 justify-items-start"
+                    }`}
+                  >
                     {ALL_INTERESTS.map((interest) => (
                       <div
                         key={interest.id}
                         onClick={() => toggleInterest(interest.id)}
-                        className={`p-4 rounded-lg border transition cursor-pointer min-h-[4rem] flex items-center ${
-                          selectedInterests.includes(interest.id)
-                            ? "border-orange-500 bg-gradient-to-br from-orange-50 via-teal-50 to-blue-50 shadow-md"
-                            : "border-gray-200 bg-white hover:border-orange-300 hover:bg-gradient-to-br hover:from-orange-50/50 hover:via-teal-50/50 hover:to-blue-50/50 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-orange-400"
-                        }`}
-                      >
-                        <div
-                          className={`flex items-center gap-3 w-full ${
+                        className={`
+                          p-4 rounded-lg border transition cursor-pointer min-h-[4rem] w-full
+                          ${
                             i18n.language === "he"
-                              ? "flex-row-reverse text-right"
-                              : ""
+                              ? "flex items-center flex-row-reverse justify-end"
+                              : "flex items-center justify-start"
+                          }
+                          ${
+                            selectedInterests.includes(interest.id)
+                              ? "border-orange-500 bg-gradient-to-br from-orange-50 via-teal-50 to-blue-50 shadow-md"
+                              : "border-gray-200 bg-white hover:border-orange-300 hover:bg-gradient-to-br hover:from-orange-50/50 hover:via-teal-50/50 hover:to-blue-50/50 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-orange-400"
                           }`}
-                        >
-                          <interest.icon className="w-5 h-5 flex-shrink-0 text-orange-500" />
-                          <p className="text-base font-medium leading-relaxed">
-                            {interest.label}
-                          </p>
-                        </div>
+                      >
+                        {i18n.language === "he" ? (
+                          <>
+                            <p className="text-base font-medium leading-relaxed text-right">
+                              {interest.label}
+                            </p>
+                            <interest.icon className="w-5 h-5 flex-shrink-0 text-orange-500 ml-3" />
+                          </>
+                        ) : (
+                          <>
+                            <interest.icon className="w-5 h-5 flex-shrink-0 text-orange-500 mr-3" />
+                            <p className="text-base font-medium leading-relaxed text-left">
+                              {interest.label}
+                            </p>
+                          </>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -3027,28 +3143,61 @@ export default function MyTripsNew() {
                     <Button
                       onClick={() => setActiveTab("preferences")}
                       variant="outline"
+                      className={
+                        i18n.language === "he" ? "flex-row-reverse" : ""
+                      }
                     >
-                      <Bot className="w-4 h-4 mr-2" />
-                      {t("trips.go_to_preferences")}
+                      {i18n.language === "he" ? (
+                        <>
+                          <span>{t("trips.go_to_preferences")}</span>
+                          <Bot className="w-4 h-4 ml-2" />
+                        </>
+                      ) : (
+                        <>
+                          <Bot className="w-4 h-4 mr-2" />
+                          <span>{t("trips.go_to_preferences")}</span>
+                        </>
+                      )}
                     </Button>
                   </div>
                 )}
 
                 {aiSuggestions.length > 0 && !isGenerating && (
                   <div className="space-y-6">
-                    <div className="flex items-center justify-between">
+                    <div
+                      className={`flex items-center justify-between ${
+                        i18n.language === "he" ? "flex-row-reverse" : ""
+                      }`}
+                      dir={i18n.language === "he" ? "rtl" : "ltr"}
+                    >
                       <Button
                         onClick={handleGenerateItinerary}
                         disabled={isGeneratingItinerary}
                         variant="outline"
                         size="sm"
+                        className={
+                          i18n.language === "he" ? "flex-row-reverse" : ""
+                        }
                       >
-                        {isGeneratingItinerary ? (
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        {i18n.language === "he" ? (
+                          <>
+                            <span>{t("trips.generate_itinerary")}</span>
+                            {isGeneratingItinerary ? (
+                              <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                            ) : (
+                              <Route className="w-4 h-4 ml-2" />
+                            )}
+                          </>
                         ) : (
-                          <Route className="w-4 h-4 mr-2" />
+                          <>
+                            {isGeneratingItinerary ? (
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            ) : (
+                              <Route className="w-4 h-4 mr-2" />
+                            )}
+                            <span>{t("trips.generate_itinerary")}</span>
+                          </>
                         )}
-                        {t("trips.generate_itinerary")}
                       </Button>
                       <p className="text-sm text-gray-600">
                         {t("trips.found_suggestions", {
@@ -3081,8 +3230,11 @@ export default function MyTripsNew() {
                       return (
                         <div
                           key={index}
-                          className="border rounded-lg p-4 space-y-4 text-left"
-                          dir="ltr"
+                          className={cn(
+                            "border rounded-lg p-4 space-y-4",
+                            i18n.language === "he" ? "text-right" : "text-left"
+                          )}
+                          dir={i18n.language === "he" ? "rtl" : "ltr"}
                           data-testid={`suggestion-card-${index}`}
                         >
                           <div>
@@ -3360,7 +3512,14 @@ export default function MyTripsNew() {
                         )}
                         */}
 
-                          <div className="flex flex-wrap gap-2 mb-4 justify-end">
+                          <div
+                            className={`flex flex-wrap gap-2 mb-4 ${
+                              i18n.language === "he"
+                                ? "justify-end"
+                                : "justify-start"
+                            }`}
+                            dir={i18n.language === "he" ? "rtl" : "ltr"}
+                          >
                             {suggestion.travelStyle.map((style) => {
                               const interestConfig = ALL_INTERESTS.find(
                                 (int) => int.id === style.trim().toLowerCase()
@@ -3379,7 +3538,12 @@ export default function MyTripsNew() {
                             })}
                           </div>
 
-                          <div className="flex items-center pt-4 border-t justify-between">
+                          <div
+                            className={`flex items-center pt-4 border-t justify-between ${
+                              i18n.language === "he" ? "flex-row-reverse" : ""
+                            }`}
+                            dir={i18n.language === "he" ? "rtl" : "ltr"}
+                          >
                             <Button
                               onClick={() =>
                                 handleGenerateItineraryForSuggestion(suggestion)
@@ -3388,13 +3552,33 @@ export default function MyTripsNew() {
                               variant="outline"
                               size="sm"
                               data-testid={`button-generate-itinerary-${index}`}
+                              className={
+                                i18n.language === "he" ? "flex-row-reverse" : ""
+                              }
                             >
-                              {isGeneratingItinerary ? (
-                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                              {i18n.language === "he" ? (
+                                <>
+                                  <span>
+                                    {t("trips.generate_daily_itinerary")}
+                                  </span>
+                                  {isGeneratingItinerary ? (
+                                    <Loader2 className="w-4 h-4 animate-spin ml-2" />
+                                  ) : (
+                                    <Route className="w-4 h-4 ml-2" />
+                                  )}
+                                </>
                               ) : (
-                                <Route className="w-4 h-4 mr-2" />
+                                <>
+                                  {isGeneratingItinerary ? (
+                                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                  ) : (
+                                    <Route className="w-4 h-4 mr-2" />
+                                  )}
+                                  <span>
+                                    {t("trips.generate_daily_itinerary")}
+                                  </span>
+                                </>
                               )}
-                              {t("trips.generate_daily_itinerary")}
                             </Button>
 
                             <Button
@@ -3405,13 +3589,29 @@ export default function MyTripsNew() {
                               variant="default"
                               size="sm"
                               data-testid={`button-save-trip-${index}`}
+                              className={
+                                i18n.language === "he" ? "flex-row-reverse" : ""
+                              }
                             >
-                              {saveTripMutation.isPending ? (
-                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                              {i18n.language === "he" ? (
+                                <>
+                                  <span>{t("trips.save_trip")}</span>
+                                  {saveTripMutation.isPending ? (
+                                    <Loader2 className="w-4 h-4 animate-spin ml-2" />
+                                  ) : (
+                                    <Heart className="w-4 h-4 ml-2" />
+                                  )}
+                                </>
                               ) : (
-                                <Heart className="w-4 h-4 mr-2" />
+                                <>
+                                  {saveTripMutation.isPending ? (
+                                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                  ) : (
+                                    <Heart className="w-4 h-4 mr-2" />
+                                  )}
+                                  <span>{t("trips.save_trip")}</span>
+                                </>
                               )}
-                              {t("trips.save_trip")}
                             </Button>
                           </div>
                         </div>
@@ -3457,10 +3657,10 @@ export default function MyTripsNew() {
                 {itinerary.length === 0 && !isGeneratingItinerary && (
                   <div className="text-center py-8">
                     <Route className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <p className="text-lg font-medium text-gray-700 mb-2">
+                    <p className="text-lg font-medium text-gray-700 mb-2 text-center">
                       {t("trips.no_itinerary_generated")}
                     </p>
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm text-gray-500 mb-4 text-center">
                       {t("trips.generate_suggestions_first")}
                     </p>
                     <Button onClick={handleGenerateItinerary} variant="outline">
@@ -3913,35 +4113,64 @@ export default function MyTripsNew() {
                 {!isAuthenticated ? (
                   <div className="text-center py-8">
                     <Save className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <p className="text-lg font-medium text-gray-700 mb-2">
+                    <p className="text-lg font-medium text-gray-700 mb-2 text-center">
                       {t("auth.sign_in_to_view_itineraries")}
                     </p>
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm text-gray-500 mb-4 text-center">
                       {t("auth.need_to_sign_in_to_access")}
                     </p>
                     <Button
                       onClick={() => signInWithGoogle()}
                       variant="outline"
+                      className={
+                        i18n.language === "he" ? "flex-row-reverse" : ""
+                      }
                     >
-                      <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
-                        <path
-                          fill="currentColor"
-                          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                        />
-                        <path
-                          fill="currentColor"
-                          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                        />
-                        <path
-                          fill="currentColor"
-                          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                        />
-                        <path
-                          fill="currentColor"
-                          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                        />
-                      </svg>
-                      {t("auth.sign_in_with_google")}
+                      {i18n.language === "he" ? (
+                        <>
+                          <span>{t("auth.sign_in_with_google")}</span>
+                          <svg className="w-4 h-4 ml-2" viewBox="0 0 24 24">
+                            <path
+                              fill="currentColor"
+                              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                            />
+                            <path
+                              fill="currentColor"
+                              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                            />
+                            <path
+                              fill="currentColor"
+                              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                            />
+                            <path
+                              fill="currentColor"
+                              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                            />
+                          </svg>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
+                            <path
+                              fill="currentColor"
+                              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                            />
+                            <path
+                              fill="currentColor"
+                              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                            />
+                            <path
+                              fill="currentColor"
+                              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                            />
+                            <path
+                              fill="currentColor"
+                              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                            />
+                          </svg>
+                          <span>{t("auth.sign_in_with_google")}</span>
+                        </>
+                      )}
                     </Button>
                   </div>
                 ) : isLoadingItineraries ? (
@@ -3954,25 +4183,41 @@ export default function MyTripsNew() {
                 ) : savedItineraries.length === 0 ? (
                   <div className="text-center py-8 bg-gray-50 rounded-lg">
                     <Save className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                    <p className="text-gray-600 mb-2">
+                    <p className="text-gray-600 mb-2 text-center">
                       {t("auth.no_saved_itineraries_yet")}
                     </p>
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm text-gray-500 mb-4 text-center">
                       {t("auth.saved_itineraries_will_appear_here")}
                     </p>
                     <Button
                       onClick={() => setActiveTab("itinerary")}
                       variant="outline"
+                      className={
+                        i18n.language === "he" ? "flex-row-reverse" : ""
+                      }
                     >
-                      <Route className="w-4 h-4 mr-2" />
-                      {t("auth.create_new_itinerary")}
+                      {i18n.language === "he" ? (
+                        <>
+                          <span>{t("auth.create_new_itinerary")}</span>
+                          <Route className="w-4 h-4 ml-2" />
+                        </>
+                      ) : (
+                        <>
+                          <Route className="w-4 h-4 mr-2" />
+                          <span>{t("auth.create_new_itinerary")}</span>
+                        </>
+                      )}
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-6">
                     {/* Header Banner */}
                     <div className="bg-gradient-to-r from-purple-100 via-pink-100 to-orange-100 p-4 rounded-lg text-center">
-                      <p className="text-lg font-semibold text-gray-800 flex items-center gap-2 justify-center">
+                      <p
+                        className={`text-lg font-semibold text-gray-800 flex items-center gap-2 justify-center ${
+                          i18n.language === "he" ? "flex-row-reverse" : ""
+                        }`}
+                      >
                         <Calendar className="w-5 h-5 text-purple-600" />
                         {t("trips.you_have_count_itineraries", {
                           count: savedItineraries.length,
@@ -3991,7 +4236,10 @@ export default function MyTripsNew() {
                               : "border-l-4 border-l-purple-500"
                           }`}
                         >
-                          <CardContent className="p-6">
+                          <CardContent
+                            className="p-6"
+                            dir={i18n.language === "he" ? "rtl" : "ltr"}
+                          >
                             <div className="flex flex-col gap-4">
                               {/* Header with title and delete button */}
                               <div
@@ -4051,7 +4299,10 @@ export default function MyTripsNew() {
                               </div>
 
                               {/* Info Grid */}
-                              <div className="grid grid-cols-3 gap-4">
+                              <div
+                                className="grid grid-cols-3 gap-4"
+                                dir={i18n.language === "he" ? "rtl" : "ltr"}
+                              >
                                 <div className="bg-purple-50 p-4 rounded-lg">
                                   <div
                                     className={`flex flex-col gap-2 ${
@@ -4306,7 +4557,7 @@ export default function MyTripsNew() {
           <TabsContent value="saved" className="mt-6">
             <div className="text-center mb-4">
               <h2
-                className={`text-2xl font-bold text-orange-500 mb-2 flex items-center gap-2 ${
+                className={`text-2xl font-bold text-orange-500 mb-2 flex items-center gap-2 text-center ${
                   i18n.language === "he"
                     ? "justify-center flex-row-reverse"
                     : "justify-center"
@@ -4315,7 +4566,7 @@ export default function MyTripsNew() {
                 <FolderOpen className="w-6 h-6" />
                 {t("trips.my_saved_trips")}
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 text-center">
                 {t("trips.view_manage_trips")}
               </p>
             </div>
@@ -4324,7 +4575,7 @@ export default function MyTripsNew() {
                 {isLoadingSavedTrips && (
                   <div className="text-center py-8">
                     <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-primary" />
-                    <p className="text-lg font-medium text-gray-700">
+                    <p className="text-lg font-medium text-gray-700 text-center">
                       {t("trips.loading_trips")}
                     </p>
                   </div>
@@ -4333,18 +4584,30 @@ export default function MyTripsNew() {
                 {savedTrips.length === 0 && !isLoadingSavedTrips && (
                   <div className="text-center py-8">
                     <BookOpen className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <p className="text-lg font-medium text-gray-700 mb-2">
+                    <p className="text-lg font-medium text-gray-700 mb-2 text-center">
                       {t("trips.no_saved_trips")}
                     </p>
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm text-gray-500 mb-4 text-center">
                       {t("trips.create_first_trip_ai")}
                     </p>
                     <Button
                       onClick={() => setActiveTab("preferences")}
                       variant="outline"
+                      className={
+                        i18n.language === "he" ? "flex-row-reverse" : ""
+                      }
                     >
-                      <Bot className="w-4 h-4 mr-2" />
-                      {t("trips.start_planning")}
+                      {i18n.language === "he" ? (
+                        <>
+                          <span>{t("trips.start_planning")}</span>
+                          <Bot className="w-4 h-4 ml-2" />
+                        </>
+                      ) : (
+                        <>
+                          <Bot className="w-4 h-4 mr-2" />
+                          <span>{t("trips.start_planning")}</span>
+                        </>
+                      )}
                     </Button>
                   </div>
                 )}
@@ -4352,7 +4615,11 @@ export default function MyTripsNew() {
                 {savedTrips.length > 0 && !isLoadingSavedTrips && (
                   <div className="space-y-6">
                     <div className="bg-gradient-to-r from-orange-100 to-amber-100 p-4 rounded-lg mb-6 text-center">
-                      <p className="text-lg font-semibold text-gray-800 flex items-center gap-2 justify-center">
+                      <p
+                        className={`text-lg font-semibold text-gray-800 flex items-center gap-2 justify-center text-center ${
+                          i18n.language === "he" ? "flex-row-reverse" : ""
+                        }`}
+                      >
                         <Heart className="w-5 h-5 text-orange-600" />
                         {t("trips.you_have_trips", {
                           count: savedTrips.length,
@@ -4389,21 +4656,20 @@ export default function MyTripsNew() {
                           }`}
                           data-testid={`card-saved-trip-${trip.id}`}
                         >
-                          <CardContent className="p-6">
-                            <div className="flex flex-col gap-4">
+                          <CardContent
+                            className="p-6 w-full"
+                            dir={i18n.language === "he" ? "rtl" : "ltr"}
+                          >
+                            <div className="flex flex-col w-full gap-4">
                               {/* Header with title, subtitle, description, and budget */}
                               <div
-                                className={`flex items-start justify-between gap-8 ${
-                                  i18n.language === "he"
-                                    ? "flex-row-reverse"
-                                    : ""
+                                className={`flex items-start justify-between w-full gap-8 ${
+                                  i18n.language === "he" ? "" : ""
                                 }`}
                               >
                                 <div
-                                  className={`flex-1 min-w-0 flex flex-col gap-2 ${
-                                    i18n.language === "he"
-                                      ? "items-end"
-                                      : "items-start"
+                                  className={`flex flex-col gap-2 ${
+                                    i18n.language === "he" ? "" : "items-start"
                                   }`}
                                 >
                                   <h3
@@ -4418,9 +4684,7 @@ export default function MyTripsNew() {
                                   </h3>
                                   <div
                                     className={`flex items-center gap-2 text-gray-600 ${
-                                      i18n.language === "he"
-                                        ? "flex-row-reverse"
-                                        : ""
+                                      i18n.language === "he" ? "" : ""
                                     }`}
                                   >
                                     <MapPin className="w-4 h-4 flex-shrink-0 text-orange-500" />
@@ -4443,7 +4707,7 @@ export default function MyTripsNew() {
                                         ? "text-right"
                                         : "text-left"
                                     }`}
-                                    dir={i18n.language === "he" ? "rtl" : "ltr"}
+                                    // dir={i18n.language === "he" ? "rtl" : "ltr"}
                                     style={
                                       i18n.language === "he"
                                         ? {
@@ -4470,20 +4734,21 @@ export default function MyTripsNew() {
                               </div>
 
                               {/* Info Cards Grid */}
-                              <div className="grid grid-cols-3 gap-4">
+                              <div
+                                className="grid grid-cols-3 gap-4"
+                                dir={i18n.language === "he" ? "rtl" : "ltr"}
+                              >
                                 <div className="bg-blue-50 p-4 rounded-lg">
                                   <div
                                     className={`flex flex-col gap-2 ${
                                       i18n.language === "he"
-                                        ? "items-end"
+                                        ? ""
                                         : "items-start"
                                     }`}
                                   >
                                     <div
                                       className={`flex items-center gap-2 ${
-                                        i18n.language === "he"
-                                          ? "flex-row-reverse"
-                                          : ""
+                                        i18n.language === "he" ? "" : ""
                                       }`}
                                     >
                                       <Calendar
@@ -4530,15 +4795,13 @@ export default function MyTripsNew() {
                                   <div
                                     className={`flex flex-col gap-2 ${
                                       i18n.language === "he"
-                                        ? "items-end"
+                                        ? ""
                                         : "items-start"
                                     }`}
                                   >
                                     <div
                                       className={`flex items-center gap-2 ${
-                                        i18n.language === "he"
-                                          ? "flex-row-reverse"
-                                          : ""
+                                        i18n.language === "he" ? "" : ""
                                       }`}
                                     >
                                       {i18n.language === "he" ? (
@@ -4590,15 +4853,13 @@ export default function MyTripsNew() {
                                     <div
                                       className={`flex flex-col gap-2 ${
                                         i18n.language === "he"
-                                          ? "items-end"
+                                          ? ""
                                           : "items-start"
                                       }`}
                                     >
                                       <div
                                         className={`flex items-center gap-2 ${
-                                          i18n.language === "he"
-                                            ? "flex-row-reverse"
-                                            : ""
+                                          i18n.language === "he" ? "" : ""
                                         }`}
                                       >
                                         <Calendar
@@ -4665,9 +4926,12 @@ export default function MyTripsNew() {
                                       <div
                                         className={`flex flex-col gap-3 md:flex-row md:flex-wrap md:gap-6 ${
                                           i18n.language === "he"
-                                            ? "md:flex-row-reverse"
-                                            : ""
+                                            ? "md:flex-row-reverse md:justify-end"
+                                            : "md:justify-start"
                                         }`}
+                                        dir={
+                                          i18n.language === "he" ? "rtl" : "ltr"
+                                        }
                                       >
                                         {translatedHighlights.map(
                                           (highlight, idx) => (
@@ -4703,9 +4967,7 @@ export default function MyTripsNew() {
                                 <div>
                                   <div
                                     className={`flex items-center gap-2 mb-3 ${
-                                      i18n.language === "he"
-                                        ? "flex-row-reverse"
-                                        : ""
+                                      i18n.language === "he" ? "" : ""
                                     }`}
                                   >
                                     <Star className="w-4 h-4 text-yellow-600" />
@@ -4722,9 +4984,10 @@ export default function MyTripsNew() {
                                   <div
                                     className={`flex flex-wrap gap-2 ${
                                       i18n.language === "he"
-                                        ? "justify-end"
-                                        : ""
+                                        ? ""
+                                        : "justify-start"
                                     }`}
+                                    dir={i18n.language === "he" ? "rtl" : "ltr"}
                                   >
                                     {(() => {
                                       // Handle both string and array formats
@@ -4776,6 +5039,7 @@ export default function MyTripsNew() {
                                     ? "flex-row-reverse"
                                     : ""
                                 }`}
+                                dir={i18n.language === "he" ? "rtl" : "ltr"}
                               >
                                 {(() => {
                                   // Check if there's an existing itinerary for this trip
@@ -4799,16 +5063,21 @@ export default function MyTripsNew() {
                                       >
                                         <Link
                                           href={`/itineraries/${existingItinerary.id}`}
+                                          className={
+                                            i18n.language === "he"
+                                              ? "flex flex-row-reverse items-center"
+                                              : "flex items-center"
+                                          }
                                         >
                                           {i18n.language === "he" ? (
                                             <>
-                                              צפה במסלול היומי
-                                              <Calendar className="w-4 h-4 mr-2" />
+                                              <span>צפה במסלול היומי</span>
+                                              <Calendar className="w-4 h-4 ml-2" />
                                             </>
                                           ) : (
                                             <>
                                               <Calendar className="w-4 h-4 mr-2" />
-                                              View Daily Itinerary
+                                              <span>View Daily Itinerary</span>
                                             </>
                                           )}
                                         </Link>
@@ -4819,7 +5088,6 @@ export default function MyTripsNew() {
                                     return (
                                       <Button
                                         variant="outline"
-                                        className="flex-1 bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 border-orange-200"
                                         onClick={async () => {
                                           // Convert saved trip to suggestion format
                                           const suggestion = {
@@ -4861,27 +5129,39 @@ export default function MyTripsNew() {
                                         }}
                                         disabled={isGeneratingItinerary}
                                         data-testid={`button-generate-itinerary-${trip.id}`}
+                                        className={`flex-1 bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 border-orange-200 ${
+                                          i18n.language === "he"
+                                            ? "flex-row-reverse"
+                                            : ""
+                                        }`}
                                       >
-                                        {isGeneratingItinerary ? (
-                                          <Loader2
-                                            className={`w-4 h-4 animate-spin ${
-                                              i18n.language === "he"
-                                                ? "ml-2"
-                                                : "mr-2"
-                                            }`}
-                                          />
+                                        {i18n.language === "he" ? (
+                                          <>
+                                            <span>
+                                              {isGeneratingItinerary
+                                                ? "יוצר מסלול..."
+                                                : "צור מסלול יומי"}
+                                            </span>
+                                            {isGeneratingItinerary ? (
+                                              <Loader2 className="w-4 h-4 animate-spin ml-2" />
+                                            ) : (
+                                              <Calendar className="w-4 h-4 ml-2" />
+                                            )}
+                                          </>
                                         ) : (
-                                          <Calendar
-                                            className={`w-4 h-4 ${
-                                              i18n.language === "he"
-                                                ? "ml-2"
-                                                : "mr-2"
-                                            }`}
-                                          />
+                                          <>
+                                            {isGeneratingItinerary ? (
+                                              <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                            ) : (
+                                              <Calendar className="w-4 h-4 mr-2" />
+                                            )}
+                                            <span>
+                                              {t(
+                                                "trips.generate_daily_itinerary"
+                                              )}
+                                            </span>
+                                          </>
                                         )}
-                                        {i18n.language === "he"
-                                          ? "צור מסלול יומי"
-                                          : t("trips.generate_daily_itinerary")}
                                       </Button>
                                     );
                                   }
@@ -4891,23 +5171,34 @@ export default function MyTripsNew() {
                                   className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
                                   data-testid={`button-book-flight-${trip.id}`}
                                 >
-                                  <Link href="/flights">
+                                  <Link
+                                    href="/flights"
+                                    className={
+                                      i18n.language === "he"
+                                        ? "flex flex-row-reverse items-center"
+                                        : "flex items-center"
+                                    }
+                                  >
                                     {i18n.language === "he" ? (
                                       <>
-                                        סגור טיסה
-                                        <Plane className="w-4 h-4 mr-2" />
+                                        <span>סגור טיסה</span>
+                                        <Plane className="w-4 h-4 ml-2" />
                                       </>
                                     ) : (
                                       <>
                                         <Plane className="w-4 h-4 mr-2" />
-                                        Book Flight
+                                        <span>Book Flight</span>
                                       </>
                                     )}
                                   </Link>
                                 </Button>
                                 <Button
                                   variant="outline"
-                                  className="border-red-200 hover:bg-red-50 hover:border-red-300 text-red-600"
+                                  className={`border-red-200 hover:bg-red-50 hover:border-red-300 text-red-600 ${
+                                    i18n.language === "he"
+                                      ? "flex-row-reverse"
+                                      : ""
+                                  }`}
                                   onClick={() => {
                                     if (
                                       confirm(
@@ -4921,20 +5212,25 @@ export default function MyTripsNew() {
                                   disabled={deleteTripMutation.isPending}
                                   data-testid={`button-delete-trip-${trip.id}`}
                                 >
-                                  {deleteTripMutation.isPending ? (
-                                    <Loader2
-                                      className={`w-4 h-4 animate-spin ${
-                                        i18n.language === "he" ? "ml-2" : "mr-2"
-                                      }`}
-                                    />
+                                  {i18n.language === "he" ? (
+                                    <>
+                                      <span>{t("common.delete")}</span>
+                                      {deleteTripMutation.isPending ? (
+                                        <Loader2 className="w-4 h-4 animate-spin ml-2" />
+                                      ) : (
+                                        <Trash2 className="w-4 h-4 ml-2" />
+                                      )}
+                                    </>
                                   ) : (
-                                    <Trash2
-                                      className={`w-4 h-4 ${
-                                        i18n.language === "he" ? "ml-2" : "mr-2"
-                                      }`}
-                                    />
+                                    <>
+                                      {deleteTripMutation.isPending ? (
+                                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                      ) : (
+                                        <Trash2 className="w-4 h-4 mr-2" />
+                                      )}
+                                      <span>{t("common.delete")}</span>
+                                    </>
                                   )}
-                                  {t("common.delete")}
                                 </Button>
                               </div>
                             </div>
