@@ -251,7 +251,7 @@ export default function JourneysPage() {
                 : "Multi-Destination Journeys"}
             </h1>
           </div>
-          <div className="flex justify-start">
+          <div className={`flex ${isRTL ? "justify-end" : "justify-start"}`}>
             <p
               className={`text-xl opacity-90 mt-4 ${
                 isRTL ? "text-right" : "text-left"
@@ -274,14 +274,14 @@ export default function JourneysPage() {
               {/* Season Filter */}
               <div>
                 <label
-                  className="block text-sm font-medium mb-2 text-left"
+                  className={`block text-sm font-medium mb-2 ${isRTL ? "text-right" : "text-left"}`}
                   dir={isRTL ? "rtl" : "ltr"}
                 >
                   {isRTL ? "עונה" : "Season"}
                 </label>
                 <Select
                   value={filters.season}
-                  onValueChange={(val) =>
+                  onValueChange={(val: string) =>
                     setFilters((prev) => ({ ...prev, season: val }))
                   }
                 >
@@ -331,7 +331,7 @@ export default function JourneysPage() {
               {/* Budget Filter */}
               <div className="md:col-span-2">
                 <label
-                  className="block text-sm font-medium mb-2 text-left"
+                  className={`block text-sm font-medium mb-2 ${isRTL ? "text-right" : "text-left"}`}
                   dir={isRTL ? "rtl" : "ltr"}
                 >
                   {isRTL ? "תקציב" : "Budget"}:{" "}
@@ -357,7 +357,7 @@ export default function JourneysPage() {
                   min={0}
                   max={10000}
                   step={100}
-                  onValueChange={([min, max]) =>
+                  onValueChange={([min, max]: number[]) =>
                     setFilters((prev) => ({
                       ...prev,
                       minBudget: min,
@@ -389,14 +389,14 @@ export default function JourneysPage() {
             <div className="mt-6" dir={isRTL ? "rtl" : "ltr"}>
               <label
                 className={`block text-sm font-medium mb-3 ${
-                  isRTL ? "text-left" : "text-left"
+                  isRTL ? "text-right" : "text-left"
                 }`}
               >
                 {isRTL ? "תגיות" : "Tags"}
               </label>
               <div
                 className={`flex flex-wrap gap-2 ${
-                  isRTL ? "justify-start" : "justify-start"
+                  isRTL ? "justify-end" : "justify-start"
                 }`}
               >
                 {tagFilters.map((tag) => (
@@ -450,7 +450,7 @@ export default function JourneysPage() {
                       alt={journey.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1">
+                    <div className={`absolute top-4 ${isRTL ? "left-4" : "right-4"} bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1`}>
                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                       <span className="text-sm font-semibold">
                         {journey.rating.toFixed(1)}
@@ -460,7 +460,7 @@ export default function JourneysPage() {
 
                   <CardContent className="p-6 flex-1 flex flex-col">
                     <h3
-                      className="text-xl font-bold mb-2"
+                      className={`text-xl font-bold mb-2 ${isRTL ? "text-right" : "text-left"}`}
                       dir={isRTL ? "rtl" : "ltr"}
                     >
                       {translateJourneyTitle(journey.title)}
@@ -469,7 +469,7 @@ export default function JourneysPage() {
                     {/* Destination Chain */}
                     <div
                       className={`flex items-center gap-2 mb-3 text-orange-600 font-medium ${
-                        isRTL ? "flex-row-reverse justify-end" : ""
+                        isRTL ? "flex-row-reverse justify-end" : "justify-start"
                       }`}
                     >
                       <MapPin className="w-4 h-4 flex-shrink-0" />
@@ -479,7 +479,7 @@ export default function JourneysPage() {
                     </div>
 
                     {/* Stats */}
-                    <div className="flex gap-4 mb-4 text-sm text-gray-600">
+                    <div className={`flex gap-4 mb-4 text-sm text-gray-600 ${isRTL ? "flex-row-reverse justify-end" : "justify-start"}`}>
                       <div
                         className={`flex items-center gap-1 ${
                           isRTL ? "flex-row-reverse" : ""
@@ -490,7 +490,7 @@ export default function JourneysPage() {
                           {formatDuration(journey.totalNights)}
                         </span>
                       </div>
-                      <div className="flex flex-col">
+                      <div className={`flex flex-col ${isRTL ? "items-end" : "items-start"}`}>
                         <div
                           className={`flex items-center gap-1 ${
                             isRTL ? "flex-row-reverse" : ""
@@ -511,7 +511,7 @@ export default function JourneysPage() {
                           </span>
                         </div>
                         <span
-                          className="text-xs text-gray-500 mt-0.5"
+                          className={`text-xs text-gray-500 mt-0.5 ${isRTL ? "text-right" : "text-left"}`}
                           dir={isRTL ? "rtl" : "ltr"}
                         >
                           {isRTL
@@ -524,7 +524,7 @@ export default function JourneysPage() {
                     {/* Audience Tags */}
                     <div
                       className={`flex flex-wrap gap-2 mb-4 ${
-                        isRTL ? "flex-row-reverse justify-end" : ""
+                        isRTL ? "flex-row-reverse justify-end" : "justify-start"
                       }`}
                     >
                       {journey.audienceTags?.slice(0, 3).map((tag) => (
@@ -540,14 +540,14 @@ export default function JourneysPage() {
                     </div>
 
                     <Button
-                      className="w-full mt-auto bg-orange-500 hover:bg-orange-600"
+                      className={`w-full mt-auto bg-orange-500 hover:bg-orange-600 ${isRTL ? "flex-row-reverse" : ""}`}
                       data-testid={`view-journey-${journey.id}`}
                     >
                       <span dir={isRTL ? "rtl" : "ltr"}>
                         {isRTL ? "הצג מסלול" : "View Journey"}
                       </span>
                       <ArrowLeft
-                        className={`w-4 h-4 ${isRTL ? "mr-2" : "ml-2"}`}
+                        className={`w-4 h-4 ${isRTL ? "mr-2 rotate-180" : "ml-2"}`}
                       />
                     </Button>
                   </CardContent>
