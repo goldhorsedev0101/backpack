@@ -163,7 +163,9 @@
 }
 
 /* Margin and padding adjustments */
-[dir="rtl"] .mr-3 {
+/* DISABLED: These auto-flips conflict with conditional classes in components */
+/* We now handle margins conditionally in components using isHebrew/isRTL checks */
+/* [dir="rtl"] .mr-3 {
   margin-right: 0;
   margin-left: 0.75rem;
 }
@@ -191,16 +193,18 @@
 [dir="rtl"] .ml-1 {
   margin-left: 0;
   margin-right: 0.25rem;
-}
+} */
 
 /* Flex direction adjustments */
-[dir="rtl"] .justify-start {
+/* DISABLED: These auto-flips conflict with conditional classes in components */
+/* We now handle justification conditionally in components using isHebrew/isRTL checks */
+/* [dir="rtl"] .justify-start {
   justify-content: flex-end;
 }
 
 [dir="rtl"] .justify-end {
   justify-content: flex-start;
-}
+} */
 
 /* Border adjustments */
 [dir="rtl"] .border-l {
@@ -299,9 +303,10 @@ textarea.ltr-field:-ms-input-placeholder,
 }
 
 /* Button text alignment */
-[dir="rtl"] .justify-start {
+/* DISABLED: Conflicts with conditional classes in components */
+/* [dir="rtl"] .justify-start {
   text-align: right;
-}
+} */
 
 /* Grid and layout adjustments */
 [dir="rtl"] .grid {
@@ -337,13 +342,14 @@ textarea.ltr-field:-ms-input-placeholder,
 }
 
 /* Flex container adjustments */
-[dir="rtl"] .flex.justify-start {
+/* DISABLED: Conflicts with conditional classes in components */
+/* [dir="rtl"] .flex.justify-start {
   justify-content: flex-end;
 }
 
 [dir="rtl"] .flex.justify-end {
   justify-content: flex-start;
-}
+} */
 
 /* Specific mobile navigation fixes */
 [dir="rtl"] .md\\:hidden .flex.justify-between {
