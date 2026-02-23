@@ -8,6 +8,7 @@
  * This file is a placeholder for reference only.
  */
 
+
 export default function HotelDealsPage() {
   return (
     <div>
